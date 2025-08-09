@@ -99,9 +99,20 @@ check_goreleaser_config() {
         else
             log_error "GoReleaser validation failed: $file"
             goreleaser check --config "$file" 2>&1 | head -20
+            return 1
         fi
     else
         log_warning "goreleaser not installed, skipping native validation"
+        return 0
+    fi
+    
+    # Test snapshot build if config validates
+    log_info "Testing snapshot build for $file..."
+    if goreleaser build --snapshot --single-target --config "$file" --clean > /dev/null 2>&1; then
+        log_success "Snapshot build test passed: $file"
+    else
+        log_error "Snapshot build test failed: $file"
+        return 1
     fi
 }
 
@@ -141,6 +152,33 @@ check_project_structure() {
         log_warning "go.mod not found"
     fi
     
+    # Check for LICENSE file
+    if [[ -f "LICENSE" ]]; then
+        log_success "LICENSE file exists"
+        
+        # Check LICENSE file size (should not be empty)
+        local license_size=$(wc -c < "LICENSE" 2>/dev/null || echo "0")
+        if [[ $license_size -gt 100 ]]; then
+            log_success "LICENSE file has content ($license_size bytes)"
+        else
+            log_warning "LICENSE file seems too small: $license_size bytes"
+        fi
+    else
+        log_warning "No LICENSE file found"
+    fi
+    
+    # Check for license generation script
+    if [[ -f "scripts/generate-license.sh" ]]; then
+        log_success "License generation script exists"
+        if [[ -x "scripts/generate-license.sh" ]]; then
+            log_success "License script is executable"
+        else
+            log_warning "License script is not executable"
+        fi
+    else
+        log_warning "License generation script not found"
+    fi
+    
     # Check for Dockerfile if Docker is configured
     if grep -q "dockers:" "$GORELEASER_FILE" 2>/dev/null || grep -q "dockers:" "$GORELEASER_PRO_FILE" 2>/dev/null; then
         if [[ -f "Dockerfile" ]]; then
@@ -148,6 +186,19 @@ check_project_structure() {
         else
             log_warning "Dockerfile not found but Docker is configured"
         fi
+    fi
+    
+    # Check for assets/licenses directory
+    if [[ -d "assets/licenses" ]]; then
+        log_success "License templates directory exists"
+        local template_count=$(find assets/licenses -name "*.template" | wc -l)
+        if [[ $template_count -gt 0 ]]; then
+            log_success "Found $template_count license templates"
+        else
+            log_warning "No license templates found in assets/licenses"
+        fi
+    else
+        log_warning "License templates directory not found"
     fi
 }
 
@@ -234,6 +285,59 @@ check_git_state() {
     fi
 }
 
+test_license_system() {
+    log_info "Testing license generation system..."
+    
+    if [[ -f "scripts/generate-license.sh" ]] && [[ -x "scripts/generate-license.sh" ]]; then
+        # Test license script help
+        if ./scripts/generate-license.sh --help >/dev/null 2>&1; then
+            log_success "License script help works"
+        else
+            log_warning "License script help failed"
+        fi
+        
+        # Test license templates listing
+        if ./scripts/generate-license.sh --list >/dev/null 2>&1; then
+            log_success "License templates listing works"
+        else
+            log_warning "License templates listing failed"
+        fi
+        
+        # Test license generation (if readme config exists)
+        if [[ -f ".readme/configs/readme-config.yaml" ]]; then
+            # Backup existing LICENSE
+            local backup_license=""
+            if [[ -f "LICENSE" ]]; then
+                backup_license=$(mktemp)
+                cp LICENSE "$backup_license"
+            fi
+            
+            # Test license generation
+            if ./scripts/generate-license.sh >/dev/null 2>&1; then
+                log_success "License generation test passed"
+                
+                # Restore backup if we made one
+                if [[ -n "$backup_license" ]] && [[ -f "$backup_license" ]]; then
+                    cp "$backup_license" LICENSE
+                    rm -f "$backup_license"
+                fi
+            else
+                log_warning "License generation test failed"
+                
+                # Restore backup if we made one
+                if [[ -n "$backup_license" ]] && [[ -f "$backup_license" ]]; then
+                    cp "$backup_license" LICENSE
+                    rm -f "$backup_license"
+                fi
+            fi
+        else
+            log_warning "No readme config found, skipping license generation test"
+        fi
+    else
+        log_warning "License generation script not found or not executable"
+    fi
+}
+
 run_dry_run() {
     log_info "Running GoReleaser dry-run..."
     
@@ -298,6 +402,10 @@ main() {
     
     # Check Git state
     check_git_state
+    echo
+    
+    # Test license system
+    test_license_system
     echo
     
     # Validate templates
