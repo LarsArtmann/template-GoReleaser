@@ -1,0 +1,29 @@
+version: "1.0"
+generated: 2025-08-09T20:36:00.000000+01:00
+project:
+    name: template-GoReleaser
+    description: Comprehensive GoReleaser template for Go projects with free and pro versions
+    type: library
+    language: go
+    keywords:
+        - go
+        - goreleaser
+        - release
+        - automation
+        - template
+        - ci-cd
+    repository:
+        url: "https://github.com/LarsArtmann/template-GoReleaser"
+        owner: "LarsArtmann"
+        name: "template-GoReleaser"
+        branch: main
+    contact:
+        name: Lars Artmann
+    license:
+        type: MIT
+        file: LICENSE
+template:
+    type: intermediate
+    variant: default
+    include_toc: true
+    toc_depth: 3
