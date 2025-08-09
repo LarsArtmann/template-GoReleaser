@@ -4,14 +4,12 @@
 # Build stage
 FROM golang:1.23-alpine AS builder
 
-# Install build dependencies
+# Install build dependencies with specific versions for security
 RUN apk add --no-cache \
-    git \
-    ca-certificates \
-    tzdata
-
-# Create non-root user
-RUN adduser -D -g '' appuser
+    git=~2.45 \
+    ca-certificates=~20240226 \
+    tzdata=~2024a && \
+    adduser -D -g '' appuser
 
 # Set working directory
 WORKDIR /build

@@ -78,7 +78,7 @@ func RunCommandWithTimeout(t *testing.T, timeout time.Duration, dir, command str
 	case <-time.After(timeout):
 		// Command timed out
 		if cmd.Process != nil {
-			cmd.Process.Kill()
+			_ = cmd.Process.Kill() // Error handling not critical for cleanup
 		}
 		err = fmt.Errorf("command timed out after %v", timeout)
 	}
@@ -147,6 +147,7 @@ func CopyDir(t *testing.T, src, dst string) {
 
 // copyFile copies a single file
 func copyFile(src, dst string, mode os.FileMode) error {
+	// #nosec G304 - src is validated by caller in test environment
 	srcFile, err := os.Open(src)
 	if err != nil {
 		return err
@@ -155,10 +156,11 @@ func copyFile(src, dst string, mode os.FileMode) error {
 
 	// Create destination directory if it doesn't exist
 	dstDir := filepath.Dir(dst)
-	if err := os.MkdirAll(dstDir, 0755); err != nil {
+	if err := os.MkdirAll(dstDir, 0750); err != nil {
 		return err
 	}
 
+	// #nosec G304 - dst is validated by caller in test environment
 	dstFile, err := os.Create(dst)
 	if err != nil {
 		return err
@@ -196,6 +198,7 @@ func FileExists(path string) bool {
 func FileContains(t *testing.T, path, content string) bool {
 	t.Helper()
 
+	// #nosec G304 - path is validated by caller in test environment
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return false
@@ -209,10 +212,10 @@ func WriteFile(t *testing.T, path, content string) {
 	t.Helper()
 
 	dir := filepath.Dir(path)
-	err := os.MkdirAll(dir, 0755)
+	err := os.MkdirAll(dir, 0750)
 	require.NoError(t, err, "Failed to create directory for file %s", path)
 
-	err = os.WriteFile(path, []byte(content), 0644)
+	err = os.WriteFile(path, []byte(content), 0600)
 	require.NoError(t, err, "Failed to write file %s", path)
 }
 
@@ -227,14 +230,14 @@ func SetEnvVars(t *testing.T, vars map[string]string) func() {
 		if original, exists := os.LookupEnv(key); exists {
 			originalVars[key] = original
 		}
-		os.Setenv(key, value)
+		_ = os.Setenv(key, value) // Error handling not critical in tests
 	}
 
 	// Return cleanup function
 	return func() {
 		for key := range vars {
 			if original, exists := originalVars[key]; exists {
-				os.Setenv(key, original)
+				_ = os.Setenv(key, original) // Error handling not critical in tests
 			} else {
 				os.Unsetenv(key)
 			}

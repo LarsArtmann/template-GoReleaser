@@ -363,6 +363,78 @@ test_license_system() {
     fi
 }
 
+run_security_validation() {
+    log_info "Running security validation..."
+    
+    # Go code security scan
+    if command -v gosec &> /dev/null; then
+        log_info "Scanning Go code with gosec..."
+        if gosec -quiet ./... 2>/dev/null; then
+            log_success "Go code security scan passed"
+        else
+            log_error "Go code security issues found"
+        fi
+    else
+        log_warning "gosec not installed, skipping Go security scan"
+    fi
+    
+    # Dependency vulnerability scan
+    if command -v govulncheck &> /dev/null; then
+        log_info "Checking dependencies for vulnerabilities..."
+        if govulncheck ./... 2>/dev/null | grep -q "No vulnerabilities found"; then
+            log_success "No vulnerable dependencies found"
+        else
+            log_warning "Vulnerable dependencies or scan issues detected"
+        fi
+    else
+        log_warning "govulncheck not installed, skipping dependency vulnerability scan"
+    fi
+    
+    # Shell script security scan
+    if command -v shellcheck &> /dev/null; then
+        log_info "Scanning shell scripts..."
+        local shell_issues=0
+        for script in *.sh scripts/*.sh; do
+            if [[ -f "$script" ]]; then
+                if ! shellcheck --severity=error "$script" 2>/dev/null; then
+                    shell_issues=$((shell_issues + 1))
+                fi
+            fi
+        done
+        if [[ $shell_issues -eq 0 ]]; then
+            log_success "Shell script security scan passed"
+        else
+            log_error "Shell script security issues found in $shell_issues files"
+        fi
+    else
+        log_warning "shellcheck not installed, skipping shell script scan"
+    fi
+    
+    # Dockerfile security scan
+    if [[ -f "Dockerfile" ]]; then
+        if command -v hadolint &> /dev/null; then
+            log_info "Scanning Dockerfile..."
+            if hadolint Dockerfile 2>/dev/null; then
+                log_success "Dockerfile security scan passed"
+            else
+                log_error "Dockerfile security issues found"
+            fi
+        else
+            log_warning "hadolint not installed, skipping Dockerfile scan"
+        fi
+    fi
+    
+    # Check for hardcoded secrets
+    log_info "Checking for hardcoded secrets..."
+    local secret_count=$(grep -r -i --exclude-dir=.git --exclude-dir=dist --exclude-dir=vendor \
+        -E "(password|secret|token|key)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{8,}" . 2>/dev/null | wc -l || echo 0)
+    if [[ $secret_count -eq 0 ]]; then
+        log_success "No hardcoded secrets detected"
+    else
+        log_error "Potential hardcoded secrets found: $secret_count matches"
+    fi
+}
+
 run_dry_run() {
     log_info "Running GoReleaser dry-run..."
     
@@ -438,6 +510,10 @@ main() {
     validate_templates
     CURRENT_FILE=$GORELEASER_PRO_FILE
     validate_templates
+    echo
+    
+    # Run security validation
+    run_security_validation
     echo
     
     # Try dry-run

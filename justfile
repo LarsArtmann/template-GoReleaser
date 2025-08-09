@@ -186,9 +186,16 @@ install-tools:
     go install github.com/goreleaser/goreleaser/v2@latest
     go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
     go install github.com/securego/gosec/v2/cmd/gosec@latest
+    go install golang.org/x/vuln/cmd/govulncheck@latest
     go install github.com/sigstore/cosign/v2/cmd/cosign@latest
     go install github.com/anchore/syft/cmd/syft@latest
     go install github.com/a-h/templ/cmd/templ@latest
+    @echo "Installing security scanning tools via Homebrew..."
+    @if command -v brew >/dev/null 2>&1; then \
+        brew install shellcheck hadolint trivy; \
+    else \
+        echo "⚠ Homebrew not found. Please install shellcheck, hadolint, and trivy manually"; \
+    fi
     @echo "✓ All tools installed"
 
 # Setup environment from example
@@ -230,17 +237,34 @@ changelog:
     git log --pretty=format:"* %s (%h)" > CHANGELOG.md
     @echo "✓ Changelog generated"
 
-# Run security scan
+# Run comprehensive security scan
 security-scan:
-    @echo "Running security scan..."
+    @echo "Running comprehensive security scan..."
+    @echo "1. Scanning Go code with gosec..."
     gosec ./... || echo "⚠ Security issues found in code"
+    @echo "2. Scanning dependencies with govulncheck..."
+    govulncheck ./... || echo "⚠ Vulnerable dependencies found"
+    @if command -v shellcheck >/dev/null 2>&1; then \
+        echo "3. Scanning shell scripts with shellcheck..."; \
+        find . -name "*.sh" -exec shellcheck --severity=error --format=gcc {} \; || echo "⚠ Shell script issues found"; \
+    else \
+        echo "⚠ shellcheck not found. Install with: brew install shellcheck"; \
+    fi
+    @if [ -f Dockerfile ]; then \
+        if command -v hadolint >/dev/null 2>&1; then \
+            echo "4. Scanning Dockerfile with hadolint..."; \
+            hadolint Dockerfile || echo "⚠ Dockerfile issues found"; \
+        else \
+            echo "⚠ hadolint not found. Install with: brew install hadolint"; \
+        fi; \
+    fi
     @if command -v trivy >/dev/null 2>&1; then \
-        echo "Running Trivy filesystem scan..."; \
-        trivy fs . || true; \
+        echo "5. Running Trivy filesystem scan..."; \
+        trivy fs . --security-checks vuln,config,secret || echo "⚠ Trivy found issues"; \
     else \
         echo "⚠ Trivy not found. Install with: brew install trivy"; \
     fi
-    @echo "✓ Security scan complete"
+    @echo "✓ Comprehensive security scan complete"
 
 # Update dependencies
 update-deps:
@@ -277,9 +301,9 @@ watch:
         just build; \
     fi
 
-# Complete CI pipeline
-ci: clean init fmt lint test-all-coverage validate build snapshot
-    @echo "✓ CI pipeline complete"
+# Complete CI pipeline with security scanning
+ci: clean init fmt lint security-scan test-all-coverage validate build snapshot
+    @echo "✓ CI pipeline complete with security validation"
 
 # Integration testing pipeline
 integration-ci: clean init fmt lint integration-test-coverage validate
