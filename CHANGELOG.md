@@ -1,0 +1,7 @@
+* fix: critical GitHub Actions workflow issues (f08ea45)
+* feat: Enhance verification system with comprehensive validation (e8c75de)
+* feat: Fix and optimize GoReleaser configurations (017f382)
+* feat: Complete license system dogfooding with EUPL-1.2 (93f0b89)
+* feat: Add automated license generation system (79f93c8)
+* feat: Add comprehensive README.md and fix readme-generator configuration (dc70cf0)
+* feat: Create comprehensive GoReleaser template with free and pro versions (63b61df)

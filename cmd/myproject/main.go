@@ -8,12 +8,12 @@ import (
 )
 
 var (
-	version      = "dev"
-	commit       = "none"
-	date         = "unknown"
-	builtBy      = "unknown"
+	version        = "dev"
+	commit         = "none"
+	date           = "unknown"
+	builtBy        = "unknown"
 	gitDescription = ""
-	gitState     = ""
+	gitState       = ""
 )
 
 func main() {
@@ -21,19 +21,19 @@ func main() {
 		versionFlag = flag.Bool("version", false, "Print version information")
 		healthFlag  = flag.Bool("health", false, "Health check")
 	)
-	
+
 	flag.Parse()
-	
+
 	if *versionFlag {
 		printVersion()
 		os.Exit(0)
 	}
-	
+
 	if *healthFlag {
 		fmt.Println("OK")
 		os.Exit(0)
 	}
-	
+
 	fmt.Println("Hello from GoReleaser Template!")
 	fmt.Printf("Version: %s\n", version)
 }
@@ -45,11 +45,11 @@ func printVersion() {
 	fmt.Printf("Built by:     %s\n", builtBy)
 	fmt.Printf("Go version:   %s\n", runtime.Version())
 	fmt.Printf("OS/Arch:      %s/%s\n", runtime.GOOS, runtime.GOARCH)
-	
+
 	if gitDescription != "" {
 		fmt.Printf("Git describe: %s\n", gitDescription)
 	}
-	
+
 	if gitState != "" {
 		fmt.Printf("Git state:    %s\n", gitState)
 	}

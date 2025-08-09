@@ -35,6 +35,33 @@ test-coverage: test
     go tool cover -html=coverage.out -o coverage.html
     @echo "✓ Coverage report generated: coverage.html"
 
+# Run integration tests
+integration-test:
+    @echo "Running integration tests..."
+    go test -v -race -timeout=20m -coverprofile=integration-coverage.out -coverpkg=./... ./tests/integration/...
+    @echo "✓ Integration tests complete"
+
+# Run integration tests with coverage report
+integration-test-coverage: integration-test
+    @echo "Generating integration test coverage report..."
+    go tool cover -html=integration-coverage.out -o integration-coverage.html
+    go tool cover -func=integration-coverage.out
+    @echo "✓ Integration test coverage report generated: integration-coverage.html"
+
+# Run all tests (unit + integration)
+test-all:
+    @echo "Running all tests..."
+    just test
+    just integration-test
+    @echo "✓ All tests complete"
+
+# Run all tests with coverage
+test-all-coverage:
+    @echo "Running all tests with coverage..."
+    just test-coverage
+    just integration-test-coverage
+    @echo "✓ All tests with coverage complete"
+
 # Run linters
 lint:
     @echo "Running linters..."
@@ -55,6 +82,7 @@ clean:
     rm -rf dist/ build/ bin/
     rm -f myproject *.exe
     rm -f coverage.out coverage.html
+    rm -f integration-coverage.out integration-coverage.html
     rm -f validation-report.json
     @echo "✓ Clean complete"
 
@@ -250,8 +278,12 @@ watch:
     fi
 
 # Complete CI pipeline
-ci: clean init fmt lint test validate build snapshot
+ci: clean init fmt lint test-all-coverage validate build snapshot
     @echo "✓ CI pipeline complete"
+
+# Integration testing pipeline
+integration-ci: clean init fmt lint integration-test-coverage validate
+    @echo "✓ Integration CI pipeline complete"
 
 # Help - show all available commands
 help:
@@ -264,6 +296,13 @@ help:
     @echo "  2. Edit .env with your configuration"
     @echo "  3. Run 'just install-tools' to install development tools"
     @echo "  4. Run 'just validate' to check configuration"
+    @echo ""
+    @echo "Testing:"
+    @echo "  - 'just test' for unit tests"
+    @echo "  - 'just integration-test' for integration tests"
+    @echo "  - 'just test-all' for all tests"
+    @echo "  - 'just test-all-coverage' for all tests with coverage"
+    @echo "  - 'just integration-ci' for integration testing pipeline"
     @echo ""
     @echo "Release Process:"
     @echo "  1. Run 'just ci' to verify everything"

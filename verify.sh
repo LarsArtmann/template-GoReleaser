@@ -120,18 +120,43 @@ check_required_env_vars() {
     local file=$1
     log_info "Checking environment variables in $file..."
     
-    # Extract env var references
-    local env_vars=$(grep -oE '\{\{\.Env\.[A-Z_]+\}\}' "$file" 2>/dev/null | sed 's/{{\.Env\.\([^}]*\)}}/\1/' | sort -u)
+    # Extract env var references with correct pattern
+    local env_vars=$(grep -oE '\{\{ \.Env\.[A-Z_]+ \}\}' "$file" 2>/dev/null | sed 's/{{ \.Env\.\([A-Z_]*\) }}/\1/' | sort -u)
     
     if [[ -n "$env_vars" ]]; then
-        echo "Required environment variables:"
+        echo "Environment variables in $file:"
+        local critical_missing=()
         for var in $env_vars; do
             if [[ -n "${!var:-}" ]]; then
-                log_success "$var is set"
+                # Basic validation for common patterns
+                local value="${!var}"
+                if [[ "$value" =~ ^(your-|xxxx|example|changeme|todo) ]] || [[ ${#value} -lt 3 ]]; then
+                    log_warning "$var is set but appears to be a placeholder"
+                else
+                    log_success "$var is set"
+                fi
             else
                 log_warning "$var is not set"
+                # Check if this is a critical variable
+                case "$var" in
+                    GITHUB_TOKEN|GITHUB_OWNER|GITHUB_REPO)
+                        critical_missing+=("$var")
+                        ;;
+                esac
             fi
         done
+        
+        if [[ ${#critical_missing[@]} -gt 0 ]]; then
+            echo
+            log_error "Critical environment variables missing:"
+            for var in "${critical_missing[@]}"; do
+                echo "  - $var"
+            done
+            echo
+            echo "Set these variables or source a .env file before running GoReleaser"
+        fi
+    else
+        log_success "No environment variables required in $file"
     fi
 }
 

@@ -45,7 +45,7 @@ log_subheader() {
 
 log_check() {
     echo -ne "${BLUE}[CHECKING]${NC} $1... "
-    ((TOTAL_CHECKS++))
+    TOTAL_CHECKS=$((TOTAL_CHECKS + 1))
 }
 
 log_pass() {
@@ -56,14 +56,14 @@ log_pass() {
 log_fail() {
     echo -e "${RED}[FAIL]${NC} $2"
     VALIDATION_RESULTS["$1"]="FAIL"
-    ((FAILED_CHECKS++))
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
 }
 
 log_critical() {
     echo -e "${RED}[CRITICAL]${NC} $2"
     VALIDATION_RESULTS["$1"]="CRITICAL"
-    ((FAILED_CHECKS++))
-    ((CRITICAL_FAILURES++))
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+    CRITICAL_FAILURES=$((CRITICAL_FAILURES + 1))
 }
 
 # Validation functions
@@ -223,8 +223,8 @@ validate_environment_variables() {
     
     log_subheader "Environment Variables"
     
-    # Extract all environment variables
-    local env_vars=$(grep -oE '\{\{\.Env\.[A-Z_]+\}\}' "$file" 2>/dev/null | sed 's/{{\.Env\.\([^}]*\)}}/\1/' | sort -u)
+    # Extract all environment variables with correct pattern
+    local env_vars=$(grep -oE '\{\{ \.Env\.[A-Z_]+ \}\}' "$file" 2>/dev/null | sed 's/{{ \.Env\.\([A-Z_]*\) }}/\1/' | sort -u)
     
     if [[ -z "$env_vars" ]]; then
         log_check "Environment variables"
@@ -233,20 +233,78 @@ validate_environment_variables() {
     fi
     
     local missing_vars=()
+    local critical_vars=("GITHUB_TOKEN" "GITHUB_OWNER" "GITHUB_REPO")
+    local invalid_vars=()
+    
     for var in $env_vars; do
         log_check "Environment variable: $var"
         if [[ -n "${!var:-}" ]]; then
-            log_pass "$var"
+            local value="${!var}"
+            # Validate critical variables more strictly
+            local is_critical=false
+            for critical_var in "${critical_vars[@]}"; do
+                if [[ "$var" == "$critical_var" ]]; then
+                    is_critical=true
+                    break
+                fi
+            done
+            
+            # Check for placeholder values
+            if [[ "$value" =~ ^(your-|xxxx|example|changeme|todo) ]] || [[ ${#value} -lt 3 ]]; then
+                log_fail "$var" "Appears to be placeholder value"
+                invalid_vars+=("$var")
+            elif [[ "$is_critical" == true ]]; then
+                # Additional validation for critical vars
+                case "$var" in
+                    GITHUB_TOKEN)
+                        if [[ ! "$value" =~ ^(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{82})$ ]]; then
+                            log_fail "$var" "Invalid GitHub token format"
+                            invalid_vars+=("$var")
+                        else
+                            log_pass "$var"
+                        fi
+                        ;;
+                    GITHUB_OWNER|GITHUB_REPO)
+                        if [[ ! "$value" =~ ^[A-Za-z0-9._-]+$ ]]; then
+                            log_fail "$var" "Invalid format for GitHub owner/repo"
+                            invalid_vars+=("$var")
+                        else
+                            log_pass "$var"
+                        fi
+                        ;;
+                    *)
+                        log_pass "$var"
+                        ;;
+                esac
+            else
+                log_pass "$var"
+            fi
         else
-            log_fail "$var" "Not set"
+            if [[ " ${critical_vars[*]} " =~ " $var " ]]; then
+                log_critical "$var" "Critical variable not set"
+            else
+                log_fail "$var" "Not set"
+            fi
             missing_vars+=("$var")
         fi
     done
     
-    if [[ ${#missing_vars[@]} -gt 0 ]]; then
+    if [[ ${#missing_vars[@]} -gt 0 ]] || [[ ${#invalid_vars[@]} -gt 0 ]]; then
         echo
-        echo -e "${YELLOW}Missing environment variables:${NC}"
-        printf '%s\n' "${missing_vars[@]}" | sed 's/^/  - /'
+        if [[ ${#missing_vars[@]} -gt 0 ]]; then
+            echo -e "${YELLOW}Missing environment variables:${NC}"
+            printf '%s\n' "${missing_vars[@]}" | sed 's/^/  - /'
+        fi
+        if [[ ${#invalid_vars[@]} -gt 0 ]]; then
+            echo -e "${RED}Invalid environment variables:${NC}"
+            printf '%s\n' "${invalid_vars[@]}" | sed 's/^/  - /'
+        fi
+        echo
+        echo -e "${BLUE}Quick setup:${NC}"
+        echo "1. Copy .env.example to .env: cp .env.example .env"
+        echo "2. Edit .env with your values: editor .env"
+        echo "3. Source the file: source .env"
+        echo "4. Run validation again: ./validate-strict.sh"
     fi
 }
 

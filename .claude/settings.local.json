@@ -6,7 +6,12 @@
       "Bash(readme-generator generate:*)",
       "Bash(readme-generator:*)",
       "Bash(command -v:*)",
-      "Bash(./scripts/generate-license.sh:*)"
+      "Bash(./scripts/generate-license.sh:*)",
+      "Bash(bash:*)",
+      "Bash(./validate-env.sh)",
+      "Bash(hadolint:*)",
+      "Bash(shellcheck:*)",
+      "Bash(./validate-strict.sh:*)"
     ],
     "deny": []
   }
