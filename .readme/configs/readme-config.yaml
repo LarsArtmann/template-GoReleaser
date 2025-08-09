@@ -20,7 +20,7 @@ project:
     contact:
         name: Lars Artmann
     license:
-        type: MIT
+        type: EUPL-1.2
         file: LICENSE
 template:
     type: intermediate
