@@ -1,7 +1,6 @@
-# GoReleaser Template - Pro Version
+# GoReleaser Template - Pro Version (Simplified)
 # https://goreleaser.com/customization/
-# This is a comprehensive template for the Pro version of GoReleaser
-# Includes all Pro features: Docker manifests, signing, SBOM, packages, etc.
+# This is a simplified Pro template focusing on core Pro features
 
 # Configuration version
 version: 2
@@ -9,94 +8,50 @@ version: 2
 # Project configuration
 project_name: myproject
 
-# JSONSchema validation (Pro feature)
-# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
-
 # Build configurations
 before:
   hooks:
-    # Ensure go.mod is tidy
     - go mod tidy
-    # Generate code if needed
     - go generate ./...
-    # Generate templ files if using templ
-    - cmd: templ generate
-      output: true
-    # Generate TypeSpec files if using TypeSpec
-    - cmd: tsp compile ./typespec
-      output: true
-    # Run tests before build
     - go test -v ./...
-    # Run linters
-    - golangci-lint run
-    # Security scanning
-    - gosec ./...
 
 builds:
   - id: main
-    # Entry point - adjust to your main package location
     main: ./cmd/{{.ProjectName}}
-    
-    # Binary name
     binary: '{{.ProjectName}}'
     
-    # Build flags
     flags:
       - -trimpath
       - -v
     
-    # Compiler flags for optimization
-    gcflags:
-      - all=-N -l
-    
-    # Linker flags for smaller binaries and version injection
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
       - -X main.builtBy=goreleaser-pro
-      - -X main.gitDescription={{.Summary}}
-      - -X main.gitState={{.IsGitDirty}}
     
-    # Environment variables
     env:
       - CGO_ENABLED=0
     
-    # Target operating systems
     goos:
       - linux
       - darwin
       - windows
       - freebsd
       - openbsd
-      - netbsd
-      - dragonfly
-      - solaris
     
-    # Target architectures
     goarch:
       - amd64
       - arm64
       - arm
       - 386
-      - ppc64le
-      - s390x
-      - mips64le
       - riscv64
     
-    # ARM variants
     goarm:
-      - "5"
       - "6"
       - "7"
     
-    # MIPS variants
-    gomips:
-      - hardfloat
-      - softfloat
-    
-    # Ignore certain combinations
     ignore:
       - goos: darwin
         goarch: 386
@@ -104,26 +59,12 @@ builds:
         goarch: arm
       - goos: windows
         goarch: arm
-      - goos: freebsd
-        goarch: arm
-      - goos: openbsd
-        goarch: arm
     
-    # Module support
     mod_timestamp: '{{ .CommitTimestamp }}'
     
-    # Build tags
     tags:
       - netgo
       - osusergo
-      - static_build
-    
-    # Hooks
-    hooks:
-      post:
-        # UPX compression for smaller binaries
-        - cmd: upx -9 {{ .Path }}
-          output: true
 
 # Universal binaries for macOS
 universal_binaries:
@@ -132,27 +73,10 @@ universal_binaries:
       - main
     name_template: '{{.ProjectName}}'
     replace: true
-    
-    # Hooks for notarization
-    hooks:
-      post:
-        - cmd: xcrun notarytool submit {{ .Path }} --wait --keychain-profile "AC_PASSWORD"
-          output: true
-
-# UPX compression configuration (Pro feature)
-upx:
-  - enabled: true
-    compress: best
-    lzma: true
-    brute: true
-    goos: [linux, windows]
-    goarch: [amd64, arm64]
 
 # Archives configuration
 archives:
   - id: default
-    
-    # Archive name template
     name_template: >-
       {{ .ProjectName }}_
       {{- .Version }}_
@@ -162,12 +86,6 @@ archives:
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
     
-    # Use zip for Windows
-    format_overrides:
-      - goos: windows
-        format: zip
-    
-    # Files to include in the archive
     files:
       - LICENSE*
       - README*
@@ -175,34 +93,11 @@ archives:
       - docs/**/*
       - examples/**/*
       - scripts/**/*
-      - completions/**/*
-      - man/**/*
-    
-    # Archive format
-    format: tar.gz
-    
-    # Compression algorithm
-    compression: gzip
-    
-    # Additional files with templating
-    rlcp: true
-    
-    # Wrap in directory
-    wrap_in_directory: false
 
 # Checksum generation
 checksum:
   name_template: 'checksums.txt'
   algorithm: sha256
-  
-  # Split checksum files
-  split: false
-  
-  # Extra files to checksum
-  extra_files:
-    - glob: ./dist/*.sig
-    - glob: ./dist/*.sbom.json
-    - glob: ./dist/*.sbom.spdx.json
 
 # Signing configuration (Pro feature)
 signs:
@@ -218,14 +113,12 @@ signs:
     artifacts: all
     output: true
 
-# Docker configuration (Pro feature - multi-registry support)
+# Docker configuration (Pro feature)
 dockers:
   - id: amd64
     image_templates:
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:latest-amd64"
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:{{.Version}}-amd64"
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:latest-amd64"
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:{{.Version}}-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-amd64"
     
     dockerfile: Dockerfile
     use: buildx
@@ -234,24 +127,13 @@ dockers:
       - "--pull"
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.description={{.ProjectName}}"
-      - "--label=org.opencontainers.image.url=https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}"
-      - "--label=org.opencontainers.image.source=https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.licenses=MIT"
-    
-    extra_files:
-      - scripts/
-      - configs/
+      - "--label=org.opencontainers.image.source=https://github.com/LarsArtmann/template-GoReleaser"
   
   - id: arm64
     image_templates:
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:latest-arm64"
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:{{.Version}}-arm64"
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:latest-arm64"
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:{{.Version}}-arm64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-arm64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-arm64"
     
     dockerfile: Dockerfile
     use: buildx
@@ -265,35 +147,15 @@ dockers:
 
 # Docker manifests (Pro feature)
 docker_manifests:
-  - name_template: "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:latest"
+  - name_template: "ghcr.io/larsartmann/{{.ProjectName}}:latest"
     image_templates:
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:latest-amd64"
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:latest-arm64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-arm64"
   
-  - name_template: "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:{{.Version}}"
+  - name_template: "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}"
     image_templates:
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:{{.Version}}-amd64"
-      - "ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:{{.Version}}-arm64"
-  
-  - name_template: "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:latest"
-    image_templates:
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:latest-amd64"
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:latest-arm64"
-  
-  - name_template: "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:{{.Version}}"
-    image_templates:
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:{{.Version}}-amd64"
-      - "docker.io/{{.Env.DOCKER_USERNAME}}/{{.ProjectName}}:{{.Version}}-arm64"
-
-# Docker signing (Pro feature)
-docker_signs:
-  - cmd: cosign
-    args:
-      - sign
-      - "${artifact}@${digest}"
-      - "--yes"
-    artifacts: all
-    output: true
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-arm64"
 
 # SBOM generation (Pro feature)
 sboms:
@@ -301,236 +163,61 @@ sboms:
     artifacts: archive
     documents:
       - "${artifact}.sbom.json"
-      - "${artifact}.sbom.spdx.json"
-    
     cmd: syft
     args:
       - "${artifact}"
       - "--output"
       - "json=${document}"
-      - "--output"
-      - "spdx-json=${artifact}.sbom.spdx.json"
 
 # Linux packages (Pro feature)
 nfpms:
   - id: packages
     package_name: "{{.ProjectName}}"
-    vendor: "{{.Env.VENDOR_NAME}}"
-    homepage: "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}"
-    maintainer: "{{.Env.MAINTAINER_NAME}} <{{.Env.MAINTAINER_EMAIL}}>"
-    description: "{{.ProjectName}} - {{.Env.PROJECT_DESCRIPTION}}"
+    vendor: "LarsArtmann"
+    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    maintainer: "Lars Artmann <lars@example.com>"
+    description: "{{.ProjectName}} - A great Go application"
     license: MIT
     
     formats:
       - deb
       - rpm
       - apk
-      - archlinux
     
     dependencies:
       - git
-    
-    recommends:
-      - golang
-    
-    suggests:
-      - docker
-    
-    # Config files
-    contents:
-      - src: ./configs/config.yaml
-        dst: /etc/{{.ProjectName}}/config.yaml
-        type: config
-      
-      - src: ./scripts/{{.ProjectName}}.service
-        dst: /etc/systemd/system/{{.ProjectName}}.service
-        type: config
-      
-      - src: ./completions/{{.ProjectName}}.bash
-        dst: /etc/bash_completion.d/{{.ProjectName}}
-      
-      - src: ./completions/{{.ProjectName}}.zsh
-        dst: /usr/share/zsh/site-functions/_{{.ProjectName}}
-      
-      - src: ./completions/{{.ProjectName}}.fish
-        dst: /usr/share/fish/vendor_completions.d/{{.ProjectName}}.fish
-      
-      - src: ./man/{{.ProjectName}}.1
-        dst: /usr/share/man/man1/{{.ProjectName}}.1
-    
-    scripts:
-      postinstall: scripts/postinstall.sh
-      preremove: scripts/preremove.sh
-    
-    overrides:
-      deb:
-        dependencies:
-          - git
-          - ca-certificates
-      rpm:
-        dependencies:
-          - git
-          - ca-certificates
 
-# Homebrew tap configuration (Pro feature)
+# Homebrew tap (Pro feature)
 brews:
   - name: "{{.ProjectName}}"
     repository:
-      owner: "{{.Env.GITHUB_OWNER}}"
+      owner: "LarsArtmann"
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    
-    commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
-    
-    homepage: "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}"
-    description: "{{.ProjectName}} - {{.Env.PROJECT_DESCRIPTION}}"
+    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    description: "{{.ProjectName}} - A great Go application"
     license: MIT
     
-    # Dependencies
-    dependencies:
-      - name: git
-        type: optional
-    
-    # Installation
     install: |
       bin.install "{{.ProjectName}}"
-      bash_completion.install "completions/{{.ProjectName}}.bash" => "{{.ProjectName}}"
-      zsh_completion.install "completions/{{.ProjectName}}.zsh" => "_{{.ProjectName}}"
-      fish_completion.install "completions/{{.ProjectName}}.fish"
-      man1.install "man/{{.ProjectName}}.1"
-    
-    # Test
-    test: |
-      system "#{bin}/{{.ProjectName}}", "--version"
 
 # Scoop manifest (Pro feature)
 scoops:
   - repository:
-      owner: "{{.Env.GITHUB_OWNER}}"
+      owner: "LarsArtmann"
       name: scoop-bucket
       token: "{{ .Env.SCOOP_GITHUB_TOKEN }}"
     
-    commit_author:
-      name: goreleaserbot
-      email: bot@goreleaser.com
-    
-    commit_msg_template: "Scoop manifest update for {{ .ProjectName }} version {{ .Tag }}"
-    
-    homepage: "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}"
-    description: "{{.ProjectName}} - {{.Env.PROJECT_DESCRIPTION}}"
+    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    description: "{{.ProjectName}} - A great Go application"
     license: MIT
-
-# Snapcraft (Pro feature)
-snapcrafts:
-  - name: "{{.ProjectName}}"
-    publish: true
-    summary: "{{.ProjectName}} - {{.Env.PROJECT_DESCRIPTION}}"
-    description: |
-      {{.ProjectName}} is a powerful tool that does amazing things.
-      
-      Features:
-      - Feature 1
-      - Feature 2
-      - Feature 3
-    
-    grade: stable
-    confinement: strict
-    license: MIT
-    
-    apps:
-      {{.ProjectName}}:
-        command: {{.ProjectName}}
-        plugs:
-          - network
-          - network-bind
-          - home
-
-# AUR configuration (Pro feature)
-aurs:
-  - name: "{{.ProjectName}}-bin"
-    homepage: "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}"
-    description: "{{.ProjectName}} - {{.Env.PROJECT_DESCRIPTION}}"
-    maintainers:
-      - "{{.Env.MAINTAINER_NAME}} <{{.Env.MAINTAINER_EMAIL}}>"
-    license: MIT
-    private_key: "{{ .Env.AUR_KEY }}"
-    git_url: "ssh://aur@aur.archlinux.org/{{.ProjectName}}-bin.git"
-    
-    package: |
-      # bin
-      install -Dm755 {{.ProjectName}} "${pkgdir}/usr/bin/{{.ProjectName}}"
-      
-      # completions
-      install -Dm644 completions/{{.ProjectName}}.bash "${pkgdir}/usr/share/bash-completion/completions/{{.ProjectName}}"
-      install -Dm644 completions/{{.ProjectName}}.zsh "${pkgdir}/usr/share/zsh/site-functions/_{{.ProjectName}}"
-      install -Dm644 completions/{{.ProjectName}}.fish "${pkgdir}/usr/share/fish/vendor_completions.d/{{.ProjectName}}.fish"
-      
-      # man pages
-      install -Dm644 man/{{.ProjectName}}.1 "${pkgdir}/usr/share/man/man1/{{.ProjectName}}.1"
-      
-      # license
-      install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/{{.ProjectName}}/LICENSE"
-
-# Publishers (Pro feature)
-publishers:
-  - name: fury.io
-    ids:
-      - packages
-    dir: "{{ dir .ArtifactPath }}"
-    cmd: |
-      curl -F package=@{{ .ArtifactName }} https://{{ .Env.FURY_TOKEN }}@push.fury.io/{{ .Env.FURY_ACCOUNT }}/
-
-# Blob storage upload (Pro feature)
-blobs:
-  - provider: s3
-    region: us-east-1
-    bucket: "{{.Env.S3_BUCKET}}"
-    folder: "{{.ProjectName}}/{{.Version}}"
-    ids:
-      - default
-      - packages
-    
-    extra_files:
-      - glob: ./dist/*.sig
-      - glob: ./dist/*.sbom.json
-  
-  - provider: azblob
-    bucket: "{{.Env.AZURE_STORAGE_CONTAINER}}"
-    folder: "{{.ProjectName}}/{{.Version}}"
-    ids:
-      - default
-  
-  - provider: gs
-    bucket: "{{.Env.GCS_BUCKET}}"
-    folder: "{{.ProjectName}}/{{.Version}}"
-    ids:
-      - default
-
-# Artifactory upload (Pro feature)
-artifactories:
-  - name: production
-    target: "https://{{.Env.ARTIFACTORY_HOST}}/artifactory/{{.Env.ARTIFACTORY_REPO}}/{{.ProjectName}}/{{.Version}}/"
-    username: "{{.Env.ARTIFACTORY_USERNAME}}"
-    password: "{{.Env.ARTIFACTORY_PASSWORD}}"
-    mode: archive
-
-# Custom publishers (Pro feature)
-custom_publishers:
-  - name: custom
-    cmd: |
-      echo "Publishing {{ .ArtifactName }} to custom registry..."
-      # Add your custom publishing logic here
 
 # Changelog generation
 changelog:
   sort: asc
   use: github
   
-  # Group commits by type
   groups:
     - title: '🚀 Features'
       regexp: '^.*feat(\([[:word:]]+\))??!?:.+$'
@@ -541,31 +228,9 @@ changelog:
     - title: '📚 Documentation'
       regexp: '^.*docs(\([[:word:]]+\))??!?:.+$'
       order: 2
-    - title: '⚡ Performance'
-      regexp: '^.*perf(\([[:word:]]+\))??!?:.+$'
-      order: 3
-    - title: '♻️ Refactoring'
-      regexp: '^.*refactor(\([[:word:]]+\))??!?:.+$'
-      order: 4
-    - title: '🧪 Testing'
-      regexp: '^.*test(\([[:word:]]+\))??!?:.+$'
-      order: 5
-    - title: '🔧 Build & CI'
-      regexp: '^.*ci(\([[:word:]]+\))??!?:.+$'
-      order: 6
-    - title: '🎨 Style'
-      regexp: '^.*style(\([[:word:]]+\))??!?:.+$'
-      order: 7
-    - title: '📦 Dependencies'
-      regexp: '^.*deps(\([[:word:]]+\))??!?:.+$'
-      order: 8
-    - title: '🔒 Security'
-      regexp: '^.*security(\([[:word:]]+\))??!?:.+$'
-      order: 9
     - title: '⚙️ Other'
       order: 999
   
-  # Filters
   filters:
     exclude:
       - '^chore:'
@@ -573,240 +238,55 @@ changelog:
       - Merge pull request
       - Merge remote-tracking branch
       - Merge branch
-  
-  # Custom template
-  template: |
-    ## What's Changed
-    {{ range .Changes }}
-    * {{ .Title }} by @{{ .AuthorUsername }} in {{ .URL }}
-    {{ end }}
-    
-    **Full Changelog**: {{ .PreviousTag }}...{{ .Tag }}
 
 # Release configuration
 release:
-  # GitHub/GitLab/Gitea release
   github:
-    owner: '{{ .Env.GITHUB_OWNER }}'
-    name: '{{ .Env.GITHUB_REPO }}'
+    owner: 'LarsArtmann'
+    name: 'template-GoReleaser'
   
-  # Release name template
   name_template: "{{.ProjectName}} v{{.Version}}"
-  
-  # Disable auto-generated release notes
   disable: false
-  
-  # Draft release
   draft: false
-  
-  # Mark as prerelease for non-stable versions
   prerelease: auto
   
-  # Make release latest
-  make_latest: true
-  
-  # Release notes
   footer: |
     ## Installation
     
-    ### macOS/Linux
-    ```bash
-    curl -sfL https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/download/{{.Tag}}/{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}.tar.gz | tar -xz
-    sudo mv {{.ProjectName}} /usr/local/bin/
-    ```
-    
     ### Homebrew
     ```bash
-    brew tap {{.Env.GITHUB_OWNER}}/tap
+    brew tap LarsArtmann/tap
     brew install {{.ProjectName}}
     ```
     
-    ### Windows (Scoop)
+    ### Scoop
     ```powershell
-    scoop bucket add {{.Env.GITHUB_OWNER}} https://github.com/{{.Env.GITHUB_OWNER}}/scoop-bucket
+    scoop bucket add LarsArtmann https://github.com/LarsArtmann/scoop-bucket
     scoop install {{.ProjectName}}
     ```
     
     ### Docker
     ```bash
-    docker pull ghcr.io/{{.Env.GITHUB_OWNER}}/{{.ProjectName}}:{{.Version}}
+    docker pull ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}
     ```
-    
-    ### Package Managers
-    - **DEB/RPM**: Available in releases
-    - **AUR**: `yay -S {{.ProjectName}}-bin`
-    - **Snap**: `snap install {{.ProjectName}}`
-    
-    ## Verification
-    
-    All artifacts are signed with cosign. To verify:
-    ```bash
-    cosign verify-blob --certificate {{.ProjectName}}.pem --signature {{.ProjectName}}.sig {{.ProjectName}}
-    ```
-  
-  # Extra files to upload
-  extra_files:
-    - glob: ./dist/*.sig
-    - glob: ./dist/*.pem
-    - glob: ./dist/*.sbom.json
-    - glob: ./dist/*.sbom.spdx.json
-  
-  # Discussion category name
-  discussion_category_name: General
 
-# Milestone closing (Pro feature)
-milestones:
-  - close: true
-    fail_on_error: false
-    name_template: "{{ .Tag }}"
+# Snapshot configuration
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
 
 # Source archive
 source:
   enabled: true
   name_template: '{{ .ProjectName }}_{{ .Version }}_source'
-  format: tar.gz
-  
-  # Files to exclude
-  files:
-    - glob: ./.git/**/*
-    - glob: ./dist/**/*
-    - glob: ./.github/**/*
-    - glob: ./.vscode/**/*
-    - glob: ./.idea/**/*
 
 # Git configuration
 git:
-  # Tag sort order
   tag_sort: -version:refname
-  
-  # Prerelease suffix
   prerelease_suffix: "-"
-  
-  # Ignore tags
-  ignore_tags:
-    - nightly
-    - dev
-    - experimental
 
 # GoMod configuration
 gomod:
-  # Proxy configuration
   proxy: true
-  
-  # Go version to use
-  go: "1.23"
-  
-  # Module path
-  mod: mod
-  
-  # Environment variables
   env:
     - GOPROXY=https://proxy.golang.org,direct
     - GOSUMDB=sum.golang.org
-    - GOPRIVATE=github.com/{{.Env.GITHUB_OWNER}}
-
-# Announce releases (Pro feature - extended options)
-announce:
-  skip: false
-  
-  # Twitter
-  twitter:
-    enabled: true
-    message_template: |
-      🚀 {{.ProjectName}} {{.Tag}} is out! 🎉
-      
-      Check it out: https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/tag/{{.Tag}}
-      
-      #golang #opensource #devtools
-  
-  # Discord
-  discord:
-    enabled: true
-    message_template: |
-      **{{.ProjectName}} {{.Tag}} has been released!** 🚀
-      
-      Check it out: https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/tag/{{.Tag}}
-    
-    author: GoReleaser
-    color: "3888754"
-    icon_url: https://goreleaser.com/static/avatar.png
-  
-  # Slack
-  slack:
-    enabled: true
-    message_template: |
-      *{{.ProjectName}} {{.Tag}} has been released!* 🚀
-      
-      Check it out: https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/tag/{{.Tag}}
-    
-    channel: '#releases'
-    username: GoReleaser
-    icon_emoji: ':rocket:'
-  
-  # Teams
-  teams:
-    enabled: true
-    title: "{{.ProjectName}} {{.Tag}} Released!"
-    message: |
-      {{.ProjectName}} {{.Tag}} has been released!
-      
-      Check it out: https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/tag/{{.Tag}}
-    
-    color: "3888754"
-  
-  # Email
-  smtp:
-    enabled: false
-    host: smtp.gmail.com
-    port: 587
-    from: "{{.Env.SMTP_FROM}}"
-    to:
-      - "{{.Env.SMTP_TO}}"
-    username: "{{.Env.SMTP_USERNAME}}"
-    password: "{{.Env.SMTP_PASSWORD}}"
-    subject: "{{.ProjectName}} {{.Tag}} Released!"
-    body: |
-      {{.ProjectName}} {{.Tag}} has been released!
-      
-      Check it out: https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/tag/{{.Tag}}
-  
-  # Webhook
-  webhook:
-    enabled: false
-    endpoint_url: "{{.Env.WEBHOOK_URL}}"
-    message_template: |
-      {
-        "project": "{{.ProjectName}}",
-        "version": "{{.Tag}}",
-        "url": "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/tag/{{.Tag}}"
-      }
-    
-    content_type: application/json
-    headers:
-      Authorization: "Bearer {{.Env.WEBHOOK_TOKEN}}"
-
-# Environment variables template
-env_files:
-  github_token: ~/.config/goreleaser/github_token
-  gitlab_token: ~/.config/goreleaser/gitlab_token
-  gitea_token: ~/.config/goreleaser/gitea_token
-
-# Metadata (Pro feature)
-metadata:
-  mod_timestamp: "{{ .CommitTimestamp }}"
-
-# Report generation (Pro feature)
-report:
-  # Generate JSON report
-  use: json
-  
-  # Output file
-  output: dist/report.json
-
-# Verification (Pro feature)
-verify:
-  # Verify artifacts
-  artifacts: true
-  
-  # Skip verification
-  skip: false

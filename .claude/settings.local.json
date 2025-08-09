@@ -1,7 +1,12 @@
 {
   "permissions": {
     "allow": [
-      "Bash(./verify.sh)"
+      "Bash(./verify.sh)",
+      "Bash(readme-generator)",
+      "Bash(readme-generator generate:*)",
+      "Bash(readme-generator:*)",
+      "Bash(command -v:*)",
+      "Bash(./scripts/generate-license.sh:*)"
     ],
     "deny": []
   }
