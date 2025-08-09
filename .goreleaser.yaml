@@ -1,0 +1,269 @@
+# GoReleaser Template - Free Version
+# https://goreleaser.com/customization/
+# This is a comprehensive template for the free version of GoReleaser
+# For Pro features, see .goreleaser.pro.yaml
+
+# Configuration version
+version: 2
+
+# Project configuration
+project_name: myproject
+
+# Build configurations
+before:
+  hooks:
+    # Ensure go.mod is tidy
+    - go mod tidy
+    # Generate code if needed
+    - go generate ./...
+    # Run tests before build
+    - go test -v ./...
+
+builds:
+  - id: main
+    # Entry point - adjust to your main package location
+    main: ./cmd/{{.ProjectName}}
+    
+    # Binary name
+    binary: '{{.ProjectName}}'
+    
+    # Build flags
+    flags:
+      - -trimpath
+      - -v
+    
+    # Linker flags for smaller binaries and version injection
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser
+    
+    # Environment variables
+    env:
+      - CGO_ENABLED=0
+    
+    # Target operating systems
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+      - openbsd
+    
+    # Target architectures
+    goarch:
+      - amd64
+      - arm64
+      - arm
+      - 386
+      - riscv64
+    
+    # ARM variants
+    goarm:
+      - "6"
+      - "7"
+    
+    # Ignore certain combinations
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
+      - goos: windows
+        goarch: arm64
+      - goos: freebsd
+        goarch: arm
+      - goos: openbsd
+        goarch: arm
+      - goos: openbsd
+        goarch: arm64
+    
+    # Module support
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    
+    # Build tags
+    tags:
+      - netgo
+      - osusergo
+
+# Universal binaries for macOS
+universal_binaries:
+  - id: main
+    ids:
+      - main
+    name_template: '{{.ProjectName}}'
+    replace: true
+
+# Archives configuration
+archives:
+  - id: default
+    
+    # Archive name template
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    
+    # Files to include in the archive
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - docs/*
+      - examples/*
+      - scripts/*
+
+# Checksum generation
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+  
+  # Extra files to checksum
+  extra_files:
+    - glob: ./dist/*.sig
+    - glob: ./dist/*.sbom.json
+
+# Snapshot configuration (for non-tagged builds)
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+# Changelog generation
+changelog:
+  sort: asc
+  use: github
+  
+  # Group commits by type
+  groups:
+    - title: '🚀 Features'
+      regexp: '^.*feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: '🐛 Bug Fixes'
+      regexp: '^.*fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: '📚 Documentation'
+      regexp: '^.*docs(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: '⚡ Performance'
+      regexp: '^.*perf(\([[:word:]]+\))??!?:.+$'
+      order: 3
+    - title: '♻️ Refactoring'
+      regexp: '^.*refactor(\([[:word:]]+\))??!?:.+$'
+      order: 4
+    - title: '🧪 Testing'
+      regexp: '^.*test(\([[:word:]]+\))??!?:.+$'
+      order: 5
+    - title: '🔧 Build & CI'
+      regexp: '^.*ci(\([[:word:]]+\))??!?:.+$'
+      order: 6
+    - title: '🎨 Style'
+      regexp: '^.*style(\([[:word:]]+\))??!?:.+$'
+      order: 7
+    - title: '📦 Dependencies'
+      regexp: '^.*deps(\([[:word:]]+\))??!?:.+$'
+      order: 8
+    - title: '🔒 Security'
+      regexp: '^.*security(\([[:word:]]+\))??!?:.+$'
+      order: 9
+    - title: '⚙️ Other'
+      order: 999
+  
+  # Filters
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'
+      - '^chore:'
+      - '^ci:'
+      - '^build:'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+
+# Release configuration
+release:
+  # GitHub/GitLab/Gitea release
+  github:
+    owner: 'LarsArtmann'
+    name: 'template-GoReleaser'
+  
+  # Release name template
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  
+  # Disable auto-generated release notes
+  disable: false
+  
+  # Draft release
+  draft: false
+  
+  # Mark as prerelease for non-stable versions
+  prerelease: auto
+  
+  # Release notes
+  footer: |
+    ## Installation
+    
+    ### macOS/Linux
+    ```bash
+    curl -sfL https://github.com/LarsArtmann/template-GoReleaser/releases/download/{{.Tag}}/{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}.tar.gz | tar -xz
+    sudo mv {{.ProjectName}} /usr/local/bin/
+    ```
+    
+    ### Windows
+    Download the ZIP file and extract to your PATH.
+    
+    ## Docker
+    ```bash
+    docker pull ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}
+    ```
+  
+  # Extra files to upload
+  extra_files:
+    - glob: ./dist/*.sig
+    - glob: ./dist/*.sbom.json
+
+# Source archive
+source:
+  enabled: true
+  name_template: '{{ .ProjectName }}_{{ .Version }}_source'
+  format: tar.gz
+
+# Git configuration
+git:
+  # Tag sort order
+  tag_sort: -version:refname
+  
+  # Prerelease suffix
+  prerelease_suffix: "-"
+  
+  # Ignore tags
+  ignore_tags:
+    - nightly
+    - dev
+
+# GoMod configuration
+gomod:
+  # Proxy configuration
+  proxy: true
+  
+  # Environment variables
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org
+
+# Announce releases (free version - limited options)
+announce:
+  skip: false
+
+# Environment variables template
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+  gitlab_token: ~/.config/goreleaser/gitlab_token

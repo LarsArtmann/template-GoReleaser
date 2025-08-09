@@ -1,0 +1,292 @@
+# GoReleaser Template - Pro Version (Simplified)
+# https://goreleaser.com/customization/
+# This is a simplified Pro template focusing on core Pro features
+
+# Configuration version
+version: 2
+
+# Project configuration
+project_name: myproject
+
+# Build configurations
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+    - go test -v ./...
+
+builds:
+  - id: main
+    main: ./cmd/{{.ProjectName}}
+    binary: '{{.ProjectName}}'
+    
+    flags:
+      - -trimpath
+      - -v
+    
+    ldflags:
+      - -s -w
+      - -X main.version={{.Version}}
+      - -X main.commit={{.Commit}}
+      - -X main.date={{.Date}}
+      - -X main.builtBy=goreleaser-pro
+    
+    env:
+      - CGO_ENABLED=0
+    
+    goos:
+      - linux
+      - darwin
+      - windows
+      - freebsd
+      - openbsd
+    
+    goarch:
+      - amd64
+      - arm64
+      - arm
+      - 386
+      - riscv64
+    
+    goarm:
+      - "6"
+      - "7"
+    
+    ignore:
+      - goos: darwin
+        goarch: 386
+      - goos: darwin
+        goarch: arm
+      - goos: windows
+        goarch: arm
+    
+    mod_timestamp: '{{ .CommitTimestamp }}'
+    
+    tags:
+      - netgo
+      - osusergo
+
+# Universal binaries for macOS
+universal_binaries:
+  - id: main
+    ids:
+      - main
+    name_template: '{{.ProjectName}}'
+    replace: true
+
+# Archives configuration
+archives:
+  - id: default
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    
+    files:
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - docs/**/*
+      - examples/**/*
+      - scripts/**/*
+
+# Checksum generation
+checksum:
+  name_template: 'checksums.txt'
+  algorithm: sha256
+
+# Signing configuration (Pro feature)
+signs:
+  - cmd: cosign
+    signature: "${artifact}.sig"
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--output-signature=${signature}"
+      - "--output-certificate=${certificate}"
+      - "${artifact}"
+      - "--yes"
+    artifacts: all
+    output: true
+
+# Docker configuration (Pro feature)
+dockers:
+  - id: amd64
+    image_templates:
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-amd64"
+    
+    dockerfile: Dockerfile
+    use: buildx
+    
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source=https://github.com/LarsArtmann/template-GoReleaser"
+  
+  - id: arm64
+    image_templates:
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-arm64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-arm64"
+    
+    dockerfile: Dockerfile
+    use: buildx
+    goarch: arm64
+    
+    build_flag_templates:
+      - "--pull"
+      - "--platform=linux/arm64"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+
+# Docker manifests (Pro feature)
+docker_manifests:
+  - name_template: "ghcr.io/larsartmann/{{.ProjectName}}:latest"
+    image_templates:
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:latest-arm64"
+  
+  - name_template: "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}"
+    image_templates:
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-amd64"
+      - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-arm64"
+
+# SBOM generation (Pro feature)
+sboms:
+  - id: sbom
+    artifacts: archive
+    documents:
+      - "${artifact}.sbom.json"
+    cmd: syft
+    args:
+      - "${artifact}"
+      - "--output"
+      - "json=${document}"
+
+# Linux packages (Pro feature)
+nfpms:
+  - id: packages
+    package_name: "{{.ProjectName}}"
+    vendor: "LarsArtmann"
+    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    maintainer: "Lars Artmann <lars@example.com>"
+    description: "{{.ProjectName}} - A great Go application"
+    license: MIT
+    
+    formats:
+      - deb
+      - rpm
+      - apk
+    
+    dependencies:
+      - git
+
+# Homebrew tap (Pro feature)
+brews:
+  - name: "{{.ProjectName}}"
+    repository:
+      owner: "LarsArtmann"
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    
+    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    description: "{{.ProjectName}} - A great Go application"
+    license: MIT
+    
+    install: |
+      bin.install "{{.ProjectName}}"
+
+# Scoop manifest (Pro feature)
+scoops:
+  - repository:
+      owner: "LarsArtmann"
+      name: scoop-bucket
+      token: "{{ .Env.SCOOP_GITHUB_TOKEN }}"
+    
+    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    description: "{{.ProjectName}} - A great Go application"
+    license: MIT
+
+# Changelog generation
+changelog:
+  sort: asc
+  use: github
+  
+  groups:
+    - title: '🚀 Features'
+      regexp: '^.*feat(\([[:word:]]+\))??!?:.+$'
+      order: 0
+    - title: '🐛 Bug Fixes'
+      regexp: '^.*fix(\([[:word:]]+\))??!?:.+$'
+      order: 1
+    - title: '📚 Documentation'
+      regexp: '^.*docs(\([[:word:]]+\))??!?:.+$'
+      order: 2
+    - title: '⚙️ Other'
+      order: 999
+  
+  filters:
+    exclude:
+      - '^chore:'
+      - 'merge conflict'
+      - Merge pull request
+      - Merge remote-tracking branch
+      - Merge branch
+
+# Release configuration
+release:
+  github:
+    owner: 'LarsArtmann'
+    name: 'template-GoReleaser'
+  
+  name_template: "{{.ProjectName}} v{{.Version}}"
+  disable: false
+  draft: false
+  prerelease: auto
+  
+  footer: |
+    ## Installation
+    
+    ### Homebrew
+    ```bash
+    brew tap LarsArtmann/tap
+    brew install {{.ProjectName}}
+    ```
+    
+    ### Scoop
+    ```powershell
+    scoop bucket add LarsArtmann https://github.com/LarsArtmann/scoop-bucket
+    scoop install {{.ProjectName}}
+    ```
+    
+    ### Docker
+    ```bash
+    docker pull ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}
+    ```
+
+# Snapshot configuration
+snapshot:
+  version_template: "{{ incpatch .Version }}-next"
+
+# Source archive
+source:
+  enabled: true
+  name_template: '{{ .ProjectName }}_{{ .Version }}_source'
+
+# Git configuration
+git:
+  tag_sort: -version:refname
+  prerelease_suffix: "-"
+
+# GoMod configuration
+gomod:
+  proxy: true
+  env:
+    - GOPROXY=https://proxy.golang.org,direct
+    - GOSUMDB=sum.golang.org

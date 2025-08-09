@@ -1,0 +1,132 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.txt
+coverage.html
+
+# Go workspace files
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# Build directories
+dist/
+build/
+bin/
+out/
+
+# GoReleaser
+.goreleaser/
+
+# IDE specific files
+.idea/
+*.iml
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+*.log
+
+# Generated files
+*.pb.go
+*_gen.go
+*_templ.go
+*.generated.go
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Archives
+*.tar.gz
+*.zip
+*.tar
+*.gz
+
+# Docker
+.dockerignore
+docker-compose.override.yml
+
+# Validation reports
+validation-report.json
+validation-*.json
+
+# Release notes
+RELEASE_NOTES.md
+
+# Signing
+cosign.key
+cosign.pub
+*.sig
+
+# SBOM files
+*.sbom.json
+*.sbom.spdx.json
+
+# UPX backups
+*.upx
+
+# macOS
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+.nfs*
