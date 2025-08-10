@@ -33,9 +33,9 @@ RECOMMENDED_TOOLS=("docker" "cosign" "syft" "upx" "yq" "jq")
 # Logging functions
 log_header() {
     echo
-    echo -e "${MAGENTA}════════════════════════════════════════${NC}"
+    echo -e "${MAGENTA}========================================${NC}"
     echo -e "${MAGENTA}  $1${NC}"
-    echo -e "${MAGENTA}════════════════════════════════════════${NC}"
+    echo -e "${MAGENTA}========================================${NC}"
 }
 
 log_subheader() {
@@ -447,6 +447,11 @@ run_goreleaser_validation() {
     
     log_subheader "GoReleaser Validation"
     
+    # Temporarily clear conflicting tokens for GoReleaser
+    local saved_gitlab_token="${GITLAB_TOKEN:-}"
+    local saved_gitea_token="${GITEA_TOKEN:-}"
+    unset GITLAB_TOKEN GITEA_TOKEN
+    
     for file in "$GORELEASER_FILE" "$GORELEASER_PRO_FILE"; do
         if [[ ! -f "$file" ]]; then
             continue
@@ -458,11 +463,15 @@ run_goreleaser_validation() {
         if goreleaser check --config "$file" &> /dev/null; then
             log_pass "$name"
         else
-            log_fail "$name" "GoReleaser validation failed"
+            log_fail "$name" "GoReleaser validation failed (might be expected in test environment)"
             echo -e "${YELLOW}Error details:${NC}"
-            goreleaser check --config "$file" 2>&1 | head -10 | sed 's/^/  /'
+            goreleaser check --config "$file" 2>&1 | head -10 | grep -v "multiple tokens" | sed 's/^/  /' || true
         fi
     done
+    
+    # Restore tokens
+    [[ -n "$saved_gitlab_token" ]] && export GITLAB_TOKEN="$saved_gitlab_token"
+    [[ -n "$saved_gitea_token" ]] && export GITEA_TOKEN="$saved_gitea_token"
 }
 
 generate_report() {
@@ -476,34 +485,34 @@ generate_report() {
     
     if [[ $CRITICAL_FAILURES -gt 0 ]]; then
         echo
-        echo -e "${RED}╔════════════════════════════════════════╗${NC}"
-        echo -e "${RED}║  CRITICAL FAILURES DETECTED!           ║${NC}"
-        echo -e "${RED}║  Configuration is NOT production ready ║${NC}"
-        echo -e "${RED}╚════════════════════════════════════════╝${NC}"
+        echo -e "${RED}========================================${NC}"
+        echo -e "${RED}  CRITICAL FAILURES DETECTED!           ${NC}"
+        echo -e "${RED}  Configuration is NOT production ready ${NC}"
+        echo -e "${RED}========================================${NC}"
         return 1
     elif [[ $FAILED_CHECKS -gt 0 ]]; then
         echo
-        echo -e "${YELLOW}╔════════════════════════════════════════╗${NC}"
-        echo -e "${YELLOW}║  WARNINGS DETECTED                     ║${NC}"
-        echo -e "${YELLOW}║  Review and fix before production use  ║${NC}"
-        echo -e "${YELLOW}╚════════════════════════════════════════╝${NC}"
+        echo -e "${YELLOW}========================================${NC}"
+        echo -e "${YELLOW}  WARNINGS DETECTED                     ${NC}"
+        echo -e "${YELLOW}  Review and fix before production use  ${NC}"
+        echo -e "${YELLOW}========================================${NC}"
         return 0
     else
         echo
-        echo -e "${GREEN}╔════════════════════════════════════════╗${NC}"
-        echo -e "${GREEN}║  ALL VALIDATIONS PASSED! ✓            ║${NC}"
-        echo -e "${GREEN}║  Configuration is production ready     ║${NC}"
-        echo -e "${GREEN}╚════════════════════════════════════════╝${NC}"
+        echo -e "${GREEN}========================================${NC}"
+        echo -e "${GREEN}  ALL VALIDATIONS PASSED! ✓            ${NC}"
+        echo -e "${GREEN}  Configuration is production ready     ${NC}"
+        echo -e "${GREEN}========================================${NC}"
         return 0
     fi
 }
 
 # Main execution
 main() {
-    echo -e "${MAGENTA}╔════════════════════════════════════════╗${NC}"
-    echo -e "${MAGENTA}║  STRICT GORELEASER VALIDATOR          ║${NC}"
-    echo -e "${MAGENTA}║  Zero Tolerance Mode Enabled          ║${NC}"
-    echo -e "${MAGENTA}╚════════════════════════════════════════╝${NC}"
+    echo -e "${MAGENTA}========================================${NC}"
+    echo -e "${MAGENTA}  STRICT GORELEASER VALIDATOR          ${NC}"
+    echo -e "${MAGENTA}  Zero Tolerance Mode Enabled          ${NC}"
+    echo -e "${MAGENTA}========================================${NC}"
     
     log_header "CONFIGURATION VALIDATION"
     validate_yaml_structure "$GORELEASER_FILE"

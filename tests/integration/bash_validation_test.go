@@ -14,16 +14,16 @@ import (
 // TestBashValidationScriptsFunctionality tests the existing bash validation scripts
 func (suite *IntegrationTestSuite) TestBashValidationScriptsFunctionality() {
 	validationScripts := []struct {
-		name           string
-		scriptPath     string
-		expectSuccess  bool
+		name            string
+		scriptPath      string
+		expectSuccess   bool
 		requiredEnvVars map[string]string
-		setupFunc      func(string)
+		setupFunc       func(string)
 	}{
 		{
-			name:           "Verify Script Basic Functionality",
-			scriptPath:     "verify.sh",
-			expectSuccess:  true,
+			name:            "Verify Script Basic Functionality",
+			scriptPath:      "verify.sh",
+			expectSuccess:   true,
 			requiredEnvVars: fixtures.TestEnvironmentVars["minimal"],
 			setupFunc: func(testDir string) {
 				suite.setupGoProject(testDir)
@@ -31,9 +31,9 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsFunctionality() {
 			},
 		},
 		{
-			name:           "Strict Validation Script",
-			scriptPath:     "validate-strict.sh",
-			expectSuccess:  false, // May fail with minimal setup
+			name:            "Strict Validation Script",
+			scriptPath:      "validate-strict.sh",
+			expectSuccess:   false, // May fail with minimal setup
 			requiredEnvVars: fixtures.TestEnvironmentVars["minimal"],
 			setupFunc: func(testDir string) {
 				suite.setupGoProject(testDir)
@@ -70,7 +70,7 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsFunctionality() {
 				if result.ExitCode != 0 {
 					suite.T().Logf("%s output: %s", script.scriptPath, result.Stdout)
 					suite.T().Logf("%s errors: %s", script.scriptPath, result.Stderr)
-					
+
 					// Allow warnings but require overall success
 					if strings.Contains(result.Stdout, "warning") {
 						suite.T().Logf("Script completed with warnings, which is acceptable")
@@ -84,7 +84,7 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsFunctionality() {
 					output := result.Stdout + result.Stderr
 					assert.True(suite.T(),
 						strings.Contains(output, "error") || strings.Contains(output, "Error") ||
-						strings.Contains(output, "fail") || strings.Contains(output, "warning"),
+							strings.Contains(output, "fail") || strings.Contains(output, "warning"),
 						"Failed script should provide useful feedback")
 				}
 			}
@@ -193,12 +193,12 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsEdgeCases() {
 			result := helpers.RunCommand(suite.T(), testDir, "./"+tc.scriptPath)
 
 			if tc.expectError {
-				assert.NotEqual(suite.T(), 0, result.ExitCode, 
+				assert.NotEqual(suite.T(), 0, result.ExitCode,
 					"Script should fail for edge case: %s", tc.description)
-				
+
 				// Verify error messages are helpful
 				output := result.Stdout + result.Stderr
-				assert.True(suite.T(), len(output) > 0, 
+				assert.True(suite.T(), len(output) > 0,
 					"Script should provide error output for: %s", tc.description)
 			} else {
 				// Should handle gracefully (may warn but not necessarily fail)
@@ -254,30 +254,30 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsToolDetection() {
 	// Should provide summary of tool availability
 	assert.True(suite.T(),
 		strings.Contains(output, "check") || strings.Contains(output, "Check") ||
-		strings.Contains(output, "install") || strings.Contains(output, "Install"),
+			strings.Contains(output, "install") || strings.Contains(output, "Install"),
 		"Script should provide information about tool checks")
 }
 
 // TestBashValidationScriptsEnvironmentVariableDetection tests environment variable detection
 func (suite *IntegrationTestSuite) TestBashValidationScriptsEnvironmentVariableDetection() {
 	envTestCases := []struct {
-		name     string
-		envVars  map[string]string
+		name          string
+		envVars       map[string]string
 		expectMention []string
 	}{
 		{
-			name:     "Minimal Environment Variables",
-			envVars:  fixtures.TestEnvironmentVars["minimal"],
+			name:          "Minimal Environment Variables",
+			envVars:       fixtures.TestEnvironmentVars["minimal"],
 			expectMention: []string{"GITHUB_TOKEN", "DOCKER_USERNAME"},
 		},
 		{
-			name:     "Complete Environment Variables", 
-			envVars:  fixtures.TestEnvironmentVars["complete"],
+			name:          "Complete Environment Variables",
+			envVars:       fixtures.TestEnvironmentVars["complete"],
 			expectMention: []string{"GITHUB_TOKEN", "GORELEASER_KEY"},
 		},
 		{
-			name:     "Missing Critical Variables",
-			envVars:  map[string]string{"PROJECT_NAME": "test"},
+			name:          "Missing Critical Variables",
+			envVars:       map[string]string{"PROJECT_NAME": "test"},
 			expectMention: []string{"GITHUB_TOKEN"},
 		},
 	}
@@ -316,8 +316,8 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsEnvironmentVariableD
 			// Should provide information about environment variable status
 			assert.True(suite.T(),
 				strings.Contains(output, "environment") || strings.Contains(output, "Environment") ||
-				strings.Contains(output, "variable") || strings.Contains(output, "Variable") ||
-				strings.Contains(output, "env") || strings.Contains(output, "Env"),
+					strings.Contains(output, "variable") || strings.Contains(output, "Variable") ||
+					strings.Contains(output, "env") || strings.Contains(output, "Env"),
 				"Script should provide information about environment variables")
 		})
 	}
@@ -372,9 +372,9 @@ func (suite *IntegrationTestSuite) TestBashValidationScriptsOutputFormat() {
 // validateScriptOutput validates that script output is well-structured
 func (suite *IntegrationTestSuite) validateScriptOutput(result helpers.CommandResult, scriptPath string) {
 	output := result.Stdout + result.Stderr
-	
+
 	// Should have meaningful content
-	assert.True(suite.T(), len(output) > 100, 
+	assert.True(suite.T(), len(output) > 100,
 		"Script %s should produce substantial output", scriptPath)
 
 	// Should provide summary information
@@ -382,7 +382,7 @@ func (suite *IntegrationTestSuite) validateScriptOutput(result helpers.CommandRe
 		strings.Contains(output, "check") || strings.Contains(output, "Check") ||
 		strings.Contains(output, "error") || strings.Contains(output, "Error") ||
 		strings.Contains(output, "warning") || strings.Contains(output, "Warning")
-	assert.True(suite.T(), hasSummary, 
+	assert.True(suite.T(), hasSummary,
 		"Script %s should provide summary information", scriptPath)
 
 	// Should mention key components

@@ -56,10 +56,15 @@ get_license_type() {
     fi
     
     local license_type
-    license_type=$(yq eval '.project.license.type' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    # Try different possible paths for license type
+    license_type=$(yq eval '.license.type' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    if [[ "$license_type" == "null" || "$license_type" == "" ]]; then
+        license_type=$(yq eval '.project.license.type' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    fi
     
     if [[ "$license_type" == "null" || "$license_type" == "" ]]; then
         log_error "License type not found in configuration"
+        log_info "Checked paths: .license.type, .project.license.type"
         exit 1
     fi
     
@@ -69,7 +74,14 @@ get_license_type() {
 # Get copyright holder from config
 get_copyright_holder() {
     local copyright_holder
-    copyright_holder=$(yq eval '.project.contact.name' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    # Try different possible paths for copyright holder
+    copyright_holder=$(yq eval '.author.name' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    if [[ "$copyright_holder" == "null" || "$copyright_holder" == "" ]]; then
+        copyright_holder=$(yq eval '.project.contact.name' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    fi
+    if [[ "$copyright_holder" == "null" || "$copyright_holder" == "" ]]; then
+        copyright_holder=$(yq eval '.project.author' "$CONFIG_FILE" 2>/dev/null || echo "null")
+    fi
     
     if [[ "$copyright_holder" == "null" || "$copyright_holder" == "" ]]; then
         log_warning "Copyright holder not found in config, using default"
@@ -180,14 +192,63 @@ list_templates() {
     fi
 }
 
+# Try to get license info from environment or CLI args
+get_fallback_license_type() {
+    # Check environment variables
+    if [[ -n "${LICENSE_TYPE:-}" ]]; then
+        echo "$LICENSE_TYPE"
+        return 0
+    fi
+    
+    # Check for common license files or indicators
+    if [[ -f "go.mod" ]]; then
+        # For Go projects, default to MIT
+        echo "MIT"
+        return 0
+    fi
+    
+    # Last resort - ask user to specify
+    log_error "No license type found. Please specify via:"
+    echo "  - Environment variable: export LICENSE_TYPE=MIT"
+    echo "  - Config file: $CONFIG_FILE"
+    echo "  - Command line argument: $0 MIT [author]"
+    exit 1
+}
+
+get_fallback_copyright_holder() {
+    # Check environment variables
+    if [[ -n "${COPYRIGHT_HOLDER:-}" ]]; then
+        echo "$COPYRIGHT_HOLDER"
+        return 0
+    fi
+    if [[ -n "${AUTHOR_NAME:-}" ]]; then
+        echo "$AUTHOR_NAME"
+        return 0
+    fi
+    if [[ -n "${PROJECT_AUTHOR:-}" ]]; then
+        echo "$PROJECT_AUTHOR"
+        return 0
+    fi
+    
+    # Try to get from git config
+    if command -v git &> /dev/null && [[ -d .git ]]; then
+        local git_name
+        git_name=$(git config user.name 2>/dev/null || echo "")
+        if [[ -n "$git_name" ]]; then
+            echo "$git_name"
+            return 0
+        fi
+    fi
+    
+    # Default fallback
+    echo "Project Maintainer"
+}
+
 # Main function
 main() {
     local license_type copyright_holder year
     
     log_info "License Generator Starting..."
-    
-    # Check dependencies
-    check_dependencies
     
     # Handle command line options
     case "${1:-}" in
@@ -196,18 +257,42 @@ main() {
             exit 0
             ;;
         "--help"|"-h")
-            echo "Usage: $0 [--list|--help]"
-            echo "  --list, -l    List available license templates"
-            echo "  --help, -h    Show this help message"
+            echo "Usage: $0 [license_type] [copyright_holder] [--list|--help]"
+            echo "  license_type      License type (MIT, Apache-2.0, BSD-3-Clause, etc.)"
+            echo "  copyright_holder  Name of copyright holder"
+            echo "  --list, -l        List available license templates"
+            echo "  --help, -h        Show this help message"
             echo
-            echo "Generates LICENSE file based on configuration in $CONFIG_FILE"
+            echo "Configuration sources (in order of preference):"
+            echo "  1. Command line arguments"
+            echo "  2. Configuration file: $CONFIG_FILE"
+            echo "  3. Environment variables: LICENSE_TYPE, COPYRIGHT_HOLDER"
+            echo "  4. Git config (for copyright holder)"
+            echo "  5. Intelligent defaults"
             exit 0
             ;;
     esac
     
-    # Get configuration values
-    license_type=$(get_license_type)
-    copyright_holder=$(get_copyright_holder)
+    # Check dependencies (but don't require yq if we have CLI args or env vars)
+    if [[ ! -f "$CONFIG_FILE" ]] && [[ -z "${1:-}" ]] && [[ -z "${LICENSE_TYPE:-}" ]]; then
+        check_dependencies
+    fi
+    
+    # Get configuration values from various sources
+    if [[ -n "${1:-}" ]]; then
+        # Command line arguments take precedence
+        license_type="$1"
+        copyright_holder="${2:-$(get_fallback_copyright_holder)}"
+    elif [[ -f "$CONFIG_FILE" ]] && command -v yq &> /dev/null; then
+        # Use config file if available
+        license_type=$(get_license_type)
+        copyright_holder=$(get_copyright_holder)
+    else
+        # Use fallback methods
+        license_type=$(get_fallback_license_type)
+        copyright_holder=$(get_fallback_copyright_holder)
+    fi
+    
     year=$(get_current_year)
     
     # Generate license

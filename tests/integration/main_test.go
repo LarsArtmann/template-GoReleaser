@@ -23,10 +23,10 @@ func (suite *IntegrationTestSuite) SetupSuite() {
 	var err error
 	cwd, err := os.Getwd()
 	suite.Require().NoError(err)
-	
+
 	// Navigate to project root (go up from tests/integration to project root)
 	suite.originalDir = filepath.Join(cwd, "..", "..")
-	
+
 	// Verify we're at the project root by checking for key files
 	goModPath := filepath.Join(suite.originalDir, "go.mod")
 	suite.Require().True(helpers.FileExists(goModPath), "Could not find project root - go.mod not found at %s", goModPath)

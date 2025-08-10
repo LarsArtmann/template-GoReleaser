@@ -12,7 +12,13 @@
       "Bash(hadolint:*)",
       "Bash(shellcheck:*)",
       "Bash(./validate-strict.sh:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(unset GITHUB_TOKEN GITLAB_TOKEN GITEA_TOKEN GORELEASER_KEY)",
+      "Bash(env)",
+      "Bash(./goreleaser-cli --help)",
+      "Bash(./goreleaser-cli version)",
+      "Bash(./goreleaser-cli license list)",
+      "Bash(./goreleaser-cli validate --help)"
     ],
     "deny": []
   }

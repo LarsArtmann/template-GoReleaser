@@ -118,13 +118,13 @@ func CopyDir(t *testing.T, src, dst string) {
 		}
 
 		// Skip certain directories that shouldn't be copied for tests
-		if strings.Contains(relPath, "tests") || 
-		   strings.Contains(relPath, ".git") ||
-		   strings.Contains(relPath, "dist") ||
-		   strings.Contains(relPath, "build") ||
-		   strings.Contains(relPath, "vendor") ||
-		   strings.Contains(relPath, "node_modules") ||
-		   strings.Contains(relPath, ".DS_Store") {
+		if strings.Contains(relPath, "tests") ||
+			strings.Contains(relPath, ".git") ||
+			strings.Contains(relPath, "dist") ||
+			strings.Contains(relPath, "build") ||
+			strings.Contains(relPath, "vendor") ||
+			strings.Contains(relPath, "node_modules") ||
+			strings.Contains(relPath, ".DS_Store") {
 			if info.IsDir() {
 				return filepath.SkipDir
 			}

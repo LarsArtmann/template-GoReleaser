@@ -15,52 +15,52 @@ import (
 // TestJustCommands tests that just commands work correctly with the actual project
 func (suite *IntegrationTestSuite) TestJustCommands() {
 	basicCommands := []struct {
-		name        string
-		command     string
+		name          string
+		command       string
 		expectSuccess bool
-		timeout     time.Duration
-		requiresGo  bool
-		description string
+		timeout       time.Duration
+		requiresGo    bool
+		description   string
 	}{
 		{
-			name:        "Just Help",
-			command:     "help",
+			name:          "Just Help",
+			command:       "help",
 			expectSuccess: true,
-			timeout:     30 * time.Second,
-			requiresGo:  false,
-			description: "Should display help information",
+			timeout:       30 * time.Second,
+			requiresGo:    false,
+			description:   "Should display help information",
 		},
 		{
-			name:        "Just List",
-			command:     "--list",
+			name:          "Just List",
+			command:       "--list",
 			expectSuccess: true,
-			timeout:     30 * time.Second,
-			requiresGo:  false,
-			description: "Should list available commands",
+			timeout:       30 * time.Second,
+			requiresGo:    false,
+			description:   "Should list available commands",
 		},
 		{
-			name:        "Just Init",
-			command:     "init",
+			name:          "Just Init",
+			command:       "init",
 			expectSuccess: true,
-			timeout:     2 * time.Minute,
-			requiresGo:  true,
-			description: "Should initialize the project",
+			timeout:       2 * time.Minute,
+			requiresGo:    true,
+			description:   "Should initialize the project",
 		},
 		{
-			name:        "Just Format",
-			command:     "fmt",
+			name:          "Just Format",
+			command:       "fmt",
 			expectSuccess: true,
-			timeout:     1 * time.Minute,
-			requiresGo:  true,
-			description: "Should format the code",
+			timeout:       1 * time.Minute,
+			requiresGo:    true,
+			description:   "Should format the code",
 		},
 		{
-			name:        "Just Clean",
-			command:     "clean",
+			name:          "Just Clean",
+			command:       "clean",
 			expectSuccess: true,
-			timeout:     30 * time.Second,
-			requiresGo:  false,
-			description: "Should clean build artifacts",
+			timeout:       30 * time.Second,
+			requiresGo:    false,
+			description:   "Should clean build artifacts",
 		},
 	}
 
@@ -122,17 +122,17 @@ func (suite *IntegrationTestSuite) TestJustCommands() {
 // TestJustBuildCommands tests build-related just commands
 func (suite *IntegrationTestSuite) TestJustBuildCommands() {
 	buildCommands := []struct {
-		name        string
-		command     string
+		name          string
+		command       string
 		expectSuccess bool
-		timeout     time.Duration
-		verifyFunc  func(*IntegrationTestSuite, string, helpers.CommandResult)
+		timeout       time.Duration
+		verifyFunc    func(*IntegrationTestSuite, string, helpers.CommandResult)
 	}{
 		{
-			name:        "Just Build",
-			command:     "build",
+			name:          "Just Build",
+			command:       "build",
 			expectSuccess: true,
-			timeout:     3 * time.Minute,
+			timeout:       3 * time.Minute,
 			verifyFunc: func(suite *IntegrationTestSuite, testDir string, result helpers.CommandResult) {
 				// Should create a binary
 				binaryPath := filepath.Join(testDir, "myproject")
@@ -149,7 +149,7 @@ func (suite *IntegrationTestSuite) TestJustBuildCommands() {
 						}
 					}
 				}
-				
+
 				if helpers.FileExists(binaryPath) {
 					suite.T().Logf("Binary found at: %s", binaryPath)
 				} else {
@@ -158,10 +158,10 @@ func (suite *IntegrationTestSuite) TestJustBuildCommands() {
 			},
 		},
 		{
-			name:        "Just Test",
-			command:     "test",
+			name:          "Just Test",
+			command:       "test",
 			expectSuccess: true,
-			timeout:     2 * time.Minute,
+			timeout:       2 * time.Minute,
 			verifyFunc: func(suite *IntegrationTestSuite, testDir string, result helpers.CommandResult) {
 				output := result.Stdout + result.Stderr
 				assert.True(suite.T(), strings.Contains(output, "test") || strings.Contains(output, "PASS") || strings.Contains(output, "ok"),
@@ -169,10 +169,10 @@ func (suite *IntegrationTestSuite) TestJustBuildCommands() {
 			},
 		},
 		{
-			name:        "Just Test Coverage",
-			command:     "test-coverage",
+			name:          "Just Test Coverage",
+			command:       "test-coverage",
 			expectSuccess: true,
-			timeout:     3 * time.Minute,
+			timeout:       3 * time.Minute,
 			verifyFunc: func(suite *IntegrationTestSuite, testDir string, result helpers.CommandResult) {
 				// Should create coverage files
 				coverageFiles := []string{"coverage.out", "coverage.html"}
@@ -228,35 +228,35 @@ func (suite *IntegrationTestSuite) TestJustBuildCommands() {
 // TestJustValidationCommands tests validation-related just commands
 func (suite *IntegrationTestSuite) TestJustValidationCommands() {
 	validationCommands := []struct {
-		name        string
-		command     string
+		name          string
+		command       string
 		expectSuccess bool
-		timeout     time.Duration
-		setupFunc   func(string)
+		timeout       time.Duration
+		setupFunc     func(string)
 	}{
 		{
-			name:        "Just Validate",
-			command:     "validate",
+			name:          "Just Validate",
+			command:       "validate",
 			expectSuccess: true,
-			timeout:     2 * time.Minute,
+			timeout:       2 * time.Minute,
 			setupFunc: func(testDir string) {
 				// Standard setup
 			},
 		},
 		{
-			name:        "Just Validate Strict",
-			command:     "validate-strict",
+			name:          "Just Validate Strict",
+			command:       "validate-strict",
 			expectSuccess: false, // May fail with minimal setup
-			timeout:     2 * time.Minute,
+			timeout:       2 * time.Minute,
 			setupFunc: func(testDir string) {
 				// Standard setup
 			},
 		},
 		{
-			name:        "Just Check",
-			command:     "check",
+			name:          "Just Check",
+			command:       "check",
 			expectSuccess: true,
-			timeout:     1 * time.Minute,
+			timeout:       1 * time.Minute,
 			setupFunc: func(testDir string) {
 				suite.setupGoProject(testDir)
 				suite.initGitRepo(testDir)
@@ -289,7 +289,7 @@ func (suite *IntegrationTestSuite) TestJustValidationCommands() {
 				if result.ExitCode != 0 {
 					suite.T().Logf("Just %s output: %s", cmd.command, result.Stdout)
 					suite.T().Logf("Just %s errors: %s", cmd.command, result.Stderr)
-					
+
 					// Allow warnings for validation commands
 					if strings.Contains(result.Stdout, "warning") || strings.Contains(result.Stdout, "Warning") {
 						suite.T().Logf("Validation completed with warnings, which is acceptable")
@@ -302,7 +302,7 @@ func (suite *IntegrationTestSuite) TestJustValidationCommands() {
 				output := result.Stdout + result.Stderr
 				assert.True(suite.T(),
 					strings.Contains(output, "error") || strings.Contains(output, "fail") || strings.Contains(output, "Error") ||
-					strings.Contains(output, "warning") || strings.Contains(output, "Warning"),
+						strings.Contains(output, "warning") || strings.Contains(output, "Warning"),
 					"Failed validation should provide useful feedback")
 			}
 		})
@@ -312,30 +312,30 @@ func (suite *IntegrationTestSuite) TestJustValidationCommands() {
 // TestJustGoReleaserCommands tests GoReleaser-related just commands
 func (suite *IntegrationTestSuite) TestJustGoReleaserCommands() {
 	goreleaserCommands := []struct {
-		name         string
-		command      string
+		name          string
+		command       string
 		expectSuccess bool
-		timeout      time.Duration
-		skipPro      bool
-		setupFunc    func(string)
+		timeout       time.Duration
+		skipPro       bool
+		setupFunc     func(string)
 	}{
 		{
-			name:        "Just Snapshot",
-			command:     "snapshot",
+			name:          "Just Snapshot",
+			command:       "snapshot",
 			expectSuccess: true,
-			timeout:     5 * time.Minute,
-			skipPro:     false,
+			timeout:       5 * time.Minute,
+			skipPro:       false,
 			setupFunc: func(testDir string) {
 				suite.setupGoProject(testDir)
 				suite.initGitRepo(testDir)
 			},
 		},
 		{
-			name:        "Just Dry Run",
-			command:     "dry-run",
+			name:          "Just Dry Run",
+			command:       "dry-run",
 			expectSuccess: false, // May fail without proper setup
-			timeout:     5 * time.Minute,
-			skipPro:     false,
+			timeout:       5 * time.Minute,
+			skipPro:       false,
 			setupFunc: func(testDir string) {
 				suite.setupGoProject(testDir)
 				suite.initGitRepo(testDir)
@@ -343,11 +343,11 @@ func (suite *IntegrationTestSuite) TestJustGoReleaserCommands() {
 			},
 		},
 		{
-			name:        "Just Snapshot Pro",
-			command:     "snapshot-pro",
+			name:          "Just Snapshot Pro",
+			command:       "snapshot-pro",
 			expectSuccess: false, // Will fail without pro license
-			timeout:     5 * time.Minute,
-			skipPro:     true, // Skip unless we want to test failure
+			timeout:       5 * time.Minute,
+			skipPro:       true, // Skip unless we want to test failure
 			setupFunc: func(testDir string) {
 				suite.setupGoProject(testDir)
 				suite.initGitRepo(testDir)
@@ -380,7 +380,7 @@ func (suite *IntegrationTestSuite) TestJustGoReleaserCommands() {
 			if !suite.isJustAvailable() {
 				suite.T().Skip("just command not available")
 			}
-			
+
 			if !suite.isGoReleaserAvailable() {
 				suite.T().Skip("goreleaser command not available")
 			}
@@ -394,7 +394,7 @@ func (suite *IntegrationTestSuite) TestJustGoReleaserCommands() {
 					suite.T().Logf("Just %s errors: %s", cmd.command, result.Stderr)
 				}
 				helpers.AssertCommandSuccess(suite.T(), result, "Just %s should succeed", cmd.command)
-				
+
 				// Verify dist directory was created for successful builds
 				if strings.Contains(cmd.command, "snapshot") {
 					distDir := filepath.Join(testDir, "dist")
@@ -405,8 +405,8 @@ func (suite *IntegrationTestSuite) TestJustGoReleaserCommands() {
 				output := result.Stdout + result.Stderr
 				assert.True(suite.T(),
 					strings.Contains(output, "error") || strings.Contains(output, "Error") ||
-					strings.Contains(output, "fail") || strings.Contains(output, "license") ||
-					result.ExitCode != 0,
+						strings.Contains(output, "fail") || strings.Contains(output, "license") ||
+						result.ExitCode != 0,
 					"Command should fail gracefully or provide error information")
 			}
 		})
@@ -438,7 +438,7 @@ func (suite *IntegrationTestSuite) TestJustCIWorkflow() {
 	if result.ExitCode != 0 {
 		suite.T().Logf("Just CI output: %s", result.Stdout)
 		suite.T().Logf("Just CI errors: %s", result.Stderr)
-		
+
 		// CI might fail due to missing tools, which is acceptable in test environment
 		output := result.Stdout + result.Stderr
 		if strings.Contains(output, "not installed") || strings.Contains(output, "command not found") {
@@ -452,22 +452,22 @@ func (suite *IntegrationTestSuite) TestJustCIWorkflow() {
 		output := result.Stdout + result.Stderr
 		assert.True(suite.T(),
 			strings.Contains(output, "error") || strings.Contains(output, "fail") ||
-			strings.Contains(output, "Error") || strings.Contains(output, "warning"),
+				strings.Contains(output, "Error") || strings.Contains(output, "warning"),
 			"CI workflow should provide useful feedback on failure")
 	} else {
 		suite.T().Log("CI workflow completed successfully")
-		
+
 		// Verify expected outputs
 		expectedOutputs := []string{
 			"Clean", "format", "lint", "test", "build",
 		}
-		
+
 		output := result.Stdout
 		for _, expected := range expectedOutputs {
 			// Allow case variations
 			assert.True(suite.T(),
 				strings.Contains(strings.ToLower(output), strings.ToLower(expected)) ||
-				strings.Contains(output, expected),
+					strings.Contains(output, expected),
 				"CI output should mention %s step", expected)
 		}
 	}
