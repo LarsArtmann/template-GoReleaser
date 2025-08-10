@@ -4,9 +4,6 @@ package tests
 
 import (
 	"testing"
-	
-	// Import the integration test package to run the test suite
-	_ "github.com/LarsArtmann/template-GoReleaser/tests/integration"
 )
 
 // TestMain provides package-level test setup and teardown if needed
