@@ -1,0 +1,112 @@
+graph TB
+    subgraph "Improved Architecture - Unified Go Application"
+        subgraph "CLI Layer - cobra/fang"
+            CLI[goreleaser-cli<br/>Main Entry]
+            CMD_VAL[validate cmd]
+            CMD_VER[verify cmd]
+            CMD_LIC[license cmd]
+            CMD_SRV[server cmd]
+            CMD_CFG[config cmd]
+        end
+
+        subgraph "Core Domain - DDD"
+            DOM_CFG[Config Domain<br/>Types & Rules]
+            DOM_VAL[Validation Domain<br/>Rules & Results]
+            DOM_LIC[License Domain<br/>Templates & Gen]
+            DOM_PRJ[Project Domain<br/>Structure & State]
+        end
+
+        subgraph "Application Services - CQRS"
+            SVC_CMD[Command Services<br/>Write Operations]
+            SVC_QRY[Query Services<br/>Read Operations]
+            SVC_EVT[Event Bus<br/>Domain Events]
+        end
+
+        subgraph "Infrastructure - Ports & Adapters"
+            HTTP[HTTP Server<br/>gin]
+            CFG[Config Manager<br/>viper]
+            TMPL[Template Engine<br/>templ]
+            DI[DI Container<br/>samber/do]
+            VAL[Validators<br/>samber/mo Results]
+        end
+
+        subgraph "Web UI - HTMX"
+            UI_DASH[Dashboard]
+            UI_CFG[Config Editor]
+            UI_VAL[Validation View]
+            UI_API[REST API]
+        end
+
+        subgraph "Testing - Ginkgo BDD"
+            TEST_UNIT[Unit Tests]
+            TEST_INT[Integration Tests]
+            TEST_E2E[E2E Tests]
+            TEST_BDD[BDD Scenarios]
+        end
+
+        subgraph "Observability - OTEL"
+            TRACE[Tracing]
+            METRIC[Metrics]
+            LOG[Structured Logs]
+        end
+
+        subgraph "External"
+            GR_CFG[GoReleaser Configs]
+            ENV[Environment]
+            GIT[Git Repository]
+        end
+    end
+
+    CLI --> CMD_VAL
+    CLI --> CMD_VER
+    CLI --> CMD_LIC
+    CLI --> CMD_SRV
+    CLI --> CMD_CFG
+
+    CMD_VAL --> SVC_QRY
+    CMD_VER --> SVC_CMD
+    CMD_LIC --> SVC_CMD
+    CMD_SRV --> HTTP
+    CMD_CFG --> CFG
+
+    SVC_CMD --> DOM_CFG
+    SVC_CMD --> DOM_LIC
+    SVC_CMD --> DOM_PRJ
+    SVC_QRY --> DOM_VAL
+    SVC_CMD --> SVC_EVT
+    SVC_EVT --> LOG
+
+    HTTP --> UI_DASH
+    HTTP --> UI_CFG
+    HTTP --> UI_VAL
+    HTTP --> UI_API
+    UI_CFG --> TMPL
+    TMPL --> UI_DASH
+
+    DOM_VAL --> VAL
+    DOM_CFG --> CFG
+    DI --> SVC_CMD
+    DI --> SVC_QRY
+    DI --> HTTP
+
+    VAL --> ENV
+    CFG --> GR_CFG
+    DOM_PRJ --> GIT
+
+    TEST_BDD --> DOM_CFG
+    TEST_BDD --> DOM_VAL
+    TEST_INT --> SVC_CMD
+    TEST_UNIT --> VAL
+
+    TRACE --> SVC_CMD
+    METRIC --> HTTP
+    LOG --> SVC_EVT
+
+    style CLI fill:#a8e6cf
+    style HTTP fill:#a8e6cf
+    style DI fill:#a8e6cf
+    style DOM_CFG fill:#c4e1ff
+    style DOM_VAL fill:#c4e1ff
+    style DOM_LIC fill:#c4e1ff
+    style DOM_PRJ fill:#c4e1ff
+    style TEST_BDD fill:#ffd3b6

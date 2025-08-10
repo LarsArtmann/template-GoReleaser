@@ -1,0 +1,130 @@
+graph TB
+    subgraph "Improved Events & Commands - CQRS + Event Sourcing"
+        subgraph "Commands - Write Side"
+            CMD1[ValidateConfigCommand<br/>Payload: ConfigPath]
+            CMD2[GenerateLicenseCommand<br/>Payload: Type, Author]
+            CMD3[UpdateConfigCommand<br/>Payload: Config]
+            CMD4[VerifyProjectCommand<br/>Payload: ProjectPath]
+            CMD5[BuildReleaseCommand<br/>Payload: BuildConfig]
+        end
+
+        subgraph "Command Handlers"
+            CH1[ValidateConfigHandler]
+            CH2[GenerateLicenseHandler]
+            CH3[UpdateConfigHandler]
+            CH4[VerifyProjectHandler]
+            CH5[BuildReleaseHandler]
+        end
+
+        subgraph "Domain Events"
+            EV1[ConfigValidatedEvent<br/>Status, Issues]
+            EV2[LicenseGeneratedEvent<br/>Type, Path]
+            EV3[ConfigUpdatedEvent<br/>Changes]
+            EV4[ProjectVerifiedEvent<br/>Results]
+            EV5[ReleaseBuildEvent<br/>Artifacts]
+            EV6[ValidationFailedEvent<br/>Errors]
+        end
+
+        subgraph "Event Store"
+            ES[Event Store<br/>Append-Only Log]
+            SNAP[Snapshots<br/>State Cache]
+        end
+
+        subgraph "Event Bus"
+            BUS[Event Bus<br/>Pub/Sub]
+            SAGA[Saga Coordinator]
+        end
+
+        subgraph "Queries - Read Side"
+            Q1[GetConfigStatusQuery]
+            Q2[GetValidationResultsQuery]
+            Q3[GetProjectStateQuery]
+            Q4[GetBuildHistoryQuery]
+            Q5[GetLicenseOptionsQuery]
+        end
+
+        subgraph "Query Handlers"
+            QH1[ConfigStatusHandler]
+            QH2[ValidationResultsHandler]
+            QH3[ProjectStateHandler]
+            QH4[BuildHistoryHandler]
+            QH5[LicenseOptionsHandler]
+        end
+
+        subgraph "Read Models - Projections"
+            RM1[ConfigStatusView]
+            RM2[ValidationResultsView]
+            RM3[ProjectStateView]
+            RM4[BuildHistoryView]
+            RM5[LicenseRegistryView]
+        end
+
+        subgraph "Side Effects"
+            SE1[NotificationService]
+            SE2[MetricsCollector]
+            SE3[AuditLogger]
+            SE4[WebhookDispatcher]
+        end
+    end
+
+    CMD1 --> CH1
+    CMD2 --> CH2
+    CMD3 --> CH3
+    CMD4 --> CH4
+    CMD5 --> CH5
+
+    CH1 --> EV1
+    CH1 --> EV6
+    CH2 --> EV2
+    CH3 --> EV3
+    CH4 --> EV4
+    CH5 --> EV5
+
+    EV1 --> ES
+    EV2 --> ES
+    EV3 --> ES
+    EV4 --> ES
+    EV5 --> ES
+    EV6 --> ES
+
+    ES --> SNAP
+    ES --> BUS
+
+    BUS --> SE1
+    BUS --> SE2
+    BUS --> SE3
+    BUS --> SE4
+    BUS --> SAGA
+
+    BUS --> RM1
+    BUS --> RM2
+    BUS --> RM3
+    BUS --> RM4
+    BUS --> RM5
+
+    Q1 --> QH1
+    Q2 --> QH2
+    Q3 --> QH3
+    Q4 --> QH4
+    Q5 --> QH5
+
+    QH1 --> RM1
+    QH2 --> RM2
+    QH3 --> RM3
+    QH4 --> RM4
+    QH5 --> RM5
+
+    SAGA --> CMD3
+    SAGA --> CMD5
+
+    style CMD1 fill:#c4e1ff
+    style CMD2 fill:#c4e1ff
+    style CMD3 fill:#c4e1ff
+    style EV1 fill:#a8e6cf
+    style EV2 fill:#a8e6cf
+    style EV3 fill:#a8e6cf
+    style ES fill:#ffd3b6
+    style BUS fill:#f4a6a6
+    style RM1 fill:#d4a5f9
+    style RM2 fill:#d4a5f9
+    style RM3 fill:#d4a5f9
