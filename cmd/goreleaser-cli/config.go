@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -82,17 +83,31 @@ func runConfigShow(cmd *cobra.Command, args []string) {
 	fmt.Printf("📄 Config file: %s\n", configFile)
 	fmt.Printf("📏 File format: %s\n", filepath.Ext(configFile))
 
-	fmt.Println("\n🔧 Configuration values:")
-
-	// Show all configuration values
-	allSettings := viper.AllSettings()
-	if len(allSettings) == 0 {
-		fmt.Println("  (no configuration values set)")
+	// Load typed configuration
+	config, err := LoadTypedConfig()
+	if err != nil {
+		fmt.Printf("❌ Error loading configuration: %v\n", err)
 		return
 	}
 
-	for key, value := range allSettings {
-		fmt.Printf("  %s = %v\n", key, value)
+	fmt.Println("\n🔧 Configuration values:")
+	fmt.Printf("  📄 License: %s (year: %d)\n", config.License.Type, config.License.Year)
+	fmt.Printf("  👤 Author: %s <%s>\n", config.Author.Name, config.Author.Email)
+	fmt.Printf("  📦 Project: %s\n", config.Project.Name)
+	if config.Project.Description != "" {
+		fmt.Printf("  📋 Description: %s\n", config.Project.Description)
+	}
+	fmt.Printf("  🛠️  CLI: verbose=%t, colors=%t, timeout=%ds\n", 
+		config.CLI.Verbose, config.CLI.Colors, config.CLI.Timeout)
+
+	// Validate configuration
+	if errors := config.Validate(); len(errors) > 0 {
+		fmt.Println("\n⚠️  Configuration validation warnings:")
+		for _, err := range errors {
+			fmt.Printf("  - %s\n", err)
+		}
+	} else {
+		fmt.Println("\n✅ Configuration is valid")
 	}
 
 	// Show environment variables that would override
@@ -206,4 +221,75 @@ cli:
 	fmt.Println("\n📝 Edit the file to customize your settings:")
 	fmt.Printf("   %s\n", configFile)
 	fmt.Println("\n💡 Use 'goreleaser-cli config show' to view current settings")
+}
+
+// LoadTypedConfig loads the configuration into typed structs
+func LoadTypedConfig() (*Config, error) {
+	config := DefaultConfig()
+	
+	// If no config file is set, try to find one
+	if viper.ConfigFileUsed() == "" {
+		home, err := os.UserHomeDir()
+		if err == nil {
+			configFile := filepath.Join(home, ".goreleaser-cli.yaml")
+			if _, err := os.Stat(configFile); err == nil {
+				viper.SetConfigFile(configFile)
+				viper.ReadInConfig()
+			}
+		}
+	}
+	
+	// Unmarshal into typed config
+	if err := viper.Unmarshal(config); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
+	}
+	
+	// Apply environment variable overrides
+	if licenseType := os.Getenv("LICENSE_TYPE"); licenseType != "" {
+		config.License.Type = licenseType
+	}
+	if authorName := os.Getenv("COPYRIGHT_HOLDER"); authorName != "" {
+		config.Author.Name = authorName
+	}
+	if authorName := os.Getenv("AUTHOR_NAME"); authorName != "" && config.Author.Name == "" {
+		config.Author.Name = authorName
+	}
+	if projectAuthor := os.Getenv("PROJECT_AUTHOR"); projectAuthor != "" && config.Author.Name == "" {
+		config.Author.Name = projectAuthor
+	}
+	
+	// Set current year if not specified
+	if config.License.Year == 0 {
+		config.License.Year = time.Now().Year()
+	}
+	
+	return config, nil
+}
+
+// SaveTypedConfig saves the typed configuration to file
+func SaveTypedConfig(config *Config) error {
+	configFile := viper.ConfigFileUsed()
+	if configFile == "" {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return fmt.Errorf("cannot determine home directory: %w", err)
+		}
+		configFile = filepath.Join(home, ".goreleaser-cli.yaml")
+		viper.SetConfigFile(configFile)
+	}
+	
+	// Convert config to viper settings
+	viper.Set("license", config.License)
+	viper.Set("author", config.Author)
+	viper.Set("project", config.Project)
+	viper.Set("cli", config.CLI)
+	
+	if err := viper.WriteConfig(); err != nil {
+		// If WriteConfig fails, try WriteConfigAs
+		if err := viper.WriteConfigAs(configFile); err != nil {
+			return fmt.Errorf("cannot write config file: %w", err)
+		}
+	}
+	
+	return nil
 }
