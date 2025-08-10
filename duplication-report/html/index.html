@@ -1,0 +1,204 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Copy/Paste Detector Report</title><link href="styles/tailwind.css" rel="stylesheet"><link href="styles/prism.css" rel="stylesheet"></head><body class="bg-gray-100"><header class="bg-white shadow py-4"><div class="container mx-auto px-4"><h1 class="text-3xl font-semibold text-gray-800">jscpd - copy/paste report</h1></div></header><main class="container mx-auto my-8 p-4 bg-white shadow rounded"><section class="mb-8" id="dashboard"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Dashboard</h2><div class="grid grid-cols-4 gap-4"><div class="bg-blue-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-blue-800 mb-2">Total Files</h3><span class="text-4xl font-bold text-blue-800">16</span></div><div class="bg-green-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-green-800 mb-2">Total Lines of Code</h3><span class="text-4xl font-bold text-green-800">4949</span></div><div class="bg-yellow-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-yellow-800 mb-2">Number of Clones</h3><span class="text-4xl font-bold text-yellow-800">16</span></div><div class="bg-red-200 p-4 rounded text-center"><h3 class="text-lg font-semibold text-red-800 mb-2">Duplicated Lines</h3><span class="text-4xl font-bold text-red-800">195 (3.94%)</span></div></div></section><section class="mb-8" id="formats"><h2 class="text-2xl font-semibold text-gray-700 mb-4">Formats with Duplications</h2><table class="w-full table-auto"><thead><tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal"><th class="py-3 px-6 text-left">Format</th><th class="py-3 px-6 text-left">Files</th><th class="py-3 px-6 text-left">Lines</th><th class="py-3 px-6 text-left">Clones</th><th class="py-3 px-6 text-left">Duplicated Lines</th><th class="py-3 px-6 text-left">Duplicated Tokens</th></tr></thead><tbody><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#go-clones">go</a></td><td class="py-3 px-6">11</td><td class="py-3 px-6">2812</td><td class="py-3 px-6">15</td><td class="py-3 px-6">176</td><td class="py-3 px-6">1653</td></tr><tr class="bg-white border-b border-gray-200 text-gray-800 text-sm"><td class="py-3 px-6"><a class="text-blue-600 hover:underline" href="#bash-clones">bash</a></td><td class="py-3 px-6">5</td><td class="py-3 px-6">2137</td><td class="py-3 px-6">1</td><td class="py-3 px-6">19</td><td class="py-3 px-6">106</td></tr></tbody></table></section><section class="mb-8" id="txt-clones"><a name="go-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">go</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">tests/integration/validation_test.go (Line 168:2 - Line 178:53), tests/integration/validation_test.go (Line 65:4 - Line 75:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn0" onclick="toggleCodeBlock('cloneGroup0', 'expandBtn0', 'collapseBtn0')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup0"><code class="language-go text-sm text-gray-800">validateScript := filepath.Join(testDir, &quot;verify.sh&quot;)
+	require.True(suite.T(), helpers.FileExists(validateScript), &quot;Validation script should exist&quot;)
+
+	// Make script executable
+	err := os.Chmod(validateScript, 0755)
+	require.NoError(suite.T(), err)
+
+	// Execute validation
+	result := helpers.RunCommand(suite.T(), testDir, &quot;./verify.sh&quot;)
+
+	// Validation should handle missing tools gracefully</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/validation_test.go (Line 223:8 - Line 236:28), tests/integration/validation_test.go (Line 62:11 - Line 75:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn1" onclick="toggleCodeBlock('cloneGroup1', 'expandBtn1', 'collapseBtn1')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup1"><code class="language-go text-sm text-gray-800">)
+
+			// Run validation script
+			validateScript := filepath.Join(testDir, &quot;verify.sh&quot;)
+			require.True(suite.T(), helpers.FileExists(validateScript), &quot;Validation script should exist&quot;)
+
+			// Make script executable
+			err := os.Chmod(validateScript, 0755)
+			require.NoError(suite.T(), err)
+
+			// Execute validation
+			result := helpers.RunCommand(suite.T(), testDir, &quot;./verify.sh&quot;)
+
+			// Log output for debugging</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/validation_test.go (Line 320:2 - Line 334:7), tests/integration/validation_test.go (Line 222:8 - Line 75:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn2" onclick="toggleCodeBlock('cloneGroup2', 'expandBtn2', 'collapseBtn2')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup2"><code class="language-go text-sm text-gray-800">)
+			suite.RegisterCleanup(cleanup)
+
+			// Run validation script
+			validateScript := filepath.Join(testDir, &quot;verify.sh&quot;)
+			require.True(suite.T(), helpers.FileExists(validateScript), &quot;Validation script should exist&quot;)
+
+			// Make script executable
+			err := os.Chmod(validateScript, 0755)
+			require.NoError(suite.T(), err)
+
+			// Execute validation
+			result := helpers.RunCommand(suite.T(), testDir, &quot;./verify.sh&quot;)
+
+			output</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/license_test.go (Line 156:20 - Line 167:27), tests/integration/license_test.go (Line 133:20 - Line 144:27)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn3" onclick="toggleCodeBlock('cloneGroup3', 'expandBtn3', 'collapseBtn3')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup3"><code class="language-go text-sm text-gray-800">)
+	suite.RegisterCleanup(func() { os.RemoveAll(testDir) })
+
+	// Check if license generation script exists
+	licenseScript := filepath.Join(testDir, &quot;scripts&quot;, &quot;generate-license.sh&quot;)
+	require.True(suite.T(), helpers.FileExists(licenseScript), &quot;License generation script should exist&quot;)
+
+	// Make script executable
+	err := os.Chmod(licenseScript, 0755)
+	require.NoError(suite.T(), err)
+
+	// Test list functionality</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/license_test.go (Line 222:2 - Line 230:48), tests/integration/license_test.go (Line 136:2 - Line 144:27)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn4" onclick="toggleCodeBlock('cloneGroup4', 'expandBtn4', 'collapseBtn4')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup4"><code class="language-go text-sm text-gray-800">// Check if license generation script exists
+	licenseScript := filepath.Join(testDir, &quot;scripts&quot;, &quot;generate-license.sh&quot;)
+	require.True(suite.T(), helpers.FileExists(licenseScript), &quot;License generation script should exist&quot;)
+
+	// Make script executable
+	err := os.Chmod(licenseScript, 0755)
+	require.NoError(suite.T(), err)
+
+	// Try to run license generation without config</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/license_test.go (Line 270:2 - Line 279:8), tests/integration/license_test.go (Line 96:4 - Line 106:3)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn5" onclick="toggleCodeBlock('cloneGroup5', 'expandBtn5', 'collapseBtn5')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup5"><code class="language-go text-sm text-gray-800">licenseScript := filepath.Join(testDir, &quot;scripts&quot;, &quot;generate-license.sh&quot;)
+	require.True(suite.T(), helpers.FileExists(licenseScript), &quot;License generation script should exist&quot;)
+
+	// Make script executable
+	err = os.Chmod(licenseScript, 0755)
+	require.NoError(suite.T(), err)
+
+	// Run license generation
+	result := helpers.RunCommand(suite.T(), testDir, &quot;./scripts/generate-license.sh&quot;)
+	helpers</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/justfile_test.go (Line 207:4 - Line 215:25), tests/integration/justfile_test.go (Line 91:4 - Line 99:29)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn6" onclick="toggleCodeBlock('cloneGroup6', 'expandBtn6', 'collapseBtn6')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup6"><code class="language-go text-sm text-gray-800">// Run just command
+			result := helpers.RunCommandWithTimeout(suite.T(), cmd.timeout, testDir, &quot;just&quot;, cmd.command)
+
+			if cmd.expectSuccess {
+				if result.ExitCode != 0 {
+					suite.T().Logf(&quot;Just %s output: %s&quot;, cmd.command, result.Stdout)
+					suite.T().Logf(&quot;Just %s errors: %s&quot;, cmd.command, result.Stderr)
+				}
+				helpers.AssertCommandSuccess(suite.T(), result, &quot;Just %s should succeed&quot;</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/justfile_test.go (Line 274:10 - Line 293:42), tests/integration/justfile_test.go (Line 196:15 - Line 98:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn7" onclick="toggleCodeBlock('cloneGroup7', 'expandBtn7', 'collapseBtn7')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup7"><code class="language-go text-sm text-gray-800">(testDir)
+
+			// Set up environment variables
+			cleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[&quot;minimal&quot;])
+			suite.RegisterCleanup(cleanup)
+
+			// Check if just command is available
+			if !suite.isJustAvailable() {
+				suite.T().Skip(&quot;just command not available&quot;)
+			}
+
+			// Run just command
+			result := helpers.RunCommandWithTimeout(suite.T(), cmd.timeout, testDir, &quot;just&quot;, cmd.command)
+
+			if cmd.expectSuccess {
+				if result.ExitCode != 0 {
+					suite.T().Logf(&quot;Just %s output: %s&quot;, cmd.command, result.Stdout)
+					suite.T().Logf(&quot;Just %s errors: %s&quot;, cmd.command, result.Stderr)
+					
+					// Allow warnings for validation commands</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/justfile_test.go (Line 385:35 - Line 398:59), tests/integration/justfile_test.go (Line 204:29 - Line 216:2)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn8" onclick="toggleCodeBlock('cloneGroup8', 'expandBtn8', 'collapseBtn8')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup8"><code class="language-go text-sm text-gray-800">)
+			}
+
+			// Run just command
+			result := helpers.RunCommandWithTimeout(suite.T(), cmd.timeout, testDir, &quot;just&quot;, cmd.command)
+
+			if cmd.expectSuccess {
+				if result.ExitCode != 0 {
+					suite.T().Logf(&quot;Just %s output: %s&quot;, cmd.command, result.Stdout)
+					suite.T().Logf(&quot;Just %s errors: %s&quot;, cmd.command, result.Stderr)
+				}
+				helpers.AssertCommandSuccess(suite.T(), result, &quot;Just %s should succeed&quot;, cmd.command)
+				
+				// Verify dist directory was created for successful builds</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/goreleaser_test.go (Line 222:24 - Line 232:29), tests/integration/goreleaser_test.go (Line 177:25 - Line 187:63)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn9" onclick="toggleCodeBlock('cloneGroup9', 'expandBtn9', 'collapseBtn9')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup9"><code class="language-go text-sm text-gray-800">)
+	suite.RegisterCleanup(func() { os.RemoveAll(testDir) })
+
+	// Set up environment variables
+	cleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[&quot;minimal&quot;])
+	suite.RegisterCleanup(cleanup)
+
+	// Create a proper Go project structure
+	suite.setupGoProject(testDir)
+
+	// Initialize Git repository</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/components_test.go (Line 42:27 - Line 55:3), tests/integration/license_test.go (Line 246:22 - Line 259:9)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn10" onclick="toggleCodeBlock('cloneGroup10', 'expandBtn10', 'collapseBtn10')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup10"><code class="language-go text-sm text-gray-800">)
+			suite.RegisterCleanup(func() { os.RemoveAll(testDir) })
+
+			// Set up environment variables
+			cleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[&quot;complete&quot;])
+			suite.RegisterCleanup(cleanup)
+
+			// Create readme config
+			readmeConfigDir := filepath.Join(testDir, &quot;.readme&quot;, &quot;configs&quot;)
+			err := os.MkdirAll(readmeConfigDir, 0755)
+			require.NoError(suite.T(), err)
+
+			configPath := filepath.Join(readmeConfigDir, &quot;readme-config.yaml&quot;)
+			helpers.WriteFile(suite.T(), configPath, tc</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/components_test.go (Line 191:30 - Line 202:20), tests/integration/justfile_test.go (Line 419:15 - Line 430:38)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn11" onclick="toggleCodeBlock('cloneGroup11', 'expandBtn11', 'collapseBtn11')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup11"><code class="language-go text-sm text-gray-800">)
+	suite.RegisterCleanup(func() { os.RemoveAll(testDir) })
+
+	// Set up complete project
+	suite.setupGoProject(testDir)
+	suite.initGitRepo(testDir)
+
+	// Set up environment variables
+	cleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[&quot;complete&quot;])
+	suite.RegisterCleanup(cleanup)
+
+	// Generate license</code></pre></div><div class="py-4"><p class="text-gray-600">tests/integration/components_test.go (Line 270:2 - Line 277:28), tests/integration/license_test.go (Line 254:2 - Line 261:35)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn12" onclick="toggleCodeBlock('cloneGroup12', 'expandBtn12', 'collapseBtn12')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup12"><code class="language-go text-sm text-gray-800">readmeConfigDir := filepath.Join(testDir, &quot;.readme&quot;, &quot;configs&quot;)
+	err := os.MkdirAll(readmeConfigDir, 0755)
+	require.NoError(suite.T(), err)
+
+	configPath := filepath.Join(readmeConfigDir, &quot;readme-config.yaml&quot;)
+	helpers.WriteFile(suite.T(), configPath, fixtures.ReadmeConfigs[&quot;complete&quot;])
+
+	// Step 5: Generate license</code></pre></div><div class="py-4"><p class="text-gray-600">tests/helpers/test_helpers.go (Line 58:9 - Line 69:5), tests/helpers/test_helpers.go (Line 26:2 - Line 37:4)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn13" onclick="toggleCodeBlock('cloneGroup13', 'expandBtn13', 'collapseBtn13')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup13"><code class="language-go text-sm text-gray-800">, dir, command string, args ...string) CommandResult {
+	t.Helper()
+
+	start := time.Now()
+	cmd := exec.Command(command, args...)
+	cmd.Dir = dir
+
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &amp;stdout
+	cmd.Stderr = &amp;stderr
+
+	done</code></pre></div><div class="py-4"><p class="text-gray-600">tests/helpers/test_helpers.go (Line 86:2 - Line 105:42), tests/helpers/test_helpers.go (Line 38:2 - Line 57:59)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn14" onclick="toggleCodeBlock('cloneGroup14', 'expandBtn14', 'collapseBtn14')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup14"><code class="language-go text-sm text-gray-800">duration := time.Since(start)
+
+	exitCode := 0
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			exitCode = exitErr.ExitCode()
+		} else {
+			exitCode = 1
+		}
+	}
+
+	return CommandResult{
+		ExitCode: exitCode,
+		Stdout:   stdout.String(),
+		Stderr:   stderr.String(),
+		Duration: duration,
+	}
+}
+
+// CopyDir recursively copies a directory</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div><a name="bash-clones"></a><h2 class="text-2xl font-semibold text-gray-700 mb-4">bash</h2><div class="divide-y divide-gray-200 border-b-2"><div class="py-4"><p class="text-gray-600">validate-env.sh (Line 117:1 - Line 136:13), verify.sh (Line 25:1 - Line 44:14)</p><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2" id="expandBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Show code</button><button class="bg-gray-500 text-white px-1 py-0.5 text-xs rounded focus:outline-none ml-2 hidden" id="collapseBtn15" onclick="toggleCodeBlock('cloneGroup15', 'expandBtn15', 'collapseBtn15')">Hide code</button><pre class="bg-gray-100 border border-gray-200 p-4 rounded mt-2 hidden" id="cloneGroup15"><code class="language-bash text-sm text-gray-800">log_info() {
+    echo -e &quot;${BLUE}[INFO]${NC} $1&quot;
+}
+
+log_success() {
+    echo -e &quot;${GREEN}[✓]${NC} $1&quot;
+    ((CHECKS++))
+}
+
+log_warning() {
+    echo -e &quot;${YELLOW}[⚠]${NC} $1&quot;
+    ((WARNINGS++))
+}
+
+log_error() {
+    echo -e &quot;${RED}[✗]${NC} $1&quot;
+    ((ERRORS++))
+}
+
+log_critical</code></pre></div><!-- Add more clone groups for .txt format as needed         // Add more clone groups for .txt format as needed--></div></section><!-- Add more sections for other formats and clone groups as needed--></main><footer class="bg-white shadow mt-8 py-4"><div class="container mx-auto px-4 text-center"><p class="text-sm text-gray-600">This report is generated by jscpd, an open-source copy/paste detector.</p><p class="text-sm text-gray-600">jscpd is licensed under the MIT License.</p><a class="text-blue-500 text-sm" href="https://github.com/kucherenko/jscpd" target="_blank" rel="noopener noreferrer">View jscpd on GitHub</a></div></footer><script src="js/prism.js"></script><script>function toggleCodeBlock(codeBlockId, expandBtnId, collapseBtnId) {
+  const codeBlock = document.getElementById(codeBlockId);
+  const expandBtn = document.getElementById(expandBtnId);
+  const collapseBtn = document.getElementById(collapseBtnId);
+
+  codeBlock.classList.toggle('hidden');
+  expandBtn.classList.toggle('hidden');
+  collapseBtn.classList.toggle('hidden');
+}</script></body></html>

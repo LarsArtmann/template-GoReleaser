@@ -266,6 +266,58 @@ security-scan:
     fi
     @echo "✓ Comprehensive security scan complete"
 
+# Find duplicate code (alias: fd)
+find-duplicates:
+    @echo "Finding duplicate code with jscpd..."
+    @if ! command -v jscpd >/dev/null 2>&1; then \
+        echo "⚠ jscpd not found. Installing with bun..."; \
+        bun add -g jscpd; \
+    fi
+    @if [ ! -f .jscpd.json ]; then \
+        echo "Creating default .jscpd.json configuration..."; \
+        echo '{ \
+            "threshold": 0, \
+            "reporters": ["console", "json", "html"], \
+            "minLines": 5, \
+            "minTokens": 50, \
+            "ignore": [ \
+                "**/vendor/**", \
+                "**/node_modules/**", \
+                "**/.git/**", \
+                "**/dist/**", \
+                "**/build/**", \
+                "**/*.pb.go", \
+                "**/go.sum", \
+                "**/go.mod", \
+                "**/*.md", \
+                "**/LICENSE", \
+                "**/*.yaml", \
+                "**/*.yml", \
+                "**/*.json", \
+                "**/testdata/**" \
+            ], \
+            "output": "./duplication-report", \
+            "silent": false, \
+            "exitCode": 0 \
+        }' | jq '.' > .jscpd.json; \
+        echo "✓ Created .jscpd.json configuration"; \
+    fi
+    @echo "Running jscpd to detect code duplication..."
+    @jscpd . --config .jscpd.json || echo "✓ Duplication analysis complete"
+    @if [ -f ./duplication-report/jscpd-report.json ]; then \
+        echo ""; \
+        echo "📊 Duplication Summary:"; \
+        jq -r '.statistics | "  Total Lines: \(.total.lines // 0)\n  Duplicate Lines: \(.total.duplicatedLines // 0)\n  Duplicate Percentage: \(.total.percentage // 0)%"' ./duplication-report/jscpd-report.json 2>/dev/null || true; \
+        echo ""; \
+        echo "📁 Reports generated in ./duplication-report/"; \
+        echo "   - HTML report: ./duplication-report/jscpd-report.html"; \
+        echo "   - JSON report: ./duplication-report/jscpd-report.json"; \
+    fi
+    @echo "✓ Code duplication analysis complete"
+
+# Alias for find-duplicates
+fd: find-duplicates
+
 # Update dependencies
 update-deps:
     @echo "Updating dependencies..."

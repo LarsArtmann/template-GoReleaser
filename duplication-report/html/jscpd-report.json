@@ -1,0 +1,822 @@
+{
+  "statistics": {
+    "detectionDate": "2025-08-10T04:57:22.418Z",
+    "formats": {
+      "go": {
+        "sources": {
+          "tests/integration/validation_test.go": {
+            "lines": 388,
+            "tokens": 3256,
+            "sources": 1,
+            "clones": 6,
+            "duplicatedLines": 74,
+            "duplicatedTokens": 638,
+            "percentage": 19.07,
+            "percentageTokens": 19.59,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration/main_test.go": {
+            "lines": 78,
+            "tokens": 520,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration/license_test.go": {
+            "lines": 287,
+            "tokens": 2561,
+            "sources": 1,
+            "clones": 8,
+            "duplicatedLines": 76,
+            "duplicatedTokens": 798,
+            "percentage": 26.48,
+            "percentageTokens": 31.16,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration/justfile_test.go": {
+            "lines": 485,
+            "tokens": 4227,
+            "sources": 1,
+            "clones": 7,
+            "duplicatedLines": 91,
+            "duplicatedTokens": 947,
+            "percentage": 18.76,
+            "percentageTokens": 22.4,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration/goreleaser_test.go": {
+            "lines": 331,
+            "tokens": 2959,
+            "sources": 1,
+            "clones": 2,
+            "duplicatedLines": 20,
+            "duplicatedTokens": 146,
+            "percentage": 6.04,
+            "percentageTokens": 4.93,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration/components_test.go": {
+            "lines": 348,
+            "tokens": 3057,
+            "sources": 1,
+            "clones": 3,
+            "duplicatedLines": 31,
+            "duplicatedTokens": 311,
+            "percentage": 8.91,
+            "percentageTokens": 10.17,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration/bash_validation_test.go": {
+            "lines": 398,
+            "tokens": 3522,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/helpers/test_helpers.go": {
+            "lines": 259,
+            "tokens": 1988,
+            "sources": 1,
+            "clones": 4,
+            "duplicatedLines": 60,
+            "duplicatedTokens": 466,
+            "percentage": 23.17,
+            "percentageTokens": 23.44,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/fixtures/test_configs.go": {
+            "lines": 168,
+            "tokens": 382,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "cmd/myproject/main.go": {
+            "lines": 55,
+            "tokens": 346,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "tests/integration_test.go": {
+            "lines": 15,
+            "tokens": 55,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 2812,
+          "tokens": 22873,
+          "sources": 11,
+          "clones": 15,
+          "duplicatedLines": 176,
+          "duplicatedTokens": 1653,
+          "percentage": 6.26,
+          "percentageTokens": 7.23,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      },
+      "bash": {
+        "sources": {
+          "scripts/generate-license.sh": {
+            "lines": 233,
+            "tokens": 1331,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "verify.sh": {
+            "lines": 546,
+            "tokens": 2330,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 19,
+            "duplicatedTokens": 106,
+            "percentage": 3.48,
+            "percentageTokens": 4.55,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "validate-strict.sh": {
+            "lines": 574,
+            "tokens": 3346,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "validate-env.sh": {
+            "lines": 650,
+            "tokens": 4001,
+            "sources": 1,
+            "clones": 1,
+            "duplicatedLines": 19,
+            "duplicatedTokens": 106,
+            "percentage": 2.92,
+            "percentageTokens": 2.65,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          },
+          "validate-commands.sh": {
+            "lines": 134,
+            "tokens": 665,
+            "sources": 1,
+            "clones": 0,
+            "duplicatedLines": 0,
+            "duplicatedTokens": 0,
+            "percentage": 0,
+            "percentageTokens": 0,
+            "newDuplicatedLines": 0,
+            "newClones": 0
+          }
+        },
+        "total": {
+          "lines": 2137,
+          "tokens": 11673,
+          "sources": 5,
+          "clones": 1,
+          "duplicatedLines": 19,
+          "duplicatedTokens": 106,
+          "percentage": 0.89,
+          "percentageTokens": 0.91,
+          "newDuplicatedLines": 0,
+          "newClones": 0
+        }
+      }
+    },
+    "total": {
+      "lines": 4949,
+      "tokens": 34546,
+      "sources": 16,
+      "clones": 16,
+      "duplicatedLines": 195,
+      "duplicatedTokens": 1759,
+      "percentage": 3.94,
+      "percentageTokens": 5.09,
+      "newDuplicatedLines": 0,
+      "newClones": 0
+    }
+  },
+  "duplicates": [
+    {
+      "format": "go",
+      "lines": 11,
+      "fragment": "validateScript := filepath.Join(testDir, \"verify.sh\")\n\trequire.True(suite.T(), helpers.FileExists(validateScript), \"Validation script should exist\")\n\n\t// Make script executable\n\terr := os.Chmod(validateScript, 0755)\n\trequire.NoError(suite.T(), err)\n\n\t// Execute validation\n\tresult := helpers.RunCommand(suite.T(), testDir, \"./verify.sh\")\n\n\t// Validation should handle missing tools gracefully",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/validation_test.go",
+        "start": 168,
+        "end": 178,
+        "startLoc": {
+          "line": 168,
+          "column": 2,
+          "position": 1369
+        },
+        "endLoc": {
+          "line": 178,
+          "column": 53,
+          "position": 1468
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/validation_test.go",
+        "start": 65,
+        "end": 75,
+        "startLoc": {
+          "line": 65,
+          "column": 4,
+          "position": 428
+        },
+        "endLoc": {
+          "line": 75,
+          "column": 3,
+          "position": 527
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 14,
+      "fragment": ")\n\n\t\t\t// Run validation script\n\t\t\tvalidateScript := filepath.Join(testDir, \"verify.sh\")\n\t\t\trequire.True(suite.T(), helpers.FileExists(validateScript), \"Validation script should exist\")\n\n\t\t\t// Make script executable\n\t\t\terr := os.Chmod(validateScript, 0755)\n\t\t\trequire.NoError(suite.T(), err)\n\n\t\t\t// Execute validation\n\t\t\tresult := helpers.RunCommand(suite.T(), testDir, \"./verify.sh\")\n\n\t\t\t// Log output for debugging",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/validation_test.go",
+        "start": 223,
+        "end": 236,
+        "startLoc": {
+          "line": 223,
+          "column": 8,
+          "position": 1895
+        },
+        "endLoc": {
+          "line": 236,
+          "column": 28,
+          "position": 2001
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/validation_test.go",
+        "start": 62,
+        "end": 75,
+        "startLoc": {
+          "line": 62,
+          "column": 11,
+          "position": 421
+        },
+        "endLoc": {
+          "line": 75,
+          "column": 3,
+          "position": 527
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 15,
+      "fragment": ")\n\t\t\tsuite.RegisterCleanup(cleanup)\n\n\t\t\t// Run validation script\n\t\t\tvalidateScript := filepath.Join(testDir, \"verify.sh\")\n\t\t\trequire.True(suite.T(), helpers.FileExists(validateScript), \"Validation script should exist\")\n\n\t\t\t// Make script executable\n\t\t\terr := os.Chmod(validateScript, 0755)\n\t\t\trequire.NoError(suite.T(), err)\n\n\t\t\t// Execute validation\n\t\t\tresult := helpers.RunCommand(suite.T(), testDir, \"./verify.sh\")\n\n\t\t\toutput",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/validation_test.go",
+        "start": 320,
+        "end": 334,
+        "startLoc": {
+          "line": 320,
+          "column": 2,
+          "position": 2686
+        },
+        "endLoc": {
+          "line": 334,
+          "column": 7,
+          "position": 2800
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/validation_test.go",
+        "start": 222,
+        "end": 75,
+        "startLoc": {
+          "line": 222,
+          "column": 8,
+          "position": 1887
+        },
+        "endLoc": {
+          "line": 75,
+          "column": 3,
+          "position": 527
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 12,
+      "fragment": ")\n\tsuite.RegisterCleanup(func() { os.RemoveAll(testDir) })\n\n\t// Check if license generation script exists\n\tlicenseScript := filepath.Join(testDir, \"scripts\", \"generate-license.sh\")\n\trequire.True(suite.T(), helpers.FileExists(licenseScript), \"License generation script should exist\")\n\n\t// Make script executable\n\terr := os.Chmod(licenseScript, 0755)\n\trequire.NoError(suite.T(), err)\n\n\t// Test list functionality",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 156,
+        "end": 167,
+        "startLoc": {
+          "line": 156,
+          "column": 20,
+          "position": 1232
+        },
+        "endLoc": {
+          "line": 167,
+          "column": 27,
+          "position": 1336
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 133,
+        "end": 144,
+        "startLoc": {
+          "line": 133,
+          "column": 20,
+          "position": 988
+        },
+        "endLoc": {
+          "line": 144,
+          "column": 27,
+          "position": 1092
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 9,
+      "fragment": "// Check if license generation script exists\n\tlicenseScript := filepath.Join(testDir, \"scripts\", \"generate-license.sh\")\n\trequire.True(suite.T(), helpers.FileExists(licenseScript), \"License generation script should exist\")\n\n\t// Make script executable\n\terr := os.Chmod(licenseScript, 0755)\n\trequire.NoError(suite.T(), err)\n\n\t// Try to run license generation without config",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 222,
+        "end": 230,
+        "startLoc": {
+          "line": 222,
+          "column": 2,
+          "position": 1890
+        },
+        "endLoc": {
+          "line": 230,
+          "column": 48,
+          "position": 1969
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 136,
+        "end": 144,
+        "startLoc": {
+          "line": 136,
+          "column": 2,
+          "position": 1013
+        },
+        "endLoc": {
+          "line": 144,
+          "column": 27,
+          "position": 1092
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 10,
+      "fragment": "licenseScript := filepath.Join(testDir, \"scripts\", \"generate-license.sh\")\n\trequire.True(suite.T(), helpers.FileExists(licenseScript), \"License generation script should exist\")\n\n\t// Make script executable\n\terr = os.Chmod(licenseScript, 0755)\n\trequire.NoError(suite.T(), err)\n\n\t// Run license generation\n\tresult := helpers.RunCommand(suite.T(), testDir, \"./scripts/generate-license.sh\")\n\thelpers",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 270,
+        "end": 279,
+        "startLoc": {
+          "line": 270,
+          "column": 2,
+          "position": 2362
+        },
+        "endLoc": {
+          "line": 279,
+          "column": 8,
+          "position": 2463
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 96,
+        "end": 106,
+        "startLoc": {
+          "line": 96,
+          "column": 4,
+          "position": 605
+        },
+        "endLoc": {
+          "line": 106,
+          "column": 3,
+          "position": 707
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 9,
+      "fragment": "// Run just command\n\t\t\tresult := helpers.RunCommandWithTimeout(suite.T(), cmd.timeout, testDir, \"just\", cmd.command)\n\n\t\t\tif cmd.expectSuccess {\n\t\t\t\tif result.ExitCode != 0 {\n\t\t\t\t\tsuite.T().Logf(\"Just %s output: %s\", cmd.command, result.Stdout)\n\t\t\t\t\tsuite.T().Logf(\"Just %s errors: %s\", cmd.command, result.Stderr)\n\t\t\t\t}\n\t\t\t\thelpers.AssertCommandSuccess(suite.T(), result, \"Just %s should succeed\"",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 207,
+        "end": 215,
+        "startLoc": {
+          "line": 207,
+          "column": 4,
+          "position": 1731
+        },
+        "endLoc": {
+          "line": 215,
+          "column": 25,
+          "position": 1850
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 91,
+        "end": 99,
+        "startLoc": {
+          "line": 91,
+          "column": 4,
+          "position": 595
+        },
+        "endLoc": {
+          "line": 99,
+          "column": 29,
+          "position": 714
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 20,
+      "fragment": "(testDir)\n\n\t\t\t// Set up environment variables\n\t\t\tcleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[\"minimal\"])\n\t\t\tsuite.RegisterCleanup(cleanup)\n\n\t\t\t// Check if just command is available\n\t\t\tif !suite.isJustAvailable() {\n\t\t\t\tsuite.T().Skip(\"just command not available\")\n\t\t\t}\n\n\t\t\t// Run just command\n\t\t\tresult := helpers.RunCommandWithTimeout(suite.T(), cmd.timeout, testDir, \"just\", cmd.command)\n\n\t\t\tif cmd.expectSuccess {\n\t\t\t\tif result.ExitCode != 0 {\n\t\t\t\t\tsuite.T().Logf(\"Just %s output: %s\", cmd.command, result.Stdout)\n\t\t\t\t\tsuite.T().Logf(\"Just %s errors: %s\", cmd.command, result.Stderr)\n\t\t\t\t\t\n\t\t\t\t\t// Allow warnings for validation commands",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 274,
+        "end": 293,
+        "startLoc": {
+          "line": 274,
+          "column": 10,
+          "position": 2292
+        },
+        "endLoc": {
+          "line": 293,
+          "column": 42,
+          "position": 2469
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 196,
+        "end": 98,
+        "startLoc": {
+          "line": 196,
+          "column": 15,
+          "position": 1658
+        },
+        "endLoc": {
+          "line": 98,
+          "column": 2,
+          "position": 697
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 14,
+      "fragment": ")\n\t\t\t}\n\n\t\t\t// Run just command\n\t\t\tresult := helpers.RunCommandWithTimeout(suite.T(), cmd.timeout, testDir, \"just\", cmd.command)\n\n\t\t\tif cmd.expectSuccess {\n\t\t\t\tif result.ExitCode != 0 {\n\t\t\t\t\tsuite.T().Logf(\"Just %s output: %s\", cmd.command, result.Stdout)\n\t\t\t\t\tsuite.T().Logf(\"Just %s errors: %s\", cmd.command, result.Stderr)\n\t\t\t\t}\n\t\t\t\thelpers.AssertCommandSuccess(suite.T(), result, \"Just %s should succeed\", cmd.command)\n\t\t\t\t\n\t\t\t\t// Verify dist directory was created for successful builds",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 385,
+        "end": 398,
+        "startLoc": {
+          "line": 385,
+          "column": 35,
+          "position": 3253
+        },
+        "endLoc": {
+          "line": 398,
+          "column": 59,
+          "position": 3390
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 204,
+        "end": 216,
+        "startLoc": {
+          "line": 204,
+          "column": 29,
+          "position": 1724
+        },
+        "endLoc": {
+          "line": 216,
+          "column": 2,
+          "position": 1859
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 11,
+      "fragment": ")\n\tsuite.RegisterCleanup(func() { os.RemoveAll(testDir) })\n\n\t// Set up environment variables\n\tcleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[\"minimal\"])\n\tsuite.RegisterCleanup(cleanup)\n\n\t// Create a proper Go project structure\n\tsuite.setupGoProject(testDir)\n\n\t// Initialize Git repository",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/goreleaser_test.go",
+        "start": 222,
+        "end": 232,
+        "startLoc": {
+          "line": 222,
+          "column": 24,
+          "position": 1822
+        },
+        "endLoc": {
+          "line": 232,
+          "column": 29,
+          "position": 1895
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/goreleaser_test.go",
+        "start": 177,
+        "end": 187,
+        "startLoc": {
+          "line": 177,
+          "column": 25,
+          "position": 1415
+        },
+        "endLoc": {
+          "line": 187,
+          "column": 63,
+          "position": 1488
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 14,
+      "fragment": ")\n\t\t\tsuite.RegisterCleanup(func() { os.RemoveAll(testDir) })\n\n\t\t\t// Set up environment variables\n\t\t\tcleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[\"complete\"])\n\t\t\tsuite.RegisterCleanup(cleanup)\n\n\t\t\t// Create readme config\n\t\t\treadmeConfigDir := filepath.Join(testDir, \".readme\", \"configs\")\n\t\t\terr := os.MkdirAll(readmeConfigDir, 0755)\n\t\t\trequire.NoError(suite.T(), err)\n\n\t\t\tconfigPath := filepath.Join(readmeConfigDir, \"readme-config.yaml\")\n\t\t\thelpers.WriteFile(suite.T(), configPath, tc",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/components_test.go",
+        "start": 42,
+        "end": 55,
+        "startLoc": {
+          "line": 42,
+          "column": 27,
+          "position": 248
+        },
+        "endLoc": {
+          "line": 55,
+          "column": 3,
+          "position": 390
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 246,
+        "end": 259,
+        "startLoc": {
+          "line": 246,
+          "column": 22,
+          "position": 2129
+        },
+        "endLoc": {
+          "line": 259,
+          "column": 9,
+          "position": 2271
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 12,
+      "fragment": ")\n\tsuite.RegisterCleanup(func() { os.RemoveAll(testDir) })\n\n\t// Set up complete project\n\tsuite.setupGoProject(testDir)\n\tsuite.initGitRepo(testDir)\n\n\t// Set up environment variables\n\tcleanup := helpers.SetEnvVars(suite.T(), fixtures.TestEnvironmentVars[\"complete\"])\n\tsuite.RegisterCleanup(cleanup)\n\n\t// Generate license",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/components_test.go",
+        "start": 191,
+        "end": 202,
+        "startLoc": {
+          "line": 191,
+          "column": 30,
+          "position": 1680
+        },
+        "endLoc": {
+          "line": 202,
+          "column": 20,
+          "position": 1761
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/justfile_test.go",
+        "start": 419,
+        "end": 430,
+        "startLoc": {
+          "line": 419,
+          "column": 15,
+          "position": 3606
+        },
+        "endLoc": {
+          "line": 430,
+          "column": 38,
+          "position": 3687
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 8,
+      "fragment": "readmeConfigDir := filepath.Join(testDir, \".readme\", \"configs\")\n\terr := os.MkdirAll(readmeConfigDir, 0755)\n\trequire.NoError(suite.T(), err)\n\n\tconfigPath := filepath.Join(readmeConfigDir, \"readme-config.yaml\")\n\thelpers.WriteFile(suite.T(), configPath, fixtures.ReadmeConfigs[\"complete\"])\n\n\t// Step 5: Generate license",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/integration/components_test.go",
+        "start": 270,
+        "end": 277,
+        "startLoc": {
+          "line": 270,
+          "column": 2,
+          "position": 2321
+        },
+        "endLoc": {
+          "line": 277,
+          "column": 28,
+          "position": 2409
+        }
+      },
+      "secondFile": {
+        "name": "tests/integration/license_test.go",
+        "start": 254,
+        "end": 261,
+        "startLoc": {
+          "line": 254,
+          "column": 2,
+          "position": 2193
+        },
+        "endLoc": {
+          "line": 261,
+          "column": 35,
+          "position": 2281
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 12,
+      "fragment": ", dir, command string, args ...string) CommandResult {\n\tt.Helper()\n\n\tstart := time.Now()\n\tcmd := exec.Command(command, args...)\n\tcmd.Dir = dir\n\n\tvar stdout, stderr bytes.Buffer\n\tcmd.Stdout = &stdout\n\tcmd.Stderr = &stderr\n\n\tdone",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/helpers/test_helpers.go",
+        "start": 58,
+        "end": 69,
+        "startLoc": {
+          "line": 58,
+          "column": 9,
+          "position": 353
+        },
+        "endLoc": {
+          "line": 69,
+          "column": 5,
+          "position": 452
+        }
+      },
+      "secondFile": {
+        "name": "tests/helpers/test_helpers.go",
+        "start": 26,
+        "end": 37,
+        "startLoc": {
+          "line": 26,
+          "column": 2,
+          "position": 90
+        },
+        "endLoc": {
+          "line": 37,
+          "column": 4,
+          "position": 189
+        }
+      }
+    },
+    {
+      "format": "go",
+      "lines": 20,
+      "fragment": "duration := time.Since(start)\n\n\texitCode := 0\n\tif err != nil {\n\t\tif exitErr, ok := err.(*exec.ExitError); ok {\n\t\t\texitCode = exitErr.ExitCode()\n\t\t} else {\n\t\t\texitCode = 1\n\t\t}\n\t}\n\n\treturn CommandResult{\n\t\tExitCode: exitCode,\n\t\tStdout:   stdout.String(),\n\t\tStderr:   stderr.String(),\n\t\tDuration: duration,\n\t}\n}\n\n// CopyDir recursively copies a directory",
+      "tokens": 0,
+      "firstFile": {
+        "name": "tests/helpers/test_helpers.go",
+        "start": 86,
+        "end": 105,
+        "startLoc": {
+          "line": 86,
+          "column": 2,
+          "position": 584
+        },
+        "endLoc": {
+          "line": 105,
+          "column": 42,
+          "position": 718
+        }
+      },
+      "secondFile": {
+        "name": "tests/helpers/test_helpers.go",
+        "start": 38,
+        "end": 57,
+        "startLoc": {
+          "line": 38,
+          "column": 2,
+          "position": 200
+        },
+        "endLoc": {
+          "line": 57,
+          "column": 59,
+          "position": 334
+        }
+      }
+    },
+    {
+      "format": "bash",
+      "lines": 20,
+      "fragment": "log_info() {\n    echo -e \"${BLUE}[INFO]${NC} $1\"\n}\n\nlog_success() {\n    echo -e \"${GREEN}[✓]${NC} $1\"\n    ((CHECKS++))\n}\n\nlog_warning() {\n    echo -e \"${YELLOW}[⚠]${NC} $1\"\n    ((WARNINGS++))\n}\n\nlog_error() {\n    echo -e \"${RED}[✗]${NC} $1\"\n    ((ERRORS++))\n}\n\nlog_critical",
+      "tokens": 0,
+      "firstFile": {
+        "name": "validate-env.sh",
+        "start": 117,
+        "end": 136,
+        "startLoc": {
+          "line": 117,
+          "column": 1,
+          "position": 614
+        },
+        "endLoc": {
+          "line": 136,
+          "column": 13,
+          "position": 720
+        }
+      },
+      "secondFile": {
+        "name": "verify.sh",
+        "start": 25,
+        "end": 44,
+        "startLoc": {
+          "line": 25,
+          "column": 1,
+          "position": 71
+        },
+        "endLoc": {
+          "line": 44,
+          "column": 14,
+          "position": 177
+        }
+      }
+    }
+  ],
+  "filename": "/Users/larsartmann/.bun/install/global/node_modules/@jscpd/html-reporter/dist/templates/main.pug"
+}

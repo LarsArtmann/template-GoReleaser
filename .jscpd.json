@@ -1,0 +1,29 @@
+{
+  "threshold": 0,
+  "reporters": [
+    "console",
+    "json",
+    "html"
+  ],
+  "minLines": 5,
+  "minTokens": 50,
+  "ignore": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/.git/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/*.pb.go",
+    "**/go.sum",
+    "**/go.mod",
+    "**/*.md",
+    "**/LICENSE",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*.json",
+    "**/testdata/**"
+  ],
+  "output": "./duplication-report",
+  "silent": false,
+  "exitCode": 0
+}
