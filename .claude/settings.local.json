@@ -18,7 +18,11 @@
       "Bash(./goreleaser-cli --help)",
       "Bash(./goreleaser-cli version)",
       "Bash(./goreleaser-cli license list)",
-      "Bash(./goreleaser-cli validate --help)"
+      "Bash(./goreleaser-cli validate --help)",
+      "Bash(./goreleaser-cli --help)",
+      "Bash(./goreleaser-cli version)",
+      "Bash(./goreleaser-cli license list)",
+      "Bash(./goreleaser-cli validate --config)"
     ],
     "deny": []
   }
