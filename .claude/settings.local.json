@@ -11,7 +11,8 @@
       "Bash(./validate-env.sh)",
       "Bash(hadolint:*)",
       "Bash(shellcheck:*)",
-      "Bash(./validate-strict.sh:*)"
+      "Bash(./validate-strict.sh:*)",
+      "Bash(test:*)"
     ],
     "deny": []
   }
