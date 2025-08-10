@@ -1,0 +1,152 @@
+package templates
+
+templ ConfigContent() {
+	<div class="space-y-6">
+		<div class="bg-white rounded-lg shadow-md p-6">
+			<h2 class="text-2xl font-bold text-gray-800 mb-4">GoReleaser Configuration Editor</h2>
+			<p class="text-gray-600 mb-6">
+				Edit your .goreleaser.yaml configuration with real-time validation and syntax highlighting.
+			</p>
+			
+			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+				<!-- Editor Panel -->
+				<div class="lg:col-span-2">
+					<div class="bg-gray-50 rounded-lg p-4">
+						<div class="flex justify-between items-center mb-4">
+							<h3 class="text-lg font-semibold">Configuration Editor</h3>
+							<div class="space-x-2">
+								<button 
+									hx-get="/api/config/load" 
+									hx-target="#config-editor"
+									class="bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700"
+								>
+									Load
+								</button>
+								<button 
+									hx-post="/config" 
+									hx-include="#config-form"
+									hx-target="#save-result"
+									class="bg-green-600 text-white px-3 py-1 text-sm rounded hover:bg-green-700"
+								>
+									Save
+								</button>
+							</div>
+						</div>
+						<form id="config-form" class="space-y-4">
+							<textarea 
+								id="config-editor"
+								name="config"
+								rows="20"
+								class="w-full p-3 border border-gray-300 rounded-lg font-mono text-sm"
+								placeholder="# GoReleaser configuration
+project_name: my-project
+
+before:
+  hooks:
+    - go mod tidy
+    - go generate ./...
+
+builds:
+  - env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+
+archives:
+  - format: tar.gz
+    name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch &quot;amd64&quot; }}x86_64
+      {{- else if eq .Arch &quot;386&quot; }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+    format_overrides:
+    - goos: windows
+      format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: &quot;{{ incpatch .Version }}-next&quot;
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+      - '^docs:'
+      - '^test:'"
+							></textarea>
+							<div id="save-result"></div>
+						</form>
+					</div>
+				</div>
+
+				<!-- Validation Panel -->
+				<div class="space-y-4">
+					<div class="bg-gray-50 rounded-lg p-4">
+						<h3 class="text-lg font-semibold mb-4">Validation</h3>
+						<button 
+							hx-post="/api/v1/validate/config" 
+							hx-include="#config-form"
+							hx-target="#validation-results"
+							class="w-full bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700 mb-4"
+						>
+							Validate Configuration
+						</button>
+						<div id="validation-results" class="space-y-2">
+							<div class="text-gray-500 text-sm">Click "Validate Configuration" to check your config</div>
+						</div>
+					</div>
+
+					<div class="bg-gray-50 rounded-lg p-4">
+						<h3 class="text-lg font-semibold mb-4">Environment Check</h3>
+						<button 
+							hx-post="/api/v1/validate/environment" 
+							hx-target="#environment-results"
+							class="w-full bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 mb-4"
+						>
+							Check Environment
+						</button>
+						<div id="environment-results" class="space-y-2">
+							<div class="text-gray-500 text-sm">Click "Check Environment" to validate your setup</div>
+						</div>
+					</div>
+
+					<div class="bg-gray-50 rounded-lg p-4">
+						<h3 class="text-lg font-semibold mb-4">Quick Templates</h3>
+						<div class="space-y-2">
+							<button 
+								class="w-full bg-gray-600 text-white px-3 py-2 text-sm rounded hover:bg-gray-700"
+								onclick="loadTemplate('basic')"
+							>
+								Basic Config
+							</button>
+							<button 
+								class="w-full bg-gray-600 text-white px-3 py-2 text-sm rounded hover:bg-gray-700"
+								onclick="loadTemplate('docker')"
+							>
+								With Docker
+							</button>
+							<button 
+								class="w-full bg-gray-600 text-white px-3 py-2 text-sm rounded hover:bg-gray-700"
+								onclick="loadTemplate('homebrew')"
+							>
+								With Homebrew
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+}
+
+templ Config() {
+	@Base("Configuration Editor - GoReleaser Tool", ConfigContent())
+}

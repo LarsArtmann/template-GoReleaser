@@ -25,7 +25,8 @@
       "Bash(./goreleaser-cli validate --config)",
       "Bash(./goreleaser-cli validate --help)",
       "Bash(./goreleaser-cli-new config init --force)",
-      "Bash(./goreleaser-cli-new config show)"
+      "Bash(./goreleaser-cli-new config show)",
+      "Bash(./goreleaser-cli verify --help)"
     ],
     "deny": []
   }
