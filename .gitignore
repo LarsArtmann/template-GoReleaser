@@ -78,6 +78,10 @@ docker-compose.override.yml
 validation-report.json
 validation-*.json
 
+# Code duplication reports
+duplication-report/
+.jscpd.json
+
 # Release notes
 RELEASE_NOTES.md
 
