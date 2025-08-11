@@ -7,7 +7,7 @@
 version: 2
 
 # Project configuration
-project_name: myproject
+project_name: goreleaser-cli
 
 # Build configurations
 before:
@@ -20,12 +20,12 @@ before:
     - go test -v ./...
 
 builds:
-  - id: main
-    # Entry point - adjust to your main package location
-    main: ./cmd/{{.ProjectName}}
+  - id: goreleaser-cli
+    # Entry point - goreleaser CLI tool
+    main: ./cmd/goreleaser-cli
     
     # Binary name
-    binary: '{{.ProjectName}}'
+    binary: 'goreleaser-cli'
     
     # Build flags
     flags:
@@ -92,10 +92,10 @@ builds:
 
 # Universal binaries for macOS
 universal_binaries:
-  - id: main
+  - id: goreleaser-cli
     ids:
-      - main
-    name_template: '{{.ProjectName}}'
+      - goreleaser-cli
+    name_template: 'goreleaser-cli'
     replace: true
 
 # Archives configuration

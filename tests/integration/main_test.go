@@ -64,7 +64,10 @@ func (suite *IntegrationTestSuite) TearDownSuite() {
 
 	// Restore original working directory
 	if suite.originalDir != "" {
-		os.Chdir(suite.originalDir)
+		if err := os.Chdir(suite.originalDir); err != nil {
+			// Log error but don't fail teardown
+			suite.T().Logf("Warning: could not restore original directory: %v", err)
+		}
 	}
 }
 

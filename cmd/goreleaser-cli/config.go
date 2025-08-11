@@ -234,7 +234,10 @@ func LoadTypedConfig() (*Config, error) {
 			configFile := filepath.Join(home, ".goreleaser-cli.yaml")
 			if _, err := os.Stat(configFile); err == nil {
 				viper.SetConfigFile(configFile)
-				viper.ReadInConfig()
+				if err := viper.ReadInConfig(); err != nil {
+					// Config file exists but cannot be read - continue with defaults
+					// This is not fatal as we can still use defaults
+				}
 			}
 		}
 	}

@@ -20,7 +20,7 @@ init:
 # Build the project
 build:
     @echo "Building project..."
-    go build -v ./cmd/myproject
+    go build -v ./cmd/goreleaser-cli
     @echo "✓ Build complete"
 
 # Run tests
@@ -80,7 +80,7 @@ fmt:
 clean:
     @echo "Cleaning build artifacts..."
     rm -rf dist/ build/ bin/
-    rm -f myproject *.exe
+    rm -f goreleaser-cli goreleaser-cli-server *.exe
     rm -f coverage.out coverage.html
     rm -f integration-coverage.out integration-coverage.html
     rm -f validation-report.json
@@ -213,7 +213,7 @@ setup-env:
 docker-build:
     @echo "Building Docker image..."
     @if docker info >/dev/null 2>&1; then \
-        docker build -t myproject:latest .; \
+        docker build -t goreleaser-cli:latest .; \
         echo "✓ Docker image built"; \
     else \
         echo "⚠ Docker daemon is not running. Please start Docker first."; \
@@ -224,7 +224,7 @@ docker-build:
 docker-run: docker-build
     @echo "Running Docker container..."
     @if docker info >/dev/null 2>&1; then \
-        docker run --rm myproject:latest; \
+        docker run --rm goreleaser-cli:latest; \
         echo "✓ Docker container executed"; \
     else \
         echo "⚠ Docker daemon is not running. Please start Docker first."; \
@@ -327,15 +327,15 @@ update-deps:
 
 # Show current version
 version:
-    @go run ./cmd/myproject -version
+    @go run ./cmd/goreleaser-cli version
 
 # Health check
 health:
-    @go run ./cmd/myproject -health
+    @echo "Health check not applicable for CLI tool"
 
 # Run the application
 run:
-    go run ./cmd/myproject
+    go run ./cmd/goreleaser-cli
 
 # Watch for changes and rebuild
 watch:

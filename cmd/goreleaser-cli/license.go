@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"strings"
@@ -121,12 +120,18 @@ func runLicenseGenerate(cmd *cobra.Command, args []string) {
 
 		if licenseType == "" {
 			fmt.Print("Enter license type (e.g., MIT, Apache-2.0): ")
-			fmt.Scanln(&licenseType)
+			if _, err := fmt.Scanln(&licenseType); err != nil {
+				fmt.Printf("❌ Failed to read license type: %v\n", err)
+				os.Exit(1)
+			}
 		}
 
 		if copyrightHolder == "" {
 			fmt.Print("Enter copyright holder name: ")
-			fmt.Scanln(&copyrightHolder)
+			if _, err := fmt.Scanln(&copyrightHolder); err != nil {
+				fmt.Printf("❌ Failed to read copyright holder: %v\n", err)
+				os.Exit(1)
+			}
 		}
 	}
 
@@ -166,16 +171,16 @@ func runLicenseList(cmd *cobra.Command, args []string) {
 	fmt.Println("📋 Available license templates:")
 
 	templatesDir := "assets/licenses"
-	files, err := ioutil.ReadDir(templatesDir)
+	files, err := os.ReadDir(templatesDir)
 	if err != nil {
 		fmt.Printf("❌ Cannot read templates directory: %v\n", err)
 		os.Exit(1)
 	}
 
 	found := false
-	for _, file := range files {
-		if strings.HasSuffix(file.Name(), ".template") {
-			licenseName := strings.TrimSuffix(file.Name(), ".template")
+	for _, entry := range files {
+		if strings.HasSuffix(entry.Name(), ".template") {
+			licenseName := strings.TrimSuffix(entry.Name(), ".template")
 			fmt.Printf("  • %s\n", licenseName)
 			found = true
 		}
@@ -212,7 +217,7 @@ func runLicenseShow(cmd *cobra.Command, args []string) {
 	preview, _ := cmd.Flags().GetBool("preview")
 	if preview {
 		fmt.Println("\n📖 License content preview (first 15 lines):")
-		content, err := ioutil.ReadFile(licenseFile)
+		content, err := os.ReadFile(licenseFile)
 		if err != nil {
 			fmt.Printf("❌ Cannot read file content: %v\n", err)
 			return
@@ -246,7 +251,7 @@ func runLicenseValidate(cmd *cobra.Command, args []string) {
 	}
 
 	// Read and validate content
-	content, err := ioutil.ReadFile(licenseFile)
+	content, err := os.ReadFile(licenseFile)
 	if err != nil {
 		fmt.Printf("❌ Cannot read LICENSE file: %v\n", err)
 		os.Exit(1)
