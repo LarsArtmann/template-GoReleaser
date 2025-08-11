@@ -69,8 +69,13 @@ func registerDomainServices(injector *do.Injector) {
 		return services.NewConfigService(viper), nil
 	})
 	
+	// Validation service
+	do.Provide[services.ValidationService](injector, func(i *do.Injector) (services.ValidationService, error) {
+		configService := do.MustInvoke[services.ConfigService](i)
+		return services.NewValidationService(configService), nil
+	})
+	
 	// TODO: Add other domain services as they are implemented
-	// - ValidationService
 	// - LicenseService  
 	// - VerificationService
 }

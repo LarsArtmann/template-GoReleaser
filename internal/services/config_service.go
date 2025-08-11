@@ -7,6 +7,7 @@ import (
 
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
+	"github.com/LarsArtmann/template-GoReleaser/internal/types"
 )
 
 // ConfigServiceImpl implements ConfigService interface
@@ -22,8 +23,8 @@ func NewConfigService(v *viper.Viper) ConfigService {
 }
 
 // LoadConfig loads configuration from file or creates default
-func (s *ConfigServiceImpl) LoadConfig() (*Config, error) {
-	config := &Config{}
+func (s *ConfigServiceImpl) LoadConfig() (*types.Config, error) {
+	config := &types.Config{}
 	
 	// Try to load from viper first
 	if err := s.viper.Unmarshal(config); err != nil {
@@ -37,7 +38,7 @@ func (s *ConfigServiceImpl) LoadConfig() (*Config, error) {
 }
 
 // SaveConfig saves configuration to file
-func (s *ConfigServiceImpl) SaveConfig(config *Config) error {
+func (s *ConfigServiceImpl) SaveConfig(config *types.Config) error {
 	// Determine config file path
 	configPath := s.viper.ConfigFileUsed()
 	if configPath == "" {
@@ -69,7 +70,7 @@ func (s *ConfigServiceImpl) SaveConfig(config *Config) error {
 }
 
 // ValidateConfig validates configuration structure and values
-func (s *ConfigServiceImpl) ValidateConfig(config *Config) error {
+func (s *ConfigServiceImpl) ValidateConfig(config *types.Config) error {
 	if config == nil {
 		return fmt.Errorf("config cannot be nil")
 	}
@@ -103,14 +104,13 @@ func (s *ConfigServiceImpl) ValidateConfig(config *Config) error {
 }
 
 // InitConfig creates a new configuration with defaults
-func (s *ConfigServiceImpl) InitConfig() (*Config, error) {
-	config := &Config{}
-	s.applyDefaults(config)
+func (s *ConfigServiceImpl) InitConfig() (*types.Config, error) {
+	config := types.DefaultConfig()
 	return config, nil
 }
 
 // applyDefaults applies default values to configuration
-func (s *ConfigServiceImpl) applyDefaults(config *Config) {
+func (s *ConfigServiceImpl) applyDefaults(config *types.Config) {
 	if config.License.Type == "" {
 		config.License.Type = "MIT"
 	}

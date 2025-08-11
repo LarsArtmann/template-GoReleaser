@@ -1,18 +1,20 @@
 package services
 
+import "github.com/LarsArtmann/template-GoReleaser/internal/types"
+
 // ConfigService handles configuration management operations
 type ConfigService interface {
 	// LoadConfig loads configuration from file or creates default
-	LoadConfig() (*Config, error)
+	LoadConfig() (*types.Config, error)
 	
 	// SaveConfig saves configuration to file
-	SaveConfig(config *Config) error
+	SaveConfig(config *types.Config) error
 	
 	// ValidateConfig validates configuration structure and values
-	ValidateConfig(config *Config) error
+	ValidateConfig(config *types.Config) error
 	
 	// InitConfig creates a new configuration with defaults
-	InitConfig() (*Config, error)
+	InitConfig() (*types.Config, error)
 }
 
 // ValidationService handles all validation operations
@@ -54,36 +56,8 @@ type VerificationService interface {
 	RunDryRun(configPath string) (*DryRunResult, error)
 }
 
-// Config represents the application configuration
-type Config struct {
-	License LicenseConfig `yaml:"license" json:"license"`
-	Author  AuthorConfig  `yaml:"author" json:"author"`
-	Project ProjectConfig `yaml:"project" json:"project"`
-	CLI     CLIConfig     `yaml:"cli" json:"cli"`
-}
-
-// LicenseConfig holds license-related configuration
-type LicenseConfig struct {
-	Type string `yaml:"type" json:"type"`
-}
-
-// AuthorConfig holds author information
-type AuthorConfig struct {
-	Name  string `yaml:"name" json:"name"`
-	Email string `yaml:"email" json:"email"`
-}
-
-// ProjectConfig holds project-specific settings
-type ProjectConfig struct {
-	Name        string `yaml:"name" json:"name"`
-	Description string `yaml:"description" json:"description"`
-}
-
-// CLIConfig holds CLI behavior settings
-type CLIConfig struct {
-	Verbose bool `yaml:"verbose" json:"verbose"`
-	Colors  bool `yaml:"colors" json:"colors"`
-}
+// Import Config types from main types file to avoid duplication
+// These types are defined in cmd/goreleaser-cli/types.go
 
 // ValidationResult represents the result of a validation operation
 type ValidationResult struct {
