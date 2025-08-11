@@ -32,7 +32,8 @@
       "Bash(./goreleaser-cli validate --config .goreleaser.yaml)",
       "Bash(./goreleaser-cli server:*)",
       "Bash(./goreleaser-cli config show)",
-      "Bash(./goreleaser-cli config set:*)"
+      "Bash(./goreleaser-cli config set:*)",
+      "Bash(./goreleaser-cli validate)"
     ],
     "deny": []
   }
