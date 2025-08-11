@@ -797,3 +797,14 @@ func copyFile(src, dst string) error {
 	return os.WriteFile(dst, srcContent, 0644)
 }
 
+func isPlaceholderValue(value string) bool {
+	placeholders := []string{"your-", "xxxx", "example", "changeme", "todo", "test-"}
+	lowerValue := strings.ToLower(value)
+	for _, placeholder := range placeholders {
+		if strings.HasPrefix(lowerValue, placeholder) {
+			return true
+		}
+	}
+	return len(value) < 3
+}
+
