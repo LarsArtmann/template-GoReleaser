@@ -3,11 +3,10 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
-	"time"
 
+	"github.com/samber/do"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
+	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 )
 
 // configCmd represents the config command
@@ -73,39 +72,31 @@ func runConfig(cmd *cobra.Command, args []string) {
 func runConfigShow(cmd *cobra.Command, args []string) {
 	fmt.Println("📋 Current Configuration:")
 
-	configFile := viper.ConfigFileUsed()
-	if configFile == "" {
-		fmt.Println("⚠️  No configuration file in use")
+	// Get config service from DI container
+	injector := GetContainer()
+	configService := do.MustInvoke[services.ConfigService](injector)
+
+	// Load configuration using the service
+	config, err := configService.LoadConfig()
+	if err != nil {
+		fmt.Printf("❌ Error loading configuration: %v\n", err)
 		fmt.Println("💡 Run 'goreleaser-cli config init' to create one")
 		return
 	}
 
-	fmt.Printf("📄 Config file: %s\n", configFile)
-	fmt.Printf("📏 File format: %s\n", filepath.Ext(configFile))
-
-	// Load typed configuration
-	config, err := LoadTypedConfig()
-	if err != nil {
-		fmt.Printf("❌ Error loading configuration: %v\n", err)
-		return
-	}
-
 	fmt.Println("\n🔧 Configuration values:")
-	fmt.Printf("  📄 License: %s (year: %d)\n", config.License.Type, config.License.Year)
+	fmt.Printf("  📄 License: %s\n", config.License.Type)
 	fmt.Printf("  👤 Author: %s <%s>\n", config.Author.Name, config.Author.Email)
 	fmt.Printf("  📦 Project: %s\n", config.Project.Name)
 	if config.Project.Description != "" {
 		fmt.Printf("  📋 Description: %s\n", config.Project.Description)
 	}
-	fmt.Printf("  🛠️  CLI: verbose=%t, colors=%t, timeout=%ds\n", 
-		config.CLI.Verbose, config.CLI.Colors, config.CLI.Timeout)
+	fmt.Printf("  🛠️  CLI: verbose=%t, colors=%t\n", 
+		config.CLI.Verbose, config.CLI.Colors)
 
-	// Validate configuration
-	if errors := config.Validate(); len(errors) > 0 {
-		fmt.Println("\n⚠️  Configuration validation warnings:")
-		for _, err := range errors {
-			fmt.Printf("  - %s\n", err)
-		}
+	// Validate configuration using the service
+	if err := configService.ValidateConfig(config); err != nil {
+		fmt.Printf("\n⚠️  Configuration validation error: %v\n", err)
 	} else {
 		fmt.Println("\n✅ Configuration is valid")
 	}
@@ -138,32 +129,51 @@ func runConfigSet(cmd *cobra.Command, args []string) {
 
 	fmt.Printf("🔧 Setting configuration: %s = %s\n", key, value)
 
-	// Set the value in viper
-	viper.Set(key, value)
+	// Get config service from DI container
+	injector := GetContainer()
+	configService := do.MustInvoke[services.ConfigService](injector)
 
-	// Write the config file
-	configFile := viper.ConfigFileUsed()
-	if configFile == "" {
-		// No config file exists, create one
-		home, err := os.UserHomeDir()
+	// Load current configuration
+	config, err := configService.LoadConfig()
+	if err != nil {
+		// If config doesn't exist, create a new one
+		config, err = configService.InitConfig()
 		if err != nil {
-			fmt.Printf("❌ Cannot determine home directory: %v\n", err)
-			os.Exit(1)
-		}
-
-		configFile = filepath.Join(home, ".goreleaser-cli.yaml")
-		viper.SetConfigFile(configFile)
-	}
-
-	if err := viper.WriteConfig(); err != nil {
-		// If WriteConfig fails, try WriteConfigAs (in case file doesn't exist)
-		if err := viper.WriteConfigAs(configFile); err != nil {
-			fmt.Printf("❌ Cannot write config file: %v\n", err)
+			fmt.Printf("❌ Cannot initialize configuration: %v\n", err)
 			os.Exit(1)
 		}
 	}
 
-	fmt.Printf("✅ Configuration saved to: %s\n", configFile)
+	// Set the value based on key path
+	// This is a simplified implementation - could be enhanced with path traversal
+	switch key {
+	case "license.type":
+		config.License.Type = value
+	case "author.name":
+		config.Author.Name = value
+	case "author.email":
+		config.Author.Email = value
+	case "project.name":
+		config.Project.Name = value
+	case "project.description":
+		config.Project.Description = value
+	case "cli.verbose":
+		config.CLI.Verbose = (value == "true")
+	case "cli.colors":
+		config.CLI.Colors = (value == "true")
+	default:
+		fmt.Printf("❌ Unknown configuration key: %s\n", key)
+		fmt.Println("💡 Supported keys: license.type, author.name, author.email, project.name, project.description, cli.verbose, cli.colors")
+		os.Exit(1)
+	}
+
+	// Save the updated configuration
+	if err := configService.SaveConfig(config); err != nil {
+		fmt.Printf("❌ Cannot save configuration: %v\n", err)
+		os.Exit(1)
+	}
+
+	fmt.Println("✅ Configuration updated successfully")
 }
 
 func runConfigInit(cmd *cobra.Command, args []string) {
@@ -171,128 +181,34 @@ func runConfigInit(cmd *cobra.Command, args []string) {
 
 	force, _ := cmd.Flags().GetBool("force")
 
-	// Determine config file path
-	home, err := os.UserHomeDir()
+	// Get config service from DI container
+	injector := GetContainer()
+	configService := do.MustInvoke[services.ConfigService](injector)
+
+	// Check if file already exists (simplified check)
+	if !force {
+		if _, err := configService.LoadConfig(); err == nil {
+			fmt.Println("❌ Configuration already exists")
+			fmt.Println("💡 Use --force to overwrite, or 'goreleaser-cli config show' to view current config")
+			os.Exit(1)
+		}
+	}
+
+	// Create default configuration using the service
+	config, err := configService.InitConfig()
 	if err != nil {
-		fmt.Printf("❌ Cannot determine home directory: %v\n", err)
+		fmt.Printf("❌ Cannot create default configuration: %v\n", err)
 		os.Exit(1)
 	}
 
-	configFile := filepath.Join(home, ".goreleaser-cli.yaml")
-
-	// Check if file already exists
-	if _, err := os.Stat(configFile); err == nil && !force {
-		fmt.Printf("❌ Configuration file already exists: %s\n", configFile)
-		fmt.Println("💡 Use --force to overwrite, or 'goreleaser-cli config show' to view current config")
+	// Save the configuration using the service
+	if err := configService.SaveConfig(config); err != nil {
+		fmt.Printf("❌ Cannot save configuration file: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Create default configuration
-	defaultConfig := `# GoReleaser CLI Configuration File
-# This file stores default values for the CLI tool
-
-# License settings
-license:
-  type: "MIT"
-  
-# Author/Copyright settings  
-author:
-  name: ""
-  email: ""
-
-# Project settings
-project:
-  name: ""
-  description: ""
-
-# CLI behavior settings
-cli:
-  verbose: false
-  colors: true
-`
-
-	// Write the config file
-	if err := os.WriteFile(configFile, []byte(defaultConfig), 0644); err != nil {
-		fmt.Printf("❌ Cannot create config file: %v\n", err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("✅ Configuration file created: %s\n", configFile)
-	fmt.Println("\n📝 Edit the file to customize your settings:")
-	fmt.Printf("   %s\n", configFile)
+	fmt.Println("✅ Configuration file created successfully")
+	fmt.Println("\n📝 Edit the file to customize your settings")
 	fmt.Println("\n💡 Use 'goreleaser-cli config show' to view current settings")
 }
 
-// LoadTypedConfig loads the configuration into typed structs
-func LoadTypedConfig() (*Config, error) {
-	config := DefaultConfig()
-	
-	// If no config file is set, try to find one
-	if viper.ConfigFileUsed() == "" {
-		home, err := os.UserHomeDir()
-		if err == nil {
-			configFile := filepath.Join(home, ".goreleaser-cli.yaml")
-			if _, err := os.Stat(configFile); err == nil {
-				viper.SetConfigFile(configFile)
-				if err := viper.ReadInConfig(); err != nil {
-					// Config file exists but cannot be read - continue with defaults
-					// This is not fatal as we can still use defaults
-				}
-			}
-		}
-	}
-	
-	// Unmarshal into typed config
-	if err := viper.Unmarshal(config); err != nil {
-		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
-	}
-	
-	// Apply environment variable overrides
-	if licenseType := os.Getenv("LICENSE_TYPE"); licenseType != "" {
-		config.License.Type = licenseType
-	}
-	if authorName := os.Getenv("COPYRIGHT_HOLDER"); authorName != "" {
-		config.Author.Name = authorName
-	}
-	if authorName := os.Getenv("AUTHOR_NAME"); authorName != "" && config.Author.Name == "" {
-		config.Author.Name = authorName
-	}
-	if projectAuthor := os.Getenv("PROJECT_AUTHOR"); projectAuthor != "" && config.Author.Name == "" {
-		config.Author.Name = projectAuthor
-	}
-	
-	// Set current year if not specified
-	if config.License.Year == 0 {
-		config.License.Year = time.Now().Year()
-	}
-	
-	return config, nil
-}
-
-// SaveTypedConfig saves the typed configuration to file
-func SaveTypedConfig(config *Config) error {
-	configFile := viper.ConfigFileUsed()
-	if configFile == "" {
-		home, err := os.UserHomeDir()
-		if err != nil {
-			return fmt.Errorf("cannot determine home directory: %w", err)
-		}
-		configFile = filepath.Join(home, ".goreleaser-cli.yaml")
-		viper.SetConfigFile(configFile)
-	}
-	
-	// Convert config to viper settings
-	viper.Set("license", config.License)
-	viper.Set("author", config.Author)
-	viper.Set("project", config.Project)
-	viper.Set("cli", config.CLI)
-	
-	if err := viper.WriteConfig(); err != nil {
-		// If WriteConfig fails, try WriteConfigAs
-		if err := viper.WriteConfigAs(configFile); err != nil {
-			return fmt.Errorf("cannot write config file: %w", err)
-		}
-	}
-	
-	return nil
-}
