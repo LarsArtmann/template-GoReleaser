@@ -53,6 +53,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/sagikazarmark/locafero v0.7.0 // indirect
+	github.com/samber/do v1.6.0 // indirect
 	github.com/samber/go-type-to-string v1.4.0 // indirect
 	github.com/samber/lo v1.51.0 // indirect
 	github.com/samber/mo v1.15.0 // indirect

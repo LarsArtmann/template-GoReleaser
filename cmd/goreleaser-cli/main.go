@@ -6,8 +6,10 @@ import (
 	"os"
 
 	"github.com/charmbracelet/fang"
+	"github.com/samber/do"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/LarsArtmann/template-GoReleaser/internal/container"
 )
 
 var (
@@ -20,7 +22,10 @@ var (
 	gitState       = ""
 )
 
-var cfgFile string
+var (
+	cfgFile   string
+	diContainer *container.Container
+)
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -51,7 +56,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig, initContainer)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -90,6 +95,26 @@ func initConfig() {
 	}
 }
 
+// initContainer initializes the dependency injection container
+func initContainer() {
+	diContainer = container.NewContainer()
+}
+
+// GetContainer returns the DI container for use in commands
+func GetContainer() *do.Injector {
+	if diContainer == nil {
+		initContainer()
+	}
+	return diContainer.GetInjector()
+}
+
 func main() {
+	// Ensure graceful shutdown of DI container
+	defer func() {
+		if diContainer != nil {
+			diContainer.Shutdown()
+		}
+	}()
+	
 	Execute()
 }
