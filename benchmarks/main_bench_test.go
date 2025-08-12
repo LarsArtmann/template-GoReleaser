@@ -144,7 +144,6 @@ func BenchmarkConfigService(b *testing.B) {
 	b.Run("LoadConfig", func(b *testing.B) {
 		// Create a test config file first
 		config, _ := configService.InitConfig()
-		configPath := filepath.Join(tempDir, ".goreleaser-cli.yaml")
 		_ = configService.SaveConfig(config)
 
 		b.ResetTimer()
@@ -169,14 +168,17 @@ func BenchmarkMemoryAllocation(b *testing.B) {
 		b.ReportAllocs()
 		for i := 0; i < b.N; i++ {
 			config := &types.Config{
-				ProjectName:    "test-project",
-				GoVersion:      "1.21",
-				Author:         "Test Author",
-				License:        "MIT",
-				GitRepository:  "github.com/test/repo",
-				Description:    "Test description",
-				EnableDocker:   true,
-				EnableGitHooks: true,
+				Project: types.ProjectConfig{
+					Name:        "test-project",
+					Description: "Test description",
+					Repository:  "github.com/test/repo",
+				},
+				Author: types.AuthorConfig{
+					Name: "Test Author",
+				},
+				License: types.LicenseConfig{
+					Type: "MIT",
+				},
 			}
 			_ = config
 		}
@@ -298,31 +300,34 @@ func createTestCommand() *cobra.Command {
 
 func createTestConfig() *types.Config {
 	return &types.Config{
-		ProjectName:    "benchmark-test",
-		GoVersion:      "1.21",
-		Author:         "Benchmark Author",
-		License:        "MIT",
-		GitRepository:  "github.com/test/benchmark",
-		Description:    "Benchmark test configuration",
-		EnableDocker:   true,
-		EnableGitHooks: true,
+		Project: types.ProjectConfig{
+			Name:        "benchmark-test",
+			Description: "Benchmark test configuration",
+			Repository:  "github.com/test/benchmark",
+		},
+		Author: types.AuthorConfig{
+			Name: "Benchmark Author",
+		},
+		License: types.LicenseConfig{
+			Type: "MIT",
+		},
 	}
 }
 
 func createLargeTestConfig() *types.Config {
 	config := createTestConfig()
 	// Add additional fields that might exist in a large configuration
-	config.Description = "This is a very long description that simulates a real-world configuration with extensive documentation and detailed explanations of what this project does and how it should be configured for optimal performance and maintainability."
+	config.Project.Description = "This is a very long description that simulates a real-world configuration with extensive documentation and detailed explanations of what this project does and how it should be configured for optimal performance and maintainability."
 	return config
 }
 
-// BenchmarkMain is a helper function to run all benchmarks
-func BenchmarkMain(m *testing.M) {
+// TestMain provides package-level setup and teardown for benchmarks
+func TestMain(m *testing.M) {
 	// Setup any global benchmark configuration
 	ctx := context.Background()
 	_ = ctx // Use context if needed for setup
 
-	// Run benchmarks
+	// Run tests and benchmarks
 	code := m.Run()
 
 	// Cleanup

@@ -1,0 +1,59 @@
+graph TB
+    subgraph "Improved Architecture"
+        CLI[CLI Layer - Cobra/Fang]
+        
+        subgraph "Application Layer"
+            CMD[Commands]
+            QUERY[Queries]
+            HANDLER[Handlers]
+        end
+        
+        subgraph "Domain Layer"
+            AGG[Aggregates]
+            EVENTS[Domain Events]
+            VALUE[Value Objects]
+        end
+        
+        subgraph "Infrastructure Layer"
+            DI[DI Container - samber/do]
+            DB[Database - sqlc]
+            WEB[Web Server - gin]
+            TEMPL[Templates - templ]
+            LOG[Logging - charmbracelet/log]
+            METRICS[Metrics - OTEL]
+        end
+        
+        subgraph "Presentation Layer"
+            API[REST API]
+            HTMX[HTMX Pages]
+            STATIC[Static Assets]
+        end
+        
+        subgraph "Cross-Cutting"
+            ERR[Error Handling - mo.Result]
+            FP[Functional - lo]
+            TRACE[Tracing - OTEL]
+        end
+        
+        CLI --> CMD
+        CLI --> QUERY
+        CMD --> HANDLER
+        QUERY --> HANDLER
+        HANDLER --> AGG
+        AGG --> EVENTS
+        HANDLER --> DB
+        WEB --> API
+        WEB --> HTMX
+        HTMX --> TEMPL
+        API --> HANDLER
+        
+        DI --> ALL[All Components]
+        ERR --> ALL
+        FP --> ALL
+        TRACE --> ALL
+        LOG --> ALL
+        
+        style DI fill:#90EE90
+        style ERR fill:#90EE90
+        style FP fill:#90EE90
+    end

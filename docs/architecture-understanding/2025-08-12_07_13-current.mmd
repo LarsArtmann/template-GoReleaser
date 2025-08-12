@@ -1,0 +1,48 @@
+graph TB
+    subgraph "Current Architecture"
+        CLI[CLI Layer - Cobra/Viper]
+        CMD[cmd/goreleaser-cli]
+        
+        subgraph "Internal Layer"
+            CONT[container/Container - DI]
+            VAL[validation/Service]
+            SERV[services/]
+            SERVER[server/]
+            TYPES[types/]
+        end
+        
+        subgraph "Web Layer"
+            WEB[web/templates]
+            STATIC[web/static]
+        end
+        
+        subgraph "External Dependencies"
+            COBRA[spf13/cobra]
+            VIPER[spf13/viper]
+            DO[samber/do]
+            GIN[gin-gonic/gin]
+            TEMPL[a-h/templ]
+        end
+        
+        subgraph "Ghost Systems"
+            HTMX[htmx - not integrated]
+            SQLC[sqlc - config only]
+            UNIFLOW[uniflow - not added]
+            BINS[Binaries in git]
+        end
+        
+        CMD --> CLI
+        CLI --> CONT
+        CONT --> VAL
+        CONT --> SERV
+        SERVER --> GIN
+        CMD --> COBRA
+        CMD --> VIPER
+        CONT --> DO
+        WEB -.-> TEMPL
+        
+        style HTMX fill:#ff9999
+        style SQLC fill:#ff9999
+        style UNIFLOW fill:#ff9999
+        style BINS fill:#ff9999
+    end

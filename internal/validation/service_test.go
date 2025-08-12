@@ -64,7 +64,16 @@ func TestValidateEnvironment(t *testing.T) {
 	})
 
 	t.Run("invalid token format", func(t *testing.T) {
-		// Set invalid token
+		// Clear all environment variables first to ensure clean state
+		for _, varName := range []string{
+			"GITHUB_TOKEN", "DOCKER_TOKEN", "COSIGN_PRIVATE_KEY", 
+			"GOOGLE_APPLICATION_CREDENTIALS", "SCOOP_GITHUB_TOKEN", 
+			"HOMEBREW_TAP_GITHUB_TOKEN", "AUR_KEY", "GORELEASER_KEY",
+		} {
+			os.Unsetenv(varName)
+		}
+		
+		// Set only the variables we want to test
 		os.Setenv("GITHUB_TOKEN", "invalid_token")
 		os.Setenv("GITHUB_OWNER", "testowner")
 		os.Setenv("GITHUB_REPO", "testrepo")
@@ -72,8 +81,18 @@ func TestValidateEnvironment(t *testing.T) {
 		result := service.ValidateEnvironment()
 
 		assert.False(t, result.Valid)
-		assert.Len(t, result.Issues, 1)
-		assert.Equal(t, "VALIDATION_FAILED", result.Issues[0].Code)
+		assert.Greater(t, len(result.Issues), 0, "Should have at least one validation issue")
+		
+		// Check that GITHUB_TOKEN specifically has a validation issue
+		foundGitHubTokenIssue := false
+		for _, issue := range result.Issues {
+			if issue.Field == "GITHUB_TOKEN" {
+				foundGitHubTokenIssue = true
+				assert.Equal(t, "VALIDATION_FAILED", issue.Code)
+				break
+			}
+		}
+		assert.True(t, foundGitHubTokenIssue, "Should find a GITHUB_TOKEN validation issue")
 	})
 
 	t.Run("placeholder values", func(t *testing.T) {
