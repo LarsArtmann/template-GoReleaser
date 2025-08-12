@@ -1,9 +1,9 @@
 package container
 
 import (
+	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 	"github.com/samber/do"
 	"github.com/spf13/viper"
-	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 )
 
 // Container wraps the samber/do injector
@@ -14,11 +14,11 @@ type Container struct {
 // NewContainer creates a new DI container with all services registered
 func NewContainer() *Container {
 	injector := do.New()
-	
+
 	// Register core services
 	registerCoreServices(injector)
 	registerDomainServices(injector)
-	
+
 	return &Container{
 		injector: injector,
 	}
@@ -30,8 +30,8 @@ func (c *Container) GetInjector() *do.Injector {
 }
 
 // Shutdown gracefully shuts down all services
-func (c *Container) Shutdown() {
-	c.injector.Shutdown()
+func (c *Container) Shutdown() error {
+	return c.injector.Shutdown()
 }
 
 // HealthCheck performs health checks on all registered services
@@ -48,15 +48,15 @@ func registerCoreServices(injector *do.Injector) {
 		v.SetConfigType("yaml")
 		v.AddConfigPath("$HOME")
 		v.AddConfigPath(".")
-		
+
 		// Set defaults
 		v.SetDefault("license.type", "MIT")
 		v.SetDefault("cli.verbose", false)
 		v.SetDefault("cli.colors", true)
-		
+
 		// Read config file if it exists
-		v.ReadInConfig()
-		
+		_ = v.ReadInConfig() // Ignore error if config file doesn't exist
+
 		return v, nil
 	})
 }
@@ -68,14 +68,14 @@ func registerDomainServices(injector *do.Injector) {
 		viper := do.MustInvoke[*viper.Viper](i)
 		return services.NewConfigService(viper), nil
 	})
-	
+
 	// Validation service
 	do.Provide[services.ValidationService](injector, func(i *do.Injector) (services.ValidationService, error) {
 		configService := do.MustInvoke[services.ConfigService](i)
 		return services.NewValidationService(configService), nil
 	})
-	
+
 	// TODO: Add other domain services as they are implemented
-	// - LicenseService  
+	// - LicenseService
 	// - VerificationService
 }

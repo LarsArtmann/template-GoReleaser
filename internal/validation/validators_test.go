@@ -567,7 +567,7 @@ func TestValidateEnvironmentVariable(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			issue := ValidateEnvironmentVariable(tt.varName, tt.value, tt.envVar)
-			
+
 			if tt.wantCode == "" {
 				// Expecting no issue
 				assert.True(t, IsValidationIssueEmpty(issue))
@@ -619,7 +619,7 @@ func TestMaskValue(t *testing.T) {
 
 func TestGetValidators(t *testing.T) {
 	validators := GetValidators()
-	
+
 	// Check that all expected validators are present
 	expectedValidators := []string{
 		"github_token",
@@ -632,11 +632,11 @@ func TestGetValidators(t *testing.T) {
 		"hostname",
 		"file_path",
 	}
-	
+
 	for _, expected := range expectedValidators {
 		assert.Contains(t, validators, expected, "Validator %s should be present", expected)
 	}
-	
+
 	// Test that validators can be called
 	for name, validator := range validators {
 		t.Run("validator_"+name, func(t *testing.T) {

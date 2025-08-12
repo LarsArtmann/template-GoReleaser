@@ -33,7 +33,7 @@ func NewValidationService(injector do.Injector) (*ValidationService, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return &ValidationService{
 		configService: configService,
 	}, nil
@@ -45,7 +45,7 @@ func (s *ValidationService) ValidateConfig(configPath string, content string) *V
 		Issues:   []string{},
 		Warnings: []string{},
 	}
-	
+
 	// If content is provided, validate syntax
 	if content != "" {
 		if err := s.configService.ValidateSyntax(content); err != nil {
@@ -54,7 +54,7 @@ func (s *ValidationService) ValidateConfig(configPath string, content string) *V
 			return result
 		}
 	}
-	
+
 	// If configPath is provided, validate file
 	if configPath != "" {
 		if _, err := os.Stat(configPath); os.IsNotExist(err) {
@@ -62,7 +62,7 @@ func (s *ValidationService) ValidateConfig(configPath string, content string) *V
 			result.Issues = append(result.Issues, "Config file does not exist: "+configPath)
 			return result
 		}
-		
+
 		// Try to load and validate structure
 		if _, err := s.configService.LoadConfig(configPath); err != nil {
 			result.Valid = false
@@ -70,7 +70,7 @@ func (s *ValidationService) ValidateConfig(configPath string, content string) *V
 			return result
 		}
 	}
-	
+
 	// Check for GoReleaser binary and validate with it
 	if _, err := exec.LookPath("goreleaser"); err != nil {
 		result.Warnings = append(result.Warnings, "GoReleaser binary not found - skipping native validation")
@@ -80,7 +80,7 @@ func (s *ValidationService) ValidateConfig(configPath string, content string) *V
 			result.Warnings = append(result.Warnings, "GoReleaser validation: "+err.Error())
 		}
 	}
-	
+
 	return result
 }
 
@@ -92,12 +92,12 @@ func (s *ValidationService) ValidateEnvironment() *EnvironmentResult {
 		Issues:      []string{},
 		EnvVars:     make(map[string]string),
 	}
-	
+
 	// Critical environment variables
 	criticalVars := []string{
 		"GITHUB_TOKEN",
 	}
-	
+
 	// Optional but recommended variables
 	optionalVars := []string{
 		"DOCKER_USERNAME",
@@ -106,7 +106,7 @@ func (s *ValidationService) ValidateEnvironment() *EnvironmentResult {
 		"HOMEBREW_TAP_GITHUB_TOKEN",
 		"SCOOP_GITHUB_TOKEN",
 	}
-	
+
 	// Check critical variables
 	for _, varName := range criticalVars {
 		value := os.Getenv(varName)
@@ -117,7 +117,7 @@ func (s *ValidationService) ValidateEnvironment() *EnvironmentResult {
 			result.EnvVars[varName] = "***" // Hide actual values
 		}
 	}
-	
+
 	// Check optional variables
 	for _, varName := range optionalVars {
 		value := os.Getenv(varName)
@@ -127,7 +127,7 @@ func (s *ValidationService) ValidateEnvironment() *EnvironmentResult {
 			result.EnvVars[varName] = "***" // Hide actual values
 		}
 	}
-	
+
 	// Check for required tools
 	requiredTools := []string{"go", "git"}
 	var issues []string
@@ -137,13 +137,13 @@ func (s *ValidationService) ValidateEnvironment() *EnvironmentResult {
 			issues = append(issues, tool+" not found in PATH")
 		}
 	}
-	
+
 	// Initialize the Issues field if it doesn't exist
 	if result.Issues == nil {
 		result.Issues = []string{}
 	}
 	result.Issues = append(result.Issues, issues...)
-	
+
 	// Check for optional tools
 	optionalTools := []string{"docker", "goreleaser", "cosign", "syft"}
 	for _, tool := range optionalTools {
@@ -151,21 +151,21 @@ func (s *ValidationService) ValidateEnvironment() *EnvironmentResult {
 			result.Warnings = append(result.Warnings, tool+" not found in PATH")
 		}
 	}
-	
+
 	return result
 }
 
 func (s *ValidationService) GetValidationStatus() map[string]interface{} {
 	configPath := s.configService.findConfigFile()
-	
+
 	configValid := configPath != ""
 	if configValid {
 		result := s.ValidateConfig(configPath, "")
 		configValid = result.Valid
 	}
-	
+
 	envResult := s.ValidateEnvironment()
-	
+
 	return map[string]interface{}{
 		"config_valid": configValid,
 		"env_valid":    envResult.Valid,
@@ -189,18 +189,18 @@ func (s *ValidationService) validateWithGoReleaser(configPath string) error {
 
 func (s *ValidationService) collectAllIssues(configPath string) []string {
 	var allIssues []string
-	
+
 	if configPath != "" {
 		result := s.ValidateConfig(configPath, "")
 		allIssues = append(allIssues, result.Issues...)
 	} else {
 		allIssues = append(allIssues, "No GoReleaser config file found")
 	}
-	
+
 	envResult := s.ValidateEnvironment()
 	for _, missing := range envResult.MissingVars {
 		allIssues = append(allIssues, "Missing environment variable: "+missing)
 	}
-	
+
 	return allIssues
 }

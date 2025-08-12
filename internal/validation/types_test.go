@@ -12,7 +12,7 @@ import (
 func TestUserFriendlyError(t *testing.T) {
 	originalErr := assert.AnError
 	userErr := NewUserFriendlyError("technical message", "user message", originalErr)
-	
+
 	assert.Equal(t, "technical message", userErr.Message)
 	assert.Equal(t, "user message", userErr.UserMessage)
 	assert.Equal(t, originalErr, userErr.Cause)
@@ -22,70 +22,70 @@ func TestUserFriendlyError(t *testing.T) {
 func TestValidationResult(t *testing.T) {
 	t.Run("new validation result", func(t *testing.T) {
 		result := NewValidationResult()
-		
+
 		assert.True(t, result.Valid)
 		assert.Empty(t, result.Issues)
 		assert.Empty(t, result.Warnings)
 		assert.NotZero(t, result.Timestamp)
 		assert.NotNil(t, result.Metadata)
 	})
-	
+
 	t.Run("add error", func(t *testing.T) {
 		result := NewValidationResult()
 		result.AddError("test_field", "technical message", "user message")
-		
+
 		assert.False(t, result.Valid)
 		assert.Len(t, result.Issues, 1)
 		assert.Empty(t, result.Warnings)
-		
+
 		issue := result.Issues[0]
 		assert.Equal(t, "test_field", issue.Field)
 		assert.Equal(t, "technical message", issue.Message)
 		assert.Equal(t, "user message", issue.UserMessage)
 		assert.Equal(t, SeverityError, issue.Severity)
 	})
-	
+
 	t.Run("add warning", func(t *testing.T) {
 		result := NewValidationResult()
 		result.AddWarning("test_field", "technical message", "user message")
-		
+
 		assert.True(t, result.Valid) // Warnings don't invalidate
 		assert.Empty(t, result.Issues)
 		assert.Len(t, result.Warnings, 1)
-		
+
 		warning := result.Warnings[0]
 		assert.Equal(t, SeverityWarning, warning.Severity)
 	})
-	
+
 	t.Run("add critical", func(t *testing.T) {
 		result := NewValidationResult()
 		result.AddCritical("test_field", "technical message", "user message")
-		
+
 		assert.False(t, result.Valid)
 		assert.Len(t, result.Issues, 1)
-		
+
 		issue := result.Issues[0]
 		assert.Equal(t, SeverityCritical, issue.Severity)
 	})
-	
+
 	t.Run("has critical issues", func(t *testing.T) {
 		result := NewValidationResult()
 		assert.False(t, result.HasCriticalIssues())
-		
+
 		result.AddCritical("test", "msg", "user msg")
 		assert.True(t, result.HasCriticalIssues())
 	})
-	
+
 	t.Run("get issues by severity", func(t *testing.T) {
 		result := NewValidationResult()
 		result.AddError("field1", "msg1", "user1")
 		result.AddWarning("field2", "msg2", "user2")
 		result.AddCritical("field3", "msg3", "user3")
-		
+
 		criticalIssues := result.GetIssuesBySeverity(SeverityCritical)
 		assert.Len(t, criticalIssues, 1)
 		assert.Equal(t, "field3", criticalIssues[0].Field)
-		
+
 		warningIssues := result.GetIssuesBySeverity(SeverityWarning)
 		assert.Len(t, warningIssues, 1)
 		assert.Equal(t, "field2", warningIssues[0].Field)
@@ -95,27 +95,27 @@ func TestValidationResult(t *testing.T) {
 func TestEnvironmentValidationResult(t *testing.T) {
 	t.Run("new environment validation result", func(t *testing.T) {
 		result := NewEnvironmentValidationResult()
-		
+
 		assert.True(t, result.Valid)
 		assert.Empty(t, result.CriticalMissing)
 		assert.Empty(t, result.OptionalMissing)
 		assert.NotNil(t, result.ValidatedVariables)
 		assert.Equal(t, StatusReady, result.ValidationStatus)
 	})
-	
+
 	t.Run("add missing critical", func(t *testing.T) {
 		result := NewEnvironmentValidationResult()
 		result.AddMissingCritical("GITHUB_TOKEN")
-		
+
 		assert.False(t, result.Valid)
 		assert.Contains(t, result.CriticalMissing, "GITHUB_TOKEN")
 		assert.Equal(t, StatusNeedsSetup, result.ValidationStatus)
 	})
-	
+
 	t.Run("add missing optional", func(t *testing.T) {
 		result := NewEnvironmentValidationResult()
 		result.AddMissingOptional("DOCKER_TOKEN")
-		
+
 		assert.True(t, result.Valid) // Optional missing doesn't invalidate
 		assert.Contains(t, result.OptionalMissing, "DOCKER_TOKEN")
 		assert.Equal(t, StatusHasIssues, result.ValidationStatus)
@@ -124,7 +124,7 @@ func TestEnvironmentValidationResult(t *testing.T) {
 
 func TestConfigAnalysisResult(t *testing.T) {
 	result := NewConfigAnalysisResult()
-	
+
 	assert.Empty(t, result.ConfigFiles)
 	assert.Empty(t, result.ExtractedVariables)
 	assert.Empty(t, result.MissingInExample)
@@ -137,34 +137,34 @@ func TestValidationReport_JSON(t *testing.T) {
 	t.Run("validation result JSON", func(t *testing.T) {
 		result := NewValidationResult()
 		result.AddError("test_field", "test message", "user message")
-		
+
 		jsonData, err := result.ToJSON()
 		require.NoError(t, err)
-		
+
 		// Verify it's valid JSON
 		var parsed map[string]interface{}
 		err = json.Unmarshal(jsonData, &parsed)
 		require.NoError(t, err)
-		
+
 		assert.False(t, parsed["valid"].(bool))
 		assert.NotEmpty(t, parsed["issues"])
 	})
-	
+
 	t.Run("environment validation result JSON", func(t *testing.T) {
 		result := NewEnvironmentValidationResult()
 		result.AddMissingCritical("GITHUB_TOKEN")
-		
+
 		jsonData, err := result.ToJSON()
 		require.NoError(t, err)
-		
+
 		var parsed map[string]interface{}
 		err = json.Unmarshal(jsonData, &parsed)
 		require.NoError(t, err)
-		
+
 		assert.False(t, parsed["valid"].(bool))
 		assert.Equal(t, "needs_setup", parsed["validation_status"])
 	})
-	
+
 	t.Run("validation report JSON", func(t *testing.T) {
 		report := &ValidationReport{
 			Environment:    NewEnvironmentValidationResult(),
@@ -178,14 +178,14 @@ func TestValidationReport_JSON(t *testing.T) {
 			Timestamp:          time.Now(),
 			RecommendedActions: []string{"All good!"},
 		}
-		
+
 		jsonData, err := report.ToJSON()
 		require.NoError(t, err)
-		
+
 		var parsed map[string]interface{}
 		err = json.Unmarshal(jsonData, &parsed)
 		require.NoError(t, err)
-		
+
 		assert.Equal(t, "ok", parsed["overall_status"])
 		assert.NotNil(t, parsed["environment"])
 		assert.NotNil(t, parsed["config_analysis"])
@@ -233,7 +233,7 @@ func TestVariableStatus(t *testing.T) {
 		Masked:  "gh***56",
 		Issue:   "Invalid token format",
 	}
-	
+
 	assert.True(t, status.Present)
 	assert.False(t, status.Valid)
 	assert.Equal(t, "gh***56", status.Masked)

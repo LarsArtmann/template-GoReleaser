@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/container"
 	"github.com/charmbracelet/fang"
 	"github.com/samber/do"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"github.com/LarsArtmann/template-GoReleaser/internal/container"
 )
 
 var (
@@ -23,7 +23,7 @@ var (
 )
 
 var (
-	cfgFile   string
+	cfgFile     string
 	diContainer *container.Container
 )
 
@@ -109,12 +109,19 @@ func GetContainer() *do.Injector {
 }
 
 func main() {
+	// Check for health check flag
+	if len(os.Args) > 1 && os.Args[1] == "--health" {
+		// Simple health check - return 0 for healthy
+		fmt.Println("healthy")
+		os.Exit(0)
+	}
+
 	// Ensure graceful shutdown of DI container
 	defer func() {
 		if diContainer != nil {
-			diContainer.Shutdown()
+			_ = diContainer.Shutdown()
 		}
 	}()
-	
+
 	Execute()
 }

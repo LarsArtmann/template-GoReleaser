@@ -358,13 +358,13 @@ func GetEnvironmentVariables() map[string]EnvironmentVariable {
 func GetCriticalVariables() map[string]EnvironmentVariable {
 	allVars := GetEnvironmentVariables()
 	criticalVars := make(map[string]EnvironmentVariable)
-	
+
 	for name, envVar := range allVars {
 		if envVar.Required {
 			criticalVars[name] = envVar
 		}
 	}
-	
+
 	return criticalVars
 }
 
@@ -372,13 +372,13 @@ func GetCriticalVariables() map[string]EnvironmentVariable {
 func GetOptionalVariables() map[string]EnvironmentVariable {
 	allVars := GetEnvironmentVariables()
 	optionalVars := make(map[string]EnvironmentVariable)
-	
+
 	for name, envVar := range allVars {
 		if !envVar.Required {
 			optionalVars[name] = envVar
 		}
 	}
-	
+
 	return optionalVars
 }
 
@@ -386,12 +386,12 @@ func GetOptionalVariables() map[string]EnvironmentVariable {
 func GetVariablesByCategory(category VariableCategory) map[string]EnvironmentVariable {
 	allVars := GetEnvironmentVariables()
 	categoryVars := make(map[string]EnvironmentVariable)
-	
+
 	for name, envVar := range allVars {
 		if envVar.Category == category {
 			categoryVars[name] = envVar
 		}
 	}
-	
+
 	return categoryVars
 }

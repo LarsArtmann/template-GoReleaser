@@ -192,6 +192,38 @@ trivy fs .
 ./validate-env.sh
 ```
 
+## Reporting a Vulnerability
+
+We take the security of our software seriously. If you believe you have found a security vulnerability, please report it responsibly.
+
+### How to Report
+
+**Please do NOT:**
+- Open a public GitHub issue
+- Post about it on social media
+- Exploit the vulnerability for malicious purposes
+
+**Please DO:**
+- Create a private security advisory on GitHub
+- Email security@example.com (replace with your actual email)
+- Provide sufficient information to reproduce the issue
+
+### What to Include
+
+- **Type of issue** (e.g., injection, XSS, buffer overflow)
+- **Full paths** of affected source files
+- **Location** of affected code (tag/branch/commit)
+- **Configuration** required to reproduce
+- **Step-by-step instructions** to reproduce
+- **Proof-of-concept** or exploit code (if possible)
+- **Impact assessment** and exploitation scenarios
+
+### Response Timeline
+
+- **Initial Response**: Within 48 hours
+- **Status Update**: Within 7 days
+- **Resolution**: Based on severity (Critical: 7-14 days, High: 14-30 days)
+
 ## Incident Response
 
 ### If Secrets Are Compromised
@@ -201,6 +233,8 @@ trivy fs .
 3. **Update GitHub repository secrets** with new values
 4. **Review access logs** for unauthorized usage
 5. **Audit recent releases** built with compromised secrets
+6. **Notify affected users** if necessary
+7. **Document the incident** for future prevention
 
 ### Security Issue Reporting
 
@@ -208,6 +242,7 @@ trivy fs .
 - Include detailed reproduction steps
 - Provide proposed fix if possible
 - Allow reasonable time for resolution before public disclosure
+- Credit will be given to responsible disclosure (unless you prefer anonymity)
 
 ## Security Updates
 

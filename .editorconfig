@@ -1,0 +1,88 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Global settings for all files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 2
+
+# Go files
+[*.go]
+indent_style = tab
+indent_size = 4
+
+# Go module files
+[go.{mod,sum}]
+indent_style = tab
+indent_size = 4
+
+# Markdown files
+[*.md]
+trim_trailing_whitespace = false
+indent_size = 2
+
+# YAML files
+[*.{yml,yaml}]
+indent_size = 2
+
+# JSON files
+[*.json]
+indent_size = 2
+
+# JavaScript/TypeScript files
+[*.{js,jsx,ts,tsx}]
+indent_size = 2
+
+# HTML/CSS files
+[*.{html,css,scss,sass}]
+indent_size = 2
+
+# Shell scripts
+[*.{sh,bash}]
+indent_size = 2
+
+# Makefiles
+[Makefile]
+indent_style = tab
+indent_size = 4
+
+# Justfile
+[{justfile,Justfile}]
+indent_style = space
+indent_size = 2
+
+# Docker files
+[{Dockerfile,docker-compose.yml}]
+indent_size = 2
+
+# Git config files
+[.git*]
+indent_size = 2
+
+# Protocol Buffers
+[*.proto]
+indent_size = 2
+
+# TOML files
+[*.toml]
+indent_size = 2
+
+# Configuration files
+[*.{ini,cfg,conf}]
+indent_size = 2
+
+# Batch files
+[*.{bat,cmd}]
+end_of_line = crlf
+indent_size = 2
+
+# PowerShell files
+[*.{ps1,psd1,psm1}]
+end_of_line = crlf
+indent_size = 2

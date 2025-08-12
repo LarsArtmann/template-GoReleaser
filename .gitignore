@@ -16,6 +16,9 @@ goreleaser-cli-*
 *.out
 coverage.txt
 coverage.html
+*.coverprofile
+.coverage/
+htmlcov/
 
 # Go workspace files
 go.work
@@ -41,6 +44,12 @@ out/
 *.swo
 *~
 .DS_Store
+*.sublime-project
+*.sublime-workspace
+.history/
+.vim/
+.netrwhist
+*.code-workspace
 
 # Environment files
 .env
@@ -60,6 +69,10 @@ temp/
 *_gen.go
 *_templ.go
 *.generated.go
+*.pb.gw.go
+*_string.go
+mock_*.go
+bindata.go
 
 # Certificates and keys
 *.pem
@@ -138,3 +151,35 @@ $RECYCLE.BIN/
 .directory
 .Trash-*
 .nfs*
+
+# Debug and profiling files
+debug/
+*.pprof
+*.heap
+*.allocs
+*.mutex
+*.block
+*.goroutine
+*.threadcreate
+*.prof
+*.profile
+cpu.prof
+mem.prof
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.boltdb
+
+# Local configuration
+local.yaml
+local.yml
+config.local.yaml
+config.local.yml
+.envrc
+
+# CI/CD local files
+.buildkite/local/
+.circleci/local/
+.gitlab-ci-local/

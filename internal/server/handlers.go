@@ -19,7 +19,7 @@ func (s *Server) healthHandler(c *gin.Context) {
 		"uptime":    time.Since(time.Now()).String(),
 		"version":   "dev", // This would come from build info
 	}
-	
+
 	c.JSON(http.StatusOK, health)
 }
 
@@ -27,18 +27,18 @@ func (s *Server) healthHandler(c *gin.Context) {
 func (s *Server) metricsHandler(c *gin.Context) {
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
-	
+
 	metrics := map[string]interface{}{
 		"memory": map[string]interface{}{
-			"alloc":        m.Alloc,
-			"total_alloc":  m.TotalAlloc,
-			"sys":          m.Sys,
-			"num_gc":       m.NumGC,
+			"alloc":       m.Alloc,
+			"total_alloc": m.TotalAlloc,
+			"sys":         m.Sys,
+			"num_gc":      m.NumGC,
 		},
 		"goroutines": runtime.NumGoroutine(),
 		"timestamp":  time.Now().UTC(),
 	}
-	
+
 	c.JSON(http.StatusOK, metrics)
 }
 
@@ -49,20 +49,20 @@ func (s *Server) validateConfigHandler(c *gin.Context) {
 		Content    string `json:"content,omitempty"`
 		Config     string `form:"config"` // For form submissions
 	}
-	
+
 	if err := c.ShouldBind(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format",
+			"error":   "Invalid request format",
 			"details": err.Error(),
 		})
 		return
 	}
-	
+
 	// Use content from form if available
 	if request.Config != "" {
 		request.Content = request.Config
 	}
-	
+
 	// Get validation service
 	validationService, err := do.InvokeAs[*service.ValidationService](s.injector)
 	if err != nil {
@@ -71,10 +71,10 @@ func (s *Server) validateConfigHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	result := validationService.ValidateConfig(request.ConfigPath, request.Content)
 	result.Timestamp = time.Now().UTC().Format(time.RFC3339)
-	
+
 	c.JSON(http.StatusOK, result)
 }
 
@@ -88,10 +88,10 @@ func (s *Server) validateEnvironmentHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	result := validationService.ValidateEnvironment()
 	result.Timestamp = time.Now().UTC().Format(time.RFC3339)
-	
+
 	c.JSON(http.StatusOK, result)
 }
 
@@ -105,10 +105,10 @@ func (s *Server) validateStatusHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	status := validationService.GetValidationStatus()
 	status["last_check"] = time.Now().UTC().Format(time.RFC3339)
-	
+
 	c.JSON(http.StatusOK, status)
 }
 
@@ -122,7 +122,7 @@ func (s *Server) indexHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	// Render template
 	if err := templateService.RenderTempl(c, templates.Index()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -140,7 +140,7 @@ func (s *Server) configHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	// Render template
 	if err := templateService.RenderTempl(c, templates.Config()); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -153,15 +153,15 @@ func (s *Server) updateConfigHandler(c *gin.Context) {
 	var request struct {
 		Config string `json:"config" form:"config"`
 	}
-	
+
 	if err := c.ShouldBind(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid request format",
+			"error":   "Invalid request format",
 			"details": err.Error(),
 		})
 		return
 	}
-	
+
 	// Get config service
 	configService, err := do.InvokeAs[*service.ConfigService](s.injector)
 	if err != nil {
@@ -170,16 +170,16 @@ func (s *Server) updateConfigHandler(c *gin.Context) {
 		})
 		return
 	}
-	
+
 	// Save config
 	if err := configService.SaveConfigString("", request.Config); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Failed to save configuration",
+			"error":   "Failed to save configuration",
 			"details": err.Error(),
 		})
 		return
 	}
-	
+
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
 		"message": "Configuration updated successfully",

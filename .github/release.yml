@@ -1,0 +1,178 @@
+# GitHub Release Notes Configuration
+# https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes
+
+# Automatically generated release notes configuration
+changelog:
+  # Exclude certain labels from release notes
+  exclude:
+    labels:
+      - "ignore-for-release"
+      - "duplicate"
+      - "invalid"
+      - "wontfix"
+      - "documentation"
+      - "chore"
+      - "ci"
+    authors:
+      - "dependabot"
+      - "dependabot[bot]"
+      - "github-actions"
+      - "github-actions[bot]"
+
+  # Categories for organizing release notes
+  categories:
+    - title: "🚀 New Features"
+      labels:
+        - "feature"
+        - "feat"
+        - "enhancement"
+        - "new-feature"
+    
+    - title: "🐛 Bug Fixes"
+      labels:
+        - "bug"
+        - "fix"
+        - "bugfix"
+        - "hotfix"
+        - "patch"
+    
+    - title: "⚡ Performance Improvements"
+      labels:
+        - "performance"
+        - "perf"
+        - "optimization"
+        - "speed"
+    
+    - title: "🔒 Security Updates"
+      labels:
+        - "security"
+        - "vulnerability"
+        - "cve"
+        - "security-fix"
+    
+    - title: "🏗️ Build System & Dependencies"
+      labels:
+        - "dependencies"
+        - "deps"
+        - "build"
+        - "build-system"
+        - "tooling"
+        - "go"
+        - "docker"
+        - "github-actions"
+    
+    - title: "📖 Documentation"
+      labels:
+        - "docs"
+        - "documentation"
+        - "readme"
+        - "wiki"
+        - "examples"
+    
+    - title: "🧪 Testing"
+      labels:
+        - "test"
+        - "testing"
+        - "tests"
+        - "coverage"
+        - "quality"
+    
+    - title: "🔧 Maintenance & Refactoring"
+      labels:
+        - "refactor"
+        - "refactoring"
+        - "cleanup"
+        - "maintenance"
+        - "code-quality"
+        - "style"
+    
+    - title: "🎨 UI/UX Improvements"
+      labels:
+        - "ui"
+        - "ux"
+        - "design"
+        - "interface"
+        - "styling"
+        - "frontend"
+    
+    - title: "⚙️ Configuration Changes"
+      labels:
+        - "config"
+        - "configuration"
+        - "settings"
+        - "env"
+        - "environment"
+    
+    # Catch-all category for uncategorized changes
+    - title: "🔄 Other Changes"
+      labels:
+        - "*"
+
+# Contributors section configuration
+contributors:
+  # Include all contributors by default
+  include:
+    - "*"
+  
+  # Exclude bots and automated accounts
+  exclude:
+    - "dependabot"
+    - "dependabot[bot]"
+    - "github-actions"
+    - "github-actions[bot]"
+    - "renovate"
+    - "renovate[bot]"
+
+# Template for release notes (optional custom template)
+# If not specified, GitHub will use the default template
+template: |
+  ## What's Changed in ${{RELEASE_TAG}}
+  
+  ${{CHANGELOG}}
+  
+  ## 📊 Release Statistics
+  
+  - **Total Changes**: ${{TOTAL_COUNT}} pull requests
+  - **Contributors**: ${{CONTRIBUTORS_COUNT}} contributors
+  
+  ## 🙏 Contributors
+  
+  Thank you to all the contributors who made this release possible:
+  
+  ${{CONTRIBUTORS}}
+  
+  ---
+  
+  **Full Changelog**: ${{PREVIOUS_TAG}}...${{RELEASE_TAG}}
+  
+  ## 🚀 Quick Start
+  
+  ### Download
+  
+  - [Linux (amd64)](https://github.com/${{OWNER}}/${{REPOSITORY}}/releases/download/${{RELEASE_TAG}}/goreleaser-cli_Linux_x86_64.tar.gz)
+  - [macOS (amd64)](https://github.com/${{OWNER}}/${{REPOSITORY}}/releases/download/${{RELEASE_TAG}}/goreleaser-cli_Darwin_x86_64.tar.gz)
+  - [macOS (arm64)](https://github.com/${{OWNER}}/${{REPOSITORY}}/releases/download/${{RELEASE_TAG}}/goreleaser-cli_Darwin_arm64.tar.gz)
+  - [Windows (amd64)](https://github.com/${{OWNER}}/${{REPOSITORY}}/releases/download/${{RELEASE_TAG}}/goreleaser-cli_Windows_x86_64.zip)
+  
+  ### Docker
+  
+  ```bash
+  docker run --rm ghcr.io/${{OWNER}}/${{REPOSITORY}}:${{RELEASE_TAG}}
+  ```
+  
+  ### Go Install
+  
+  ```bash
+  go install github.com/${{OWNER}}/${{REPOSITORY}}/cmd/goreleaser-cli@${{RELEASE_TAG}}
+  ```
+  
+  ## 📝 Installation & Usage
+  
+  For detailed installation and usage instructions, see the [README](https://github.com/${{OWNER}}/${{REPOSITORY}}/blob/${{RELEASE_TAG}}/README.md).
+
+# Note: This configuration will:
+# 1. Automatically categorize pull requests based on labels
+# 2. Generate comprehensive release notes with statistics
+# 3. Exclude bot-generated PRs and maintenance commits
+# 4. Include download links and installation instructions
+# 5. Acknowledge all human contributors

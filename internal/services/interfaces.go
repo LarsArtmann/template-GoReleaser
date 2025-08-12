@@ -6,13 +6,13 @@ import "github.com/LarsArtmann/template-GoReleaser/internal/types"
 type ConfigService interface {
 	// LoadConfig loads configuration from file or creates default
 	LoadConfig() (*types.Config, error)
-	
+
 	// SaveConfig saves configuration to file
 	SaveConfig(config *types.Config) error
-	
+
 	// ValidateConfig validates configuration structure and values
 	ValidateConfig(config *types.Config) error
-	
+
 	// InitConfig creates a new configuration with defaults
 	InitConfig() (*types.Config, error)
 }
@@ -21,13 +21,13 @@ type ConfigService interface {
 type ValidationService interface {
 	// ValidateProject validates the entire project structure
 	ValidateProject() (*ValidationResult, error)
-	
+
 	// ValidateEnvironment validates environment variables
 	ValidateEnvironment() (*ValidationResult, error)
-	
+
 	// ValidateGoReleaser validates GoReleaser configuration files
 	ValidateGoReleaser(configPath string) (*ValidationResult, error)
-	
+
 	// ValidateTools validates required tools are installed
 	ValidateTools() (*ValidationResult, error)
 }
@@ -36,10 +36,10 @@ type ValidationService interface {
 type LicenseService interface {
 	// GenerateLicense generates a license file based on configuration
 	GenerateLicense(licenseType string, author string) error
-	
+
 	// ListAvailableLicenses returns available license templates
 	ListAvailableLicenses() ([]LicenseTemplate, error)
-	
+
 	// ValidateLicense validates existing license file
 	ValidateLicense() (*ValidationResult, error)
 }
@@ -48,10 +48,10 @@ type LicenseService interface {
 type VerificationService interface {
 	// RunFullVerification runs all verification checks
 	RunFullVerification(opts *VerificationOptions) (*VerificationResult, error)
-	
+
 	// RunSecurityScan performs security validation
 	RunSecurityScan() (*SecurityScanResult, error)
-	
+
 	// RunDryRun performs GoReleaser dry run
 	RunDryRun(configPath string) (*DryRunResult, error)
 }
@@ -92,7 +92,7 @@ type SecurityScanResult struct {
 	Suggestions []string `json:"suggestions,omitempty"`
 }
 
-// DryRunResult contains GoReleaser dry run results  
+// DryRunResult contains GoReleaser dry run results
 type DryRunResult struct {
 	Success bool   `json:"success"`
 	Output  string `json:"output,omitempty"`

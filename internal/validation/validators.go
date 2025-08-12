@@ -18,15 +18,15 @@ type ValidatorFunction func(value string) mo.Result[string]
 // GetValidators returns a map of all available validators
 func GetValidators() map[string]ValidatorFunction {
 	return map[string]ValidatorFunction{
-		"github_token":        ValidateGitHubToken,
-		"docker_token":        ValidateDockerToken,
-		"email":               ValidateEmail,
-		"url":                 ValidateURL,
-		"aws_bucket_name":     ValidateAWSBucketName,
-		"gcs_bucket_name":     ValidateGCSBucketName,
-		"azure_storage_name":  ValidateAzureStorageName,
-		"hostname":            ValidateHostname,
-		"file_path":           ValidateFilePath,
+		"github_token":       ValidateGitHubToken,
+		"docker_token":       ValidateDockerToken,
+		"email":              ValidateEmail,
+		"url":                ValidateURL,
+		"aws_bucket_name":    ValidateAWSBucketName,
+		"gcs_bucket_name":    ValidateGCSBucketName,
+		"azure_storage_name": ValidateAzureStorageName,
+		"hostname":           ValidateHostname,
+		"file_path":          ValidateFilePath,
 	}
 }
 
@@ -42,7 +42,7 @@ func ValidateGitHubToken(token string) mo.Result[string] {
 
 	// GitHub Personal Access Token (classic): ghp_[36 chars]
 	classicPattern := regexp.MustCompile(`^ghp_[A-Za-z0-9]{36}$`)
-	
+
 	// GitHub Fine-grained Personal Access Token: github_pat_[82 chars including underscores]
 	fineGrainedPattern := regexp.MustCompile(`^github_pat_[A-Za-z0-9_]{82}$`)
 
@@ -365,7 +365,7 @@ func ValidateEnvironmentVariable(name, value string, envVar EnvironmentVariable)
 	// Check for placeholder values
 	placeholderPatterns := []string{"your-", "xxxx", "example", "changeme", "todo", "replace"}
 	lowerValue := strings.ToLower(value)
-	
+
 	if lo.SomeBy(placeholderPatterns, func(pattern string) bool {
 		return strings.HasPrefix(lowerValue, pattern)
 	}) || len(value) < 3 {
@@ -390,7 +390,7 @@ func ValidateEnvironmentVariable(name, value string, envVar EnvironmentVariable)
 					if envVar.Required {
 						severity = SeverityCritical
 					}
-					
+
 					return ValidationIssue{
 						Field:       name,
 						Message:     userErr.Message,
@@ -400,7 +400,7 @@ func ValidateEnvironmentVariable(name, value string, envVar EnvironmentVariable)
 						Value:       maskValue(value),
 					}
 				}
-				
+
 				return ValidationIssue{
 					Field:       name,
 					Message:     err.Error(),
@@ -422,7 +422,7 @@ func maskValue(value string) string {
 	if len(value) <= 4 {
 		return "***"
 	}
-	
+
 	// Show first 2 and last 2 characters with stars in between
 	return fmt.Sprintf("%s***%s", value[:2], value[len(value)-2:])
 }

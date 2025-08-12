@@ -18,9 +18,9 @@ type Server struct {
 }
 
 type Config struct {
-	Port     int
-	Host     string
-	Debug    bool
+	Port      int
+	Host      string
+	Debug     bool
 	StaticDir string
 }
 
@@ -31,7 +31,7 @@ func New(injector *do.RootScope, config Config) *Server {
 	}
 
 	router := gin.Default()
-	
+
 	// Add middleware
 	router.Use(gin.Recovery())
 	if config.Debug {
@@ -51,10 +51,10 @@ func New(injector *do.RootScope, config Config) *Server {
 func (s *Server) setupRoutes() {
 	// Health check endpoint
 	s.router.GET("/health", s.healthHandler)
-	
+
 	// Metrics endpoint
 	s.router.GET("/metrics", s.metricsHandler)
-	
+
 	// Validation endpoints
 	v1 := s.router.Group("/api/v1")
 	{
@@ -67,15 +67,15 @@ func (s *Server) setupRoutes() {
 	s.router.GET("/", s.indexHandler)
 	s.router.GET("/config", s.configHandler)
 	s.router.POST("/config", s.updateConfigHandler)
-	
+
 	// Static files
 	s.router.Static("/static", "./web/static")
 }
 
 func (s *Server) Start(ctx context.Context) error {
 	srv := &http.Server{
-		Addr:    s.addr,
-		Handler: s.router,
+		Addr:         s.addr,
+		Handler:      s.router,
 		ReadTimeout:  10 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,

@@ -75,7 +75,7 @@ A comprehensive GoReleaser template for Go projects with extensive automation, v
 
 ### Prerequisites
 
-- **Go 1.23+**: [Download Go](https://golang.org/dl/)
+- **Go 1.24+**: [Download Go](https://golang.org/dl/)
 - **Git**: Version control
 - **Docker** (optional): For container builds
 - **Just** (recommended): Task runner

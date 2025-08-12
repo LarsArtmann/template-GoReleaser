@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 	"github.com/samber/do"
 	"github.com/spf13/cobra"
-	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 )
 
 // validateCmd represents the validate command
@@ -127,4 +127,3 @@ func runValidate(cmd *cobra.Command, args []string) {
 		fmt.Println("\n🎉 All validations passed successfully!")
 	}
 }
-

@@ -39,9 +39,9 @@ func TestValidateEnvironment(t *testing.T) {
 		os.Unsetenv("GITHUB_TOKEN")
 		os.Unsetenv("GITHUB_OWNER")
 		os.Unsetenv("GITHUB_REPO")
-		
+
 		result := service.ValidateEnvironment()
-		
+
 		assert.False(t, result.Valid)
 		assert.Equal(t, StatusNeedsSetup, result.ValidationStatus)
 		assert.Contains(t, result.CriticalMissing, "GITHUB_TOKEN")
@@ -54,9 +54,9 @@ func TestValidateEnvironment(t *testing.T) {
 		os.Setenv("GITHUB_TOKEN", "ghp_validtokenformathere1234567890123456")
 		os.Setenv("GITHUB_OWNER", "testowner")
 		os.Setenv("GITHUB_REPO", "testrepo")
-		
+
 		result := service.ValidateEnvironment()
-		
+
 		assert.True(t, result.Valid)
 		assert.Empty(t, result.CriticalMissing)
 		assert.Contains(t, result.ValidatedVariables, "GITHUB_TOKEN")
@@ -68,9 +68,9 @@ func TestValidateEnvironment(t *testing.T) {
 		os.Setenv("GITHUB_TOKEN", "invalid_token")
 		os.Setenv("GITHUB_OWNER", "testowner")
 		os.Setenv("GITHUB_REPO", "testrepo")
-		
+
 		result := service.ValidateEnvironment()
-		
+
 		assert.False(t, result.Valid)
 		assert.Len(t, result.Issues, 1)
 		assert.Equal(t, "VALIDATION_FAILED", result.Issues[0].Code)
@@ -81,11 +81,11 @@ func TestValidateEnvironment(t *testing.T) {
 		os.Setenv("GITHUB_TOKEN", "ghp_validtokenformathere1234567890123456")
 		os.Setenv("GITHUB_OWNER", "your-owner-here")
 		os.Setenv("GITHUB_REPO", "testrepo")
-		
+
 		result := service.ValidateEnvironment()
-		
+
 		assert.True(t, result.Valid) // Placeholder warnings don't fail validation
-		
+
 		// Find the placeholder warning
 		found := false
 		for _, warning := range result.Warnings {
@@ -134,7 +134,7 @@ docker:
 
 	t.Run("extract variables from config", func(t *testing.T) {
 		result := service.ExtractEnvironmentVariablesFromConfigs(configFile)
-		
+
 		assert.Contains(t, result.ConfigFiles, configFile)
 		assert.Contains(t, result.ExtractedVariables, "GITHUB_OWNER")
 		assert.Contains(t, result.ExtractedVariables, "GITHUB_REPO")
@@ -145,7 +145,7 @@ docker:
 
 	t.Run("non-existent config file", func(t *testing.T) {
 		result := service.ExtractEnvironmentVariablesFromConfigs("/nonexistent/file.yaml")
-		
+
 		assert.Empty(t, result.ConfigFiles)
 		assert.Empty(t, result.ExtractedVariables)
 		assert.Empty(t, result.Issues) // Non-existent files are just skipped
@@ -193,17 +193,17 @@ docker:
 
 	t.Run("sync validation", func(t *testing.T) {
 		result := service.ValidateEnvExampleSync(envExampleFile, configFile)
-		
+
 		// Should find MISSING_VAR in config but not in .env.example
 		assert.Contains(t, result.MissingInExample, "MISSING_VAR")
-		
+
 		// Should find UNUSED_VAR in .env.example but not used in config
 		assert.Contains(t, result.UnusedInExample, "UNUSED_VAR")
-		
+
 		// Should have issues for missing variables
 		assert.Len(t, result.Issues, 1)
 		assert.Equal(t, "MISSING_IN_ENV_EXAMPLE", result.Issues[0].Code)
-		
+
 		// Should have warnings for unused variables
 		assert.Len(t, result.Warnings, 1)
 		assert.Equal(t, "UNUSED_IN_ENV_EXAMPLE", result.Warnings[0].Code)
@@ -228,17 +228,17 @@ func TestGenerateValidationReport(t *testing.T) {
 		os.Setenv("GITHUB_TOKEN", "ghp_validtokenformathere1234567890123456")
 		os.Setenv("GITHUB_OWNER", "testowner")
 		os.Setenv("GITHUB_REPO", "testrepo")
-		
+
 		report := service.GenerateValidationReport()
-		
+
 		assert.NotNil(t, report.Environment)
 		assert.NotNil(t, report.ConfigAnalysis)
 		assert.NotEmpty(t, report.Summary)
 		assert.NotEmpty(t, report.RecommendedActions)
-		
+
 		// Environment should be valid since we have all critical variables
 		assert.True(t, report.Environment.Valid)
-		
+
 		// Environment status should be Ready or HasIssues since critical vars are set
 		assert.Contains(t, []EnvironmentValidationStatus{StatusReady, StatusHasIssues}, report.Environment.ValidationStatus)
 	})
@@ -248,9 +248,9 @@ func TestGenerateValidationReport(t *testing.T) {
 		os.Unsetenv("GITHUB_TOKEN")
 		os.Unsetenv("GITHUB_OWNER")
 		os.Unsetenv("GITHUB_REPO")
-		
+
 		report := service.GenerateValidationReport()
-		
+
 		assert.Equal(t, StatusCriticalErrors, report.OverallStatus)
 		assert.False(t, report.Environment.Valid)
 		assert.Greater(t, report.Summary.CriticalIssues, 0)
@@ -260,16 +260,16 @@ func TestGenerateValidationReport(t *testing.T) {
 
 func TestGetVariableDocumentation(t *testing.T) {
 	service := NewService()
-	
+
 	t.Run("existing variable", func(t *testing.T) {
 		doc := service.GetVariableDocumentation("GITHUB_TOKEN")
 		assert.True(t, doc.IsPresent())
-		
+
 		envVar, _ := doc.Get()
 		assert.Equal(t, "GITHUB_TOKEN", envVar.Name)
 		assert.True(t, envVar.Required)
 	})
-	
+
 	t.Run("non-existent variable", func(t *testing.T) {
 		doc := service.GetVariableDocumentation("NONEXISTENT_VAR")
 		assert.False(t, doc.IsPresent())
@@ -278,12 +278,12 @@ func TestGetVariableDocumentation(t *testing.T) {
 
 func TestServiceGetVariablesByCategory(t *testing.T) {
 	service := NewService()
-	
+
 	githubVars := service.GetVariablesByCategory(CategoryGitHub)
 	assert.Contains(t, githubVars, "GITHUB_TOKEN")
 	assert.Contains(t, githubVars, "GITHUB_OWNER")
 	assert.Contains(t, githubVars, "GITHUB_REPO")
-	
+
 	dockerVars := service.GetVariablesByCategory(CategoryDocker)
 	assert.Contains(t, dockerVars, "DOCKER_USERNAME")
 	assert.Contains(t, dockerVars, "DOCKER_TOKEN")
@@ -291,7 +291,7 @@ func TestServiceGetVariablesByCategory(t *testing.T) {
 
 func TestListAllVariables(t *testing.T) {
 	service := NewService()
-	
+
 	allVars := service.ListAllVariables()
 	assert.NotEmpty(t, allVars)
 	assert.Contains(t, allVars, "GITHUB_TOKEN")
@@ -301,7 +301,7 @@ func TestListAllVariables(t *testing.T) {
 
 func TestDetermineOverallStatus(t *testing.T) {
 	service := NewService()
-	
+
 	tests := []struct {
 		name           string
 		envResult      *EnvironmentValidationResult
@@ -333,13 +333,13 @@ func TestDetermineOverallStatus(t *testing.T) {
 			expectedStatus: StatusWarnings,
 		},
 		{
-			name: "ok",
-			envResult: &EnvironmentValidationResult{},
-			configResult: &ConfigAnalysisResult{},
+			name:           "ok",
+			envResult:      &EnvironmentValidationResult{},
+			configResult:   &ConfigAnalysisResult{},
 			expectedStatus: StatusOK,
 		},
 	}
-	
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			status := service.determineOverallStatus(tt.envResult, tt.configResult)
@@ -350,24 +350,24 @@ func TestDetermineOverallStatus(t *testing.T) {
 
 func TestGenerateRecommendedActions(t *testing.T) {
 	service := NewService()
-	
+
 	t.Run("missing critical variables", func(t *testing.T) {
 		envResult := &EnvironmentValidationResult{
 			CriticalMissing: []string{"GITHUB_TOKEN", "GITHUB_OWNER"},
 		}
 		configResult := &ConfigAnalysisResult{}
-		
+
 		actions := service.generateRecommendedActions(envResult, configResult)
 		assert.Len(t, actions, 1)
 		assert.Contains(t, actions[0], "Set required environment variables")
 		assert.Contains(t, actions[0], "GITHUB_TOKEN")
 		assert.Contains(t, actions[0], "GITHUB_OWNER")
 	})
-	
+
 	t.Run("no issues", func(t *testing.T) {
 		envResult := &EnvironmentValidationResult{}
 		configResult := &ConfigAnalysisResult{}
-		
+
 		actions := service.generateRecommendedActions(envResult, configResult)
 		assert.Len(t, actions, 1)
 		assert.Contains(t, actions[0], "ready for GoReleaser execution")

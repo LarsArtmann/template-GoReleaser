@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 	"github.com/samber/do"
 	"github.com/spf13/cobra"
-	"github.com/LarsArtmann/template-GoReleaser/internal/services"
 )
 
 // configCmd represents the config command
@@ -91,7 +91,7 @@ func runConfigShow(cmd *cobra.Command, args []string) {
 	if config.Project.Description != "" {
 		fmt.Printf("  📋 Description: %s\n", config.Project.Description)
 	}
-	fmt.Printf("  🛠️  CLI: verbose=%t, colors=%t\n", 
+	fmt.Printf("  🛠️  CLI: verbose=%t, colors=%t\n",
 		config.CLI.Verbose, config.CLI.Colors)
 
 	// Validate configuration using the service
@@ -105,7 +105,7 @@ func runConfigShow(cmd *cobra.Command, args []string) {
 	fmt.Println("\n🌍 Environment variable overrides:")
 	envVars := []string{
 		"LICENSE_TYPE",
-		"COPYRIGHT_HOLDER", 
+		"COPYRIGHT_HOLDER",
 		"AUTHOR_NAME",
 		"PROJECT_AUTHOR",
 	}
@@ -211,4 +211,3 @@ func runConfigInit(cmd *cobra.Command, args []string) {
 	fmt.Println("\n📝 Edit the file to customize your settings")
 	fmt.Println("\n💡 Use 'goreleaser-cli config show' to view current settings")
 }
-

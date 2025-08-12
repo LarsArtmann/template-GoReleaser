@@ -5,9 +5,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/LarsArtmann/template-GoReleaser/internal/types"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v3"
-	"github.com/LarsArtmann/template-GoReleaser/internal/types"
 )
 
 // ConfigServiceImpl implements ConfigService interface
@@ -25,15 +25,15 @@ func NewConfigService(v *viper.Viper) ConfigService {
 // LoadConfig loads configuration from file or creates default
 func (s *ConfigServiceImpl) LoadConfig() (*types.Config, error) {
 	config := &types.Config{}
-	
+
 	// Try to load from viper first
 	if err := s.viper.Unmarshal(config); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal config: %w", err)
 	}
-	
+
 	// Apply defaults if values are empty
 	s.applyDefaults(config)
-	
+
 	return config, nil
 }
 
@@ -48,24 +48,24 @@ func (s *ConfigServiceImpl) SaveConfig(config *types.Config) error {
 		}
 		configPath = filepath.Join(homeDir, ".goreleaser-cli.yaml")
 	}
-	
+
 	// Create directory if it doesn't exist
 	dir := filepath.Dir(configPath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return fmt.Errorf("failed to create config directory: %w", err)
 	}
-	
+
 	// Marshal config to YAML
 	data, err := yaml.Marshal(config)
 	if err != nil {
 		return fmt.Errorf("failed to marshal config: %w", err)
 	}
-	
+
 	// Write to file
 	if err := os.WriteFile(configPath, data, 0644); err != nil {
 		return fmt.Errorf("failed to write config file: %w", err)
 	}
-	
+
 	return nil
 }
 
@@ -74,12 +74,12 @@ func (s *ConfigServiceImpl) ValidateConfig(config *types.Config) error {
 	if config == nil {
 		return fmt.Errorf("config cannot be nil")
 	}
-	
+
 	// Validate license type
 	if config.License.Type == "" {
 		return fmt.Errorf("license type cannot be empty")
 	}
-	
+
 	validLicenses := []string{"MIT", "Apache-2.0", "GPL-3.0", "BSD-3-Clause", "ISC", "MPL-2.0"}
 	isValid := false
 	for _, valid := range validLicenses {
@@ -91,7 +91,7 @@ func (s *ConfigServiceImpl) ValidateConfig(config *types.Config) error {
 	if !isValid {
 		return fmt.Errorf("invalid license type: %s", config.License.Type)
 	}
-	
+
 	// Validate author information for licenses that require it
 	needsAuthor := []string{"MIT", "BSD-3-Clause", "ISC"}
 	for _, license := range needsAuthor {
@@ -99,7 +99,7 @@ func (s *ConfigServiceImpl) ValidateConfig(config *types.Config) error {
 			return fmt.Errorf("license %s requires author name", config.License.Type)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -114,7 +114,7 @@ func (s *ConfigServiceImpl) applyDefaults(config *types.Config) {
 	if config.License.Type == "" {
 		config.License.Type = "MIT"
 	}
-	
+
 	if config.CLI.Colors == false && config.CLI.Verbose == false {
 		// Only set defaults if both are false (meaning uninitialized)
 		config.CLI.Colors = true

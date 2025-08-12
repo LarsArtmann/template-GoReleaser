@@ -56,7 +56,7 @@ func runVerify(cmd *cobra.Command, args []string) {
 	fmt.Println()
 
 	stats := &verifyStats{}
-	
+
 	skipSecurity, _ := cmd.Flags().GetBool("skip-security")
 	skipDryRun, _ := cmd.Flags().GetBool("skip-dry-run")
 	skipLicenseTest, _ := cmd.Flags().GetBool("skip-license-test")
@@ -294,7 +294,7 @@ func checkRequiredEnvVarsForConfig(stats *verifyStats, file string) {
 	// Extract env var references from config file
 	envVarRegex := regexp.MustCompile(`\{\{\s*\.Env\.([A-Z_]+)\s*\}\}`)
 	matches := envVarRegex.FindAllStringSubmatch(string(content), -1)
-	
+
 	configEnvVars := make(map[string]bool)
 	for _, match := range matches {
 		if len(match) > 1 {
@@ -595,7 +595,7 @@ func testLicenseSystem(stats *verifyStats) {
 	// Test license generation (if readme config exists)
 	if fileExistsSimple(".readme/configs/readme-config.yaml") {
 		logInfo("Testing license generation...")
-		
+
 		// Backup existing LICENSE
 		var backupPath string
 		if fileExistsSimple("LICENSE") {
@@ -661,7 +661,7 @@ func runSecurityValidation(stats *verifyStats) {
 		scripts, _ := filepath.Glob("*.sh")
 		scriptDir, _ := filepath.Glob("scripts/*.sh")
 		allScripts := append(scripts, scriptDir...)
-		
+
 		for _, script := range allScripts {
 			if fileExistsSimple(script) {
 				cmd := exec.Command("shellcheck", "--severity=error", script)
@@ -670,7 +670,7 @@ func runSecurityValidation(stats *verifyStats) {
 				}
 			}
 		}
-		
+
 		if shellIssues == 0 {
 			logSuccess(stats, "Shell script security scan passed")
 		} else {
@@ -807,4 +807,3 @@ func isPlaceholderValue(value string) bool {
 	}
 	return len(value) < 3
 }
-

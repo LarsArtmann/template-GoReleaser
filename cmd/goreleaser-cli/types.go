@@ -53,26 +53,26 @@ type ValidationResult struct {
 
 // ValidationReport represents a collection of validation results
 type ValidationReport struct {
-	Timestamp    time.Time          `json:"timestamp"`
-	TotalChecks  int                `json:"total_checks"`
-	Passed       int                `json:"passed"`
-	Failed       int                `json:"failed"`
-	Warnings     int                `json:"warnings"`
-	Duration     time.Duration      `json:"duration"`
-	Results      []ValidationResult `json:"results"`
-	Environment  EnvironmentInfo    `json:"environment"`
+	Timestamp   time.Time          `json:"timestamp"`
+	TotalChecks int                `json:"total_checks"`
+	Passed      int                `json:"passed"`
+	Failed      int                `json:"failed"`
+	Warnings    int                `json:"warnings"`
+	Duration    time.Duration      `json:"duration"`
+	Results     []ValidationResult `json:"results"`
+	Environment EnvironmentInfo    `json:"environment"`
 }
 
 // EnvironmentInfo represents information about the execution environment
 type EnvironmentInfo struct {
-	OS           string            `json:"os"`
-	Arch         string            `json:"arch"`
-	GoVersion    string            `json:"go_version"`
-	CLIVersion   string            `json:"cli_version"`
-	WorkingDir   string            `json:"working_dir"`
-	GitCommit    string            `json:"git_commit,omitempty"`
-	GitBranch    string            `json:"git_branch,omitempty"`
-	EnvVars      map[string]string `json:"env_vars,omitempty"`
+	OS         string            `json:"os"`
+	Arch       string            `json:"arch"`
+	GoVersion  string            `json:"go_version"`
+	CLIVersion string            `json:"cli_version"`
+	WorkingDir string            `json:"working_dir"`
+	GitCommit  string            `json:"git_commit,omitempty"`
+	GitBranch  string            `json:"git_branch,omitempty"`
+	EnvVars    map[string]string `json:"env_vars,omitempty"`
 }
 
 // GoReleaserConfig represents configuration for GoReleaser validation
@@ -169,22 +169,22 @@ func DefaultConfig() *Config {
 // Validate validates the configuration and returns any errors
 func (c *Config) Validate() []string {
 	var errors []string
-	
+
 	// Validate license
 	if c.License.Type == "" {
 		errors = append(errors, "license type is required")
 	}
-	
+
 	// Validate author
 	if c.Author.Name == "" {
 		errors = append(errors, "author name is required")
 	}
-	
+
 	// Validate CLI settings
 	if c.CLI.Timeout <= 0 {
 		errors = append(errors, "CLI timeout must be positive")
 	}
-	
+
 	return errors
 }
 

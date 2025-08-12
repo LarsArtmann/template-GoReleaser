@@ -1,0 +1,75 @@
+# CODEOWNERS file for GoReleaser Template
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Global owners - these users/teams will be requested for review on all PRs
+* @LarsArtmann
+
+# Core application code
+/cmd/ @LarsArtmann
+/internal/ @LarsArtmann
+/pkg/ @LarsArtmann
+
+# Configuration files
+/.goreleaser.yaml @LarsArtmann
+/.goreleaser.pro.yaml @LarsArtmann
+/justfile @LarsArtmann
+/Dockerfile @LarsArtmann
+/docker-compose.yml @LarsArtmann
+
+# Go module files
+/go.mod @LarsArtmann
+/go.sum @LarsArtmann
+
+# Scripts and automation
+/scripts/ @LarsArtmann
+/validate*.sh @LarsArtmann
+/verify.sh @LarsArtmann
+
+# GitHub workflows and configurations
+/.github/ @LarsArtmann
+/.github/workflows/ @LarsArtmann
+/.github/dependabot.yml @LarsArtmann
+/.github/release.yml @LarsArtmann
+
+# Documentation
+/README.md @LarsArtmann
+/CONTRIBUTING.md @LarsArtmann
+/CHANGELOG.md @LarsArtmann
+/LICENSE @LarsArtmann
+/SECURITY.md @LarsArtmann
+
+# Documentation directories
+/docs/ @LarsArtmann
+
+# Templates and assets
+/templates/ @LarsArtmann
+/assets/ @LarsArtmann
+/web/ @LarsArtmann
+
+# Test files
+/tests/ @LarsArtmann
+*_test.go @LarsArtmann
+
+# Environment and configuration templates
+/.env.template @LarsArtmann
+/.env.example @LarsArtmann
+
+# CI/CD and release configurations
+/.gitignore @LarsArtmann
+/CODEOWNERS @LarsArtmann
+
+# License templates (may require legal review for modifications)
+/assets/licenses/ @LarsArtmann
+
+# Security-sensitive files
+/SECURITY.md @LarsArtmann
+
+# Build and deployment configurations
+/Dockerfile @LarsArtmann
+/docker-compose.yml @LarsArtmann
+
+# Note: CODEOWNERS uses the last matching pattern for each file
+# More specific patterns should come after general ones
+# Teams can be specified as @org/team-name
+# Individual users as @username
+# Email addresses are also supported: user@example.com

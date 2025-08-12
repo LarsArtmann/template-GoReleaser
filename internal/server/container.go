@@ -14,10 +14,10 @@ type Container struct {
 func NewContainer() *Container {
 	injector := do.New()
 	container := &Container{injector: injector}
-	
+
 	// Register services
 	container.registerServices()
-	
+
 	return container
 }
 
@@ -25,10 +25,10 @@ func NewContainer() *Container {
 func (c *Container) registerServices() {
 	// Register configuration service
 	do.ProvideTransient(c.injector, service.NewConfigService)
-	
+
 	// Register validation service
 	do.ProvideTransient(c.injector, service.NewValidationService)
-	
+
 	// Register template service
 	do.ProvideTransient(c.injector, service.NewTemplateService)
 }

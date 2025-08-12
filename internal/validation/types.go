@@ -50,11 +50,11 @@ type ValidationIssue struct {
 
 // ValidationResult represents the result of a validation operation
 type ValidationResult struct {
-	Valid     bool               `json:"valid"`
-	Issues    []ValidationIssue  `json:"issues"`
-	Warnings  []ValidationIssue  `json:"warnings"`
-	Timestamp time.Time          `json:"timestamp"`
-	Metadata  map[string]string  `json:"metadata,omitempty"`
+	Valid     bool              `json:"valid"`
+	Issues    []ValidationIssue `json:"issues"`
+	Warnings  []ValidationIssue `json:"warnings"`
+	Timestamp time.Time         `json:"timestamp"`
+	Metadata  map[string]string `json:"metadata,omitempty"`
 }
 
 // NewValidationResult creates a new validation result
@@ -125,13 +125,13 @@ func (vr *ValidationResult) GetIssuesBySeverity(severity ValidationSeverity) []V
 
 // EnvironmentVariable represents a single environment variable definition
 type EnvironmentVariable struct {
-	Name        string             `json:"name"`
-	Description string             `json:"description"`
-	Required    bool               `json:"required"`
-	Category    VariableCategory   `json:"category"`
-	Validator   mo.Option[string]  `json:"validator,omitempty"` // Name of validation function
-	Example     mo.Option[string]  `json:"example,omitempty"`
-	Format      mo.Option[string]  `json:"format,omitempty"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Required    bool              `json:"required"`
+	Category    VariableCategory  `json:"category"`
+	Validator   mo.Option[string] `json:"validator,omitempty"` // Name of validation function
+	Example     mo.Option[string] `json:"example,omitempty"`
+	Format      mo.Option[string] `json:"format,omitempty"`
 }
 
 // VariableCategory defines categories for environment variables
@@ -149,22 +149,22 @@ const (
 
 // EnvironmentValidationResult represents the result of environment validation
 type EnvironmentValidationResult struct {
-	Valid               bool                           `json:"valid"`
-	CriticalMissing     []string                      `json:"critical_missing"`
-	OptionalMissing     []string                      `json:"optional_missing"`
-	Issues              []ValidationIssue             `json:"issues"`
-	Warnings            []ValidationIssue             `json:"warnings"`
-	ValidatedVariables  map[string]VariableStatus     `json:"validated_variables"`
-	Timestamp           time.Time                     `json:"timestamp"`
-	ValidationStatus    EnvironmentValidationStatus   `json:"validation_status"`
+	Valid              bool                        `json:"valid"`
+	CriticalMissing    []string                    `json:"critical_missing"`
+	OptionalMissing    []string                    `json:"optional_missing"`
+	Issues             []ValidationIssue           `json:"issues"`
+	Warnings           []ValidationIssue           `json:"warnings"`
+	ValidatedVariables map[string]VariableStatus   `json:"validated_variables"`
+	Timestamp          time.Time                   `json:"timestamp"`
+	ValidationStatus   EnvironmentValidationStatus `json:"validation_status"`
 }
 
 // VariableStatus represents the status of a single variable validation
 type VariableStatus struct {
-	Present   bool   `json:"present"`
-	Valid     bool   `json:"valid"`
-	Masked    string `json:"masked_value,omitempty"`
-	Issue     string `json:"issue,omitempty"`
+	Present bool   `json:"present"`
+	Valid   bool   `json:"valid"`
+	Masked  string `json:"masked_value,omitempty"`
+	Issue   string `json:"issue,omitempty"`
 }
 
 // EnvironmentValidationStatus defines overall validation status
@@ -179,14 +179,14 @@ const (
 // NewEnvironmentValidationResult creates a new environment validation result
 func NewEnvironmentValidationResult() *EnvironmentValidationResult {
 	return &EnvironmentValidationResult{
-		Valid:               true,
-		CriticalMissing:     []string{},
-		OptionalMissing:     []string{},
-		Issues:              []ValidationIssue{},
-		Warnings:            []ValidationIssue{},
-		ValidatedVariables:  make(map[string]VariableStatus),
-		Timestamp:           time.Now(),
-		ValidationStatus:    StatusReady,
+		Valid:              true,
+		CriticalMissing:    []string{},
+		OptionalMissing:    []string{},
+		Issues:             []ValidationIssue{},
+		Warnings:           []ValidationIssue{},
+		ValidatedVariables: make(map[string]VariableStatus),
+		Timestamp:          time.Now(),
+		ValidationStatus:   StatusReady,
 	}
 }
 
@@ -207,13 +207,13 @@ func (evr *EnvironmentValidationResult) AddMissingOptional(name string) {
 
 // ConfigAnalysisResult represents the result of analyzing GoReleaser configs
 type ConfigAnalysisResult struct {
-	ConfigFiles         []string          `json:"config_files"`
-	ExtractedVariables  []string          `json:"extracted_variables"`
-	MissingInExample    []string          `json:"missing_in_example"`
-	UnusedInExample     []string          `json:"unused_in_example"`
-	Issues              []ValidationIssue `json:"issues"`
-	Warnings            []ValidationIssue `json:"warnings"`
-	Timestamp           time.Time         `json:"timestamp"`
+	ConfigFiles        []string          `json:"config_files"`
+	ExtractedVariables []string          `json:"extracted_variables"`
+	MissingInExample   []string          `json:"missing_in_example"`
+	UnusedInExample    []string          `json:"unused_in_example"`
+	Issues             []ValidationIssue `json:"issues"`
+	Warnings           []ValidationIssue `json:"warnings"`
+	Timestamp          time.Time         `json:"timestamp"`
 }
 
 // NewConfigAnalysisResult creates a new config analysis result
@@ -231,12 +231,12 @@ func NewConfigAnalysisResult() *ConfigAnalysisResult {
 
 // ValidationReport represents a comprehensive validation report
 type ValidationReport struct {
-	Environment       *EnvironmentValidationResult `json:"environment"`
-	ConfigAnalysis    *ConfigAnalysisResult        `json:"config_analysis"`
-	OverallStatus     ValidationStatus             `json:"overall_status"`
-	Summary           ValidationSummary            `json:"summary"`
-	Timestamp         time.Time                    `json:"timestamp"`
-	RecommendedActions []string                    `json:"recommended_actions"`
+	Environment        *EnvironmentValidationResult `json:"environment"`
+	ConfigAnalysis     *ConfigAnalysisResult        `json:"config_analysis"`
+	OverallStatus      ValidationStatus             `json:"overall_status"`
+	Summary            ValidationSummary            `json:"summary"`
+	Timestamp          time.Time                    `json:"timestamp"`
+	RecommendedActions []string                     `json:"recommended_actions"`
 }
 
 // ValidationStatus defines overall validation status
@@ -251,12 +251,12 @@ const (
 
 // ValidationSummary provides a summary of validation results
 type ValidationSummary struct {
-	TotalChecks       int `json:"total_checks"`
-	CriticalIssues    int `json:"critical_issues"`
-	Errors            int `json:"errors"`
-	Warnings          int `json:"warnings"`
-	MissingCritical   int `json:"missing_critical"`
-	MissingOptional   int `json:"missing_optional"`
+	TotalChecks     int `json:"total_checks"`
+	CriticalIssues  int `json:"critical_issues"`
+	Errors          int `json:"errors"`
+	Warnings        int `json:"warnings"`
+	MissingCritical int `json:"missing_critical"`
+	MissingOptional int `json:"missing_optional"`
 }
 
 // ToJSON converts validation result to JSON

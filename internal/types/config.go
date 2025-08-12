@@ -61,22 +61,22 @@ func DefaultConfig() *Config {
 // Validate validates the configuration and returns any errors
 func (c *Config) Validate() []string {
 	var errors []string
-	
+
 	// Validate license
 	if c.License.Type == "" {
 		errors = append(errors, "license type is required")
 	}
-	
+
 	// Validate author
 	if c.Author.Name == "" {
 		errors = append(errors, "author name is required")
 	}
-	
+
 	// Validate CLI settings
 	if c.CLI.Timeout <= 0 {
 		errors = append(errors, "CLI timeout must be positive")
 	}
-	
+
 	return errors
 }
 

@@ -31,7 +31,7 @@ func (s *ValidationServiceImpl) ValidateProject() (*ValidationResult, error) {
 	// Check required files
 	requiredFiles := []string{
 		"go.mod",
-		"README.md", 
+		"README.md",
 		"LICENSE",
 	}
 
@@ -59,7 +59,7 @@ func (s *ValidationServiceImpl) ValidateProject() (*ValidationResult, error) {
 	// Check GoReleaser configuration files
 	goreleaserFiles := []string{
 		".goreleaser.yaml",
-		".goreleaser.yml", 
+		".goreleaser.yml",
 		".goreleaser.pro.yaml",
 		".goreleaser.pro.yml",
 		"goreleaser.yaml",
@@ -122,11 +122,11 @@ func (s *ValidationServiceImpl) ValidateEnvironment() (*ValidationResult, error)
 
 	// Check optional environment variables
 	optionalVars := map[string]string{
-		"DOCKER_USERNAME":             "Docker Hub username",
-		"DOCKER_PASSWORD":             "Docker Hub password/token",
-		"GORELEASER_KEY":              "GoReleaser Pro license key", 
-		"HOMEBREW_TAP_GITHUB_TOKEN":   "GitHub token for Homebrew tap",
-		"SCOOP_GITHUB_TOKEN":          "GitHub token for Scoop bucket",
+		"DOCKER_USERNAME":           "Docker Hub username",
+		"DOCKER_PASSWORD":           "Docker Hub password/token",
+		"GORELEASER_KEY":            "GoReleaser Pro license key",
+		"HOMEBREW_TAP_GITHUB_TOKEN": "GitHub token for Homebrew tap",
+		"SCOOP_GITHUB_TOKEN":        "GitHub token for Scoop bucket",
 	}
 
 	for varName := range optionalVars {
@@ -215,9 +215,9 @@ func (s *ValidationServiceImpl) ValidateTools() (*ValidationResult, error) {
 
 	// Check required tools
 	requiredTools := map[string]string{
-		"go":          "Go compiler",
-		"git":         "Git version control",
-		"goreleaser":  "GoReleaser binary",
+		"go":         "Go compiler",
+		"git":        "Git version control",
+		"goreleaser": "GoReleaser binary",
 	}
 
 	for tool, description := range requiredTools {
@@ -230,10 +230,10 @@ func (s *ValidationServiceImpl) ValidateTools() (*ValidationResult, error) {
 
 	// Check recommended tools
 	recommendedTools := map[string]string{
-		"docker":   "Docker for container builds",
-		"yq":       "YAML processor",
-		"cosign":   "Container signing",
-		"syft":     "SBOM generation",
+		"docker": "Docker for container builds",
+		"yq":     "YAML processor",
+		"cosign": "Container signing",
+		"syft":   "SBOM generation",
 	}
 
 	for tool, description := range recommendedTools {

@@ -83,7 +83,7 @@ func runServer(cmd *cobra.Command, args []string) {
 		sigChan := make(chan os.Signal, 1)
 		signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 		<-sigChan
-		
+
 		fmt.Println("\n🛑 Shutdown signal received")
 		cancel()
 	}()
