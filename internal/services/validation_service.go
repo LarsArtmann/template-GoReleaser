@@ -5,6 +5,9 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/samber/lo"
+	"github.com/samber/mo"
 )
 
 // ValidationServiceImpl implements ValidationService interface
@@ -28,35 +31,45 @@ func (s *ValidationServiceImpl) ValidateProject() (*ValidationResult, error) {
 		Checks:   0,
 	}
 
-	// Check required files
+	// Check required files using lo.Map and lo.Filter for functional patterns
 	requiredFiles := []string{
 		"go.mod",
 		"README.md",
 		"LICENSE",
 	}
 
-	for _, file := range requiredFiles {
-		result.Checks++
-		if _, err := os.Stat(file); os.IsNotExist(err) {
-			result.Errors = append(result.Errors, fmt.Sprintf("Missing required file: %s", file))
-			result.Success = false
-		}
+	result.Checks += len(requiredFiles)
+	missingFiles := lo.Filter(requiredFiles, func(file string, _ int) bool {
+		_, err := os.Stat(file)
+		return os.IsNotExist(err)
+	})
+
+	if len(missingFiles) > 0 {
+		result.Errors = append(result.Errors, lo.Map(missingFiles, func(file string, _ int) string {
+			return fmt.Sprintf("Missing required file: %s", file)
+		})...)
+		result.Success = false
 	}
 
-	// Check required directories
+	// Check required directories using functional patterns
 	requiredDirs := []string{
 		"cmd",
 	}
 
-	for _, dir := range requiredDirs {
-		result.Checks++
-		if info, err := os.Stat(dir); os.IsNotExist(err) || !info.IsDir() {
-			result.Errors = append(result.Errors, fmt.Sprintf("Missing required directory: %s", dir))
-			result.Success = false
-		}
+	result.Checks += len(requiredDirs)
+	missingDirs := lo.Filter(requiredDirs, func(dir string, _ int) bool {
+		info, err := os.Stat(dir)
+		return os.IsNotExist(err) || !info.IsDir()
+	})
+
+	if len(missingDirs) > 0 {
+		result.Errors = append(result.Errors, lo.Map(missingDirs, func(dir string, _ int) string {
+			return fmt.Sprintf("Missing required directory: %s", dir)
+		})...)
+		result.Success = false
 	}
 
-	// Check GoReleaser configuration files
+	// Check GoReleaser configuration files using functional patterns
 	goreleaserFiles := []string{
 		".goreleaser.yaml",
 		".goreleaser.yml",
@@ -66,12 +79,19 @@ func (s *ValidationServiceImpl) ValidateProject() (*ValidationResult, error) {
 		"goreleaser.yml",
 	}
 
-	foundGoReleaserConfig := false
-	for _, file := range goreleaserFiles {
-		if _, err := os.Stat(file); err == nil {
-			foundGoReleaserConfig = true
-			result.Checks++
+	existingConfigs := lo.Filter(goreleaserFiles, func(file string, _ int) bool {
+		_, err := os.Stat(file)
+		return err == nil
+	})
 
+	result.Checks += len(existingConfigs) + 1
+
+	if len(existingConfigs) == 0 {
+		result.Errors = append(result.Errors, "No GoReleaser configuration files found")
+		result.Success = false
+	} else {
+		// Validate each existing config
+		for _, file := range existingConfigs {
 			// Validate YAML syntax
 			if !s.validateYAMLSyntax(file) {
 				result.Errors = append(result.Errors, fmt.Sprintf("Invalid YAML syntax in %s", file))
@@ -85,12 +105,6 @@ func (s *ValidationServiceImpl) ValidateProject() (*ValidationResult, error) {
 				}
 			}
 		}
-	}
-
-	result.Checks++
-	if !foundGoReleaserConfig {
-		result.Errors = append(result.Errors, "No GoReleaser configuration files found")
-		result.Success = false
 	}
 
 	return result, nil
@@ -213,22 +227,26 @@ func (s *ValidationServiceImpl) ValidateTools() (*ValidationResult, error) {
 		Checks:   0,
 	}
 
-	// Check required tools
+	// Check required tools using functional patterns
 	requiredTools := map[string]string{
 		"go":         "Go compiler",
 		"git":        "Git version control",
 		"goreleaser": "GoReleaser binary",
 	}
 
-	for tool, description := range requiredTools {
-		result.Checks++
-		if _, err := exec.LookPath(tool); err != nil {
-			result.Errors = append(result.Errors, fmt.Sprintf("Required tool not found: %s (%s)", tool, description))
-			result.Success = false
-		}
+	result.Checks += len(requiredTools)
+	missingRequiredTools := lo.PickBy(requiredTools, func(tool, description string) bool {
+		return s.getToolPath(tool).IsAbsent()
+	})
+
+	if len(missingRequiredTools) > 0 {
+		result.Errors = append(result.Errors, lo.MapToSlice(missingRequiredTools, func(tool, description string) string {
+			return fmt.Sprintf("Required tool not found: %s (%s)", tool, description)
+		})...)
+		result.Success = false
 	}
 
-	// Check recommended tools
+	// Check recommended tools using functional patterns
 	recommendedTools := map[string]string{
 		"docker": "Docker for container builds",
 		"yq":     "YAML processor",
@@ -236,11 +254,15 @@ func (s *ValidationServiceImpl) ValidateTools() (*ValidationResult, error) {
 		"syft":   "SBOM generation",
 	}
 
-	for tool, description := range recommendedTools {
-		result.Checks++
-		if _, err := exec.LookPath(tool); err != nil {
-			result.Warnings = append(result.Warnings, fmt.Sprintf("Recommended tool not found: %s (%s)", tool, description))
-		}
+	result.Checks += len(recommendedTools)
+	missingRecommendedTools := lo.PickBy(recommendedTools, func(tool, description string) bool {
+		return s.getToolPath(tool).IsAbsent()
+	})
+
+	if len(missingRecommendedTools) > 0 {
+		result.Warnings = append(result.Warnings, lo.MapToSlice(missingRecommendedTools, func(tool, description string) string {
+			return fmt.Sprintf("Recommended tool not found: %s (%s)", tool, description)
+		})...)
 	}
 
 	return result, nil
@@ -282,14 +304,28 @@ func (s *ValidationServiceImpl) validateGoReleaserConfig(file string) bool {
 	return true
 }
 
-// isPlaceholderValue checks if a value appears to be a placeholder
+// isPlaceholderValue checks if a value appears to be a placeholder using functional patterns
 func (s *ValidationServiceImpl) isPlaceholderValue(value string) bool {
 	placeholders := []string{"your-", "xxxx", "example", "changeme", "todo", "test-"}
 	lowerValue := strings.ToLower(value)
-	for _, placeholder := range placeholders {
-		if strings.HasPrefix(lowerValue, placeholder) {
-			return true
-		}
+	
+	return len(value) < 3 || lo.SomeBy(placeholders, func(placeholder string) bool {
+		return strings.HasPrefix(lowerValue, placeholder)
+	})
+}
+
+// getToolPath returns an Option containing the tool path if found
+func (s *ValidationServiceImpl) getToolPath(tool string) mo.Option[string] {
+	if path, err := exec.LookPath(tool); err == nil {
+		return mo.Some(path)
 	}
-	return len(value) < 3
+	return mo.None[string]()
+}
+
+// checkFileExists returns an Option containing file info if file exists
+func (s *ValidationServiceImpl) checkFileExists(path string) mo.Option[os.FileInfo] {
+	if info, err := os.Stat(path); err == nil {
+		return mo.Some(info)
+	}
+	return mo.None[os.FileInfo]()
 }

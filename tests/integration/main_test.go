@@ -1,9 +1,11 @@
 package integration
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/LarsArtmann/template-GoReleaser/tests/helpers"
 	"github.com/stretchr/testify/suite"
@@ -15,10 +17,15 @@ type IntegrationTestSuite struct {
 	originalDir  string
 	tempDir      string
 	cleanupFuncs []func()
+	ctx          context.Context
+	cancel       context.CancelFunc
 }
 
 // SetupSuite runs once before all tests in the suite
 func (suite *IntegrationTestSuite) SetupSuite() {
+	// Create context with timeout for entire test suite
+	suite.ctx, suite.cancel = context.WithTimeout(context.Background(), 2*time.Minute)
+
 	// Store original working directory and find project root
 	var err error
 	cwd, err := os.Getwd()
@@ -57,6 +64,11 @@ func (suite *IntegrationTestSuite) TearDownTest() {
 
 // TearDownSuite runs once after all tests in the suite
 func (suite *IntegrationTestSuite) TearDownSuite() {
+	// Cancel context to stop any ongoing operations
+	if suite.cancel != nil {
+		suite.cancel()
+	}
+
 	// Clean up temporary directory
 	if suite.tempDir != "" {
 		os.RemoveAll(suite.tempDir)

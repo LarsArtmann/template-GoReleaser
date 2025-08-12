@@ -67,7 +67,7 @@ func (suite *IntegrationTestSuite) TestGoReleaserSnapshot() {
 			name:       "Free Version Snapshot",
 			configFile: ".goreleaser.yaml",
 			envVars:    fixtures.TestEnvironmentVars["minimal"],
-			timeout:    5 * time.Minute,
+			timeout:    5 * time.Second, // Reduced from 5 minutes
 			expectBuilds: []string{
 				"myproject_linux_amd64",
 				"myproject_linux_arm64",
@@ -80,7 +80,7 @@ func (suite *IntegrationTestSuite) TestGoReleaserSnapshot() {
 			name:       "Pro Version Snapshot",
 			configFile: ".goreleaser.pro.yaml",
 			envVars:    fixtures.TestEnvironmentVars["complete"],
-			timeout:    10 * time.Minute,
+			timeout:    5 * time.Second, // Reduced from 10 minutes
 			skipPro:    true, // Skip pro tests unless we have a license
 			expectBuilds: []string{
 				"myproject_linux_amd64",
@@ -194,8 +194,8 @@ func (suite *IntegrationTestSuite) TestGoReleaserDryRun() {
 		suite.T().Skipf("Configuration file %s does not exist", configFile)
 	}
 
-	// Run GoReleaser dry-run
-	result := helpers.RunCommandWithTimeout(suite.T(), 5*time.Minute, testDir,
+	// Run GoReleaser dry-run with reduced timeout
+	result := helpers.RunCommandWithTimeout(suite.T(), 5*time.Second, testDir,
 		"goreleaser", "release", "--skip=publish", "--clean", "--config", configFile)
 
 	if result.ExitCode != 0 {
@@ -238,8 +238,8 @@ func (suite *IntegrationTestSuite) TestGoReleaserBuild() {
 		suite.T().Skipf("Configuration file %s does not exist", configFile)
 	}
 
-	// Run GoReleaser build (single target for speed)
-	result := helpers.RunCommandWithTimeout(suite.T(), 3*time.Minute, testDir,
+	// Run GoReleaser build (single target for speed) with reduced timeout
+	result := helpers.RunCommandWithTimeout(suite.T(), 5*time.Second, testDir,
 		"goreleaser", "build", "--snapshot", "--single-target", "--config", configFile)
 
 	if result.ExitCode != 0 {

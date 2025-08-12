@@ -2,6 +2,7 @@ package helpers
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -22,12 +23,22 @@ type CommandResult struct {
 	Duration time.Duration
 }
 
-// RunCommand executes a command and returns the result
+// RunCommand executes a command and returns the result with a default timeout
 func RunCommand(t *testing.T, dir, command string, args ...string) CommandResult {
+	t.Helper()
+	// Use RunCommandWithTimeout with a short default for tests
+	return RunCommandWithTimeout(t, 5*time.Second, dir, command, args...)
+}
+
+// RunCommandWithTimeout executes a command with a timeout and proper cleanup
+func RunCommandWithTimeout(t *testing.T, timeout time.Duration, dir, command string, args ...string) CommandResult {
 	t.Helper()
 
 	start := time.Now()
-	cmd := exec.Command(command, args...)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout)
+	defer cancel()
+
+	cmd := exec.CommandContext(ctx, command, args...)
 	cmd.Dir = dir
 
 	var stdout, stderr bytes.Buffer
@@ -41,54 +52,8 @@ func RunCommand(t *testing.T, dir, command string, args ...string) CommandResult
 	if err != nil {
 		if exitErr, ok := err.(*exec.ExitError); ok {
 			exitCode = exitErr.ExitCode()
-		} else {
-			exitCode = 1
-		}
-	}
-
-	return CommandResult{
-		ExitCode: exitCode,
-		Stdout:   stdout.String(),
-		Stderr:   stderr.String(),
-		Duration: duration,
-	}
-}
-
-// RunCommandWithTimeout executes a command with a timeout
-func RunCommandWithTimeout(t *testing.T, timeout time.Duration, dir, command string, args ...string) CommandResult {
-	t.Helper()
-
-	start := time.Now()
-	cmd := exec.Command(command, args...)
-	cmd.Dir = dir
-
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-
-	done := make(chan error, 1)
-	go func() {
-		done <- cmd.Run()
-	}()
-
-	var err error
-	select {
-	case err = <-done:
-		// Command completed normally
-	case <-time.After(timeout):
-		// Command timed out
-		if cmd.Process != nil {
-			_ = cmd.Process.Kill() // Error handling not critical for cleanup
-		}
-		err = fmt.Errorf("command timed out after %v", timeout)
-	}
-
-	duration := time.Since(start)
-
-	exitCode := 0
-	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
-			exitCode = exitErr.ExitCode()
+		} else if ctx.Err() == context.DeadlineExceeded {
+			exitCode = 124 // timeout exit code
 		} else {
 			exitCode = 1
 		}
