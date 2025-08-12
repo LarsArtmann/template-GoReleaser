@@ -182,4 +182,4 @@ config.local.yml
 # CI/CD local files
 .buildkite/local/
 .circleci/local/
-.gitlab-ci-local/
+.gitlab-ci-local/goreleaser-cli*
