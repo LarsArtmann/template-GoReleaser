@@ -1,7 +1,7 @@
 # GoReleaser Template
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-1.23+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.22+-blue.svg)](https://golang.org)
 [![Just](https://img.shields.io/badge/Just-Task%20Runner-blue.svg)](https://github.com/casey/just)
 
 A comprehensive GoReleaser template for Go projects with extensive automation, validation scripts, and both free and pro configurations.
@@ -75,7 +75,7 @@ A comprehensive GoReleaser template for Go projects with extensive automation, v
 
 ### Prerequisites
 
-- **Go 1.24+**: [Download Go](https://golang.org/dl/)
+- **Go 1.22+**: [Download Go](https://golang.org/dl/)
 - **Git**: Version control
 - **Docker** (optional): For container builds
 - **Just** (recommended): Task runner
@@ -170,7 +170,7 @@ git push origin v1.0.0
 ### Project Structure
 
 ```
-├── cmd/myproject/          # Application entry point
+├── cmd/goreleaser-cli/     # Application entry point
 │   └── main.go
 ├── assets/                 # License templates and assets
 │   └── licenses/
@@ -208,12 +208,11 @@ Choose from multiple license templates in `assets/licenses/`:
 just run
 
 # Run with specific flags
-go run ./cmd/myproject -version
-go run ./cmd/myproject -health
+go run ./cmd/goreleaser-cli version
 
 # Build and run
 just build
-./myproject
+./goreleaser-cli
 ```
 
 ### Testing
@@ -343,7 +342,7 @@ goreleaser check --config .goreleaser.yaml
 #### Build Fails
 ```bash
 # Check Go version
-go version  # Should be 1.23+
+go version  # Should be 1.22+
 
 # Update dependencies
 just update-deps
