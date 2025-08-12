@@ -40,7 +40,7 @@ A comprehensive GoReleaser template for Go projects with extensive automation, v
 
 ### Advanced Features (Pro)
 - **Enhanced Security**: Advanced signing and verification
-- **Template Generation**: Support for templ and TypeSpec
+- **Template Generation**: Support for templ templates
 - **Advanced Compression**: UPX compression support
 - **Extended Validation**: Strict validation with additional checks
 
