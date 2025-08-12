@@ -1,457 +1,261 @@
-# GoReleaser Template
+# GoReleaser Wizard 🚀
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-1.22+-blue.svg)](https://golang.org)
-[![Just](https://img.shields.io/badge/Just-Task%20Runner-blue.svg)](https://github.com/casey/just)
+[![Go Version](https://img.shields.io/badge/go-1.23+-blue.svg)](https://golang.org)
+[![GoReleaser](https://img.shields.io/badge/powered%20by-GoReleaser-blue.svg)](https://goreleaser.com)
 
-A comprehensive GoReleaser template for Go projects with extensive automation, validation scripts, and both free and pro configurations.
+**The interactive setup wizard that creates perfect GoReleaser configurations in seconds.**
 
-## Table of Contents
+Stop copy-pasting configs. Stop guessing at YAML. Get a production-ready GoReleaser setup with one command.
 
-- [Features](#features)
-- [Quick Start](#quick-start)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Configuration](#configuration)
-- [Development](#development)
-- [Release Process](#release-process)
-- [Available Commands](#available-commands)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
+## ✨ Features
 
-## Features
+- 🎯 **Interactive wizard** - Guides you through every option
+- 🧠 **Smart defaults** - Detects your project structure automatically
+- 🚀 **GitHub Actions included** - Complete CI/CD pipeline ready to go
+- 📦 **Multi-platform builds** - Linux, macOS, Windows, ARM, and more
+- 🐳 **Docker support** - Multi-arch container images
+- 🔒 **Security built-in** - Code signing, SBOM generation
+- ✅ **Validation** - Check your config before releasing
 
-### Core Features
-- **Complete GoReleaser Setup**: Pre-configured for both free and pro versions
-- **Automated Validation**: Comprehensive verification scripts for configurations
-- **Just Integration**: Extensive task automation with Just commands
-- **Multi-Platform Builds**: Support for multiple OS/architecture combinations
-- **Docker Support**: Container builds and multi-platform images
-- **Security Features**: Code signing, SBOM generation, and security scanning
-- **License Templates**: Multiple license templates (MIT, Apache-2.0, BSD-3-Clause, EUPL-1.2)
-
-### Development Tools
-- **Code Quality**: Linting, formatting, and security scanning
-- **Testing**: Comprehensive test automation with coverage reports
-- **CI/CD Ready**: GitHub Actions compatible
-- **Environment Management**: `.env` file setup and management
-- **Dependency Management**: Automated updates and security checks
-
-### Advanced Features (Pro)
-- **Enhanced Security**: Advanced signing and verification
-- **Template Generation**: Support for templ templates
-- **Advanced Compression**: UPX compression support
-- **Extended Validation**: Strict validation with additional checks
-
-## Quick Start
-
-1. **Use as GitHub Template**:
-   ```bash
-   gh repo create my-project --template LarsArtmann/template-GoReleaser
-   cd my-project
-   ```
-
-2. **Or Clone Directly**:
-   ```bash
-   git clone https://github.com/LarsArtmann/template-GoReleaser.git my-project
-   cd my-project
-   rm -rf .git && git init
-   ```
-
-3. **Initialize Project**:
-   ```bash
-   just setup-env
-   just install-tools
-   just init
-   ```
-
-4. **Validate Setup**:
-   ```bash
-   just validate
-   ```
-
-## Installation
-
-### Prerequisites
-
-- **Go 1.22+**: [Download Go](https://golang.org/dl/)
-- **Git**: Version control
-- **Docker** (optional): For container builds
-- **Just** (recommended): Task runner
-
-### Install Just (Task Runner)
+## 🎬 Quick Start
 
 ```bash
-# macOS
-brew install just
+# Install
+go install github.com/LarsArtmann/template-GoReleaser/cmd/goreleaser-wizard@latest
 
-# Linux
-curl --proto '=https' --tlsv1.2 -sSf https://just.systems/install.sh | bash -s -- --to ~/bin
+# Run the wizard
+goreleaser-wizard init
 
-# Windows
-scoop install just
+# That's it! Your .goreleaser.yaml is ready
 ```
 
-### Install Development Tools
+## 📸 Demo
 
 ```bash
-just install-tools
+$ goreleaser-wizard init
+🚀 GoReleaser Configuration Wizard
+Let's create the perfect GoReleaser config for your project!
+
+? Project Name › my-awesome-cli
+? Project Description › A fantastic CLI tool
+? Project Type › CLI Application
+? Binary Name › my-awesome-cli
+? Main Package Path › ./cmd/my-awesome-cli
+
+? Target Platforms › ✓ linux ✓ darwin ✓ windows
+? Target Architectures › ✓ amd64 ✓ arm64
+? Enable CGO? › No (recommended)
+? Embed Version Info? › Yes (recommended)
+
+? Git Provider › GitHub
+? Docker Images? › Yes
+? Code Signing? › Yes
+? Generate SBOM? › Yes
+
+✓ Created .goreleaser.yaml
+✓ Created .github/workflows/release.yml
+
+✨ Setup Complete!
 ```
 
-This installs:
-- GoReleaser
-- golangci-lint
-- gosec
-- cosign
-- syft
-- templ
+## 🛠️ Installation
 
-## Usage
-
-### Environment Setup
-
-1. **Create Environment File**:
-   ```bash
-   just setup-env
-   ```
-
-2. **Edit `.env` with Your Configuration**:
-   ```bash
-   # Example .env contents
-   GITHUB_TOKEN=your_github_token
-   DOCKER_REGISTRY=ghcr.io
-   PROJECT_NAME=my-project
-   ```
-
-### Basic Development Workflow
+### Using Go
 
 ```bash
-# Build the project
-just build
-
-# Run tests
-just test
-
-# Run with coverage
-just test-coverage
-
-# Format code
-just fmt
-
-# Run linters
-just lint
-
-# Full CI pipeline
-just ci
+go install github.com/LarsArtmann/template-GoReleaser/cmd/goreleaser-wizard@latest
 ```
 
-### Release Workflow
+### From Source
 
 ```bash
-# Validate configuration
-just validate
-
-# Create a snapshot build (no release)
-just snapshot
-
-# Dry run (test release process)
-just dry-run
-
-# Create version tag
-just tag v1.0.0
-
-# Push tag to trigger release
-git push origin v1.0.0
+git clone https://github.com/LarsArtmann/template-GoReleaser.git
+cd template-GoReleaser
+go build -o goreleaser-wizard ./cmd/goreleaser-wizard
 ```
 
-## Configuration
+### Download Binary
 
-### Project Structure
+Download the latest release from the [releases page](https://github.com/LarsArtmann/template-GoReleaser/releases).
 
-```
-├── cmd/goreleaser-cli/     # Application entry point
-│   └── main.go
-├── assets/                 # License templates and assets
-│   └── licenses/
-├── templates/              # Additional templates
-├── scripts/                # Build and utility scripts
-├── .readme/configs/        # README generator config
-├── justfile                # Task automation
-├── verify.sh              # Configuration verifier
-├── validate-strict.sh     # Strict validation
-├── Dockerfile             # Container configuration
-└── go.mod                 # Go module definition
-```
+## 📖 Usage
 
-### GoReleaser Configurations
+### Interactive Mode (Recommended)
 
-The template supports two GoReleaser configurations:
-
-- **`.goreleaser.yaml`**: Free version with basic features
-- **`.goreleaser.pro.yaml`**: Pro version with advanced features
-
-### License Templates
-
-Choose from multiple license templates in `assets/licenses/`:
-- MIT License
-- Apache License 2.0
-- BSD 3-Clause License
-- EUPL 1.2 License
-
-## Development
-
-### Running the Application
+The wizard will guide you through creating a perfect configuration:
 
 ```bash
-# Run directly
-just run
-
-# Run with specific flags
-go run ./cmd/goreleaser-cli version
-
-# Build and run
-just build
-./goreleaser-cli
+goreleaser-wizard init
 ```
 
-### Testing
+Options:
+- `--force` - Overwrite existing configuration
+- `--minimal` - Create minimal configuration
+- `--pro` - Include GoReleaser Pro features
+
+### Non-Interactive Mode
+
+Perfect for CI/CD pipelines:
 
 ```bash
-# Run all tests
-just test
-
-# Run tests with coverage
-just test-coverage
-
-# View coverage report
-open coverage.html
+goreleaser-wizard generate \
+  --name my-project \
+  --binary my-app \
+  --platforms linux,darwin,windows \
+  --docker \
+  --github-action
 ```
 
-### Code Quality
+### Validate Configuration
+
+Check your existing GoReleaser configuration:
 
 ```bash
-# Format code
-just fmt
+goreleaser-wizard validate
 
-# Run linters
-just lint
+# With fixes
+goreleaser-wizard validate --fix
 
-# Security scan
-just security-scan
-
-# Complete quality check
-just ci
+# Verbose output
+goreleaser-wizard validate --verbose
 ```
 
-## Release Process
+## 🎯 What It Creates
 
-### Automated (Recommended)
+### `.goreleaser.yaml`
+- Optimized build configuration
+- Multi-platform support
+- Archive generation
+- Checksums and signatures
+- Changelog generation
+- Release configuration
 
-1. **Prepare Release**:
-   ```bash
-   just ci                    # Ensure everything passes
-   just validate             # Validate GoReleaser config
-   ```
+### `.github/workflows/release.yml`
+- Automated releases on tags
+- Docker image building
+- Code signing with cosign
+- SBOM generation
+- Multi-platform builds
 
-2. **Create Release**:
-   ```bash
-   just tag v1.0.0          # Create version tag
-   git push origin v1.0.0   # Trigger release
-   ```
+## 🏗️ Project Types
 
-3. **GitHub Actions** handles the rest automatically.
+The wizard adapts to your project:
 
-### Manual Release
+- **CLI Application** - Single binary with version info
+- **Web Service** - Includes Docker configuration
+- **Library with CLI** - Focuses on the CLI component
+- **Multiple Binaries** - Configures multiple build targets
+
+## 🔧 Advanced Features
+
+### GoReleaser Pro Support
+
+Enable Pro features during setup:
 
 ```bash
-# For manual releases (requires tag)
-just release              # Free version
-just release-pro          # Pro version (requires license)
+goreleaser-wizard init --pro
 ```
 
-## Available Commands
+Adds support for:
+- Custom publishers
+- Advanced templating
+- Nightlies
+- Docker manifests
+- And more!
 
-### Core Commands
+### Docker Integration
 
-| Command | Description |
-|---------|-------------|
-| `just init` | Initialize project dependencies |
-| `just build` | Build the application |
-| `just test` | Run tests with coverage |
-| `just fmt` | Format code |
-| `just lint` | Run linters |
-| `just clean` | Clean build artifacts |
+When Docker is enabled, the wizard:
+- Detects your registry (ghcr.io, Docker Hub, etc.)
+- Configures multi-platform images
+- Sets up proper labels
+- Handles authentication in CI/CD
 
-### Validation Commands
+### Package Managers
 
-| Command | Description |
-|---------|-------------|
-| `just validate` | Validate GoReleaser configuration |
-| `just validate-strict` | Run strict validation checks |
-| `just check` | Check free GoReleaser config |
-| `just check-pro` | Check pro GoReleaser config |
+Optional support for:
+- **Homebrew** - macOS/Linux formula
+- **Snap** - Linux snap packages
+- **Scoop** - Windows package manager
+- **AUR** - Arch Linux (Pro)
 
-### Release Commands
+## 🧪 Testing Your Configuration
 
-| Command | Description |
-|---------|-------------|
-| `just snapshot` | Build snapshot (no release) |
-| `just snapshot-pro` | Build pro snapshot |
-| `just dry-run` | Test release process |
-| `just tag <version>` | Create version tag |
-| `just release` | Create release |
-| `just release-pro` | Create pro release |
-
-### Development Tools
-
-| Command | Description |
-|---------|-------------|
-| `just setup-env` | Create .env from template |
-| `just install-tools` | Install development tools |
-| `just docker-build` | Build Docker image |
-| `just security-scan` | Run security analysis |
-| `just update-deps` | Update dependencies |
-| `just ci` | Complete CI pipeline |
-
-### Utility Commands
-
-| Command | Description |
-|---------|-------------|
-| `just version` | Show application version |
-| `just health` | Health check |
-| `just changelog` | Generate changelog |
-| `just help` | Show detailed help |
-
-## Troubleshooting
-
-### Common Issues
-
-#### GoReleaser Validation Fails
-```bash
-# Check configuration syntax
-just validate
-
-# Run with verbose output
-goreleaser check --config .goreleaser.yaml
-
-# Validate project structure
-./verify.sh
-```
-
-#### Build Fails
-```bash
-# Check Go version
-go version  # Should be 1.22+
-
-# Update dependencies
-just update-deps
-
-# Clean and rebuild
-just clean
-just build
-```
-
-#### Missing Tools
-```bash
-# Install all required tools
-just install-tools
-
-# Check specific tool
-which goreleaser
-which golangci-lint
-```
-
-#### Docker Issues
-```bash
-# Test Docker build
-just docker-build
-
-# Check Docker daemon
-docker info
-```
-
-### Environment Issues
-
-#### Missing Environment Variables
-```bash
-# Check .env file exists
-ls -la .env
-
-# Recreate from template
-just setup-env
-```
-
-#### Git Configuration
-```bash
-# Check Git setup
-git remote -v
-git status
-
-# Verify tags
-git tag
-```
-
-### Getting Help
-
-1. **Check Logs**: Most commands provide verbose output
-2. **Run Validation**: Use `just validate` and `./verify.sh`
-3. **Check Documentation**: Run `just help` for command details
-4. **Inspect Configuration**: Review `.goreleaser.yaml` files
-
-### Debug Mode
+After generating your configuration:
 
 ```bash
-# Run any command with verbose output
-goreleaser --debug
+# 1. Validate the configuration
+goreleaser-wizard validate
 
-# Check environment
-env | grep -E "(GITHUB|DOCKER)"
+# 2. Test build locally
+goreleaser build --snapshot --clean
 
-# Validate step by step
-just validate-strict
+# 3. Create a tag
+git tag -a v0.1.0 -m 'First release'
+
+# 4. Push to trigger release
+git push origin v0.1.0
 ```
 
-## Contributing
+## 📚 Examples
 
-1. **Fork the Repository**
-2. **Create Feature Branch**: `git checkout -b feature/amazing-feature`
-3. **Make Changes**: Follow the existing code style
-4. **Add Tests**: Ensure new features are tested
-5. **Run CI**: `just ci` must pass
-6. **Submit Pull Request**: With clear description
+### Minimal CLI Tool
 
-### Development Guidelines
+```bash
+goreleaser-wizard generate \
+  --name simple-cli \
+  --binary simple \
+  --platforms linux,darwin
+```
 
-- Follow Go conventions and gofmt
-- Add tests for new features
-- Update documentation as needed
-- Ensure all linters pass
-- Validate GoReleaser configurations
+### Full-Featured Web Service
 
-## License
+```bash
+goreleaser-wizard generate \
+  --name api-server \
+  --binary server \
+  --docker \
+  --signing \
+  --github-action \
+  --platforms linux,darwin,windows \
+  --architectures amd64,arm64
+```
+
+### Library with CLI
+
+```bash
+goreleaser-wizard init --minimal
+# Then select "Library with CLI" in the wizard
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing`)
+5. Open a Pull Request
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-### Additional License Templates
+## 🙏 Acknowledgments
 
-This template includes several license options in `assets/licenses/`:
-- MIT License (default)
-- Apache License 2.0
-- BSD 3-Clause License
-- EUPL 1.2 License
+- [GoReleaser](https://goreleaser.com) - The amazing release automation tool
+- [Charm](https://charm.sh) - Beautiful terminal UI components
+- [Cobra](https://github.com/spf13/cobra) - CLI framework
+- [Viper](https://github.com/spf13/viper) - Configuration management
 
-## Support
+## 🔗 Links
 
-- **Documentation**: Check the `justfile` and validation scripts
-- **Issues**: [GitHub Issues](https://github.com/LarsArtmann/template-GoReleaser/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/LarsArtmann/template-GoReleaser/discussions)
+- [GoReleaser Documentation](https://goreleaser.com)
+- [GitHub Actions](https://docs.github.com/en/actions)
+- [Report Issues](https://github.com/LarsArtmann/template-GoReleaser/issues)
 
 ---
 
-**⚡ Quick Commands Reference**:
-```bash
-just setup-env && just install-tools  # Initial setup
-just ci                                # Full validation
-just tag v1.0.0 && git push origin v1.0.0  # Release
-```
+**Made with ❤️ to simplify Go releases**

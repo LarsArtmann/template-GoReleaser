@@ -7,7 +7,7 @@
 version: 2
 
 # Project configuration
-project_name: goreleaser-cli
+project_name: goreleaser-wizard
 
 # Build configurations
 before:
@@ -20,12 +20,12 @@ before:
     - go test -v ./...
 
 builds:
-  - id: goreleaser-cli
-    # Entry point - goreleaser CLI tool
-    main: ./cmd/goreleaser-cli
+  - id: goreleaser-wizard
+    # Entry point - GoReleaser Wizard tool
+    main: ./cmd/goreleaser-wizard
     
     # Binary name
-    binary: 'goreleaser-cli'
+    binary: 'goreleaser-wizard'
     
     # Build flags
     flags:
@@ -92,10 +92,10 @@ builds:
 
 # Universal binaries for macOS
 universal_binaries:
-  - id: goreleaser-cli
+  - id: goreleaser-wizard
     ids:
-      - goreleaser-cli
-    name_template: 'goreleaser-cli'
+      - goreleaser-wizard
+    name_template: 'goreleaser-wizard'
     replace: true
 
 # Archives configuration

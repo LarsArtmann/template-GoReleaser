@@ -17,7 +17,7 @@ init:
 # Build the application
 build:
     @echo "Building application..."
-    go build -o goreleaser-cli ./cmd/goreleaser-cli
+    go build -o goreleaser-wizard ./cmd/goreleaser-wizard
     @echo "✓ Build complete"
 
 # Run tests
@@ -36,7 +36,7 @@ fmt:
 clean:
     @echo "Cleaning build artifacts..."
     go clean
-    rm -f goreleaser-cli
+    rm -f goreleaser-wizard goreleaser-cli
     @echo "✓ Clean complete"
 
 # Verify project setup
