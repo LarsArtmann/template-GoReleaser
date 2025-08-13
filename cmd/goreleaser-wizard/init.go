@@ -96,16 +96,30 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 		logger.SetLevel(log.DebugLevel)
 	}
 
+	// Set up panic recovery
+	defer HandlePanic("init wizard", logger)
+
 	fmt.Println(titleStyle.Render("🚀 GoReleaser Configuration Wizard"))
 	fmt.Println(infoStyle.Render("Let's create the perfect GoReleaser config for your project!\n"))
 
 	// Check if config already exists
 	force, _ := cmd.Flags().GetBool("force")
-	if !force && fileExists(".goreleaser.yaml") {
-		logger.Warn("Configuration already exists", "file", ".goreleaser.yaml")
-		fmt.Println(errorStyle.Render("⚠️  .goreleaser.yaml already exists!"))
-		fmt.Println("Use --force to overwrite or run 'goreleaser-wizard validate' to check existing config.")
-		os.Exit(1)
+	if !force {
+		if err := CheckFileExists(".goreleaser.yaml", false); err == nil {
+			// File exists and is accessible
+			logger.Warn("Configuration already exists", "file", ".goreleaser.yaml")
+			err := NewWizardError(
+				"configuration setup",
+				ErrConfiguration,
+				".goreleaser.yaml already exists",
+				true,
+				"Use --force to overwrite existing configuration",
+				"Run 'goreleaser-wizard validate' to check existing config",
+				"Backup existing config before overwriting",
+			)
+			LogAndDisplayError(err, logger)
+			return
+		}
 	}
 
 	config := &ProjectConfig{}
@@ -113,40 +127,40 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	// Detect project info
 	detectProjectInfo(config)
 
-	// Run interactive forms
+	// Run interactive forms with enhanced error handling
 	if err := askBasicInfo(config); err != nil {
-		fmt.Println(errorStyle.Render("✗ " + err.Error()))
-		os.Exit(1)
+		LogAndDisplayError(UserInputError("basic information", err), logger)
+		return
 	}
 
 	if err := askBuildOptions(config); err != nil {
-		fmt.Println(errorStyle.Render("✗ " + err.Error()))
-		os.Exit(1)
+		LogAndDisplayError(UserInputError("build options", err), logger)
+		return
 	}
 
 	if err := askReleaseOptions(config); err != nil {
-		fmt.Println(errorStyle.Render("✗ " + err.Error()))
-		os.Exit(1)
+		LogAndDisplayError(UserInputError("release options", err), logger)
+		return
 	}
 
 	if err := askAdvancedOptions(config); err != nil {
-		fmt.Println(errorStyle.Render("✗ " + err.Error()))
-		os.Exit(1)
+		LogAndDisplayError(UserInputError("advanced options", err), logger)
+		return
 	}
 
 	// Generate configuration
 	fmt.Println("\n" + infoStyle.Render("Generating configuration..."))
 
 	if err := generateGoReleaserConfig(config); err != nil {
-		fmt.Println(errorStyle.Render("✗ Failed to generate .goreleaser.yaml: " + err.Error()))
-		os.Exit(1)
+		LogAndDisplayError(TemplateError("goreleaser.yaml", err), logger)
+		return
 	}
 	fmt.Println(successStyle.Render("✓ Created .goreleaser.yaml"))
 
 	if config.GenerateActions {
 		if err := generateGitHubActions(config); err != nil {
-			fmt.Println(errorStyle.Render("✗ Failed to generate GitHub Actions: " + err.Error()))
-			os.Exit(1)
+			LogAndDisplayError(TemplateError("github actions workflow", err), logger)
+			return
 		}
 		fmt.Println(successStyle.Render("✓ Created .github/workflows/release.yml"))
 	}
@@ -162,33 +176,36 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 }
 
 func detectProjectInfo(config *ProjectConfig) {
-	// Try to detect project name from go.mod
-	if data, err := os.ReadFile("go.mod"); err == nil {
+	// Try to detect project name from go.mod with error handling
+	data, err := SafeReadFile("go.mod")
+	if err == nil {
 		lines := strings.Split(string(data), "\n")
 		for _, line := range lines {
 			if strings.HasPrefix(line, "module ") {
 				module := strings.TrimPrefix(line, "module ")
 				parts := strings.Split(module, "/")
-				config.ProjectName = parts[len(parts)-1]
+				if len(parts) > 0 {
+					config.ProjectName = parts[len(parts)-1]
+				}
 				break
 			}
 		}
 	}
 
-	// Detect main.go location
-	if fileExists("main.go") {
+	// Detect main.go location with error handling
+	if CheckFileExists("main.go", false) == nil {
 		config.MainPath = "."
 		config.ProjectType = "CLI Application"
-	} else if fileExists("cmd/" + config.ProjectName + "/main.go") {
+	} else if config.ProjectName != "" && CheckFileExists("cmd/"+config.ProjectName+"/main.go", false) == nil {
 		config.MainPath = "./cmd/" + config.ProjectName
 		config.ProjectType = "CLI Application"
 	} else {
-		// Look for any main.go in cmd/
+		// Look for any main.go in cmd/ with error handling
 		if entries, err := os.ReadDir("cmd"); err == nil {
 			for _, entry := range entries {
 				if entry.IsDir() {
 					mainPath := filepath.Join("cmd", entry.Name(), "main.go")
-					if fileExists(mainPath) {
+					if CheckFileExists(mainPath, false) == nil {
 						config.MainPath = "./cmd/" + entry.Name()
 						config.BinaryName = entry.Name()
 						config.ProjectType = "CLI Application"
@@ -475,6 +492,5 @@ func askAdvancedOptions(config *ProjectConfig) error {
 }
 
 func fileExists(path string) bool {
-	_, err := os.Stat(path)
-	return err == nil
+	return CheckFileExists(path, false) == nil
 }

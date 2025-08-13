@@ -7,7 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var validateCmd = &cobra.Command{
@@ -30,6 +32,15 @@ func init() {
 }
 
 func runValidate(cmd *cobra.Command, args []string) {
+	// Set up logger
+	logger := log.New(os.Stderr)
+	if viper.GetBool("debug") {
+		logger.SetLevel(log.DebugLevel)
+	}
+
+	// Set up panic recovery
+	defer HandlePanic("validate command", logger)
+
 	verbose, _ := cmd.Flags().GetBool("verbose")
 	fix, _ := cmd.Flags().GetBool("fix")
 
@@ -43,12 +54,13 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Check 1: .goreleaser.yaml exists
 	total++
-	if !fileExists(".goreleaser.yaml") {
+	if err := CheckFileExists(".goreleaser.yaml", false); err != nil {
 		issues = append(issues, ".goreleaser.yaml not found")
 		fmt.Println(errorStyle.Render("✗ .goreleaser.yaml not found"))
 		if fix {
 			fmt.Println(infoStyle.Render("  → Run 'goreleaser-wizard init' to create one"))
 		}
+		logger.Debug("GoReleaser config check", "error", err)
 	} else {
 		passed++
 		fmt.Println(successStyle.Render("✓ .goreleaser.yaml exists"))
@@ -56,12 +68,13 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Check 2: go.mod exists
 	total++
-	if !fileExists("go.mod") {
+	if err := CheckFileExists("go.mod", false); err != nil {
 		issues = append(issues, "go.mod not found")
 		fmt.Println(errorStyle.Render("✗ go.mod not found"))
 		if fix {
-			fmt.Println(infoStyle.Render("  → Run 'go mod init' to create one"))
+			fmt.Println(infoStyle.Render("  → Run 'go mod init <module-name>' to create one"))
 		}
+		logger.Debug("Go module check", "error", err)
 	} else {
 		passed++
 		fmt.Println(successStyle.Render("✓ go.mod exists"))
@@ -69,19 +82,30 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Check 3: Git repository
 	total++
-	if !fileExists(".git") {
+	if err := CheckFileExists(".git", false); err != nil {
 		warnings = append(warnings, "Not a git repository")
 		fmt.Println(errorStyle.Render("⚠ Not a git repository"))
 		fmt.Println(infoStyle.Render("  → GoReleaser requires a git repository to work"))
+		if fix {
+			fmt.Println(infoStyle.Render("  → Run 'git init' to initialize repository"))
+		}
+		logger.Debug("Git repository check", "error", err)
 	} else {
-		// Check for uncommitted changes
-		cmd := exec.Command("git", "status", "--porcelain")
-		output, err := cmd.Output()
-		if err == nil && len(output) > 0 {
+		// Check for uncommitted changes with error handling
+		gitCmd := exec.Command("git", "status", "--porcelain")
+		output, err := gitCmd.Output()
+		if err != nil {
+			logger.Warn("Failed to check git status", "error", err)
+			warnings = append(warnings, "Could not check git status")
+			fmt.Println(errorStyle.Render("⚠ Could not check git status"))
+		} else if len(output) > 0 {
 			warnings = append(warnings, "Uncommitted changes detected")
 			fmt.Println(errorStyle.Render("⚠ Uncommitted changes detected"))
 			if verbose {
 				fmt.Println(infoStyle.Render("  → " + strings.TrimSpace(string(output))))
+			}
+			if fix {
+				fmt.Println(infoStyle.Render("  → Commit changes with 'git add . && git commit -m \"message\"'"))
 			}
 		} else {
 			passed++
@@ -97,7 +121,9 @@ func runValidate(cmd *cobra.Command, args []string) {
 		fmt.Println(errorStyle.Render("✗ GoReleaser not installed"))
 		if fix {
 			fmt.Println(infoStyle.Render("  → Install with: go install github.com/goreleaser/goreleaser/v2@latest"))
+			fmt.Println(infoStyle.Render("  → Or download from: https://goreleaser.com/install/"))
 		}
+		logger.Debug("GoReleaser dependency check", "error", err)
 	} else {
 		passed++
 		fmt.Println(successStyle.Render("✓ GoReleaser installed"))
@@ -105,7 +131,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 			fmt.Println(infoStyle.Render("  → " + goreleaserPath))
 		}
 
-		// Check 5: Run goreleaser check
+		// Check 5: Run goreleaser check with enhanced error handling
 		total++
 		fmt.Print("  Checking configuration... ")
 		checkCmd := exec.Command("goreleaser", "check")
@@ -116,6 +142,11 @@ func runValidate(cmd *cobra.Command, args []string) {
 			if verbose {
 				fmt.Println(infoStyle.Render("  → " + strings.TrimSpace(string(checkOutput))))
 			}
+			if fix {
+				fmt.Println(infoStyle.Render("  → Fix configuration issues in .goreleaser.yaml"))
+				fmt.Println(infoStyle.Render("  → Run 'goreleaser-wizard init --force' to regenerate"))
+			}
+			logger.Debug("GoReleaser config validation", "error", checkErr, "output", string(checkOutput))
 		} else {
 			passed++
 			fmt.Println(successStyle.Render("OK"))
@@ -123,7 +154,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 	}
 
 	// Check 6: Main package exists
-	if fileExists(".goreleaser.yaml") {
+	if CheckFileExists(".goreleaser.yaml", false) == nil {
 		total++
 		// Parse config to find main path
 		// For simplicity, we'll check common locations
@@ -134,7 +165,12 @@ func runValidate(cmd *cobra.Command, args []string) {
 			"./*.go",
 		}
 		for _, path := range commonPaths {
-			if matches, _ := filepath.Glob(path); len(matches) > 0 {
+			matches, globErr := filepath.Glob(path)
+			if globErr != nil {
+				logger.Debug("Glob pattern error", "pattern", path, "error", globErr)
+				continue
+			}
+			if len(matches) > 0 {
 				mainFound = true
 				break
 			}
@@ -144,6 +180,9 @@ func runValidate(cmd *cobra.Command, args []string) {
 			warnings = append(warnings, "No main.go found in expected locations")
 			fmt.Println(errorStyle.Render("⚠ No main.go found"))
 			fmt.Println(infoStyle.Render("  → Make sure your main package path is correct in .goreleaser.yaml"))
+			if fix {
+				fmt.Println(infoStyle.Render("  → Create main.go or update build.main path in config"))
+			}
 		} else {
 			passed++
 			fmt.Println(successStyle.Render("✓ Main package found"))
@@ -151,12 +190,17 @@ func runValidate(cmd *cobra.Command, args []string) {
 	}
 
 	// Check 7: Docker (if configured)
-	if fileExists("Dockerfile") {
+	if CheckFileExists("Dockerfile", false) == nil {
 		total++
 		dockerPath, err := exec.LookPath("docker")
 		if err != nil {
 			warnings = append(warnings, "Docker not installed but Dockerfile exists")
 			fmt.Println(errorStyle.Render("⚠ Docker not installed"))
+			if fix {
+				fmt.Println(infoStyle.Render("  → Install Docker from https://docker.com/"))
+				fmt.Println(infoStyle.Render("  → Or remove Docker configuration from .goreleaser.yaml"))
+			}
+			logger.Debug("Docker dependency check", "error", err)
 		} else {
 			passed++
 			fmt.Println(successStyle.Render("✓ Docker installed"))
@@ -168,7 +212,10 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Check 8: GitHub Actions workflow
 	total++
-	if fileExists(".github/workflows/release.yml") || fileExists(".github/workflows/release.yaml") {
+	workflowFound := CheckFileExists(".github/workflows/release.yml", false) == nil || 
+					 CheckFileExists(".github/workflows/release.yaml", false) == nil
+	
+	if workflowFound {
 		passed++
 		fmt.Println(successStyle.Render("✓ GitHub Actions workflow found"))
 	} else {
@@ -176,6 +223,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 		fmt.Println(infoStyle.Render("ℹ No GitHub Actions workflow"))
 		if fix {
 			fmt.Println(infoStyle.Render("  → Run 'goreleaser-wizard init' with GitHub Actions option"))
+			fmt.Println(infoStyle.Render("  → Or manually create .github/workflows/release.yml"))
 		}
 	}
 
@@ -209,13 +257,15 @@ func runValidate(cmd *cobra.Command, args []string) {
 		fmt.Println("  1. Test build: goreleaser build --snapshot --clean")
 		fmt.Println("  2. Create tag: git tag -a v0.1.0 -m 'First release'")
 		fmt.Println("  3. Push tag: git push origin v0.1.0")
+		logger.Info("Validation completed successfully", "passed", passed, "total", total, "warnings", len(warnings))
 	} else {
 		fmt.Println()
 		fmt.Println(errorStyle.Render("⚠️  Please fix the issues above before releasing"))
-		if fix {
+		if !fix {
 			fmt.Println()
 			fmt.Println("Run with --fix to see suggested fixes")
 		}
+		logger.Error("Validation failed", "issues", len(issues), "warnings", len(warnings), "passed", passed, "total", total)
 		os.Exit(1)
 	}
 }

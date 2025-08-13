@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -34,9 +35,17 @@ workflows tailored to your project's needs.`,
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 func Execute() {
+	// Set up logger for error handling
+	logger := log.New(os.Stderr)
+	if viper.GetBool("debug") {
+		logger.SetLevel(log.DebugLevel)
+	}
+
+	// Set up panic recovery
+	defer HandlePanic("command execution", logger)
+
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		LogAndDisplayError(err, logger)
 	}
 }
 
@@ -61,15 +70,42 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	logger := log.New(os.Stderr)
+	if viper.GetBool("debug") {
+		logger.SetLevel(log.DebugLevel)
+	}
+
+	// Set up panic recovery for config initialization
+	defer HandlePanic("config initialization", logger)
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
+		// Validate the config file exists and is readable
+		if err := CheckFileExists(cfgFile, true); err != nil {
+			LogAndDisplayError(
+				ConfigurationError("custom config file", err),
+				logger,
+			)
+			return
+		}
 	} else {
 		// Find home directory.
 		home, err := os.UserHomeDir()
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			LogAndDisplayError(
+				NewWizardError(
+					"get home directory",
+					err,
+					"unable to determine user home directory",
+					true,
+					"Check your system's home directory configuration",
+					"Ensure proper user permissions",
+					"Try setting the HOME environment variable manually",
+				),
+				logger,
+			)
+			return
 		}
 
 		// Search config in home directory with name ".goreleaser-wizard" (without extension).
@@ -81,8 +117,13 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err == nil && viper.GetBool("debug") {
-		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	if err := viper.ReadInConfig(); err != nil {
+		// Only log if it's not a "file not found" error for optional config
+		if cfgFile != "" || !os.IsNotExist(err) {
+			logger.Warn("Config file error", "error", err, "file", viper.ConfigFileUsed())
+		}
+	} else if viper.GetBool("debug") {
+		logger.Info("Using config file", "file", viper.ConfigFileUsed())
 	}
 }
 
@@ -104,5 +145,9 @@ var versionCmd = &cobra.Command{
 }
 
 func main() {
+	// Set up global panic recovery
+	logger := log.New(os.Stderr)
+	defer HandlePanic("main", logger)
+
 	Execute()
 }
