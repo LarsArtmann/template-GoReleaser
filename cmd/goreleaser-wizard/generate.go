@@ -64,9 +64,8 @@ func runGenerate(cmd *cobra.Command, args []string) {
 		if config.ProjectName == "" {
 			err := UserInputError(
 				"project name",
-				ErrUserInput,
+				fmt.Errorf("project name is required"),
 			)
-			err.Suggestions = append(err.Suggestions, "Use --name flag to specify project name")
 			LogAndDisplayError(err, logger)
 			return
 		}
@@ -80,13 +79,11 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	if !force {
 		if err := CheckFileExists(".goreleaser.yaml", false); err == nil {
 			err := NewWizardError(
-				"file exists check",
 				ErrFileOperation,
 				".goreleaser.yaml already exists",
-				true,
+				"Configuration file already exists in current directory",
 				"Use --force flag to overwrite existing file",
-				"Backup existing config before overwriting",
-				"Choose a different output location",
+				nil,
 			)
 			LogAndDisplayError(err, logger)
 			return
@@ -152,9 +149,9 @@ builds:
     {{if .LDFlags}}
     ldflags:
       - -s -w
-      - -X main.version={{"{{"}}{{"}}"}}Version{{"{{"}}{{"}}"}}
-      - -X main.commit={{"{{"}}{{"}}"}}Commit{{"{{"}}{{"}}"}}
-      - -X main.date={{"{{"}}{{"}}"}}Date{{"{{"}}{{"}}"}}
+      - -X main.version={{"{{"}}.Version{{"}}"}}
+      - -X main.commit={{"{{"}}.Commit{{"}}"}}
+      - -X main.date={{"{{"}}.Date{{"}}"}}
       - -X main.builtBy=goreleaser{{end}}
     
     # Ignore certain platform combinations
@@ -172,12 +169,12 @@ builds:
 archives:
   - id: default
     name_template: >-
-      {{"{{"}} .ProjectName {{"}}"}}_
-      {{"{{"}} .Version {{"}}"}}_
-      {{"{{"}} title .Os {{"}}"}}_
-      {{"{{"}} if eq .Arch "amd64" {{"}}"}}x86_64
-      {{"{{"}} else if eq .Arch "386" {{"}}"}}i386
-      {{"{{"}} else {{"}}"}}{{"{{"}} .Arch {{"}}"}}{{"{{"}} end {{"}}"}}
+      {{"{{"}}.ProjectName{{"}}"}}_
+      {{"{{"}}.Version{{"}}"}}_
+      {{"{{"}}title .Os{{"}}"}}_
+      {{"{{"}}if eq .Arch "amd64"{{"}}"}}x86_64
+      {{"{{"}}else if eq .Arch "386"{{"}}"}}i386
+      {{"{{"}}else{{"}}"}}{{"{{"}}.Arch{{"}}"}}{{"{{"}}end{{"}}"}}
     
     format_overrides:
       - goos: windows
@@ -193,7 +190,7 @@ checksum:
   algorithm: sha256
 
 snapshot:
-  version_template: "{{"{{"}} incpatch .Version {{"}}"}}-next"
+  version_template: "{{"{{"}}incpatch .Version{{"}}"}}-next"
 
 changelog:
   sort: asc
@@ -208,14 +205,14 @@ changelog:
 
 release:{{if eq .GitProvider "GitHub"}}
   github:
-    owner: {{"{{"}} .Env.GITHUB_OWNER {{"}}"}}
-    name: {{"{{"}} .Env.GITHUB_REPO {{"}}"}}{{else if eq .GitProvider "GitLab"}}
+    owner: "{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}"
+    name: "{{"{{"}}.Env.GITHUB_REPO{{"}}"}}"{{else if eq .GitProvider "GitLab"}}
   gitlab:
-    owner: {{"{{"}} .Env.GITLAB_OWNER {{"}}"}}
-    name: {{"{{"}} .Env.GITLAB_REPO {{"}}"}}{{else if eq .GitProvider "Gitea"}}
+    owner: "{{"{{"}}.Env.GITLAB_OWNER{{"}}"}}"
+    name: "{{"{{"}}.Env.GITLAB_REPO{{"}}"}}"{{else if eq .GitProvider "Gitea"}}
   gitea:
-    owner: {{"{{"}} .Env.GITEA_OWNER {{"}}"}}
-    name: {{"{{"}} .Env.GITEA_REPO {{"}}"}}{{end}}
+    owner: "{{"{{"}}.Env.GITEA_OWNER{{"}}"}}"
+    name: "{{"{{"}}.Env.GITEA_REPO{{"}}"}}"{{end}}
   
   draft: false
   prerelease: auto
@@ -228,25 +225,25 @@ release:{{if eq .GitProvider "GitHub"}}
     ### Quick Install
     ` + "```bash" + `
     # macOS/Linux
-    curl -sfL https://github.com/{{"{{"}} .Env.GITHUB_OWNER {{"}}"}}/{{"{{"}} .Env.GITHUB_REPO {{"}}"}}/releases/download/{{"{{"}} .Tag {{"}}"}}/{{"{{"}} .ProjectName {{"}}"}}_{{"{{"}} .Version {{"}}"}}_{{"{{"}} title .Os {{"}}"}}_{{"{{"}} .Arch {{"}}"}}.tar.gz | tar -xz
+    curl -sfL https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}/releases/download/{{"{{"}}.Tag{{"}}"}}/{{"{{"}}.ProjectName{{"}}"}}_{{"{{"}}.Version{{"}}"}}_{{"{{"}}title .Os{{"}}"}}_{{"{{"}}.Arch{{"}}"}}.tar.gz | tar -xz
     
     # Windows (PowerShell)
-    Invoke-WebRequest -Uri "https://github.com/{{"{{"}} .Env.GITHUB_OWNER {{"}}"}}/{{"{{"}} .Env.GITHUB_REPO {{"}}"}}/releases/download/{{"{{"}} .Tag {{"}}"}}/{{"{{"}} .ProjectName {{"}}"}}_{{"{{"}} .Version {{"}}"}}_Windows_x86_64.zip" -OutFile "{{.BinaryName}}.zip"
+    Invoke-WebRequest -Uri "https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}/releases/download/{{"{{"}}.Tag{{"}}"}}/{{"{{"}}.ProjectName{{"}}"}}_{{"{{"}}.Version{{"}}"}}_Windows_x86_64.zip" -OutFile "{{.BinaryName}}.zip"
     ` + "```" + `
 {{if .DockerEnabled}}
 dockers:
   - image_templates:
-      - "{{.DockerRegistry}}/{{.ProjectName}}:{{"{{"}} .Tag {{"}}"}}"
+      - "{{.DockerRegistry}}/{{.ProjectName}}:{{"{{"}}.Tag{{"}}"}}"
       - "{{.DockerRegistry}}/{{.ProjectName}}:latest"
     
     dockerfile: Dockerfile
     
     build_flag_templates:
       - "--pull"
-      - "--label=org.opencontainers.image.created={{"{{"}} .Date {{"}}"}}"
-      - "--label=org.opencontainers.image.title={{"{{"}} .ProjectName {{"}}"}}"
-      - "--label=org.opencontainers.image.revision={{"{{"}} .FullCommit {{"}}"}}"
-      - "--label=org.opencontainers.image.version={{"{{"}} .Version {{"}}"}}"
+      - "--label=org.opencontainers.image.created={{"{{"}}.Date{{"}}"}}"
+      - "--label=org.opencontainers.image.title={{"{{"}}.ProjectName{{"}}"}}"
+      - "--label=org.opencontainers.image.revision={{"{{"}}.FullCommit{{"}}"}}"
+      - "--label=org.opencontainers.image.version={{"{{"}}.Version{{"}}"}}"
 {{end}}{{if .Signing}}
 signs:
   - cmd: cosign
@@ -265,13 +262,13 @@ sboms:
 {{end}}{{if .Homebrew}}
 brews:
   - repository:
-      owner: {{"{{"}} .Env.GITHUB_OWNER {{"}}"}}
+      owner: "{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}"
       name: homebrew-tap
     
     folder: Formula
     
     description: "{{.ProjectDescription}}"
-    homepage: "https://github.com/{{"{{"}} .Env.GITHUB_OWNER {{"}}"}}/{{.ProjectName}}"
+    homepage: "https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{.ProjectName}}"
     license: "MIT"
     
     test: |
@@ -367,11 +364,11 @@ jobs:
         uses: docker/login-action@v3
         with:{{if contains .DockerRegistry "ghcr.io"}}
           registry: ghcr.io
-          username: ${{"{{"}} github.actor {{"}}"}}
-          password: ${{"{{"}} secrets.GITHUB_TOKEN {{"}}"}}{{else}}
+          username: ${{"{{"}}github.actor{{"}}"}}
+          password: ${{"{{"}}secrets.GITHUB_TOKEN{{"}}"}}{{else}}
           registry: {{.DockerRegistry}}
-          username: ${{"{{"}} secrets.DOCKER_USERNAME {{"}}"}}
-          password: ${{"{{"}} secrets.DOCKER_PASSWORD {{"}}"}}{{end}}
+          username: ${{"{{"}}secrets.DOCKER_USERNAME{{"}}"}}
+          password: ${{"{{"}}secrets.DOCKER_PASSWORD{{"}}"}}{{end}}
       {{end}}{{if .Signing}}
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
@@ -386,11 +383,11 @@ jobs:
           args: release --clean{{if .ProVersion}}
           distribution: goreleaser-pro{{end}}
         env:
-          GITHUB_TOKEN: ${{"{{"}} secrets.GITHUB_TOKEN {{"}}"}}
-          GITHUB_OWNER: ${{"{{"}} github.repository_owner {{"}}"}}
-          GITHUB_REPO: ${{"{{"}} github.event.repository.name {{"}}"}}{{if .ProVersion}}
-          GORELEASER_KEY: ${{"{{"}} secrets.GORELEASER_KEY {{"}}"}}{{end}}{{if .Homebrew}}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{"{{"}} secrets.HOMEBREW_TAP_GITHUB_TOKEN {{"}}"}}{{end}}
+          GITHUB_TOKEN: ${{"{{"}}secrets.GITHUB_TOKEN{{"}}"}}
+          GITHUB_OWNER: ${{"{{"}}github.repository_owner{{"}}"}}
+          GITHUB_REPO: ${{"{{"}}github.event.repository.name{{"}}"}}{{if .ProVersion}}
+          GORELEASER_KEY: ${{"{{"}}secrets.GORELEASER_KEY{{"}}"}}{{end}}{{if .Homebrew}}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{"{{"}}secrets.HOMEBREW_TAP_GITHUB_TOKEN{{"}}"}}{{end}}
 `
 
 	t, err := template.New("actions").Funcs(template.FuncMap{

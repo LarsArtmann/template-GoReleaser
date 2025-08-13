@@ -109,13 +109,11 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 			// File exists and is accessible
 			logger.Warn("Configuration already exists", "file", ".goreleaser.yaml")
 			err := NewWizardError(
-				"configuration setup",
 				ErrConfiguration,
 				".goreleaser.yaml already exists",
-				true,
+				"Configuration file found in current directory",
 				"Use --force to overwrite existing configuration",
-				"Run 'goreleaser-wizard validate' to check existing config",
-				"Backup existing config before overwriting",
+				nil,
 			)
 			LogAndDisplayError(err, logger)
 			return
@@ -491,6 +489,3 @@ func askAdvancedOptions(config *ProjectConfig) error {
 	return nil
 }
 
-func fileExists(path string) bool {
-	return CheckFileExists(path, false) == nil
-}

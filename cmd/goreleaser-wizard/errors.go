@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/lipgloss"
@@ -20,6 +21,9 @@ var (
 	ErrFileRead          = errors.New("file read failed")
 	ErrPermission        = errors.New("permission denied")
 	ErrDependency        = errors.New("missing dependency")
+	ErrConfiguration     = errors.New("configuration error")
+	ErrUserInput         = errors.New("user input error")
+	ErrFileOperation     = errors.New("file operation error")
 )
 
 // WizardError provides detailed error information with recovery suggestions
@@ -224,4 +228,134 @@ func SafeFileWrite(path string, content []byte, perm os.FileMode) error {
 	}
 	
 	return nil
+}
+
+// fileExists checks if a file exists
+func fileExists(path string) bool {
+	_, err := os.Stat(path)
+	return err == nil
+}
+
+// HandlePanic provides standardized panic recovery
+func HandlePanic(context string, logger *log.Logger) {
+	if r := recover(); r != nil {
+		RecoverFromPanic(logger)
+	}
+}
+
+// CheckFileExists checks if a file exists and is accessible
+func CheckFileExists(path string, requireDir bool) error {
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return NewWizardError(
+				ErrProjectNotFound,
+				"File not found",
+				fmt.Sprintf("File %s does not exist", path),
+				"Check the file path and try again",
+				err,
+			)
+		}
+		return NewWizardError(
+			ErrFileRead,
+			"File access error",
+			fmt.Sprintf("Cannot access %s", path),
+			"Check file permissions and path",
+			err,
+		)
+	}
+	
+	if requireDir && !info.IsDir() {
+		return NewWizardError(
+			ErrInvalidInput,
+			"Expected directory",
+			fmt.Sprintf("%s is not a directory", path),
+			"Provide a valid directory path",
+			nil,
+		)
+	}
+	
+	return nil
+}
+
+// LogAndDisplayError logs and displays an error with proper formatting
+func LogAndDisplayError(err error, logger *log.Logger) {
+	if err != nil {
+		HandleError(err, logger)
+	}
+}
+
+// UserInputError creates a user input validation error
+func UserInputError(field string, err error) *WizardError {
+	return NewWizardError(
+		ErrInvalidInput,
+		fmt.Sprintf("Invalid %s", field),
+		err.Error(),
+		"Please provide valid input and try again",
+		err,
+	)
+}
+
+// TemplateError creates a template processing error
+func TemplateError(templateName string, err error) *WizardError {
+	return NewWizardError(
+		ErrTemplateExecution,
+		fmt.Sprintf("Template error in %s", templateName),
+		err.Error(),
+		"This may be a bug, please report it",
+		err,
+	)
+}
+
+// SafeReadFile reads a file safely with error handling
+func SafeReadFile(path string) ([]byte, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, NewWizardError(
+			ErrFileRead,
+			"Failed to read file",
+			fmt.Sprintf("Could not read %s", path),
+			"Check file exists and permissions",
+			err,
+		)
+	}
+	return data, nil
+}
+
+// SafeCreateFile creates a file safely with error handling
+func SafeCreateFile(path string) (*os.File, error) {
+	// Ensure directory exists
+	dir := filepath.Dir(path)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return nil, NewWizardError(
+			ErrPermission,
+			"Cannot create directory",
+			fmt.Sprintf("Failed to create directory %s", dir),
+			"Check directory permissions",
+			err,
+		)
+	}
+	
+	file, err := os.Create(path)
+	if err != nil {
+		return nil, NewWizardError(
+			ErrFileWrite,
+			"Cannot create file",
+			fmt.Sprintf("Failed to create %s", path),
+			"Check file permissions and disk space",
+			err,
+		)
+	}
+	return file, nil
+}
+
+// WrapFileError wraps file operation errors
+func WrapFileError(operation, path string, err error) *WizardError {
+	return NewWizardError(
+		ErrFileWrite,
+		fmt.Sprintf("Failed to %s", operation),
+		fmt.Sprintf("Error with %s: %s", path, err.Error()),
+		"Check file permissions and disk space",
+		err,
+	)
 }

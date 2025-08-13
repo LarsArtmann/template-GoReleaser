@@ -84,7 +84,13 @@ func initConfig() {
 		// Validate the config file exists and is readable
 		if err := CheckFileExists(cfgFile, true); err != nil {
 			LogAndDisplayError(
-				ConfigurationError("custom config file", err),
+				NewWizardError(
+					ErrConfiguration,
+					"Custom config file not found",
+					fmt.Sprintf("Could not access config file: %s", cfgFile),
+					"Check the file path and permissions",
+					err,
+				),
 				logger,
 			)
 			return
@@ -95,13 +101,11 @@ func initConfig() {
 		if err != nil {
 			LogAndDisplayError(
 				NewWizardError(
-					"get home directory",
-					err,
-					"unable to determine user home directory",
-					true,
+					ErrPermission,
+					"Unable to determine user home directory",
+					"System could not determine the user's home directory",
 					"Check your system's home directory configuration",
-					"Ensure proper user permissions",
-					"Try setting the HOME environment variable manually",
+					err,
 				),
 				logger,
 			)
