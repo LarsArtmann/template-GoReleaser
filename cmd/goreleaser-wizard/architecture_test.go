@@ -80,8 +80,8 @@ func TestJobExecution(t *testing.T) {
 	goMod := `module github.com/user/job-test
 go 1.21
 `
-	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0644)
-	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0o644)
+	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
@@ -144,8 +144,8 @@ func TestJobRollback(t *testing.T) {
 	goMod := `module github.com/user/rollback-test
 go 1.21
 `
-	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0644)
-	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0o644)
+	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
 	tests := []struct {
 		name            string
@@ -203,8 +203,8 @@ func TestWorkflow(t *testing.T) {
 	goMod := `module github.com/user/workflow-test
 go 1.21
 `
-	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0644)
-	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0o644)
+	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
@@ -281,8 +281,8 @@ func TestWorkflowBuilder(t *testing.T) {
 	goMod := `module github.com/user/builder-test
 go 1.21
 `
-	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0644)
-	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0o644)
+	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
@@ -368,11 +368,11 @@ func TestConcurrentJobExecution(t *testing.T) {
 	// Create multiple test projects
 	for i := range 3 {
 		projectDir := filepath.Join(tmpDir, fmt.Sprintf("project-%d", i))
-		os.MkdirAll(projectDir, 0755)
+		os.MkdirAll(projectDir, 0o755)
 
 		goMod := fmt.Sprintf("module github.com/user/concurrent-test-%d\ngo 1.21\n", i)
-		os.WriteFile(filepath.Join(projectDir, "go.mod"), []byte(goMod), 0644)
-		os.WriteFile(filepath.Join(projectDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+		os.WriteFile(filepath.Join(projectDir, "go.mod"), []byte(goMod), 0o644)
+		os.WriteFile(filepath.Join(projectDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 	}
 
 	// Change to test directory
@@ -393,7 +393,6 @@ func TestConcurrentJobExecution(t *testing.T) {
 	// Execute jobs
 	ctx := context.Background()
 	err := jm.ExecuteJobs(ctx)
-
 	if err != nil {
 		t.Errorf("Concurrent job execution failed: %v", err)
 	}

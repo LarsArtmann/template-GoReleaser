@@ -154,7 +154,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 
 	// Create .github/workflows directory
 	workflowDir := ".github/workflows"
-	err := os.MkdirAll(workflowDir, 0755)
+	err := os.MkdirAll(workflowDir, 0o755)
 	if err != nil {
 		return fmt.Errorf("failed to create workflow directory: %w", err)
 	}

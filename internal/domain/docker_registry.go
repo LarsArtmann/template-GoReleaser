@@ -11,51 +11,51 @@ import (
 type DockerRegistry string
 
 const (
-	DockerRegistryDockerHub DockerRegistry = "docker.io"  // Docker Hub
-	DockerRegistryGitHub    DockerRegistry = "ghcr.io"    // GitHub Container Registry
+	DockerRegistryDockerHub DockerRegistry = "docker.io"           // Docker Hub
+	DockerRegistryGitHub    DockerRegistry = "ghcr.io"             // GitHub Container Registry
 	DockerRegistryGitLab    DockerRegistry = "registry.gitlab.com" // GitLab Registry
-	DockerRegistryQuay      DockerRegistry = "quay.io"    // Quay.io
-	DockerRegistryCustom    DockerRegistry = "custom"      // Custom Registry
+	DockerRegistryQuay      DockerRegistry = "quay.io"             // Quay.io
+	DockerRegistryCustom    DockerRegistry = "custom"              // Custom Registry
 )
 
 // DockerRegistry metadata - generated from TypeSpec invariants
 type dockerRegistryMeta struct {
-	urlPattern           string
-	supportsHTTPSOnly    bool
+	urlPattern             string
+	supportsHTTPSOnly      bool
 	requiresAuthentication bool
-	defaultNamespace     string
+	defaultNamespace       string
 }
 
 var dockerRegistryMetaMap = map[DockerRegistry]dockerRegistryMeta{
 	DockerRegistryDockerHub: {
-		urlPattern:           "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
-		supportsHTTPSOnly:    false,
+		urlPattern:             "^[a-z0-9]([a-z0-9-]*[a-z0-9])?$",
+		supportsHTTPSOnly:      false,
 		requiresAuthentication: false,
-		defaultNamespace:     "library",
+		defaultNamespace:       "library",
 	},
 	DockerRegistryGitHub: {
-		urlPattern:           "^ghcr\\.io/[a-z0-9-]+/[a-z0-9-]+$",
-		supportsHTTPSOnly:    true,
+		urlPattern:             "^ghcr\\.io/[a-z0-9-]+/[a-z0-9-]+$",
+		supportsHTTPSOnly:      true,
 		requiresAuthentication: true,
-		defaultNamespace:     "",
+		defaultNamespace:       "",
 	},
 	DockerRegistryGitLab: {
-		urlPattern:           "^registry\\.gitlab\\.com/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$",
-		supportsHTTPSOnly:    true,
+		urlPattern:             "^registry\\.gitlab\\.com/[a-zA-Z0-9_-]+/[a-zA-Z0-9_-]+$",
+		supportsHTTPSOnly:      true,
 		requiresAuthentication: true,
-		defaultNamespace:     "",
+		defaultNamespace:       "",
 	},
 	DockerRegistryQuay: {
-		urlPattern:           "^quay\\.io/[a-z0-9-]+/[a-z0-9-]+$",
-		supportsHTTPSOnly:    true,
+		urlPattern:             "^quay\\.io/[a-z0-9-]+/[a-z0-9-]+$",
+		supportsHTTPSOnly:      true,
 		requiresAuthentication: true,
-		defaultNamespace:     "",
+		defaultNamespace:       "",
 	},
 	DockerRegistryCustom: {
-		urlPattern:           "", // User-defined
-		supportsHTTPSOnly:    true,
+		urlPattern:             "", // User-defined
+		supportsHTTPSOnly:      true,
 		requiresAuthentication: true,
-		defaultNamespace:     "",
+		defaultNamespace:       "",
 	},
 }
 
@@ -132,13 +132,13 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	if !registry.IsValid() {
 		return fmt.Errorf("invalid Docker registry: %s", registry)
 	}
-	
+
 	if url == "" {
 		return fmt.Errorf("Docker registry URL cannot be empty")
 	}
-	
+
 	url = strings.TrimSpace(url)
-	
+
 	if registry == DockerRegistryDockerHub {
 		// Docker Hub allows simple usernames or full registry URLs
 		if !strings.Contains(url, "docker.io") && !strings.Contains(url, "/") {
@@ -149,7 +149,7 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 			return fmt.Errorf("GitHub Container Registry should include ghcr.io")
 		}
 	}
-	
+
 	// Validate against registry pattern if available
 	pattern := registry.URLPattern()
 	if pattern != "" {
@@ -159,7 +159,7 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 			return fmt.Errorf("URL '%s' does not match expected pattern for registry %s", url, registry)
 		}
 	}
-	
+
 	return nil
 }
 
@@ -168,11 +168,11 @@ func ValidateDockerImageName(name string) error {
 	if len(name) == 0 {
 		return nil // Empty is allowed, will default to project name
 	}
-	
+
 	if len(name) > 255 {
 		return fmt.Errorf("Docker image name must be 255 characters or less")
 	}
-	
+
 	// Docker image name pattern: lowercase, numbers, dots, hyphens, underscores, forward slashes
 	pattern := `^[a-z0-9][a-z0-9/_.-]*$`
 	matched, err := regexp.MatchString(pattern, name)
@@ -182,7 +182,7 @@ func ValidateDockerImageName(name string) error {
 	if !matched {
 		return fmt.Errorf("Docker image name '%s' must start with lowercase letter/number and contain only lowercase letters, numbers, dots, hyphens, underscores, and forward slashes", name)
 	}
-	
+
 	return nil
 }
 

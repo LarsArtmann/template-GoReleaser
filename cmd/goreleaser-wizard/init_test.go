@@ -27,8 +27,8 @@ func TestInitCommand(t *testing.T) {
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(dir+"/go.mod", []byte(goMod), 0644)
-				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
+				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 				return dir
 			},
 			expectError: false,
@@ -105,8 +105,8 @@ func TestProjectDetection(t *testing.T) {
 				goMod := `module github.com/user/simpleapp
 go 1.21
 `
-				os.WriteFile(dir+"/go.mod", []byte(goMod), 0644)
-				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
+				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 				return dir
 			},
 			expectedProject: ProjectConfig{
@@ -123,9 +123,9 @@ go 1.21
 				goMod := `module github.com/user/cmdapp
 go 1.21
 `
-				os.WriteFile(dir+"/go.mod", []byte(goMod), 0644)
-				os.MkdirAll(dir+"/cmd/cmdapp", 0755)
-				os.WriteFile(dir+"/cmd/cmdapp/main.go", []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
+				os.MkdirAll(dir+"/cmd/cmdapp", 0o755)
+				os.WriteFile(dir+"/cmd/cmdapp/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 				return dir
 			},
 			expectedProject: ProjectConfig{
@@ -262,7 +262,6 @@ func TestCommandHelp(t *testing.T) {
 			// Execute with help flag
 			tt.command.SetArgs(tt.args)
 			err := tt.command.Execute()
-
 			// Help should not return an error
 			if err != nil {
 				t.Errorf("Help command returned error: %v", err)

@@ -22,12 +22,12 @@ go 1.21
 require github.com/charmbracelet/huh v0.7.0
 require github.com/charmbracelet/lipgloss v1.1.0
 `
-	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0o644)
 
 	// Create main and cmd structure
-	os.MkdirAll(filepath.Join(tmpDir, "cmd", "benchmark-test"), 0755)
-	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
-	os.WriteFile(filepath.Join(tmpDir, "cmd", "benchmark-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+	os.MkdirAll(filepath.Join(tmpDir, "cmd", "benchmark-test"), 0o755)
+	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+	os.WriteFile(filepath.Join(tmpDir, "cmd", "benchmark-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
@@ -50,8 +50,8 @@ func BenchmarkConfigGeneration(b *testing.B) {
 	goMod := `module github.com/user/config-benchmark
 go 1.21
 `
-	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
-	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0o644)
+	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
@@ -95,8 +95,8 @@ func BenchmarkGitHubActionsGeneration(b *testing.B) {
 	goMod := `module github.com/user/actions-benchmark
 go 1.21
 `
-	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
-	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0o644)
+	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
@@ -141,7 +141,7 @@ func BenchmarkFileOperations(b *testing.B) {
 		filename := fmt.Sprintf("benchmark-file-%d.txt", i)
 
 		// Test write operation
-		err := SafeFileWrite(filename, []byte(content), 0644)
+		err := SafeFileWrite(filename, []byte(content), 0o644)
 		if err != nil {
 			b.Fatalf("SafeFileWrite failed: %v", err)
 		}
@@ -229,13 +229,13 @@ func TestMemoryUsage(t *testing.T) {
 
 	for i := range 10 {
 		projectDir := filepath.Join(tmpDir, fmt.Sprintf("project-%d", i))
-		os.MkdirAll(projectDir, 0755)
+		os.MkdirAll(projectDir, 0o755)
 		os.Chdir(projectDir)
 
 		// Create basic project
 		goMod := fmt.Sprintf("module github.com/user/memory-test-%d\ngo 1.21\n", i)
-		os.WriteFile("go.mod", []byte(goMod), 0644)
-		os.WriteFile("main.go", []byte("package main\n\nfunc main() {}"), 0644)
+		os.WriteFile("go.mod", []byte(goMod), 0o644)
+		os.WriteFile("main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
 		// Run wizard operations
 		config := &ProjectConfig{}
@@ -278,8 +278,8 @@ func TestConcurrentOperations(t *testing.T) {
 
 			// Create project
 			goMod := fmt.Sprintf("module github.com/user/concurrent-test-%d\ngo 1.21\n", id)
-			os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
-			os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+			os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0o644)
+			os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 			originalDir, _ := os.Getwd()
 			defer os.Chdir(originalDir)
@@ -289,7 +289,6 @@ func TestConcurrentOperations(t *testing.T) {
 			config := &ProjectConfig{}
 			detectProjectInfo(config)
 			err := generateGoReleaserConfig(config)
-
 			if err != nil {
 				errors <- fmt.Errorf("project %d: %v", id, err)
 				return
@@ -317,43 +316,43 @@ func createBenchmarkProject(t *testing.T, dir string, complexity int) {
 	goMod := `module github.com/user/benchmark-project
 go 1.21
 `
-	os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
-	os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	// Add complexity based on level
 	if complexity >= 1 {
 		// Add cmd structure
-		os.MkdirAll(filepath.Join(dir, "cmd", "benchmark-project"), 0755)
-		os.WriteFile(filepath.Join(dir, "cmd", "benchmark-project", "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+		os.MkdirAll(filepath.Join(dir, "cmd", "benchmark-project"), 0o755)
+		os.WriteFile(filepath.Join(dir, "cmd", "benchmark-project", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 	}
 
 	if complexity >= 3 {
 		// Add internal structure
-		os.MkdirAll(filepath.Join(dir, "internal", "app"), 0755)
-		os.WriteFile(filepath.Join(dir, "internal", "app", "app.go"), []byte("package app\n\nfunc Run() {}"), 0644)
-		os.WriteFile(filepath.Join(dir, "internal", "app", "config.go"), []byte("package app\n\ntype Config struct {}"), 0644)
+		os.MkdirAll(filepath.Join(dir, "internal", "app"), 0o755)
+		os.WriteFile(filepath.Join(dir, "internal", "app", "app.go"), []byte("package app\n\nfunc Run() {}"), 0o644)
+		os.WriteFile(filepath.Join(dir, "internal", "app", "config.go"), []byte("package app\n\ntype Config struct {}"), 0o644)
 	}
 
 	if complexity >= 5 {
 		// Add API structure
-		os.MkdirAll(filepath.Join(dir, "api", "v1"), 0755)
-		os.WriteFile(filepath.Join(dir, "api", "v1", "handler.go"), []byte("package v1\n\nfunc Handle() {}"), 0644)
-		os.WriteFile(filepath.Join(dir, "api", "v1", "middleware.go"), []byte("package v1\n\nfunc Middleware() {}"), 0644)
+		os.MkdirAll(filepath.Join(dir, "api", "v1"), 0o755)
+		os.WriteFile(filepath.Join(dir, "api", "v1", "handler.go"), []byte("package v1\n\nfunc Handle() {}"), 0o644)
+		os.WriteFile(filepath.Join(dir, "api", "v1", "middleware.go"), []byte("package v1\n\nfunc Middleware() {}"), 0o644)
 	}
 
 	if complexity >= 7 {
 		// Add pkg structure
-		os.MkdirAll(filepath.Join(dir, "pkg", "utils"), 0755)
-		os.WriteFile(filepath.Join(dir, "pkg", "utils", "helper.go"), []byte("package utils\n\nfunc Helper() {}"), 0644)
-		os.WriteFile(filepath.Join(dir, "pkg", "utils", "validator.go"), []byte("package utils\n\nfunc Validate() {}"), 0644)
+		os.MkdirAll(filepath.Join(dir, "pkg", "utils"), 0o755)
+		os.WriteFile(filepath.Join(dir, "pkg", "utils", "helper.go"), []byte("package utils\n\nfunc Helper() {}"), 0o644)
+		os.WriteFile(filepath.Join(dir, "pkg", "utils", "validator.go"), []byte("package utils\n\nfunc Validate() {}"), 0o644)
 	}
 
 	if complexity >= 10 {
 		// Add extensive structure
 		for i := range 5 {
 			pkgName := fmt.Sprintf("pkg%02d", i)
-			os.MkdirAll(filepath.Join(dir, pkgName), 0755)
-			os.WriteFile(filepath.Join(dir, pkgName, fmt.Sprintf("%s.go", pkgName)), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0644)
+			os.MkdirAll(filepath.Join(dir, pkgName), 0o755)
+			os.WriteFile(filepath.Join(dir, pkgName, fmt.Sprintf("%s.go", pkgName)), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0o644)
 		}
 	}
 }

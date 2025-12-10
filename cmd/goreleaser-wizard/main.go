@@ -7,8 +7,9 @@ import (
 	"os"
 
 	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
-	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/charmbracelet/log"
+	"github.com/kaptinlin/messageformat-go/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -94,7 +95,7 @@ var appLogger domain.Logger
 func init() {
 	// Create a logger adapter to satisfy domain.Logger interface
 	appLogger = &LoggerAdapter{logger: log.New(os.Stderr)}
-	
+
 	// Initialize styles
 	titleStyle = lipgloss.NewStyle().
 		Bold(true).
@@ -108,7 +109,7 @@ func init() {
 		Bold(true)
 	infoStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("86"))
-	
+
 	if viper.GetBool("debug") {
 		appLogger.(*LoggerAdapter).logger.SetLevel(log.DebugLevel)
 	}
@@ -140,16 +141,16 @@ func Execute() {
 func recoverFromPanic(context string) {
 	if r := recover(); r != nil {
 		logger.Error("Panic recovered", "context", context, "panic", r)
-		
+
 		err := domain.NewSystemError(
 			domain.ErrTemplateExecutionFailed,
 			"Unexpected error occurred",
 			fmt.Sprintf("The wizard encountered an unexpected problem: %v", r),
 			fmt.Errorf("panic: %v", r),
 		).WithContext(context)
-		
+
 		displayError(err)
-		
+
 		os.Exit(1)
 	}
 }
@@ -159,7 +160,7 @@ func displayError(err error) {
 	if err == nil {
 		return
 	}
-	
+
 	// Convert to domain error if not already
 	var domainErr *domain.DomainError
 	if !errors.As(err, &domainErr) {
@@ -170,7 +171,7 @@ func displayError(err error) {
 			err,
 		)
 	}
-	
+
 	// Display structured error information
 	fmt.Println()
 	fmt.Println(errorStyle.Render("❌ Error: " + domainErr.Message))
@@ -227,7 +228,7 @@ func initConfig() {
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
-		
+
 		// Validate the config file exists and is readable using domain types
 		if err := validateFileExists(cfgFile, true); err != nil {
 			displayError(err)
@@ -344,4 +345,3 @@ func main() {
 
 	Execute()
 }
-

@@ -23,55 +23,55 @@ const (
 // Architecture metadata - generated from TypeSpec invariants
 type architectureMeta struct {
 	supportedByAllPlatforms bool
-	is64Bit               bool
-	goSupport             string
+	is64Bit                 bool
+	goSupport               string
 }
 
 var architectureMetaMap = map[Architecture]architectureMeta{
 	ArchitectureAMD64: {
 		supportedByAllPlatforms: true,
-		is64Bit:               true,
-		goSupport:             "stable",
+		is64Bit:                 true,
+		goSupport:               "stable",
 	},
 	ArchitectureARM64: {
 		supportedByAllPlatforms: true,
-		is64Bit:               true,
-		goSupport:             "stable",
+		is64Bit:                 true,
+		goSupport:               "stable",
 	},
 	Architecture386: {
 		supportedByAllPlatforms: true,
-		is64Bit:               false,
-		goSupport:             "stable",
+		is64Bit:                 false,
+		goSupport:               "stable",
 	},
 	ArchitectureARM: {
 		supportedByAllPlatforms: true,
-		is64Bit:               false,
-		goSupport:             "stable",
+		is64Bit:                 false,
+		goSupport:               "stable",
 	},
 	ArchitecturePPC64: {
 		supportedByAllPlatforms: false,
-		is64Bit:               true,
-		goSupport:             "stable",
+		is64Bit:                 true,
+		goSupport:               "stable",
 	},
 	ArchitecturePPC64LE: {
 		supportedByAllPlatforms: false,
-		is64Bit:               true,
-		goSupport:             "stable",
+		is64Bit:                 true,
+		goSupport:               "stable",
 	},
 	ArchitectureS390X: {
 		supportedByAllPlatforms: false,
-		is64Bit:               true,
-		goSupport:             "stable",
+		is64Bit:                 true,
+		goSupport:               "stable",
 	},
 	ArchitectureMIPS: {
 		supportedByAllPlatforms: false,
-		is64Bit:               false,
-		goSupport:             "stable",
+		is64Bit:                 false,
+		goSupport:               "stable",
 	},
 	ArchitectureMIPSLE: {
 		supportedByAllPlatforms: false,
-		is64Bit:               false,
-		goSupport:             "stable",
+		is64Bit:                 false,
+		goSupport:               "stable",
 	},
 }
 

@@ -19,7 +19,7 @@ const (
 
 // Platform metadata - generated from TypeSpec invariants
 type platformMeta struct {
-	architectures   []Architecture
+	architectures  []Architecture
 	isWindowsBased bool
 	isUnixLike     bool
 	supportsCGO    bool
@@ -27,40 +27,40 @@ type platformMeta struct {
 
 var platformMetaMap = map[Platform]platformMeta{
 	PlatformLinux: {
-		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64, ArchitectureARM, Architecture386},
-		isWindowsBased:  false,
-		isUnixLike:      true,
-		supportsCGO:     true,
+		architectures:  []Architecture{ArchitectureAMD64, ArchitectureARM64, ArchitectureARM, Architecture386},
+		isWindowsBased: false,
+		isUnixLike:     true,
+		supportsCGO:    true,
 	},
 	PlatformDarwin: {
-		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64},
-		isWindowsBased:  false,
-		isUnixLike:      true,
-		supportsCGO:     true,
+		architectures:  []Architecture{ArchitectureAMD64, ArchitectureARM64},
+		isWindowsBased: false,
+		isUnixLike:     true,
+		supportsCGO:    true,
 	},
 	PlatformWindows: {
-		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
-		isWindowsBased:  true,
-		isUnixLike:      false,
-		supportsCGO:     true,
+		architectures:  []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
+		isWindowsBased: true,
+		isUnixLike:     false,
+		supportsCGO:    true,
 	},
 	PlatformFreeBSD: {
-		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
-		isWindowsBased:  false,
-		isUnixLike:      true,
-		supportsCGO:     true,
+		architectures:  []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
+		isWindowsBased: false,
+		isUnixLike:     true,
+		supportsCGO:    true,
 	},
 	PlatformOpenBSD: {
-		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
-		isWindowsBased:  false,
-		isUnixLike:      true,
-		supportsCGO:     true,
+		architectures:  []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
+		isWindowsBased: false,
+		isUnixLike:     true,
+		supportsCGO:    true,
 	},
 	PlatformNetBSD: {
-		architectures:   []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
-		isWindowsBased:  false,
-		isUnixLike:      true,
-		supportsCGO:     true,
+		architectures:  []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386},
+		isWindowsBased: false,
+		isUnixLike:     true,
+		supportsCGO:    true,
 	},
 }
 

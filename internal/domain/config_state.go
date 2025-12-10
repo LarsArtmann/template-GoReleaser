@@ -16,42 +16,42 @@ const (
 
 // ConfigState metadata - generated from TypeSpec invariants
 type configStateMeta struct {
-	description       string
-	isFinal           bool
-	allowsValidation  bool
-	allowsGeneration  bool
+	description      string
+	isFinal          bool
+	allowsValidation bool
+	allowsGeneration bool
 }
 
 var configStateMetaMap = map[ConfigState]configStateMeta{
 	ConfigStateDraft: {
 		description:      "Configuration is being created or modified",
 		isFinal:          false,
-		allowsValidation:  true,
-		allowsGeneration:  false,
+		allowsValidation: true,
+		allowsGeneration: false,
 	},
 	ConfigStateValid: {
 		description:      "Configuration is valid and ready",
 		isFinal:          false,
-		allowsValidation:  true,
-		allowsGeneration:  true,
+		allowsValidation: true,
+		allowsGeneration: true,
 	},
 	ConfigStateInvalid: {
 		description:      "Configuration has validation errors",
 		isFinal:          false,
-		allowsValidation:  true,
-		allowsGeneration:  false,
+		allowsValidation: true,
+		allowsGeneration: false,
 	},
 	ConfigStateProcessing: {
 		description:      "Configuration is being processed",
 		isFinal:          false,
-		allowsValidation:  false,
-		allowsGeneration:  false,
+		allowsValidation: false,
+		allowsGeneration: false,
 	},
 	ConfigStateGenerated: {
 		description:      "Configuration has been generated successfully",
 		isFinal:          true,
-		allowsValidation:  true,
-		allowsGeneration:  false,
+		allowsValidation: true,
+		allowsGeneration: false,
 	},
 }
 

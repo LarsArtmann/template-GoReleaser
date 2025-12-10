@@ -271,14 +271,14 @@ func TestSafeFileWrite(t *testing.T) {
 			name:    "write_new_file",
 			path:    "test-new.txt",
 			content: []byte("test content"),
-			perm:    0644,
+			perm:    0o644,
 			wantErr: false,
 		},
 		{
 			name:    "overwrite_existing_file",
 			path:    "test-existing.txt",
 			content: []byte("new content"),
-			perm:    0644,
+			perm:    0o644,
 			wantErr: false,
 			setupFunc: func() string {
 				file, _ := os.Create("test-existing.txt")
@@ -291,7 +291,7 @@ func TestSafeFileWrite(t *testing.T) {
 			name:        "write_to_invalid_path",
 			path:        "/invalid/path/test.txt",
 			content:     []byte("test"),
-			perm:        0644,
+			perm:        0o644,
 			wantErr:     true,
 			errContains: "Failed to write file",
 		},
@@ -337,7 +337,7 @@ func TestSafeFileWrite(t *testing.T) {
 					return
 				}
 				// Note: permission mask on some systems, so we check for execute bits not being set
-				if info.Mode().Perm()&0111 != 0 {
+				if info.Mode().Perm()&0o111 != 0 {
 					t.Errorf("File has execute permissions, expected none")
 				}
 			} else if tt.errContains != "" {

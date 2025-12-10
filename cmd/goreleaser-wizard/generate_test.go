@@ -286,11 +286,11 @@ func TestDetectProjectInfo(t *testing.T) {
 				// Create go.mod
 				goMod := `module github.com/user/myapp
 go 1.21`
-				if err := os.WriteFile("go.mod", []byte(goMod), 0644); err != nil {
+				if err := os.WriteFile("go.mod", []byte(goMod), 0o644); err != nil {
 					return err
 				}
 				// Create main.go
-				return os.WriteFile("main.go", []byte("package main"), 0644)
+				return os.WriteFile("main.go", []byte("package main"), 0o644)
 			},
 			expected: ProjectConfig{
 				ProjectName: "myapp",
@@ -305,14 +305,14 @@ go 1.21`
 				// Create go.mod
 				goMod := `module github.com/user/complexapp
 go 1.21`
-				if err := os.WriteFile("go.mod", []byte(goMod), 0644); err != nil {
+				if err := os.WriteFile("go.mod", []byte(goMod), 0o644); err != nil {
 					return err
 				}
 				// Create cmd/complexapp/main.go
-				if err := os.MkdirAll("cmd/complexapp", 0755); err != nil {
+				if err := os.MkdirAll("cmd/complexapp", 0o755); err != nil {
 					return err
 				}
-				return os.WriteFile("cmd/complexapp/main.go", []byte("package main"), 0644)
+				return os.WriteFile("cmd/complexapp/main.go", []byte("package main"), 0o644)
 			},
 			expected: ProjectConfig{
 				ProjectName: "complexapp",

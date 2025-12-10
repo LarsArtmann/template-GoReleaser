@@ -9,9 +9,9 @@ import (
 // Provides type safety and detailed error information
 type DomainError struct {
 	Code    ErrorCode `json:"code"`
-	Message string     `json:"message"`
-	Details string     `json:"details,omitempty"`
-	Context string     `json:"context,omitempty"`
+	Message string    `json:"message"`
+	Details string    `json:"details,omitempty"`
+	Context string    `json:"context,omitempty"`
 	Cause   error     `json:"cause,omitempty"`
 }
 
@@ -22,49 +22,49 @@ const (
 	// Validation Errors
 	ErrInvalidProjectName        ErrorCode = "INVALID_PROJECT_NAME"
 	ErrInvalidBinaryName         ErrorCode = "INVALID_BINARY_NAME"
-	ErrInvalidMainPath          ErrorCode = "INVALID_MAIN_PATH"
+	ErrInvalidMainPath           ErrorCode = "INVALID_MAIN_PATH"
 	ErrInvalidProjectDescription ErrorCode = "INVALID_PROJECT_DESCRIPTION"
 	ErrInvalidPlatform           ErrorCode = "INVALID_PLATFORM"
 	ErrInvalidArchitecture       ErrorCode = "INVALID_ARCHITECTURE"
-	ErrInvalidGitProvider       ErrorCode = "INVALID_GIT_PROVIDER"
-	ErrInvalidDockerRegistry    ErrorCode = "INVALID_DOCKER_REGISTRY"
-	ErrInvalidActionTrigger     ErrorCode = "INVALID_ACTION_TRIGGER"
-	ErrInvalidBuildTag          ErrorCode = "INVALID_BUILD_TAG"
-	ErrInvalidConfigState       ErrorCode = "INVALID_CONFIG_STATE"
+	ErrInvalidGitProvider        ErrorCode = "INVALID_GIT_PROVIDER"
+	ErrInvalidDockerRegistry     ErrorCode = "INVALID_DOCKER_REGISTRY"
+	ErrInvalidActionTrigger      ErrorCode = "INVALID_ACTION_TRIGGER"
+	ErrInvalidBuildTag           ErrorCode = "INVALID_BUILD_TAG"
+	ErrInvalidConfigState        ErrorCode = "INVALID_CONFIG_STATE"
 
 	// Configuration Errors
-	ErrDockerNotSupported      ErrorCode = "DOCKER_NOT_SUPPORTED"
-	ErrPlatformArchMismatch     ErrorCode = "PLATFORM_ARCH_MISMATCH"
-	ErrMainPathRequired        ErrorCode = "MAIN_PATH_REQUIRED"
-	ErrInvalidStateTransition   ErrorCode = "INVALID_STATE_TRANSITION"
-	ErrMissingRequiredField    ErrorCode = "MISSING_REQUIRED_FIELD"
+	ErrDockerNotSupported     ErrorCode = "DOCKER_NOT_SUPPORTED"
+	ErrPlatformArchMismatch   ErrorCode = "PLATFORM_ARCH_MISMATCH"
+	ErrMainPathRequired       ErrorCode = "MAIN_PATH_REQUIRED"
+	ErrInvalidStateTransition ErrorCode = "INVALID_STATE_TRANSITION"
+	ErrMissingRequiredField   ErrorCode = "MISSING_REQUIRED_FIELD"
 	ErrFieldTooLong           ErrorCode = "FIELD_TOO_LONG"
 	ErrFieldTooShort          ErrorCode = "FIELD_TOO_SHORT"
 
 	// Business Rule Errors
-	ErrDuplicateBuildTag        ErrorCode = "DUPLICATE_BUILD_TAG"
-	ErrTooManyBuildTags       ErrorCode = "TOO_MANY_BUILD_TAGS"
-	ErrInvalidURLPattern      ErrorCode = "INVALID_URL_PATTERN"
-	ErrReservedName           ErrorCode = "RESERVED_NAME"
-	ErrInvalidCharacters      ErrorCode = "INVALID_CHARACTERS"
+	ErrDuplicateBuildTag ErrorCode = "DUPLICATE_BUILD_TAG"
+	ErrTooManyBuildTags  ErrorCode = "TOO_MANY_BUILD_TAGS"
+	ErrInvalidURLPattern ErrorCode = "INVALID_URL_PATTERN"
+	ErrReservedName      ErrorCode = "RESERVED_NAME"
+	ErrInvalidCharacters ErrorCode = "INVALID_CHARACTERS"
 
 	// System Errors
-	ErrFileNotFound           ErrorCode = "FILE_NOT_FOUND"
-	ErrPermissionDenied        ErrorCode = "PERMISSION_DENIED"
+	ErrFileNotFound          ErrorCode = "FILE_NOT_FOUND"
+	ErrPermissionDenied      ErrorCode = "PERMISSION_DENIED"
 	ErrFileWriteFailed       ErrorCode = "FILE_WRITE_FAILED"
 	ErrFileReadFailed        ErrorCode = "FILE_READ_FAILED"
-	ErrDirectoryCreateFailed  ErrorCode = "DIRECTORY_CREATE_FAILED"
-	ErrDependencyNotFound     ErrorCode = "DEPENDENCY_NOT_FOUND"
+	ErrDirectoryCreateFailed ErrorCode = "DIRECTORY_CREATE_FAILED"
+	ErrDependencyNotFound    ErrorCode = "DEPENDENCY_NOT_FOUND"
 
 	// Template Errors
-	ErrTemplateNotFound       ErrorCode = "TEMPLATE_NOT_FOUND"
+	ErrTemplateNotFound        ErrorCode = "TEMPLATE_NOT_FOUND"
 	ErrTemplateExecutionFailed ErrorCode = "TEMPLATE_EXECUTION_FAILED"
-	ErrTemplateSyntaxError    ErrorCode = "TEMPLATE_SYNTAX_ERROR"
+	ErrTemplateSyntaxError     ErrorCode = "TEMPLATE_SYNTAX_ERROR"
 
 	// External Service Errors
-	ErrGitOperationFailed    ErrorCode = "GIT_OPERATION_FAILED"
-	ErrRegistryAccessDenied  ErrorCode = "REGISTRY_ACCESS_DENIED"
-	ErrGitHubAPIError        ErrorCode = "GITHUB_API_ERROR"
+	ErrGitOperationFailed   ErrorCode = "GIT_OPERATION_FAILED"
+	ErrRegistryAccessDenied ErrorCode = "REGISTRY_ACCESS_DENIED"
+	ErrGitHubAPIError       ErrorCode = "GITHUB_API_ERROR"
 )
 
 // Error implements the error interface
@@ -252,7 +252,7 @@ func (de *DomainError) GetRecoverySuggestion() string {
 type ErrorSeverity int
 
 const (
-	ErrorSeverityInfo    ErrorSeverity = iota
+	ErrorSeverityInfo ErrorSeverity = iota
 	ErrorSeverityWarning
 	ErrorSeverityError
 	ErrorSeverityCritical
@@ -262,17 +262,17 @@ func (de *DomainError) GetSeverity() ErrorSeverity {
 	switch de.Code {
 	// Validation errors are warnings (user can fix)
 	case ErrInvalidProjectName, ErrInvalidBinaryName, ErrInvalidMainPath,
-		 ErrInvalidPlatform, ErrInvalidArchitecture, ErrInvalidGitProvider:
+		ErrInvalidPlatform, ErrInvalidArchitecture, ErrInvalidGitProvider:
 		return ErrorSeverityWarning
-	
+
 	// Configuration errors are errors (more serious)
 	case ErrDockerNotSupported, ErrPlatformArchMismatch, ErrInvalidStateTransition:
 		return ErrorSeverityError
-	
+
 	// System errors are critical
 	case ErrPermissionDenied, ErrFileNotFound:
 		return ErrorSeverityCritical
-	
+
 	// Default to error
 	default:
 		return ErrorSeverityError

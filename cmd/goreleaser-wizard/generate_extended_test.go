@@ -20,8 +20,8 @@ func TestRunGenerate(t *testing.T) {
 				goMod := `module github.com/user/generate-test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 				return dir
 			},
 			expectError: false,
@@ -328,7 +328,7 @@ func TestFileOperations(t *testing.T) {
 		{
 			name: "write_new_file_with_safe_write",
 			operation: func() error {
-				return SafeFileWrite("test-safe-write.txt", []byte("test content"), 0644)
+				return SafeFileWrite("test-safe-write.txt", []byte("test content"), 0o644)
 			},
 			wantErr: false,
 		},
@@ -336,7 +336,7 @@ func TestFileOperations(t *testing.T) {
 			name: "read_existing_file_with_safe_read",
 			operation: func() error {
 				content := []byte("test content for reading")
-				err := os.WriteFile("test-safe-read.txt", content, 0644)
+				err := os.WriteFile("test-safe-read.txt", content, 0o644)
 				if err != nil {
 					return err
 				}
@@ -427,14 +427,14 @@ func TestBackupCreation(t *testing.T) {
 
 			// Create original file if needed
 			if tt.originalContent != "" {
-				err := os.WriteFile(testFile, []byte(tt.originalContent), 0644)
+				err := os.WriteFile(testFile, []byte(tt.originalContent), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to create original file: %v", err)
 				}
 			}
 
 			// Write new file (this should create backup)
-			err := SafeFileWrite(testFile, []byte(tt.newContent), 0644)
+			err := SafeFileWrite(testFile, []byte(tt.newContent), 0o644)
 			if err != nil {
 				t.Errorf("SafeFileWrite() error = %v", err)
 				return

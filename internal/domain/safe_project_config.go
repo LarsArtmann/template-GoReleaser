@@ -3,7 +3,7 @@ package domain
 import (
 	"fmt"
 	"strings"
-	
+
 	"github.com/LarsArtmann/template-GoReleaser/internal/validation"
 )
 
@@ -20,7 +20,7 @@ type SafeProjectConfig struct {
 	// Build Configuration
 	Platforms     []Platform     `json:"platforms" yaml:"platforms"`
 	Architectures []Architecture `json:"architectures" yaml:"architectures"`
-	CGOStatus     CGOStatus     `json:"cgo_status" yaml:"cgo_status"`
+	CGOStatus     CGOStatus      `json:"cgo_status" yaml:"cgo_status"`
 	BuildTags     []BuildTag     `json:"build_tags,omitempty" yaml:"build_tags,omitempty"`
 	LDFlags       bool           `json:"ldflags" yaml:"ldflags"`
 
@@ -35,8 +35,8 @@ type SafeProjectConfig struct {
 	SBOM           bool           `json:"sbom" yaml:"sbom"`
 
 	// CI/CD Configuration
-	ActionLevel   ActionLevel    `json:"action_level" yaml:"action_level"`
-	ActionsOn     []ActionTrigger `json:"actions_on" yaml:"actions_on"`
+	ActionLevel ActionLevel     `json:"action_level" yaml:"action_level"`
+	ActionsOn   []ActionTrigger `json:"actions_on" yaml:"actions_on"`
 
 	// Advanced Features
 	FeatureLevel FeatureLevel `json:"feature_level" yaml:"feature_level"`
@@ -49,20 +49,20 @@ type SafeProjectConfig struct {
 func NewSafeProjectConfig() *SafeProjectConfig {
 	return &SafeProjectConfig{
 		// Smart defaults based on project analysis
-		ProjectType:      GetRecommendedProjectType(),
-		Platforms:        GetRecommendedPlatforms(),
-		Architectures:    GetRecommendedArchitectures(),
-		GitProvider:      GetRecommendedGitProvider(),
-		DockerRegistry:   GetRecommendedDockerRegistry(),
-		CGOStatus:        CGOStatusDisabled,
-		ActionLevel:      ActionLevelBasic,
-		SigningLevel:     SigningLevelNone,
-		FeatureLevel:     FeatureLevelBasic,
-		State:            ConfigStateDraft,
-		LDFlags:          true,
-		Homebrew:         false,
-		Snap:             false,
-		SBOM:             false,
+		ProjectType:    GetRecommendedProjectType(),
+		Platforms:      GetRecommendedPlatforms(),
+		Architectures:  GetRecommendedArchitectures(),
+		GitProvider:    GetRecommendedGitProvider(),
+		DockerRegistry: GetRecommendedDockerRegistry(),
+		CGOStatus:      CGOStatusDisabled,
+		ActionLevel:    ActionLevelBasic,
+		SigningLevel:   SigningLevelNone,
+		FeatureLevel:   FeatureLevelBasic,
+		State:          ConfigStateDraft,
+		LDFlags:        true,
+		Homebrew:       false,
+		Snap:           false,
+		SBOM:           false,
 	}
 }
 
@@ -221,28 +221,28 @@ func (spc *SafeProjectConfig) ValidateInvariants() error {
 // Clone creates a deep copy of the configuration
 func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 	clone := *spc
-	
+
 	// Deep copy slices
 	if spc.Platforms != nil {
 		clone.Platforms = make([]Platform, len(spc.Platforms))
 		copy(clone.Platforms, spc.Platforms)
 	}
-	
+
 	if spc.Architectures != nil {
 		clone.Architectures = make([]Architecture, len(spc.Architectures))
 		copy(clone.Architectures, spc.Architectures)
 	}
-	
+
 	if spc.BuildTags != nil {
 		clone.BuildTags = make([]BuildTag, len(spc.BuildTags))
 		copy(clone.BuildTags, spc.BuildTags)
 	}
-	
+
 	if spc.ActionsOn != nil {
 		clone.ActionsOn = make([]ActionTrigger, len(spc.ActionsOn))
 		copy(clone.ActionsOn, spc.ActionsOn)
 	}
-	
+
 	return &clone
 }
 
@@ -251,7 +251,7 @@ func (spc *SafeProjectConfig) Equals(other *SafeProjectConfig) bool {
 	if spc == nil || other == nil {
 		return spc == other
 	}
-	
+
 	return spc.ProjectName == other.ProjectName &&
 		spc.ProjectDescription == other.ProjectDescription &&
 		spc.ProjectType == other.ProjectType &&
@@ -321,7 +321,7 @@ func (spc *SafeProjectConfig) TransitionToState(newState ConfigState) error {
 	if !spc.State.AllowsTransitionTo(newState) {
 		return fmt.Errorf("invalid state transition from %s to %s", spc.State, newState)
 	}
-	
+
 	spc.State = newState
 	return nil
 }
@@ -336,13 +336,13 @@ func (cs ConfigState) AllowsTransitionTo(newState ConfigState) bool {
 		ConfigStateProcessing: {ConfigStateValid, ConfigStateInvalid, ConfigStateGenerated},
 		ConfigStateGenerated:  {}, // Final state - no transitions allowed
 	}
-	
+
 	for _, allowed := range allowedTransitions[cs] {
 		if allowed == newState {
 			return true
 		}
 	}
-	
+
 	return false
 }
 

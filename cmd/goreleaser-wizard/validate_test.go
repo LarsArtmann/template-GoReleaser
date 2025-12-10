@@ -4,10 +4,9 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
-
-	"slices"
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
@@ -32,7 +31,7 @@ func TestRunValidate(t *testing.T) {
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
 				// Create .goreleaser.yaml
 				goreleaser := `# GoReleaser configuration
 version: 2
@@ -45,9 +44,9 @@ build:
   goarch:
     - amd64
 `
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
+				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 				// Create main.go
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 				// Initialize git
 				exec.Command("git", "init").Dir = dir
 				exec.Command("git", "init").Run()
@@ -70,7 +69,7 @@ build:
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
 				return dir
 			},
 			args:        []string{},
@@ -85,12 +84,12 @@ go 1.21
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
 `
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
+				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 				return dir
 			},
 			args:  []string{},
@@ -239,8 +238,8 @@ func TestValidateProjectStructure(t *testing.T) {
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -248,7 +247,7 @@ build:
   main: .
   binary: test
 `
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
+				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 				return dir
 			},
 			expectIssues: []string{},
@@ -260,9 +259,9 @@ build:
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
-				os.MkdirAll(filepath.Join(dir, "cmd", "test"), 0755)
-				os.WriteFile(filepath.Join(dir, "cmd", "test", "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+				os.MkdirAll(filepath.Join(dir, "cmd", "test"), 0o755)
+				os.WriteFile(filepath.Join(dir, "cmd", "test", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -270,7 +269,7 @@ build:
   main: ./cmd/test
   binary: test
 `
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
+				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 				return dir
 			},
 			expectIssues: []string{},
@@ -282,7 +281,7 @@ build:
 				goMod := `module github.com/user/test
 go 1.21
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -290,7 +289,7 @@ build:
   main: .
   binary: test
 `
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
+				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 				return dir
 			},
 			expectWarnings: []string{"No main.go found"},
@@ -456,7 +455,7 @@ func TestValidateOutputFormatting(t *testing.T) {
 	goMod := `module github.com/user/test
 go 1.21
 `
-	os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
+	os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
 	goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -464,8 +463,8 @@ build:
   main: .
   binary: test
 `
-	os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0644)
-	os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+	os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
+	os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	originalDir, _ := os.Getwd()
 	os.Chdir(dir)

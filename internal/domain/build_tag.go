@@ -15,12 +15,12 @@ func (bt BuildTag) IsValid() bool {
 	if len(bt.Name) == 0 {
 		return false
 	}
-	
+
 	// Build tag pattern: alphanumerics, hyphens, underscores
 	if !isValidBuildTagName(bt.Name) {
 		return false
 	}
-	
+
 	return true
 }
 
@@ -34,14 +34,14 @@ func isValidBuildTagName(name string) bool {
 	if len(name) == 0 {
 		return false
 	}
-	
+
 	for _, char := range name {
 		isValid := (char == '_' || char == '-' || (char >= 'a' && char <= 'z') || (char >= 'A' && char <= 'Z') || (char >= '0' && char <= '9'))
 		if !isValid {
 			return false
 		}
 	}
-	
+
 	return true
 }
 
@@ -120,7 +120,7 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 
 	filtered := []BuildTag{}
 	compatibleTags := platformTags[platform]
-	
+
 	for _, tag := range tags {
 		// Keep tags that are platform-specific and compatible, or general tags
 		isPlatformSpecific := false
@@ -135,7 +135,7 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 				break
 			}
 		}
-		
+
 		// Check if compatible
 		compatible := false
 		for _, ct := range compatibleTags {
@@ -144,13 +144,13 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 				break
 			}
 		}
-		
+
 		// Keep general tags or compatible platform-specific tags
 		if !isPlatformSpecific || compatible {
 			filtered = append(filtered, tag)
 		}
 	}
-	
+
 	return filtered
 }
 

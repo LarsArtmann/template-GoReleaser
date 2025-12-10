@@ -23,12 +23,12 @@ func TestEndToEndWizard(t *testing.T) {
 go 1.21
 require github.com/charmbracelet/bubbletea v0.25.0
 `
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0644)
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 				// Create cmd directory structure
-				os.MkdirAll(filepath.Join(dir, "cmd", "e2e-test"), 0755)
-				os.WriteFile(filepath.Join(dir, "cmd", "e2e-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0644)
+				os.MkdirAll(filepath.Join(dir, "cmd", "e2e-test"), 0o755)
+				os.WriteFile(filepath.Join(dir, "cmd", "e2e-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 				return dir
 			},
@@ -263,8 +263,8 @@ func TestDifferentProjectTypes(t *testing.T) {
 			goMod := `module github.com/user/test
 go 1.21
 `
-			os.WriteFile("go.mod", []byte(goMod), 0644)
-			os.WriteFile("main.go", []byte("package main\n\nfunc main() {}"), 0644)
+			os.WriteFile("go.mod", []byte(goMod), 0o644)
+			os.WriteFile("main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
 			// Test project detection
 			config := &ProjectConfig{}
@@ -327,7 +327,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 			name: "malformed_go_mod",
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-malformed-test")
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("invalid go.mod content"), 0644)
+				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("invalid go.mod content"), 0o644)
 				return dir
 			},
 			expectError: true,
@@ -338,7 +338,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-readonly-test")
 				// Make directory read-only (this might not work on all systems)
-				os.Chmod(dir, 0444)
+				os.Chmod(dir, 0o444)
 				return dir
 			},
 			expectError: true,
@@ -353,7 +353,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 			// Ensure we can cleanup even for read-only test
 			defer func() {
 				if testDir != "" {
-					os.Chmod(testDir, 0755) // Restore permissions
+					os.Chmod(testDir, 0o755) // Restore permissions
 					os.RemoveAll(testDir)
 				}
 			}()

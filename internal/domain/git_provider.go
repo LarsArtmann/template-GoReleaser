@@ -10,56 +10,56 @@ import (
 type GitProvider string
 
 const (
-	GitProviderGitHub     GitProvider = "github"     // GitHub
-	GitProviderGitLab     GitProvider = "gitlab"     // GitLab
-	GitProviderBitbucket  GitProvider = "bitbucket"  // Bitbucket
-	GitProviderGitea      GitProvider = "gitea"      // Gitea
+	GitProviderGitHub     GitProvider = "github"      // GitHub
+	GitProviderGitLab     GitProvider = "gitlab"      // GitLab
+	GitProviderBitbucket  GitProvider = "bitbucket"   // Bitbucket
+	GitProviderGitea      GitProvider = "gitea"       // Gitea
 	GitProviderSelfHosted GitProvider = "self-hosted" // Self-hosted
 )
 
 // GitProvider metadata - generated from TypeSpec invariants
 type gitProviderMeta struct {
-	defaultRegistry           DockerRegistry
-	actionsSupported         bool
-	apiURL                  string
-	webURL                  string
+	defaultRegistry             DockerRegistry
+	actionsSupported            bool
+	apiURL                      string
+	webURL                      string
 	requiresPersonalAccessToken bool
 }
 
 var gitProviderMetaMap = map[GitProvider]gitProviderMeta{
 	GitProviderGitHub: {
-		defaultRegistry:           DockerRegistryGitHub,
-		actionsSupported:         true,
-		apiURL:                  "https://api.github.com",
-		webURL:                  "https://github.com",
+		defaultRegistry:             DockerRegistryGitHub,
+		actionsSupported:            true,
+		apiURL:                      "https://api.github.com",
+		webURL:                      "https://github.com",
 		requiresPersonalAccessToken: false,
 	},
 	GitProviderGitLab: {
-		defaultRegistry:           DockerRegistryGitLab,
-		actionsSupported:         true,
-		apiURL:                  "https://gitlab.com/api/v4",
-		webURL:                  "https://gitlab.com",
+		defaultRegistry:             DockerRegistryGitLab,
+		actionsSupported:            true,
+		apiURL:                      "https://gitlab.com/api/v4",
+		webURL:                      "https://gitlab.com",
 		requiresPersonalAccessToken: true,
 	},
 	GitProviderBitbucket: {
-		defaultRegistry:           DockerRegistryCustom,
-		actionsSupported:         true,
-		apiURL:                  "https://api.bitbucket.org/2.0",
-		webURL:                  "https://bitbucket.org",
+		defaultRegistry:             DockerRegistryCustom,
+		actionsSupported:            true,
+		apiURL:                      "https://api.bitbucket.org/2.0",
+		webURL:                      "https://bitbucket.org",
 		requiresPersonalAccessToken: true,
 	},
 	GitProviderGitea: {
-		defaultRegistry:           DockerRegistryCustom,
-		actionsSupported:         false,
-		apiURL:                  "", // Self-hosted
-		webURL:                  "", // Self-hosted
+		defaultRegistry:             DockerRegistryCustom,
+		actionsSupported:            false,
+		apiURL:                      "", // Self-hosted
+		webURL:                      "", // Self-hosted
 		requiresPersonalAccessToken: true,
 	},
 	GitProviderSelfHosted: {
-		defaultRegistry:           DockerRegistryCustom,
-		actionsSupported:         false,
-		apiURL:                  "", // User-defined
-		webURL:                  "", // User-defined
+		defaultRegistry:             DockerRegistryCustom,
+		actionsSupported:            false,
+		apiURL:                      "", // User-defined
+		webURL:                      "", // User-defined
 		requiresPersonalAccessToken: true,
 	},
 }

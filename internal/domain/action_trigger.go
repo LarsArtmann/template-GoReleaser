@@ -19,35 +19,35 @@ const (
 
 // ActionTrigger metadata - generated from TypeSpec invariants
 type actionTriggerMeta struct {
-	githubPattern   string
-	description     string
-	recommendedFor  []ProjectType
+	githubPattern  string
+	description    string
+	recommendedFor []ProjectType
 }
 
 var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 	ActionTriggerVersionTags: {
-		githubPattern: "push:\n  tags:\n    - 'v*'",
-		description:  "Triggers on version tags like v1.0.0",
+		githubPattern:  "push:\n  tags:\n    - 'v*'",
+		description:    "Triggers on version tags like v1.0.0",
 		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWeb, ProjectTypeAPI},
 	},
 	ActionTriggerAllTags: {
-		githubPattern: "push:\n  tags:\n    - '*'",
-		description:  "Triggers on any tag",
+		githubPattern:  "push:\n  tags:\n    - '*'",
+		description:    "Triggers on any tag",
 		recommendedFor: []ProjectType{ProjectTypeLibrary},
 	},
 	ActionTriggerManual: {
-		githubPattern: "workflow_dispatch:",
-		description:  "Can be triggered manually from GitHub UI",
+		githubPattern:  "workflow_dispatch:",
+		description:    "Can be triggered manually from GitHub UI",
 		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWeb, ProjectTypeAPI, ProjectTypeDesktop},
 	},
 	ActionTriggerMain: {
-		githubPattern: "push:\n  branches:\n    - main",
-		description:  "Triggers on pushes to main branch",
+		githubPattern:  "push:\n  branches:\n    - main",
+		description:    "Triggers on pushes to main branch",
 		recommendedFor: []ProjectType{ProjectTypeWeb, ProjectTypeAPI},
 	},
 	ActionTriggerRelease: {
-		githubPattern: "release:\n    types: [published]",
-		description:  "Triggers when a GitHub release is published",
+		githubPattern:  "release:\n    types: [published]",
+		description:    "Triggers when a GitHub release is published",
 		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWeb, ProjectTypeAPI, ProjectTypeDesktop},
 	},
 }

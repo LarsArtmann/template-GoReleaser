@@ -10,15 +10,14 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
-	"github.com/charmbracelet/log"
+	"github.com/kaptinlin/messageformat-go/pkg/logger"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var (
 	// Validation use case (would be injected in real implementation)
 	validationUseCase *domain.ValidationUseCase
-	fileSystemRepo   domain.FileSystemRepository
+	fileSystemRepo    domain.FileSystemRepository
 )
 
 var validateCmd = &cobra.Command{
@@ -102,8 +101,8 @@ type ValidationResults struct {
 	ActionsValid    bool
 	ProjectValid    bool
 	GoReleaserFound bool
-	Errors         []*domain.DomainError
-	Warnings       []*domain.DomainError
+	Errors          []*domain.DomainError
+	Warnings        []*domain.DomainError
 	Recommendations []string
 }
 
@@ -125,7 +124,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 	// Check if config exists
 	exists, err := fileSystemRepo.FileExists(context.Background(), configPath)
 	if err != nil {
-		results.Errors = append(results.Errors, 
+		results.Errors = append(results.Errors,
 			domain.NewSystemError(
 				domain.ErrFileReadFailed,
 				"Failed to check configuration file",
@@ -144,7 +143,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 				fmt.Sprintf("%s does not exist", configPath),
 				nil,
 			).WithContext(configPath))
-		results.Recommendations = append(results.Recommendations, 
+		results.Recommendations = append(results.Recommendations,
 			"Run 'goreleaser-wizard init' to create configuration")
 		return nil
 	}
@@ -308,7 +307,7 @@ func isValidYAML(content string) bool {
 func parseGoReleaserConfig(configPath string, results *ValidationResults) error {
 	// This would use proper YAML parsing and GoReleaser validation
 	// For now, just check for required fields
-	
+
 	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return domain.NewSystemError(
@@ -358,7 +357,6 @@ func runGoReleaserCheck(configPath string, results *ValidationResults) error {
 	// Run goreleaser check
 	cmd := exec.Command("goreleaser", "check", "-f", configPath)
 	output, err := cmd.CombinedOutput()
-
 	if err != nil {
 		results.Errors = append(results.Errors,
 			domain.NewExternalServiceError(
@@ -492,7 +490,7 @@ func attemptFixes(results *ValidationResults) error {
 
 	// Fix missing configuration directory
 	if !results.ConfigExists {
-		if err := os.MkdirAll(".github/workflows", 0755); err == nil {
+		if err := os.MkdirAll(".github/workflows", 0o755); err == nil {
 			fmt.Println(successStyle.Render("✅ Created .github/workflows directory"))
 			fixed++
 		}
@@ -501,7 +499,7 @@ func attemptFixes(results *ValidationResults) error {
 	// Try to create basic configuration if missing
 	if !results.ConfigExists {
 		configContent := generateBasicConfig()
-		if err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0644); err == nil {
+		if err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0o644); err == nil {
 			fmt.Println(successStyle.Render("✅ Created basic .goreleaser.yaml"))
 			fixed++
 		}

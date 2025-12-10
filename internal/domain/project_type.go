@@ -18,8 +18,8 @@ const (
 
 // ProjectType metadata - generated from TypeSpec invariants
 type projectTypeMeta struct {
-	defaultCGOEnabled     bool
-	recommendedPlatforms  []Platform
+	defaultCGOEnabled    bool
+	recommendedPlatforms []Platform
 	dockerSupported      bool
 	requiresMainPath     bool
 	defaultBinaryName    string
@@ -29,37 +29,37 @@ var projectTypeMetaMap = map[ProjectType]projectTypeMeta{
 	ProjectTypeCLI: {
 		defaultCGOEnabled:    false,
 		recommendedPlatforms: []Platform{PlatformLinux, PlatformDarwin, PlatformWindows},
-		dockerSupported:     true,
-		requiresMainPath:    true,
-		defaultBinaryName:   "cli-app",
+		dockerSupported:      true,
+		requiresMainPath:     true,
+		defaultBinaryName:    "cli-app",
 	},
 	ProjectTypeWeb: {
 		defaultCGOEnabled:    true,
 		recommendedPlatforms: []Platform{PlatformLinux},
-		dockerSupported:     true,
-		requiresMainPath:    true,
-		defaultBinaryName:   "web-service",
+		dockerSupported:      true,
+		requiresMainPath:     true,
+		defaultBinaryName:    "web-service",
 	},
 	ProjectTypeLibrary: {
 		defaultCGOEnabled:    false,
 		recommendedPlatforms: []Platform{PlatformLinux, PlatformDarwin, PlatformWindows},
-		dockerSupported:     false,
-		requiresMainPath:    false,
-		defaultBinaryName:   "library",
+		dockerSupported:      false,
+		requiresMainPath:     false,
+		defaultBinaryName:    "library",
 	},
 	ProjectTypeAPI: {
 		defaultCGOEnabled:    true,
 		recommendedPlatforms: []Platform{PlatformLinux},
-		dockerSupported:     true,
-		requiresMainPath:    true,
-		defaultBinaryName:   "api-server",
+		dockerSupported:      true,
+		requiresMainPath:     true,
+		defaultBinaryName:    "api-server",
 	},
 	ProjectTypeDesktop: {
 		defaultCGOEnabled:    true,
 		recommendedPlatforms: []Platform{PlatformDarwin, PlatformWindows},
-		dockerSupported:     false,
-		requiresMainPath:    true,
-		defaultBinaryName:   "desktop-app",
+		dockerSupported:      false,
+		requiresMainPath:     true,
+		defaultBinaryName:    "desktop-app",
 	},
 }
 
