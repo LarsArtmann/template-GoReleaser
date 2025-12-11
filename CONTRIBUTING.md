@@ -110,8 +110,8 @@ When reporting issues:
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/LarsArtmann/template-GoReleaser.git
-   cd template-GoReleaser
+   git clone https://github.com/LarsArtmann/GoReleaser-Wizard.git
+   cd GoReleaser-Wizard
    ```
 
 2. **Install Development Tools**
