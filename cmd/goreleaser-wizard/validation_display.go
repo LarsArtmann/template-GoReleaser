@@ -2,9 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
-
-	"github.com/charmbracelet/lipgloss"
 )
 
 // displayValidationResults displays validation results to the user

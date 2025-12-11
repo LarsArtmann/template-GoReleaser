@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/LarsArtmann/template-GoReleaser/internal/validation"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 )
 
 func main() {

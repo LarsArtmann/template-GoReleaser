@@ -1,20 +1,20 @@
- 10644 total
-   637 ./cmd/goreleaser-wizard/validate.go
+ 10667 total
    544 ./cmd/goreleaser-wizard/errors_test.go
    505 ./cmd/goreleaser-wizard/generate_extended_test.go
    490 ./cmd/goreleaser-wizard/validate_test.go
    450 ./internal/domain/interfaces.go
-   432 ./internal/domain/validation.go
+   434 ./internal/domain/validation.go
    429 ./internal/domain/enums.go
-   425 ./internal/domain/safe_project_config.go
    415 ./cmd/goreleaser-wizard/workflow.go
    411 ./cmd/goreleaser-wizard/architecture_test.go
+   405 ./internal/domain/safe_project_config.go
    384 ./cmd/goreleaser-wizard/jobs.go
    383 ./cmd/goreleaser-wizard/integration_test.go
    369 ./cmd/goreleaser-wizard/generate_test.go
    358 ./cmd/goreleaser-wizard/performance_test.go
-   347 ./cmd/goreleaser-wizard/init_test.go
    343 ./internal/validation/validators.go
-   338 ./cmd/goreleaser-wizard/main.go
+   336 ./cmd/goreleaser-wizard/main.go
    329 ./cmd/goreleaser-wizard/job_manager.go
+   329 ./cmd/goreleaser-wizard/init_test.go
    321 ./internal/validation/validators_test.go
+   312 ./internal/validation/template_escaping_test.go

@@ -6,8 +6,6 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
-
-	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 )
 
 // validateGoReleaserConfig validates GoReleaser configuration
@@ -18,8 +16,8 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 	exists, err := fileSystemRepo.FileExists(context.Background(), configPath)
 	if err != nil {
 		results.Errors = append(results.Errors,
-			domain.NewSystemError(
-				domain.ErrFileReadFailed,
+			NewSystemError(
+				"FILE_READ_FAILED",
 				"Failed to check configuration file",
 				fmt.Sprintf("Cannot access %s", configPath),
 				err,
@@ -30,8 +28,8 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 	results.ConfigExists = exists
 	if !exists {
 		results.Errors = append(results.Errors,
-			domain.NewSystemError(
-				domain.ErrFileNotFound,
+			NewSystemError(
+				"FILE_NOT_FOUND",
 				"Configuration file not found",
 				fmt.Sprintf("%s does not exist", configPath),
 				nil,
@@ -55,8 +53,8 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 		if output, err := cmd.CombinedOutput(); err != nil {
 			results.ConfigValid = false
 			results.Errors = append(results.Errors,
-				domain.NewValidationError(
-					domain.ErrInvalidConfiguration,
+				NewValidationError(
+					"INVALID_CONFIGURATION",
 					"GoReleaser configuration is invalid",
 					string(output),
 				).WithContext(configPath))
@@ -65,8 +63,8 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 		}
 	} else {
 		results.Warnings = append(results.Warnings,
-			domain.NewValidationError(
-				domain.ErrExternalToolNotFound,
+			NewValidationError(
+				"EXTERNAL_TOOL_NOT_FOUND",
 				"GoReleaser not found",
 				"Install GoReleaser for configuration validation",
 			))
@@ -85,8 +83,8 @@ func validateGitHubActions(results *ValidationResults) error {
 	exists, err := fileSystemRepo.FileExists(context.Background(), workflowPath)
 	if err != nil {
 		results.Errors = append(results.Errors,
-			domain.NewSystemError(
-				domain.ErrFileReadFailed,
+			NewSystemError(
+				"FILE_READ_FAILED",
 				"Failed to check workflow file",
 				fmt.Sprintf("Cannot access %s", workflowPath),
 				err,
@@ -116,8 +114,8 @@ func validateProjectStructure(results *ValidationResults) error {
 	// Check for go.mod
 	if exists, err := fileSystemRepo.FileExists(context.Background(), "go.mod"); err != nil {
 		results.Errors = append(results.Errors,
-			domain.NewSystemError(
-				domain.ErrFileReadFailed,
+			NewSystemError(
+				"FILE_READ_FAILED",
 				"Failed to check go.mod",
 				"Cannot access go.mod file",
 				err,
@@ -125,8 +123,8 @@ func validateProjectStructure(results *ValidationResults) error {
 		return nil
 	} else if !exists {
 		results.Errors = append(results.Errors,
-			domain.NewValidationError(
-				domain.ErrMissingDependency,
+			NewValidationError(
+				"MISSING_DEPENDENCY",
 				"go.mod not found",
 				"Run 'go mod init' to initialize Go module",
 			).WithContext("go.mod"))
@@ -138,8 +136,8 @@ func validateProjectStructure(results *ValidationResults) error {
 	mainPath := "cmd"
 	if exists, err := fileSystemRepo.DirExists(context.Background(), mainPath); err != nil {
 		results.Errors = append(results.Errors,
-			domain.NewSystemError(
-				domain.ErrFileReadFailed,
+			NewSystemError(
+				"FILE_READ_FAILED",
 				"Failed to check main directory",
 				fmt.Sprintf("Cannot access %s", mainPath),
 				err,
@@ -151,8 +149,8 @@ func validateProjectStructure(results *ValidationResults) error {
 		for _, alt := range alternatives {
 			if exists, _ := fileSystemRepo.DirExists(context.Background(), alt); exists {
 				results.Warnings = append(results.Warnings,
-					domain.NewValidationError(
-						domain.ErrInvalidProjectStructure,
+					NewValidationError(
+						"INVALID_PROJECT_STRUCTURE",
 						"Non-standard main directory",
 						fmt.Sprintf("Found %s instead of %s", alt, mainPath),
 					).WithContext(alt))
@@ -162,8 +160,8 @@ func validateProjectStructure(results *ValidationResults) error {
 		}
 
 		results.Errors = append(results.Errors,
-			domain.NewValidationError(
-				domain.ErrInvalidProjectStructure,
+			NewValidationError(
+				"INVALID_PROJECT_STRUCTURE",
 				"Main directory not found",
 				"Create cmd directory with main package",
 			).WithContext(mainPath))
@@ -187,8 +185,8 @@ func validateYAML(filePath string, results *ValidationResults) error {
 	lines := strings.Split(string(content), "\n")
 	if len(lines) == 0 {
 		results.Errors = append(results.Errors,
-			domain.NewValidationError(
-				domain.ErrInvalidFileFormat,
+			NewValidationError(
+				"INVALID_FILE_FORMAT",
 				"Empty YAML file",
 				fmt.Sprintf("%s is empty", filePath),
 			).WithContext(filePath))
@@ -207,8 +205,8 @@ func validateYAML(filePath string, results *ValidationResults) error {
 
 	if !hasYamlStructure {
 		results.Errors = append(results.Errors,
-			domain.NewValidationError(
-				domain.ErrInvalidFileFormat,
+			NewValidationError(
+				"INVALID_FILE_FORMAT",
 				"Invalid YAML structure",
 				fmt.Sprintf("%s does not appear to be valid YAML", filePath),
 			).WithContext(filePath))

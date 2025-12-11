@@ -5,7 +5,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/LarsArtmann/template-GoReleaser/internal/validation"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 )
 
 // SafeProjectConfig represents single source of truth for project configuration
@@ -126,19 +126,19 @@ func (spc *SafeProjectConfig) ApplyDefaults() {
 // ValidateInvariants enforces domain invariants and returns any violations
 func (spc *SafeProjectConfig) ValidateInvariants() error {
 	// Basic validation
-	if err := ValidateProjectName(spc.ProjectName); err != nil {
+	if err := validation.ValidateProjectName(spc.ProjectName); err != nil {
 		return err
 	}
 
-	if err := ValidateBinaryName(spc.BinaryName); err != nil {
+	if err := validation.ValidateBinaryName(spc.BinaryName); err != nil {
 		return err
 	}
 
-	if err := ValidateMainPath(spc.MainPath); err != nil {
+	if err := validation.ValidateMainPath(spc.MainPath); err != nil {
 		return err
 	}
 
-	if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
+	if err := validation.ValidateProjectDescription(spc.ProjectDescription); err != nil {
 		return err
 	}
 
@@ -398,26 +398,6 @@ func (spc *SafeProjectConfig) SetProVersion(enabled bool) {
 }
 
 // Additional validation wrapper functions for functions not in domain package
-
-// ValidateProjectName validates project name using validation package
-func ValidateProjectName(name string) error {
-	return validation.ValidateProjectName(name)
-}
-
-// ValidateBinaryName validates binary name using validation package
-func ValidateBinaryName(name string) error {
-	return validation.ValidateBinaryName(name)
-}
-
-// ValidateMainPath validates main path using validation package
-func ValidateMainPath(path string) error {
-	return validation.ValidateMainPath(path)
-}
-
-// ValidateProjectDescription validates project description using validation package
-func ValidateProjectDescription(desc string) error {
-	return validation.ValidateProjectDescription(desc)
-}
 
 // GetRecommendedPlatforms returns recommended platforms for default project type
 func GetRecommendedPlatforms() []Platform {

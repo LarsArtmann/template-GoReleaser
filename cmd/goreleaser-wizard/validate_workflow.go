@@ -3,18 +3,15 @@ package main
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 	"strings"
-
-	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
 )
 
 // validateWorkflowContent validates GitHub Actions workflow content
 func validateWorkflowContent(workflowPath string, results *ValidationResults) error {
 	data, err := os.ReadFile(workflowPath)
 	if err != nil {
-		return domain.NewSystemError(
-			domain.ErrFileReadFailed,
+		return NewSystemError(
+			"FILE_READ_FAILED",
 			"Failed to read workflow file",
 			fmt.Sprintf("Cannot read %s", workflowPath),
 			err,
@@ -28,8 +25,8 @@ func validateWorkflowContent(workflowPath string, results *ValidationResults) er
 	for _, element := range requiredElements {
 		if !strings.Contains(content, element) {
 			results.Warnings = append(results.Warnings,
-				domain.NewTemplateError(
-					domain.ErrTemplateExecutionFailed,
+				NewTemplateError(
+					"TEMPLATE_EXECUTION_FAILED",
 					"Missing workflow element",
 					fmt.Sprintf("Workflow missing required element: %s", element),
 				).WithContext(workflowPath))

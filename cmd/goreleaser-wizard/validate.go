@@ -3,18 +3,13 @@ package main
 import (
 	"fmt"
 	"os"
-	"os/exec"
-	"path/filepath"
-	"strings"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/spf13/cobra"
 )
 
 var (
-	// Validation use case (would be injected in real implementation)
-	validationUseCase *domain.ValidationUseCase
-	fileSystemRepo    domain.FileSystemRepository
+	// Validation repository (would be injected in real implementation)
+	fileSystemRepo FileSystemRepository
 )
 
 var validateCmd = &cobra.Command{
@@ -50,7 +45,6 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Initialize dependencies (in real implementation, this would be injected)
 	fileSystemRepo = &SimpleFileSystemRepository{}
-	validationUseCase = domain.NewValidationUseCase(appLogger, fileSystemRepo)
 
 	// Collect validation results
 	results := &ValidationResults{}
