@@ -20,7 +20,7 @@ repos:
         entry: goimports
         language: system
         files: '\.go$'
-        args: [-w, -local, github.com/LarsArtmann/template-GoReleaser]
+        args: [-w, -local, github.com/LarsArtmann/GoReleaser-Wizard]
 
       - id: go-mod-tidy
         name: Go Mod Tidy

@@ -1,8 +1,8 @@
 version: "1.0"
 generated: 2025-08-09T20:36:00.000000+01:00
 project:
-    name: template-GoReleaser
-    description: Comprehensive GoReleaser template for Go projects with free and pro versions
+    name: GoReleaser-Wizard
+    description: Interactive CLI wizard for creating GoReleaser configurations
     type: library
     language: go
     keywords:
@@ -10,12 +10,13 @@ project:
         - goreleaser
         - release
         - automation
-        - template
+        - wizard
+        - cli
         - ci-cd
     repository:
-        url: "https://github.com/LarsArtmann/template-GoReleaser"
+        url: "https://github.com/LarsArtmann/GoReleaser-Wizard"
         owner: "LarsArtmann"
-        name: "template-GoReleaser"
+        name: "GoReleaser-Wizard"
         branch: main
     contact:
         name: Lars Artmann

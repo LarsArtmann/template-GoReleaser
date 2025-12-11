@@ -128,7 +128,7 @@ dockers:
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source=https://github.com/LarsArtmann/template-GoReleaser"
+      - "--label=org.opencontainers.image.source=https://github.com/LarsArtmann/GoReleaser-Wizard"
   
   - id: arm64
     image_templates:
@@ -174,7 +174,7 @@ nfpms:
   - id: packages
     package_name: "{{.ProjectName}}"
     vendor: "LarsArtmann"
-    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    homepage: "https://github.com/LarsArtmann/GoReleaser-Wizard"
     maintainer: "Lars Artmann <lars@example.com>"
     description: "{{.ProjectName}} - A great Go application"
     license: MIT
@@ -195,7 +195,7 @@ brews:
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
     
-    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    homepage: "https://github.com/LarsArtmann/GoReleaser-Wizard"
     description: "{{.ProjectName}} - A great Go application"
     license: MIT
     
@@ -209,7 +209,7 @@ scoops:
       name: scoop-bucket
       token: "{{ .Env.SCOOP_GITHUB_TOKEN }}"
     
-    homepage: "https://github.com/LarsArtmann/template-GoReleaser"
+    homepage: "https://github.com/LarsArtmann/GoReleaser-Wizard"
     description: "{{.ProjectName}} - A great Go application"
     license: MIT
 
