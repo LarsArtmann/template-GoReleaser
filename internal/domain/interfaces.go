@@ -40,7 +40,7 @@ type FileSystemRepository interface {
 type TemplateRepository interface {
 	// Template operations
 	LoadTemplate(ctx context.Context, name string) (string, error)
-	RenderTemplate(ctx context.Context, templateContent string, data interface{}) (string, error)
+	RenderTemplate(ctx context.Context, templateContent string, data any) (string, error)
 	ValidateTemplate(ctx context.Context, content string) error
 
 	// Template discovery and management
@@ -94,12 +94,12 @@ type GitHubRepository interface {
 
 	// Workflow operations
 	GetWorkflows(ctx context.Context, owner, name string) ([]*GitHubWorkflow, error)
-	TriggerWorkflow(ctx context.Context, owner, name, workflowID string, inputs map[string]interface{}) error
+	TriggerWorkflow(ctx context.Context, owner, name, workflowID string, inputs map[string]any) error
 
 	// Authentication and permissions
 	ValidateToken(ctx context.Context, token string) error
 	GetUser(ctx context.Context, token string) (*GitHubUser, error)
-	CheckPermissions(ctx context.Context, owner, name string, token string) (*GitHubPermissions, error)
+	CheckPermissions(ctx context.Context, owner, name, token string) (*GitHubPermissions, error)
 }
 
 // DockerRepository handles Docker registry operations
@@ -109,7 +109,7 @@ type DockerRepository interface {
 	GetRegistryURL(ctx context.Context, registry DockerRegistry) (string, error)
 
 	// Image operations
-	BuildImage(ctx context.Context, dockerfile string, tag string, config *DockerBuildConfig) error
+	BuildImage(ctx context.Context, dockerfile, tag string, config *DockerBuildConfig) error
 	PushImage(ctx context.Context, image, registry DockerRegistry, credentials *DockerCredentials) error
 	PullImage(ctx context.Context, image string) error
 
@@ -125,21 +125,21 @@ type DockerRepository interface {
 
 // Logger interface for dependency injection
 type Logger interface {
-	Debug(msg string, args ...interface{})
-	Info(msg string, args ...interface{})
-	Warn(msg string, args ...interface{})
-	Error(msg string, args ...interface{})
-	Fatal(msg string, args ...interface{})
+	Debug(msg string, args ...any)
+	Info(msg string, args ...any)
+	Warn(msg string, args ...any)
+	Error(msg string, args ...any)
+	Fatal(msg string, args ...any)
 
 	// Context logging
-	DebugContext(ctx context.Context, msg string, args ...interface{})
-	InfoContext(ctx context.Context, msg string, args ...interface{})
-	WarnContext(ctx context.Context, msg string, args ...interface{})
-	ErrorContext(ctx context.Context, msg string, args ...interface{})
+	DebugContext(ctx context.Context, msg string, args ...any)
+	InfoContext(ctx context.Context, msg string, args ...any)
+	WarnContext(ctx context.Context, msg string, args ...any)
+	ErrorContext(ctx context.Context, msg string, args ...any)
 
 	// Structured logging
-	WithField(key string, value interface{}) Logger
-	WithFields(fields map[string]interface{}) Logger
+	WithField(key string, value any) Logger
+	WithFields(fields map[string]any) Logger
 	WithError(err error) Logger
 }
 
@@ -202,12 +202,12 @@ const (
 )
 
 type TemplateVariable struct {
-	Name         string      `json:"name"`
-	Type         string      `json:"type"`
-	Description  string      `json:"description"`
-	Required     bool        `json:"required"`
-	DefaultValue interface{} `json:"default_value,omitempty"`
-	Options      []string    `json:"options,omitempty"`
+	Name         string   `json:"name"`
+	Type         string   `json:"type"`
+	Description  string   `json:"description"`
+	Required     bool     `json:"required"`
+	DefaultValue any      `json:"default_value,omitempty"`
+	Options      []string `json:"options,omitempty"`
 }
 
 type ValidationRules struct {
@@ -443,8 +443,8 @@ type ProgressTracker interface {
 
 // Configuration store interface
 type ConfigurationStore interface {
-	Save(ctx context.Context, key string, value interface{}) error
-	Load(ctx context.Context, key string, value interface{}) (bool, error)
+	Save(ctx context.Context, key string, value any) error
+	Load(ctx context.Context, key string, value any) (bool, error)
 	Delete(ctx context.Context, key string) error
-	List(ctx context.Context, pattern string) (map[string]interface{}, error)
+	List(ctx context.Context, pattern string) (map[string]any, error)
 }

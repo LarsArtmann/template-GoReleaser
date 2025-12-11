@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 )
 
@@ -120,11 +121,8 @@ func GetRecommendedTriggers(projectType ProjectType) []ActionTrigger {
 	recommended := []ActionTrigger{}
 	for _, trigger := range GetAllActionTriggers() {
 		meta := actionTriggerMetaMap[trigger]
-		for _, recommendedType := range meta.recommendedFor {
-			if recommendedType == projectType {
-				recommended = append(recommended, trigger)
-				break
-			}
+		if slices.Contains(meta.recommendedFor, projectType) {
+			recommended = append(recommended, trigger)
 		}
 	}
 	return recommended

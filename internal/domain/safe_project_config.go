@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/LarsArtmann/template-GoReleaser/internal/validation"
@@ -337,13 +338,7 @@ func (cs ConfigState) AllowsTransitionTo(newState ConfigState) bool {
 		ConfigStateGenerated:  {}, // Final state - no transitions allowed
 	}
 
-	for _, allowed := range allowedTransitions[cs] {
-		if allowed == newState {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(allowedTransitions[cs], newState)
 }
 
 // Legacy compatibility methods - DEPRECATED but kept for migration

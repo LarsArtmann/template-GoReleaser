@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"slices"
 )
 
 // Platform represents supported target platforms
@@ -146,13 +147,7 @@ func ValidatePlatformArchCompatibility(platforms []Platform, architectures []Arc
 	for _, platform := range platforms {
 		platformArchs := platform.Architectures()
 		for _, arch := range architectures {
-			compatible := false
-			for _, platformArch := range platformArchs {
-				if arch == platformArch {
-					compatible = true
-					break
-				}
-			}
+			compatible := slices.Contains(platformArchs, arch)
 			if !compatible {
 				return fmt.Errorf("architecture %s is not supported on platform %s", arch, platform)
 			}

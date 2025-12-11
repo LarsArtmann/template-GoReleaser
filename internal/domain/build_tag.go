@@ -2,6 +2,7 @@ package domain
 
 import (
 	"fmt"
+	"slices"
 )
 
 // BuildTag represents build tags for conditional compilation
@@ -125,11 +126,8 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 		// Keep tags that are platform-specific and compatible, or general tags
 		isPlatformSpecific := false
 		for _, pt := range GetAllPlatforms() {
-			for _, ptTag := range platformTags[pt] {
-				if tag.Name == ptTag {
-					isPlatformSpecific = true
-					break
-				}
+			if slices.Contains(platformTags[pt], tag.Name) {
+				isPlatformSpecific = true
 			}
 			if isPlatformSpecific {
 				break
@@ -137,13 +135,7 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 		}
 
 		// Check if compatible
-		compatible := false
-		for _, ct := range compatibleTags {
-			if tag.Name == ct {
-				compatible = true
-				break
-			}
-		}
+		compatible := slices.Contains(compatibleTags, tag.Name)
 
 		// Keep general tags or compatible platform-specific tags
 		if !isPlatformSpecific || compatible {
@@ -164,10 +156,5 @@ func CreateBuildTag(name, description string) BuildTag {
 
 // contains checks if slice contains string
 func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }

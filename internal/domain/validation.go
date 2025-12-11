@@ -310,8 +310,8 @@ func (vu *ValidationUseCase) parseGoMod(ctx context.Context, goModPath string, i
 
 	// Simple parsing for module name
 	content := string(data)
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		if strings.HasPrefix(strings.TrimSpace(line), "module ") {
 			parts := strings.Fields(line)
 			if len(parts) >= 2 {
