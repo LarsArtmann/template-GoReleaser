@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/kaptinlin/messageformat-go/pkg/logger"
@@ -319,8 +319,6 @@ var initCmd = &cobra.Command{
 		fmt.Println("Initializing GoReleaser configuration...")
 	},
 }
-
-
 
 var generateCmd = &cobra.Command{
 	Use:   "generate",

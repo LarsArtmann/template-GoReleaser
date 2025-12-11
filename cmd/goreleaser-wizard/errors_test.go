@@ -165,7 +165,7 @@ func TestGetSuggestionForError(t *testing.T) {
 		{
 			name:     "template_error",
 			err:      NewWizardError(ErrTemplateExecution, "Template failed", "Details", "", nil),
-			expected: "This might be a bug. Please report it at https://github.com/LarsArtmann/template-GoReleaser/issues",
+			expected: "This might be a bug. Please report it at https://github.com/LarsArtmann/GoReleaser-Wizard/issues",
 		},
 		{
 			name:     "invalid_error",

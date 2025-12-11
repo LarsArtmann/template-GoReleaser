@@ -22,7 +22,7 @@ Stop copy-pasting configs. Stop guessing at YAML. Get a production-ready GoRelea
 
 ```bash
 # Install
-go install github.com/LarsArtmann/template-GoReleaser/cmd/goreleaser-wizard@latest
+go install github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest
 
 # Run the wizard
 goreleaser-wizard init
@@ -64,20 +64,20 @@ Let's create the perfect GoReleaser config for your project!
 ### Using Go
 
 ```bash
-go install github.com/LarsArtmann/template-GoReleaser/cmd/goreleaser-wizard@latest
+go install github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest
 ```
 
 ### From Source
 
 ```bash
-git clone https://github.com/LarsArtmann/template-GoReleaser.git
-cd template-GoReleaser
+git clone https://github.com/LarsArtmann/GoReleaser-Wizard.git
+cd GoReleaser-Wizard
 go build -o goreleaser-wizard ./cmd/goreleaser-wizard
 ```
 
 ### Download Binary
 
-Download the latest release from the [releases page](https://github.com/LarsArtmann/template-GoReleaser/releases).
+Download the latest release from the [releases page](https://github.com/LarsArtmann/GoReleaser-Wizard/releases).
 
 ## 📖 Usage
 
@@ -254,7 +254,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [GoReleaser Documentation](https://goreleaser.com)
 - [GitHub Actions](https://docs.github.com/en/actions)
-- [Report Issues](https://github.com/LarsArtmann/template-GoReleaser/issues)
+- [Report Issues](https://github.com/LarsArtmann/GoReleaser-Wizard/issues)
 
 ---
 

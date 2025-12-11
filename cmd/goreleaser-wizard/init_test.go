@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -182,31 +183,31 @@ func TestFormValidation(t *testing.T) {
 		{
 			name:     "valid_project_name",
 			input:    "my-awesome-project",
-			function: validateProjectName,
+			function: validation.ValidateProjectName,
 			wantErr:  false,
 		},
 		{
 			name:     "invalid_empty_project_name",
 			input:    "",
-			function: validateProjectName,
+			function: validation.ValidateProjectName,
 			wantErr:  true,
 		},
 		{
 			name:     "invalid_project_name_too_long",
 			input:    strings.Repeat("a", 65),
-			function: validateProjectName,
+			function: validation.ValidateProjectName,
 			wantErr:  true,
 		},
 		{
 			name:     "valid_binary_name",
 			input:    "my-app",
-			function: validateBinaryName,
+			function: validation.ValidateBinaryName,
 			wantErr:  false,
 		},
 		{
 			name:     "invalid_binary_name_with_spaces",
 			input:    "my app",
-			function: validateBinaryName,
+			function: validation.ValidateBinaryName,
 			wantErr:  true,
 		},
 	}
@@ -325,23 +326,4 @@ func TestFlagHandling(t *testing.T) {
 	}
 }
 
-// Mock validation functions (would normally be in the main code)
-func validateProjectName(name string) error {
-	if len(name) == 0 {
-		return UserInputError("project name", os.ErrInvalid)
-	}
-	if len(name) > 63 {
-		return UserInputError("project name", os.ErrInvalid)
-	}
-	return nil
-}
 
-func validateBinaryName(name string) error {
-	if len(name) == 0 {
-		return UserInputError("binary name", os.ErrInvalid)
-	}
-	if strings.Contains(name, " ") {
-		return UserInputError("binary name", os.ErrInvalid)
-	}
-	return nil
-}

@@ -7,7 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"github.com/LarsArtmann/template-GoReleaser/internal/domain"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/log"
 )
 
