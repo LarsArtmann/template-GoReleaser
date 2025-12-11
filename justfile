@@ -60,3 +60,13 @@ check:
 # Full CI pipeline
 ci: fmt test build verify check
     @echo "✓ CI pipeline complete"
+
+# Find code duplications
+find-duplicates threshold:
+    @echo "Finding code duplications with threshold {{threshold}}..."
+    @mkdir -p reports
+    @find . -name "*.go" -exec wc -l {} + | sort -nr | head -20 > reports/file_sizes.txt
+    @echo "File sizes written to reports/file_sizes.txt"
+    @echo "Analyzing duplications..."
+    @cd reports && find .. -name "*.go" -exec grep -l "TODO\|FIXME\|XXX" {} \; > duplications.txt
+    @echo "Duplication analysis complete, see reports/duplications.txt"

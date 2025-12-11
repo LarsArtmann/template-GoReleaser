@@ -53,37 +53,37 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Initialize dependencies (in real implementation, this would be injected)
 	fileSystemRepo = &SimpleFileSystemRepository{}
-	validationUseCase = domain.NewValidationUseCase(logger, fileSystemRepo)
+	validationUseCase = domain.NewValidationUseCase(appLogger, fileSystemRepo)
 
 	// Collect validation results
 	results := &ValidationResults{}
 
 	if !projectOnly {
 		// Validate GoReleaser configuration
-		if err := validateGoReleaserConfig(&results); err != nil {
+		if err := validateGoReleaserConfig(results); err != nil {
 			displayError(err)
 			return
 		}
 
 		// Validate GitHub Actions workflow
-		if err := validateGitHubActions(&results); err != nil {
+		if err := validateGitHubActions(results); err != nil {
 			displayError(err)
 			return
 		}
 	}
 
 	// Validate project structure
-	if err := validateProjectStructure(&results); err != nil {
+	if err := validateProjectStructure(results); err != nil {
 		displayError(err)
 		return
 	}
 
 	// Display results
-	displayValidationResults(&results, verbose)
+	displayValidationResults(results, verbose)
 
 	// Attempt fixes if requested
 	if fix && len(results.Errors) > 0 {
-		if err := attemptFixes(&results); err != nil {
+		if err := attemptFixes(results); err != nil {
 			displayError(err)
 			return
 		}

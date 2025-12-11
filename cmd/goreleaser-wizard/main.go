@@ -89,9 +89,6 @@ var appLogger domain.Logger
 // Style definitions
 var titleStyle, successStyle, errorStyle, infoStyle lipgloss.Style
 
-// Initialize logger dependency
-var appLogger domain.Logger
-
 func init() {
 	// Create a logger adapter to satisfy domain.Logger interface
 	appLogger = &LoggerAdapter{logger: log.New(os.Stderr)}
@@ -323,13 +320,7 @@ var initCmd = &cobra.Command{
 	},
 }
 
-var validateCmd = &cobra.Command{
-	Use:   "validate",
-	Short: "Validate GoReleaser configuration",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Validating GoReleaser configuration...")
-	},
-}
+
 
 var generateCmd = &cobra.Command{
 	Use:   "generate",
