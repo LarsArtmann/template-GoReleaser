@@ -227,7 +227,7 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 
 		// Validate the config file exists and is readable using domain types
-		if err := validateFileExists(cfgFile, true); err != nil {
+		if err := validateFileExists(cfgFile, false); err != nil {
 			displayError(err)
 			return
 		}
@@ -244,9 +244,10 @@ func initConfig() {
 			return
 		}
 
-		// Search config in home directory with name ".goreleaser-wizard" (without extension).
+		// Search config in home directory with name ".goreleaser-wizard" (with .yaml extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(".goreleaser-wizard")
+		viper.SetConfigType("yaml")
 	}
 
 	viper.SetEnvPrefix("GORELEASER_WIZARD")

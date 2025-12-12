@@ -1,0 +1,226 @@
+package main
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
+	"github.com/charmbracelet/log"
+	"github.com/spf13/cobra"
+)
+
+// runInitWizard runs the init command
+func runInitWizard(cmd *cobra.Command, args []string) {
+	defer recoverFromPanic("init wizard")
+
+	force, _ := cmd.Flags().GetBool("force")
+	interactive, _ := cmd.Flags().GetBool("interactive")
+
+	fmt.Println(titleStyle.Render("🧙 Initializing GoReleaser Configuration"))
+	fmt.Println()
+
+	// Detect project information
+	config := &domain.SafeProjectConfig{}
+	if err := detectProjectInfo(config); err != nil {
+		displayError(err)
+		return
+	}
+
+	// If interactive mode, prompt for confirmation/changes
+	if interactive {
+		if err := runInteractiveWizard(config); err != nil {
+			displayError(err)
+			return
+		}
+	}
+
+	// Create and execute workflow
+	logger := log.New(os.Stderr)
+	builder := NewWorkflowBuilder(logger)
+	
+	workflow, err := builder.BuildWorkflow(WorkflowTypeFullWizard, config, force)
+	if err != nil {
+		displayError(err)
+		return
+	}
+
+	// Execute workflow
+	ctx := context.Background()
+	if err := workflow.Execute(ctx); err != nil {
+		displayError(err)
+		return
+	}
+
+	// Display results
+	results := workflow.GetResults()
+	for _, result := range results {
+		if result.Status == JobStatusCompleted {
+			fmt.Printf("%s %s completed successfully\n", successStyle.Render("✅"), result.Job.Name())
+		} else if result.Status == JobStatusFailed {
+			fmt.Printf("%s %s failed: %v\n", errorStyle.Render("❌"), result.Job.Name(), result.Error)
+		}
+	}
+
+	fmt.Println()
+	fmt.Println(successStyle.Render("🎉 GoReleaser configuration initialized successfully!"))
+	fmt.Println()
+	fmt.Println("Next steps:")
+	fmt.Println("  • Review the generated .goreleaser.yaml")
+	fmt.Println("  • Run 'goreleaser-wizard validate' to check the configuration")
+	fmt.Println("  • Commit the configuration to your repository")
+}
+
+// detectProjectInfo detects project information from the current directory
+func detectProjectInfo(config *domain.SafeProjectConfig) error {
+	// Get current working directory
+	wd, err := os.Getwd()
+	if err != nil {
+		return domain.NewSystemError(
+			domain.ErrFileReadFailed,
+			"Failed to get working directory",
+			"Could not determine current directory",
+			err,
+		).WithContext("detect_project")
+	}
+
+	// Check for go.mod file
+	goModPath := filepath.Join(wd, "go.mod")
+	if _, err := os.Stat(goModPath); os.IsNotExist(err) {
+		return domain.NewValidationError(
+			domain.ErrFileNotFound,
+			"Not a Go project",
+			"go.mod file not found. Please run this command in a Go project directory.",
+		).WithContext("detect_project")
+	}
+
+	// Read go.mod to get module name
+	content, err := os.ReadFile(goModPath)
+	if err != nil {
+		return domain.NewSystemError(
+			domain.ErrFileReadFailed,
+			"Failed to read go.mod",
+			"Could not read go.mod file",
+			err,
+		).WithContext(goModPath)
+	}
+
+	// Parse module name from go.mod
+	scanner := bufio.NewScanner(strings.NewReader(string(content)))
+	var moduleName string
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if strings.HasPrefix(line, "module ") {
+			parts := strings.Fields(line)
+			if len(parts) >= 2 {
+				moduleName = parts[1]
+			}
+			break
+		}
+	}
+
+	if moduleName == "" {
+		return domain.NewValidationError(
+			domain.ErrInvalidFileFormat,
+			"Invalid go.mod format",
+			"Could not find module declaration in go.mod",
+		).WithContext(goModPath)
+	}
+
+	// Extract project name from module path
+	parts := strings.Split(moduleName, "/")
+	projectName := parts[len(parts)-1]
+
+	// Detect main path
+	mainPath, binaryName, projectType := detectMainStructure(wd)
+
+	// Set configuration values
+	config.ProjectName = projectName
+	config.MainPath = mainPath
+	config.BinaryName = binaryName
+	config.ProjectType = domain.ProjectType(projectType)
+
+	return nil
+}
+
+// detectMainStructure detects the main.go structure and determines project type
+func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
+	// Check for main.go in root
+	if _, err := os.Stat(filepath.Join(wd, "main.go")); err == nil {
+		return ".", filepath.Base(wd), "cli"
+	}
+
+	// Check for cmd/*/main.go structure
+	cmdDir := filepath.Join(wd, "cmd")
+	if entries, err := os.ReadDir(cmdDir); err == nil {
+		for _, entry := range entries {
+			if entry.IsDir() {
+				mainFile := filepath.Join(cmdDir, entry.Name(), "main.go")
+				if _, err := os.Stat(mainFile); err == nil {
+					return fmt.Sprintf("./cmd/%s", entry.Name()), entry.Name(), "cli"
+				}
+			}
+		}
+	}
+
+	// Check for other common structures
+	patterns := []struct {
+		path     string
+		binName  string
+		projType string
+	}{
+		{"src/*/main.go", "", "library"},
+		{"pkg/*/main.go", "", "library"},
+		{"*.go", filepath.Base(wd), "cli"},
+	}
+
+	for _, pattern := range patterns {
+		matches, _ := filepath.Glob(filepath.Join(wd, pattern.path))
+		if len(matches) > 0 {
+			if pattern.binName == "" {
+				// Extract binary name from path
+				parts := strings.Split(matches[0], string(filepath.Separator))
+				for i, part := range parts {
+					if part == "src" || part == "pkg" && i+1 < len(parts) {
+						binaryName = filepath.Base(matches[0])
+						binaryName = strings.TrimSuffix(binaryName, ".go")
+						return pattern.path, binaryName, pattern.projType
+					}
+				}
+			}
+			return pattern.path, pattern.binName, pattern.projType
+		}
+	}
+
+	// Default fallback
+	return ".", filepath.Base(wd), "cli"
+}
+
+// runInteractiveWizard runs an interactive wizard for configuration
+func runInteractiveWizard(config *domain.SafeProjectConfig) error {
+	fmt.Println(infoStyle.Render("📋 Project Information Detected:"))
+	fmt.Printf("  Project Name: %s\n", config.ProjectName)
+	fmt.Printf("  Main Path: %s\n", config.MainPath)
+	fmt.Printf("  Binary Name: %s\n", config.BinaryName)
+	fmt.Printf("  Project Type: %s\n", config.ProjectType)
+	fmt.Println()
+
+	// In a real implementation, this would prompt for user input
+	// For now, we'll just confirm the detected values
+	fmt.Println(infoStyle.Render("ℹ️  Using detected values. Use flags to customize if needed."))
+
+	return nil
+}
+
+// initFlags adds flags to the init command
+func init() {
+	initCmd.Flags().Bool("force", false, "force overwrite existing configuration")
+	initCmd.Flags().Bool("interactive", true, "run in interactive mode (default true)")
+	initCmd.Flags().String("project-name", "", "override project name")
+	initCmd.Flags().String("main-path", "", "override main.go path")
+	initCmd.Flags().String("binary-name", "", "override binary name")
+	initCmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
+}

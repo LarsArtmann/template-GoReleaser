@@ -1,11 +1,13 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"text/template"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/log"
@@ -13,15 +15,118 @@ import (
 
 // generateGoReleaserConfig generates GoReleaser configuration from SafeProjectConfig
 func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
-	// TODO: Implement actual configuration generation
-	fmt.Printf("Generating GoReleaser config for project: %s\n", config.ProjectName)
+	// Check if config is ready
+	if !config.IsReadyForGeneration() {
+		return fmt.Errorf("configuration is not ready for generation")
+	}
+
+	// Try multiple template locations
+	templatePaths := []string{
+		filepath.Join("templates", "goreleaser.yaml.tmpl"),
+		filepath.Join("..", "templates", "goreleaser.yaml.tmpl"),
+		filepath.Join(os.Getenv("GOROOT"), "src", "github.com", "LarsArtmann", "GoReleaser-Wizard", "templates", "goreleaser.yaml.tmpl"),
+	}
+
+	var templateContent []byte
+	for _, path := range templatePaths {
+		if _, err := os.Stat(path); err == nil {
+			templateContent, err = os.ReadFile(path)
+			if err == nil {
+				break
+			}
+		}
+	}
+
+	if templateContent == nil {
+		return fmt.Errorf("failed to find GoReleaser template in any location")
+	}
+
+	// Create template
+	tmpl, err := template.New("goreleaser").Parse(string(templateContent))
+	if err != nil {
+		return fmt.Errorf("failed to parse GoReleaser template: %w", err)
+	}
+
+	// Prepare template data
+	data := prepareGoReleaserData(config)
+
+	// Generate output
+	var output bytes.Buffer
+	if err := tmpl.Execute(&output, data); err != nil {
+		return fmt.Errorf("failed to execute GoReleaser template: %w", err)
+	}
+
+	// Create backup if file exists
+	if _, err := os.Stat(".goreleaser.yaml"); err == nil {
+		backupPath := ".goreleaser.yaml.backup"
+		if err := os.Rename(".goreleaser.yaml", backupPath); err != nil {
+			return fmt.Errorf("failed to create backup: %w", err)
+		}
+	}
+
+	// Write generated file
+	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0644); err != nil {
+		return fmt.Errorf("failed to write GoReleaser config: %w", err)
+	}
+
 	return nil
 }
 
 // generateGitHubActions generates GitHub Actions workflow from SafeProjectConfig
 func generateGitHubActions(config *domain.SafeProjectConfig) error {
-	// TODO: Implement actual GitHub Actions generation
-	fmt.Printf("Generating GitHub Actions for project: %s\n", config.ProjectName)
+	// Check if GitHub Actions generation is enabled
+	if !config.ShouldGenerateActionsFiles() {
+		return fmt.Errorf("GitHub Actions generation is not enabled")
+	}
+
+	// Try multiple template locations
+	templatePaths := []string{
+		filepath.Join("templates", "github-actions.yml.tmpl"),
+		filepath.Join("..", "templates", "github-actions.yml.tmpl"),
+		filepath.Join(os.Getenv("GOROOT"), "src", "github.com", "LarsArtmann", "GoReleaser-Wizard", "templates", "github-actions.yml.tmpl"),
+	}
+
+	var templateContent []byte
+	for _, path := range templatePaths {
+		if _, err := os.Stat(path); err == nil {
+			templateContent, err = os.ReadFile(path)
+			if err == nil {
+				break
+			}
+		}
+	}
+
+	if templateContent == nil {
+		return fmt.Errorf("failed to find GitHub Actions template in any location")
+	}
+
+	// Create template
+	tmpl, err := template.New("github-actions").Parse(string(templateContent))
+	if err != nil {
+		return fmt.Errorf("failed to parse GitHub Actions template: %w", err)
+	}
+
+	// Prepare template data
+	data := prepareGitHubActionsData(config)
+
+	// Generate output
+	var output bytes.Buffer
+	if err := tmpl.Execute(&output, data); err != nil {
+		return fmt.Errorf("failed to execute GitHub Actions template: %w", err)
+	}
+
+	// Ensure .github/workflows directory exists
+	workflowDir := filepath.Join(".github", "workflows")
+	if err := os.MkdirAll(workflowDir, 0755); err != nil {
+		return fmt.Errorf("failed to create workflow directory: %w", err)
+	}
+
+	// Write generated file
+	workflowPath := filepath.Join(workflowDir, "release.yml")
+	if err := os.WriteFile(workflowPath, output.Bytes(), 0644); err != nil {
+		return fmt.Errorf("failed to write GitHub Actions workflow: %w", err)
+	}
+
 	return nil
 }
 
@@ -346,35 +451,120 @@ func NewJobFactory(logger *log.Logger) *JobFactory {
 func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []Job {
 	var jobs []Job
 
+	// Convert to domain.SafeProjectConfig since ProjectConfig is an alias
+	safeConfig := (*domain.SafeProjectConfig)(config)
+
 	// Add project validation job
 	jobs = append(jobs, NewProjectValidationJob(".", jf.logger))
 
 	// Add dependency check job
 	dependencies := []string{"go"}
-	if config.GetDockerEnabled() {
+	if safeConfig.GetDockerEnabled() {
 		dependencies = append(dependencies, "docker")
 	}
-	if config.GetSigning() {
+	if safeConfig.GetSigning() {
 		dependencies = append(dependencies, "cosign")
 	}
 	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
 
 	// Add config generation job
-	jobs = append(jobs, NewConfigGenerationJob(config, force, jf.logger))
+	jobs = append(jobs, NewConfigGenerationJob(safeConfig, force, jf.logger))
 
 	// Add GitHub Actions generation job
-	if config.GetGenerateActions() {
-		jobs = append(jobs, NewGitHubActionsGenerationJob(config, jf.logger))
+	if safeConfig.GetGenerateActions() {
+		jobs = append(jobs, NewGitHubActionsGenerationJob(safeConfig, jf.logger))
 	}
 
 	return jobs
 }
 
+// prepareGoReleaserData prepares template data for GoReleaser configuration
+func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]interface{} {
+	data := map[string]interface{}{
+		"ProjectName":    config.ProjectName,
+		"BinaryName":     config.BinaryName,
+		"MainPath":       config.MainPath,
+		"CGOEnabled":     config.CGOStatus.String(),
+		"DockerEnabled":  config.DockerSupport.IsEnabled(),
+		"SigningEnabled": config.SigningLevel.IsEnabled(),
+	}
+
+	// Convert platforms
+	if len(config.Platforms) > 0 {
+		platforms := make([]string, len(config.Platforms))
+		for i, platform := range config.Platforms {
+			platforms[i] = platform.String()
+		}
+		data["Platforms"] = platforms
+	}
+
+	// Convert architectures
+	if len(config.Architectures) > 0 {
+		architectures := make([]string, len(config.Architectures))
+		for i, arch := range config.Architectures {
+			architectures[i] = arch.String()
+		}
+		data["Architectures"] = architectures
+	}
+
+	// Convert build tags
+	if len(config.BuildTags) > 0 {
+		tags := make([]string, len(config.BuildTags))
+		for i, tag := range config.BuildTags {
+			tags[i] = tag.String()
+		}
+		data["BuildTags"] = tags
+	}
+
+	// Add ignore combinations (common ones)
+	data["IgnoreCombinations"] = []map[string]string{
+		{"GoOS": "darwin", "GoArch": "386"},
+		{"GoOS": "windows", "GoArch": "arm64"},
+	}
+
+	// Add Docker configuration if enabled
+	if config.DockerSupport.IsEnabled() {
+		data["DockerRegistry"] = config.DockerRegistry.String()
+		data["DockerImage"] = config.GetDockerImageName()
+	}
+
+	return data
+}
+
+// prepareGitHubActionsData prepares template data for GitHub Actions workflow
+func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]interface{} {
+	data := map[string]interface{}{
+		"ProjectName":    config.ProjectName,
+		"DockerEnabled":  config.DockerSupport.IsEnabled(),
+		"SigningEnabled": config.SigningLevel.IsEnabled(),
+	}
+
+	// Convert action triggers
+	if len(config.ActionsOn) > 0 {
+		triggers := make([]string, len(config.ActionsOn))
+		for i, trigger := range config.ActionsOn {
+			triggers[i] = trigger.String()
+		}
+		data["Triggers"] = triggers
+	}
+
+	// Add Docker configuration if enabled
+	if config.DockerSupport.IsEnabled() {
+		data["DockerRegistry"] = config.DockerRegistry.String()
+		data["DockerImage"] = config.GetDockerImageName()
+	}
+
+	return data
+}
+
 // CreateConfigOnlyJobs creates jobs for config generation only
 func (jf *JobFactory) CreateConfigOnlyJobs(config *ProjectConfig, force bool) []Job {
+	// Convert to domain.SafeProjectConfig since ProjectConfig is an alias
+	safeConfig := (*domain.SafeProjectConfig)(config)
+	
 	return []Job{
 		NewProjectValidationJob(".", jf.logger),
-		NewConfigGenerationJob(config, force, jf.logger),
+		NewConfigGenerationJob(safeConfig, force, jf.logger),
 	}
 }
 
