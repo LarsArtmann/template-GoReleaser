@@ -8,6 +8,8 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // BenchmarkProjectDetection benchmarks project detection performance
@@ -61,19 +63,19 @@ go 1.21
 	config := &ProjectConfig{
 		ProjectName:        "config-benchmark",
 		ProjectDescription: "A benchmark test project",
-		ProjectType:        "CLI Application",
+		ProjectType:        domain.ProjectTypeCLI,
 		BinaryName:         "config-benchmark",
 		MainPath:           ".",
-		Platforms:          []string{"linux", "darwin", "windows"},
-		Architectures:      []string{"amd64", "arm64"},
-		CGOEnabled:         false,
-		GitProvider:        "GitHub",
-		DockerEnabled:      true,
-		DockerRegistry:     "ghcr.io/user",
-		Signing:            true,
+		Platforms:          []domain.Platform{"linux", "darwin", "windows"},
+		Architectures:      []domain.Architecture{"amd64", "arm64"},
+		CGOStatus:         domain.CGOStatusDisabled,
+		GitProvider:        domain.GitProviderGitHub,
+		DockerSupport:      domain.DockerSupportBoth,
+		DockerRegistry:     domain.DockerRegistryGitHub,
+		SigningLevel:       domain.SigningLevelBasic,
 		Homebrew:           true,
-		GenerateActions:    true,
-		ActionsOn:          []string{"On version tags (v*)"},
+		ActionLevel:        domain.ActionLevelBasic,
+		ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 	}
 
 	for b.Loop() {
@@ -106,10 +108,10 @@ go 1.21
 	config := &ProjectConfig{
 		ProjectName:     "actions-benchmark",
 		BinaryName:      "actions-benchmark",
-		GenerateActions: true,
-		DockerEnabled:   true,
-		Signing:         true,
-		ActionsOn:       []string{"On all tags"},
+		ActionLevel:     domain.ActionLevelBasic,
+		DockerSupport:   domain.DockerSupportBoth,
+		SigningLevel:    domain.SigningLevelBasic,
+		ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerAllTags},
 	}
 
 	for b.Loop() {
@@ -141,13 +143,13 @@ func BenchmarkFileOperations(b *testing.B) {
 		filename := fmt.Sprintf("benchmark-file-%d.txt", i)
 
 		// Test write operation
-		err := SafeFileWrite(filename, []byte(content), 0o644)
+		err := os.WriteFile(filename, []byte(content), 0o644)
 		if err != nil {
 			b.Fatalf("SafeFileWrite failed: %v", err)
 		}
 
 		// Test read operation
-		readContent, err := SafeReadFile(filename)
+		readContent, err := os.ReadFile(filename)
 		if err != nil {
 			b.Fatalf("SafeReadFile failed: %v", err)
 		}

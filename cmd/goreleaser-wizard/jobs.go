@@ -488,8 +488,8 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 }
 
 // prepareGoReleaserData prepares template data for GoReleaser configuration
-func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]interface{} {
-	data := map[string]interface{}{
+func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
+	data := map[string]any{
 		"ProjectName":    config.ProjectName,
 		"BinaryName":     config.BinaryName,
 		"MainPath":       config.MainPath,
@@ -541,8 +541,8 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]interfac
 }
 
 // prepareGitHubActionsData prepares template data for GitHub Actions workflow
-func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]interface{} {
-	data := map[string]interface{}{
+func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
+	data := map[string]any{
 		"ProjectName":    config.ProjectName,
 		"DockerEnabled":  config.DockerSupport.IsEnabled(),
 		"SigningEnabled": config.SigningLevel.IsEnabled(),

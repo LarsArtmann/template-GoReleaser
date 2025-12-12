@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 func TestEndToEndWizard(t *testing.T) {
@@ -75,8 +77,8 @@ require github.com/charmbracelet/bubbletea v0.25.0
 			}
 
 			// Test GitHub Actions generation
-			config.GenerateActions = true
-			config.ActionsOn = []string{"On version tags (v*)"}
+			config.ActionLevel = domain.ActionLevelBasic
+			config.ActionsOn = []domain.ActionTrigger{domain.ActionTriggerVersionTags}
 			err = generateGitHubActions(config)
 			if err != nil {
 				t.Errorf("generateGitHubActions() error = %v", err)
@@ -112,13 +114,13 @@ func TestConfigurationValidation(t *testing.T) {
 				ProjectDescription: "A test CLI application",
 				BinaryName:         "test-cli",
 				MainPath:           "./cmd/test-cli",
-				ProjectType:        "CLI Application",
-				Platforms:          []string{"linux", "darwin", "windows"},
-				Architectures:      []string{"amd64", "arm64"},
-				CGOEnabled:         false,
-				GitProvider:        "GitHub",
-				GenerateActions:    true,
-				ActionsOn:          []string{"On version tags (v*)"},
+				ProjectType:        domain.ProjectTypeCLI,
+				Platforms:          []domain.Platform{"linux", "darwin", "windows"},
+				Architectures:      []domain.Architecture{"amd64", "arm64"},
+				CGOStatus:         domain.CGOStatusDisabled,
+				GitProvider:        domain.GitProviderGitHub,
+				ActionLevel:        domain.ActionLevelBasic,
+				ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 			},
 			expectError: false,
 		},
@@ -129,13 +131,13 @@ func TestConfigurationValidation(t *testing.T) {
 				ProjectDescription: "A test web service",
 				BinaryName:         "test-web",
 				MainPath:           ".",
-				ProjectType:        "Web Service",
-				Platforms:          []string{"linux", "darwin"},
-				Architectures:      []string{"amd64"},
-				CGOEnabled:         true,
-				GitProvider:        "GitHub",
-				DockerEnabled:      true,
-				DockerRegistry:     "ghcr.io/user",
+				ProjectType:        domain.ProjectTypeWeb,
+				Platforms:          []domain.Platform{"linux", "darwin"},
+				Architectures:      []domain.Architecture{"amd64"},
+				CGOStatus:         domain.CGOStatusEnabled,
+				GitProvider:        domain.GitProviderGitHub,
+				DockerSupport:      domain.DockerSupportBoth,
+				DockerRegistry:     domain.DockerRegistryGitHub,
 				Homebrew:           true,
 			},
 			expectError: false,
@@ -226,24 +228,24 @@ func TestDifferentProjectTypes(t *testing.T) {
 			name:        "cli_application",
 			projectType: "CLI Application",
 			expectedConfig: ProjectConfig{
-				ProjectType: "CLI Application",
-				CGOEnabled:  false,
+				ProjectType: domain.ProjectTypeCLI,
+				CGOStatus:   domain.CGOStatusDisabled,
 			},
 		},
 		{
 			name:        "web_service",
 			projectType: "Web Service",
 			expectedConfig: ProjectConfig{
-				ProjectType: "Web Service",
-				CGOEnabled:  true,
+				ProjectType: domain.ProjectTypeWeb,
+				CGOStatus:   domain.CGOStatusEnabled,
 			},
 		},
 		{
 			name:        "library",
 			projectType: "Library",
 			expectedConfig: ProjectConfig{
-				ProjectType: "Library",
-				CGOEnabled:  false,
+				ProjectType: domain.ProjectTypeLibrary,
+				CGOStatus:   domain.CGOStatusDisabled,
 			},
 		},
 	}
@@ -271,16 +273,23 @@ go 1.21
 			detectProjectInfo(config)
 
 			// Override project type for testing
-			config.ProjectType = tt.projectType
-
-			// Apply project type-specific defaults
 			switch tt.projectType {
 			case "CLI Application":
-				config.CGOEnabled = false
+				config.ProjectType = domain.ProjectTypeCLI
 			case "Web Service":
-				config.CGOEnabled = true
+				config.ProjectType = domain.ProjectTypeWeb
 			case "Library":
-				config.CGOEnabled = false
+				config.ProjectType = domain.ProjectTypeLibrary
+			}
+
+			// Apply project type-specific defaults
+			switch config.ProjectType {
+			case domain.ProjectTypeCLI:
+				config.CGOStatus = domain.CGOStatusDisabled
+			case domain.ProjectTypeWeb:
+				config.CGOStatus = domain.CGOStatusEnabled
+			case domain.ProjectTypeLibrary:
+				config.CGOStatus = domain.CGOStatusDisabled
 			}
 
 			// Verify project type
@@ -289,8 +298,8 @@ go 1.21
 			}
 
 			// Verify CGO setting
-			if config.CGOEnabled != tt.expectedConfig.CGOEnabled {
-				t.Errorf("CGOEnabled = %v, want %v", config.CGOEnabled, tt.expectedConfig.CGOEnabled)
+			if config.CGOStatus != tt.expectedConfig.CGOStatus {
+				t.Errorf("CGOStatus = %v, want %v", config.CGOStatus, tt.expectedConfig.CGOStatus)
 			}
 
 			// Generate config to test

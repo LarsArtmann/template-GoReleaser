@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -138,7 +137,7 @@ project_name: test
 
 			// Run validation
 			func() {
-				defer HandlePanic("validate test", log.New(os.Stderr))
+				defer recoverFromPanic("validate test")
 				runValidate(cmd, tt.args)
 			}()
 		})
@@ -204,7 +203,7 @@ func TestCheckFileExists(t *testing.T) {
 				}()
 			}
 
-			err := CheckFileExists(tt.path, tt.requireDir)
+			err := validateFileExists(tt.path, tt.requireDir)
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CheckFileExists() error = %v, wantErr %v", err, tt.wantErr)
@@ -481,7 +480,7 @@ build:
 
 	// Run validation and check that it doesn't panic
 	func() {
-		defer HandlePanic("validate output test", log.New(os.Stderr))
+		defer recoverFromPanic("validate output test")
 		runValidate(cmd, []string{})
 	}()
 

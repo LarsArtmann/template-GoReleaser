@@ -23,47 +23,47 @@ type LoggerAdapter struct {
 	logger *log.Logger
 }
 
-func (la *LoggerAdapter) Debug(msg string, args ...interface{}) {
+func (la *LoggerAdapter) Debug(msg string, args ...any) {
 	la.logger.Debug(msg, args...)
 }
 
-func (la *LoggerAdapter) Info(msg string, args ...interface{}) {
+func (la *LoggerAdapter) Info(msg string, args ...any) {
 	la.logger.Info(msg, args...)
 }
 
-func (la *LoggerAdapter) Warn(msg string, args ...interface{}) {
+func (la *LoggerAdapter) Warn(msg string, args ...any) {
 	la.logger.Warn(msg, args...)
 }
 
-func (la *LoggerAdapter) Error(msg string, args ...interface{}) {
+func (la *LoggerAdapter) Error(msg string, args ...any) {
 	la.logger.Error(msg, args...)
 }
 
-func (la *LoggerAdapter) Fatal(msg string, args ...interface{}) {
+func (la *LoggerAdapter) Fatal(msg string, args ...any) {
 	la.logger.Fatal(msg, args...)
 }
 
-func (la *LoggerAdapter) DebugContext(ctx context.Context, msg string, args ...interface{}) {
+func (la *LoggerAdapter) DebugContext(ctx context.Context, msg string, args ...any) {
 	la.logger.Debug(msg, args...)
 }
 
-func (la *LoggerAdapter) InfoContext(ctx context.Context, msg string, args ...interface{}) {
+func (la *LoggerAdapter) InfoContext(ctx context.Context, msg string, args ...any) {
 	la.logger.Info(msg, args...)
 }
 
-func (la *LoggerAdapter) WarnContext(ctx context.Context, msg string, args ...interface{}) {
+func (la *LoggerAdapter) WarnContext(ctx context.Context, msg string, args ...any) {
 	la.logger.Warn(msg, args...)
 }
 
-func (la *LoggerAdapter) ErrorContext(ctx context.Context, msg string, args ...interface{}) {
+func (la *LoggerAdapter) ErrorContext(ctx context.Context, msg string, args ...any) {
 	la.logger.Error(msg, args...)
 }
 
-func (la *LoggerAdapter) WithField(key string, value interface{}) domain.Logger {
+func (la *LoggerAdapter) WithField(key string, value any) domain.Logger {
 	return la // Simplified - doesn't add field
 }
 
-func (la *LoggerAdapter) WithFields(fields map[string]interface{}) domain.Logger {
+func (la *LoggerAdapter) WithFields(fields map[string]any) domain.Logger {
 	return la // Simplified - doesn't add fields
 }
 

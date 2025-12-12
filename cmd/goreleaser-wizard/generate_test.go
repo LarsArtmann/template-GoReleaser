@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 func TestGenerateGoReleaserConfig(t *testing.T) {
@@ -21,10 +23,10 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				ProjectDescription: "A test application",
 				BinaryName:         "test-app",
 				MainPath:           ".",
-				Platforms:          []string{"linux", "darwin"},
-				Architectures:      []string{"amd64", "arm64"},
-				CGOEnabled:         false,
-				GitProvider:        "GitHub",
+				Platforms:          []domain.Platform{"linux", "darwin"},
+				Architectures:      []domain.Architecture{"amd64", "arm64"},
+				CGOStatus:         domain.CGOStatusDisabled,
+				GitProvider:        domain.GitProviderGitHub,
 			},
 			wantErr: false,
 			checks: []string{
@@ -45,9 +47,9 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				ProjectName:    "docker-app",
 				BinaryName:     "docker-app",
 				MainPath:       "./cmd/app",
-				DockerEnabled:  true,
-				DockerRegistry: "ghcr.io/testuser",
-				GitProvider:    "GitHub",
+				DockerSupport:  domain.DockerSupportBoth,
+				DockerRegistry: domain.DockerRegistryGitHub,
+				GitProvider:    domain.GitProviderGitHub,
 			},
 			wantErr: false,
 			checks: []string{
@@ -60,11 +62,11 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 		{
 			name: "signing_enabled",
 			config: ProjectConfig{
-				ProjectName: "signed-app",
-				BinaryName:  "signed-app",
-				MainPath:    ".",
-				Signing:     true,
-				GitProvider: "GitHub",
+				ProjectName:  "signed-app",
+				BinaryName:   "signed-app",
+				MainPath:     ".",
+				SigningLevel: domain.SigningLevelBasic,
+				GitProvider:  domain.GitProviderGitHub,
 			},
 			wantErr: false,
 			checks: []string{
@@ -177,8 +179,8 @@ func TestGenerateGitHubActions(t *testing.T) {
 			config: ProjectConfig{
 				ProjectName:     "test-app",
 				BinaryName:      "test-app",
-				GenerateActions: true,
-				ActionsOn:       []string{"On version tags (v*)"},
+				ActionLevel:     domain.ActionLevelBasic,
+				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 			},
 			wantErr: false,
 			checks: []string{
@@ -195,10 +197,10 @@ func TestGenerateGitHubActions(t *testing.T) {
 			name: "docker_support",
 			config: ProjectConfig{
 				ProjectName:     "docker-app",
-				DockerEnabled:   true,
-				DockerRegistry:  "ghcr.io/user",
-				GenerateActions: true,
-				ActionsOn:       []string{"Manual trigger only"},
+				DockerSupport:   domain.DockerSupportBoth,
+				DockerRegistry:  domain.DockerRegistryGitHub,
+				ActionLevel:     domain.ActionLevelBasic,
+				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerManual},
 			},
 			wantErr: false,
 			checks: []string{
@@ -211,9 +213,9 @@ func TestGenerateGitHubActions(t *testing.T) {
 			name: "signing_support",
 			config: ProjectConfig{
 				ProjectName:     "signed-app",
-				Signing:         true,
-				GenerateActions: true,
-				ActionsOn:       []string{"On all tags"},
+				SigningLevel:    domain.SigningLevelBasic,
+				ActionLevel:     domain.ActionLevelBasic,
+				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerAllTags},
 			},
 			wantErr: false,
 			checks: []string{

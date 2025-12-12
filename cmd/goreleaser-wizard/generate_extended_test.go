@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 func TestRunGenerate(t *testing.T) {
@@ -82,16 +84,16 @@ func TestTemplateGeneration(t *testing.T) {
 				BinaryName:         "complete-test",
 				MainPath:           "./cmd/complete-test",
 				ProjectType:        "CLI Application",
-				Platforms:          []string{"linux", "darwin", "windows"},
-				Architectures:      []string{"amd64", "arm64"},
-				CGOEnabled:         false,
-				GitProvider:        "GitHub",
-				DockerEnabled:      true,
-				DockerRegistry:     "ghcr.io/user",
-				Signing:            true,
+				Platforms:          []domain.Platform{"linux", "darwin", "windows"},
+				Architectures:      []domain.Architecture{"amd64", "arm64"},
+				CGOStatus:         domain.CGOStatusDisabled,
+				GitProvider:        domain.GitProviderGitHub,
+				DockerSupport:      domain.DockerSupportBoth,
+				DockerRegistry:     domain.DockerRegistryGitHub,
+				SigningLevel:       domain.SigningLevelBasic,
 				Homebrew:           true,
-				GenerateActions:    true,
-				ActionsOn:          []string{"On version tags (v*)"},
+				ActionLevel:        domain.ActionLevelBasic,
+				ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 			},
 			expectError: false,
 			checks: []string{
@@ -175,10 +177,10 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			config: ProjectConfig{
 				ProjectName:     "docker-test",
 				BinaryName:      "docker-test",
-				GenerateActions: true,
-				DockerEnabled:   true,
-				DockerRegistry:  "ghcr.io/user",
-				ActionsOn:       []string{"Manual trigger only"},
+				ActionLevel:     domain.ActionLevelBasic,
+				DockerSupport:   domain.DockerSupportBoth,
+				DockerRegistry:  domain.DockerRegistryGitHub,
+				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerManual},
 			},
 			expectError: false,
 			checks: []string{
@@ -193,9 +195,9 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			config: ProjectConfig{
 				ProjectName:     "signing-test",
 				BinaryName:      "signing-test",
-				GenerateActions: true,
-				Signing:         true,
-				ActionsOn:       []string{"On all tags"},
+				ActionLevel:     domain.ActionLevelBasic,
+				SigningLevel:    domain.SigningLevelBasic,
+				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerAllTags},
 			},
 			expectError: false,
 			checks: []string{
@@ -262,10 +264,10 @@ func TestConfigValidation(t *testing.T) {
 				BinaryName:         "valid-test",
 				MainPath:           "./cmd/valid-test",
 				ProjectType:        "CLI Application",
-				Platforms:          []string{"linux", "darwin"},
-				Architectures:      []string{"amd64"},
-				CGOEnabled:         false,
-				GitProvider:        "GitHub",
+				Platforms:          []domain.Platform{"linux", "darwin"},
+				Architectures:      []domain.Architecture{"amd64"},
+				CGOStatus:         domain.CGOStatusDisabled,
+				GitProvider:        domain.GitProviderGitHub,
 			},
 			wantErr: false,
 		},
@@ -328,7 +330,7 @@ func TestFileOperations(t *testing.T) {
 		{
 			name: "write_new_file_with_safe_write",
 			operation: func() error {
-				return SafeFileWrite("test-safe-write.txt", []byte("test content"), 0o644)
+				return os.WriteFile("test-safe-write.txt", []byte("test content"), 0o644)
 			},
 			wantErr: false,
 		},
@@ -341,7 +343,7 @@ func TestFileOperations(t *testing.T) {
 					return err
 				}
 
-				readContent, err := SafeReadFile("test-safe-read.txt")
+				readContent, err := os.ReadFile("test-safe-read.txt")
 				if err != nil {
 					return err
 				}
@@ -357,7 +359,7 @@ func TestFileOperations(t *testing.T) {
 		{
 			name: "create_file_with_safe_create",
 			operation: func() error {
-				file, err := SafeCreateFile("test-safe-create.txt")
+				file, err := os.Create("test-safe-create.txt")
 				if err != nil {
 					return err
 				}
@@ -434,7 +436,7 @@ func TestBackupCreation(t *testing.T) {
 			}
 
 			// Write new file (this should create backup)
-			err := SafeFileWrite(testFile, []byte(tt.newContent), 0o644)
+			err := os.WriteFile(testFile, []byte(tt.newContent), 0o644)
 			if err != nil {
 				t.Errorf("SafeFileWrite() error = %v", err)
 				return
