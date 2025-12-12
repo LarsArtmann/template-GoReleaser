@@ -196,7 +196,7 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 			return v + "-next"
 		},
 	})
-	
+
 	tmpl, err := tmpl.Parse(templateContent)
 	if err != nil {
 		return fmt.Errorf("failed to parse GoReleaser template: %w", err)
@@ -242,7 +242,7 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 
 	// Create template (no special functions needed for GitHub Actions)
 	tmpl := template.New("github-actions")
-	
+
 	tmpl, err := tmpl.Parse(templateContent)
 	if err != nil {
 		return fmt.Errorf("failed to parse GitHub Actions template: %w", err)
@@ -636,7 +636,7 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 	// Get version info
 	version := getVersion()
-	
+
 	data := map[string]any{
 		"ProjectName":    config.ProjectName,
 		"BinaryName":     config.BinaryName,
@@ -649,13 +649,13 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		"CGOEnabled":     config.CGOStatus.String(),
 		"DockerEnabled":  config.DockerSupport.IsEnabled(),
 		"SigningEnabled": config.SigningLevel.IsEnabled(),
-		
+
 		// Environment variables for GitHub integration
 		"Env": map[string]string{
 			"GITHUB_OWNER": getGitHubOwner(),
 			"GITHUB_REPO":  getGitHubRepo(),
 		},
-		
+
 		// Platform/Arch combinations for archive naming
 		"Os":   "{{.Os}}",   // This gets replaced in the template loop
 		"Arch": "{{.Arch}}", // This gets replaced in the template loop
@@ -757,12 +757,12 @@ func getVersion() string {
 			}
 		}
 	}
-	
+
 	// Fallback to version from build-time variable
 	if version != "dev" {
 		return version
 	}
-	
+
 	// Final fallback
 	return "v0.1.0"
 }

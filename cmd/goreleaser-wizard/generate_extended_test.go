@@ -86,7 +86,7 @@ func TestTemplateGeneration(t *testing.T) {
 				ProjectType:        "CLI Application",
 				Platforms:          []domain.Platform{"linux", "darwin", "windows"},
 				Architectures:      []domain.Architecture{"amd64", "arm64"},
-				CGOStatus:         domain.CGOStatusDisabled,
+				CGOStatus:          domain.CGOStatusDisabled,
 				GitProvider:        domain.GitProviderGitHub,
 				DockerSupport:      domain.DockerSupportBoth,
 				DockerRegistry:     domain.DockerRegistryGitHub,
@@ -175,12 +175,12 @@ func TestGitHubActionsGeneration(t *testing.T) {
 		{
 			name: "actions_with_docker",
 			config: ProjectConfig{
-				ProjectName:     "docker-test",
-				BinaryName:      "docker-test",
-				ActionLevel:     domain.ActionLevelBasic,
-				DockerSupport:   domain.DockerSupportBoth,
-				DockerRegistry:  domain.DockerRegistryGitHub,
-				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerManual},
+				ProjectName:    "docker-test",
+				BinaryName:     "docker-test",
+				ActionLevel:    domain.ActionLevelBasic,
+				DockerSupport:  domain.DockerSupportBoth,
+				DockerRegistry: domain.DockerRegistryGitHub,
+				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerManual},
 			},
 			expectError: false,
 			checks: []string{
@@ -193,11 +193,11 @@ func TestGitHubActionsGeneration(t *testing.T) {
 		{
 			name: "actions_with_signing",
 			config: ProjectConfig{
-				ProjectName:     "signing-test",
-				BinaryName:      "signing-test",
-				ActionLevel:     domain.ActionLevelBasic,
-				SigningLevel:    domain.SigningLevelBasic,
-				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerAllTags},
+				ProjectName:  "signing-test",
+				BinaryName:   "signing-test",
+				ActionLevel:  domain.ActionLevelBasic,
+				SigningLevel: domain.SigningLevelBasic,
+				ActionsOn:    []domain.ActionTrigger{domain.ActionTriggerAllTags},
 			},
 			expectError: false,
 			checks: []string{
@@ -266,7 +266,7 @@ func TestConfigValidation(t *testing.T) {
 				ProjectType:        "CLI Application",
 				Platforms:          []domain.Platform{"linux", "darwin"},
 				Architectures:      []domain.Architecture{"amd64"},
-				CGOStatus:         domain.CGOStatusDisabled,
+				CGOStatus:          domain.CGOStatusDisabled,
 				GitProvider:        domain.GitProviderGitHub,
 			},
 			wantErr: false,

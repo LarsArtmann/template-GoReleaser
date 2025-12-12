@@ -68,7 +68,7 @@ go 1.21
 		MainPath:           ".",
 		Platforms:          []domain.Platform{"linux", "darwin", "windows"},
 		Architectures:      []domain.Architecture{"amd64", "arm64"},
-		CGOStatus:         domain.CGOStatusDisabled,
+		CGOStatus:          domain.CGOStatusDisabled,
 		GitProvider:        domain.GitProviderGitHub,
 		DockerSupport:      domain.DockerSupportBoth,
 		DockerRegistry:     domain.DockerRegistryGitHub,
@@ -106,12 +106,12 @@ go 1.21
 	os.Chdir(tmpDir)
 
 	config := &ProjectConfig{
-		ProjectName:     "actions-benchmark",
-		BinaryName:      "actions-benchmark",
-		ActionLevel:     domain.ActionLevelBasic,
-		DockerSupport:   domain.DockerSupportBoth,
-		SigningLevel:    domain.SigningLevelBasic,
-		ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerAllTags},
+		ProjectName:   "actions-benchmark",
+		BinaryName:    "actions-benchmark",
+		ActionLevel:   domain.ActionLevelBasic,
+		DockerSupport: domain.DockerSupportBoth,
+		SigningLevel:  domain.SigningLevelBasic,
+		ActionsOn:     []domain.ActionTrigger{domain.ActionTriggerAllTags},
 	}
 
 	for b.Loop() {

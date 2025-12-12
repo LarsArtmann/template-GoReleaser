@@ -25,7 +25,7 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				MainPath:           ".",
 				Platforms:          []domain.Platform{"linux", "darwin"},
 				Architectures:      []domain.Architecture{"amd64", "arm64"},
-				CGOStatus:         domain.CGOStatusDisabled,
+				CGOStatus:          domain.CGOStatusDisabled,
 				GitProvider:        domain.GitProviderGitHub,
 			},
 			wantErr: false,
@@ -177,10 +177,10 @@ func TestGenerateGitHubActions(t *testing.T) {
 		{
 			name: "basic_actions",
 			config: ProjectConfig{
-				ProjectName:     "test-app",
-				BinaryName:      "test-app",
-				ActionLevel:     domain.ActionLevelBasic,
-				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+				ProjectName: "test-app",
+				BinaryName:  "test-app",
+				ActionLevel: domain.ActionLevelBasic,
+				ActionsOn:   []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 			},
 			wantErr: false,
 			checks: []string{
@@ -196,11 +196,11 @@ func TestGenerateGitHubActions(t *testing.T) {
 		{
 			name: "docker_support",
 			config: ProjectConfig{
-				ProjectName:     "docker-app",
-				DockerSupport:   domain.DockerSupportBoth,
-				DockerRegistry:  domain.DockerRegistryGitHub,
-				ActionLevel:     domain.ActionLevelBasic,
-				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerManual},
+				ProjectName:    "docker-app",
+				DockerSupport:  domain.DockerSupportBoth,
+				DockerRegistry: domain.DockerRegistryGitHub,
+				ActionLevel:    domain.ActionLevelBasic,
+				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerManual},
 			},
 			wantErr: false,
 			checks: []string{
@@ -212,10 +212,10 @@ func TestGenerateGitHubActions(t *testing.T) {
 		{
 			name: "signing_support",
 			config: ProjectConfig{
-				ProjectName:     "signed-app",
-				SigningLevel:    domain.SigningLevelBasic,
-				ActionLevel:     domain.ActionLevelBasic,
-				ActionsOn:       []domain.ActionTrigger{domain.ActionTriggerAllTags},
+				ProjectName:  "signed-app",
+				SigningLevel: domain.SigningLevelBasic,
+				ActionLevel:  domain.ActionLevelBasic,
+				ActionsOn:    []domain.ActionTrigger{domain.ActionTriggerAllTags},
 			},
 			wantErr: false,
 			checks: []string{
