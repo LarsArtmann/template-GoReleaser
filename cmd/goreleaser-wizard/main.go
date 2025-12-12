@@ -325,6 +325,13 @@ var generateCmd = &cobra.Command{
 	Run:   runGenerate,
 }
 
+// HandleError provides a simple error handling function for tests and CLI usage
+func HandleError(err error) {
+	if err != nil {
+		displayError(err)
+	}
+}
+
 func main() {
 	// Set up global panic recovery
 	defer recoverFromPanic("main")
