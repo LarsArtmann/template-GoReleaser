@@ -40,13 +40,7 @@ builds:
 
 archives:
   - id: default
-    name_template: >-
-      {{.ProjectName}}_
-      {{.Version}}_
-      {{title .Os}}_
-      {{if eq .Arch "amd64"}}x86_64
-      {{else if eq .Arch "386"}}i386
-      {{else}}{{.Arch}}{{end}}
+    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}"
     
     format_overrides:
       - goos: windows
@@ -87,19 +81,12 @@ release:
   footer: |
     ## Installation
     Download the appropriate archive for your platform from the assets below.
-    
-    ### Quick Install
-    ```bash
-    # macOS/Linux
-    curl -sfL https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/download/{{.Tag}}/{{.ProjectName}}_{{.Version}}_{{title .Os}}_{{.Arch}}.tar.gz | tar -xz
-    
-    # Windows (PowerShell)
-    Invoke-WebRequest -Uri "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/download/{{.Tag}}/{{.ProjectName}}_{{.Version}}_Windows_x86_64.zip" -OutFile "{{.ProjectName}}.zip"
-    ```
+
 {{if .DockerEnabled}}
 dockers:
   - image_templates:
       - "{{.DockerRegistry}}/{{.DockerImage}}:{{.Tag}}"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:v{{.Major}}"
       - "{{.DockerRegistry}}/{{.DockerImage}}:latest"
     
     dockerfile: Dockerfile
@@ -110,16 +97,5 @@ dockers:
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
-{{end}}{{if .SigningEnabled}}
-signs:
-  - cmd: cosign
-    certificate: '${artifact}.pem'
-    args:
-      - sign-blob
-      - '--oidc-issuer=https://token.actions.githubusercontent.com'
-      - '--output-certificate=${certificate}'
-      - '--output-signature=${signature}'
-      - '${artifact}'
-    artifacts: all
-    output: true
+      - "--platform=linux/amd64"
 {{end}}

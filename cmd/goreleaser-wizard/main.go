@@ -316,17 +316,13 @@ var versionCmd = &cobra.Command{
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize GoReleaser configuration",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Initializing GoReleaser configuration...")
-	},
+	Run:   runInitWizard,
 }
 
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate GoReleaser configuration",
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Generating GoReleaser configuration...")
-	},
+	Run:   runGenerate,
 }
 
 func main() {

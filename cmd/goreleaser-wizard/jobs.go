@@ -15,10 +15,7 @@ import (
 
 // generateGoReleaserConfig generates GoReleaser configuration from SafeProjectConfig
 func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
-	// Check if config is ready
-	if !config.IsReadyForGeneration() {
-		return fmt.Errorf("configuration is not ready for generation")
-	}
+	// Generate configuration (state is managed by ConfigGenerationJob)
 
 	// Try multiple template locations
 	templatePaths := []string{
@@ -164,23 +161,35 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 		return ctx.Err()
 	}
 
+	// Transition to Processing state
+	j.config.State = domain.ConfigStateProcessing
+	
 	// Validate config
 	if j.config.ProjectName == "" {
+		j.config.State = domain.ConfigStateInvalid
 		return fmt.Errorf("project name is required")
 	}
 
 	// Check existing files
 	if !j.force {
 		if _, err := os.Stat(".goreleaser.yaml"); err == nil {
+			j.config.State = domain.ConfigStateDraft
 			return fmt.Errorf(".goreleaser.yaml already exists (use --force to overwrite)")
 		}
 	}
 
+	// Apply defaults to ensure config is complete
+	j.config.ApplyDefaults()
+
 	// Generate configuration
 	err := generateGoReleaserConfig(j.config)
 	if err != nil {
+		j.config.State = domain.ConfigStateInvalid
 		return fmt.Errorf("failed to generate GoReleaser config: %w", err)
 	}
+
+	// Transition to Generated state
+	j.config.State = domain.ConfigStateGenerated
 
 	j.logger.Info("GoReleaser configuration generated successfully")
 	return nil
