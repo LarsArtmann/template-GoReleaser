@@ -325,5 +325,3 @@ func TestFlagHandling(t *testing.T) {
 		})
 	}
 }
-
-

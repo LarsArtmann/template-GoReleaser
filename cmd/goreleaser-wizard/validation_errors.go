@@ -27,7 +27,7 @@ func (de *DomainError) Unwrap() error {
 }
 
 // NewValidationError creates a validation domain error
-func NewValidationError(code string, message string, details string) *DomainError {
+func NewValidationError(code, message, details string) *DomainError {
 	return &DomainError{
 		Code:    code,
 		Message: message,
@@ -36,7 +36,7 @@ func NewValidationError(code string, message string, details string) *DomainErro
 }
 
 // NewSystemError creates a system domain error
-func NewSystemError(code string, message string, details string, cause error) *DomainError {
+func NewSystemError(code, message, details string, cause error) *DomainError {
 	return &DomainError{
 		Code:    code,
 		Message: message,
@@ -46,7 +46,7 @@ func NewSystemError(code string, message string, details string, cause error) *D
 }
 
 // NewTemplateError creates a template domain error
-func NewTemplateError(code string, message string, details string) *DomainError {
+func NewTemplateError(code, message, details string) *DomainError {
 	return &DomainError{
 		Code:    code,
 		Message: message,

@@ -62,11 +62,11 @@ const (
 	ErrTemplateSyntaxError     ErrorCode = "TEMPLATE_SYNTAX_ERROR"
 
 	// Configuration Errors
-	ErrInvalidConfiguration ErrorCode = "INVALID_CONFIGURATION"
-	ErrInvalidFileFormat   ErrorCode = "INVALID_FILE_FORMAT"
+	ErrInvalidConfiguration    ErrorCode = "INVALID_CONFIGURATION"
+	ErrInvalidFileFormat       ErrorCode = "INVALID_FILE_FORMAT"
 	ErrInvalidProjectStructure ErrorCode = "INVALID_PROJECT_STRUCTURE"
-	ErrMissingDependency  ErrorCode = "MISSING_DEPENDENCY"
-	ErrExternalToolNotFound ErrorCode = "EXTERNAL_TOOL_NOT_FOUND"
+	ErrMissingDependency       ErrorCode = "MISSING_DEPENDENCY"
+	ErrExternalToolNotFound    ErrorCode = "EXTERNAL_TOOL_NOT_FOUND"
 
 	// External Service Errors
 	ErrGitOperationFailed   ErrorCode = "GIT_OPERATION_FAILED"
