@@ -51,7 +51,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 
 	logger := log.New(os.Stderr)
 	builder := NewWorkflowBuilder(logger)
-	
+
 	workflow, err := builder.BuildWorkflow(workflowType, config, force)
 	if err != nil {
 		displayError(err)

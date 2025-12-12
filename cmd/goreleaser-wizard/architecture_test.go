@@ -298,7 +298,7 @@ go 1.21
 		MainPath:           ".",
 		Platforms:          []domain.Platform{domain.PlatformLinux, domain.PlatformDarwin},
 		Architectures:      []domain.Architecture{domain.ArchitectureAMD64},
-		CGOStatus:         domain.CGOStatusDisabled,
+		CGOStatus:          domain.CGOStatusDisabled,
 		GitProvider:        domain.GitProviderGitHub,
 		ActionLevel:        domain.ActionLevelBasic,
 		ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},

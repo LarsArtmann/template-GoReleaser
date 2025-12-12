@@ -62,7 +62,7 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 	}
 
 	// Write generated file
-	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0o644); err != nil {
 		return fmt.Errorf("failed to write GoReleaser config: %w", err)
 	}
 
@@ -114,13 +114,13 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 
 	// Ensure .github/workflows directory exists
 	workflowDir := filepath.Join(".github", "workflows")
-	if err := os.MkdirAll(workflowDir, 0755); err != nil {
+	if err := os.MkdirAll(workflowDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create workflow directory: %w", err)
 	}
 
 	// Write generated file
 	workflowPath := filepath.Join(workflowDir, "release.yml")
-	if err := os.WriteFile(workflowPath, output.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(workflowPath, output.Bytes(), 0o644); err != nil {
 		return fmt.Errorf("failed to write GitHub Actions workflow: %w", err)
 	}
 
@@ -163,7 +163,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 
 	// Transition to Processing state
 	j.config.State = domain.ConfigStateProcessing
-	
+
 	// Validate config
 	if j.config.ProjectName == "" {
 		j.config.State = domain.ConfigStateInvalid
@@ -570,7 +570,7 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]inter
 func (jf *JobFactory) CreateConfigOnlyJobs(config *ProjectConfig, force bool) []Job {
 	// Convert to domain.SafeProjectConfig since ProjectConfig is an alias
 	safeConfig := (*domain.SafeProjectConfig)(config)
-	
+
 	return []Job{
 		NewProjectValidationJob(".", jf.logger),
 		NewConfigGenerationJob(safeConfig, force, jf.logger),

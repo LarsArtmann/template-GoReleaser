@@ -41,7 +41,7 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	// Create and execute workflow
 	logger := log.New(os.Stderr)
 	builder := NewWorkflowBuilder(logger)
-	
+
 	workflow, err := builder.BuildWorkflow(WorkflowTypeFullWizard, config, force)
 	if err != nil {
 		displayError(err)
