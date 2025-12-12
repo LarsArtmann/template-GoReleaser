@@ -1,2 +1,1 @@
-../cmd/goreleaser-wizard/jobs.go
 ../cmd/goreleaser-wizard/main.go

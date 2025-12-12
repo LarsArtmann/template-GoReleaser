@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 )
@@ -23,7 +24,7 @@ func TestWizardError(t *testing.T) {
 	}{
 		{
 			name:       "basic_wizard_error",
-			errType:    ErrConfigExists,
+			errType:    domain.NewValidationError(domain.ErrInvalidProjectName, "Config already exists", ".goreleaser.yaml found").WithCause(os.ErrExist),
 			message:    "Config already exists",
 			details:    ".goreleaser.yaml found",
 			suggestion: "Use --force to overwrite",
@@ -32,7 +33,7 @@ func TestWizardError(t *testing.T) {
 		},
 		{
 			name:       "minimal_error",
-			errType:    ErrInvalidInput,
+			errType:    domain.NewValidationError(domain.ErrInvalidProjectName, "Invalid input", ""),
 			message:    "Invalid input",
 			details:    "",
 			suggestion: "",
@@ -43,14 +44,11 @@ func TestWizardError(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			wizErr := NewWizardError(tt.errType, tt.message, tt.details, tt.suggestion, tt.err)
-
-			if wizErr.Error() != tt.want {
-				t.Errorf("WizardError.Error() = %q, want %q", wizErr.Error(), tt.want)
+			if tt.errType != nil {
+				if tt.errType.Error() != tt.want {
+					t.Errorf("DomainError.Error() = %q, want %q", tt.errType.Error(), tt.want)
+				}
 			}
-
-			if wizErr.Type != tt.errType {
-				t.Errorf("WizardError.Type = %v, want %v", wizErr.Type, tt.errType)
 			}
 
 			if wizErr.Message != tt.message {
@@ -86,13 +84,13 @@ func TestHandleError(t *testing.T) {
 		},
 		{
 			name:       "wizard_error_with_details",
-			err:        NewWizardError(ErrConfigExists, "Config exists", "Details here", "Use --force", os.ErrExist),
+			err:        domain.NewSystemError(domain.ErrFileWriteFailed, "Config exists", "Details here", os.ErrExist),
 			logger:     nil,
 			wantOutput: "❌ Error: Config exists\nDetails: Details here\n💡 Suggestion: Use --force",
 		},
 		{
 			name:       "wizard_error_minimal",
-			err:        NewWizardError(ErrInvalidInput, "Invalid input", "", "", nil),
+			err:        domain.NewValidationError(domain.ErrInvalidProjectName, "Invalid input", ""),
 			logger:     nil,
 			wantOutput: "❌ Error: Invalid input",
 		},

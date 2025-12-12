@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/log"
 )
 
@@ -295,12 +296,12 @@ go 1.21
 		ProjectType:        "CLI Application",
 		BinaryName:         "builder-test",
 		MainPath:           ".",
-		Platforms:          []string{"linux", "darwin"},
-		Architectures:      []string{"amd64"},
-		CGOEnabled:         false,
-		GitProvider:        "GitHub",
-		GenerateActions:    true,
-		ActionsOn:          []string{"On version tags (v*)"},
+		Platforms:          []domain.Platform{domain.PlatformLinux, domain.PlatformDarwin},
+		Architectures:      []domain.Architecture{domain.ArchitectureAMD64},
+		CGOStatus:         domain.CGOStatusDisabled,
+		GitProvider:        domain.GitProviderGitHub,
+		ActionLevel:        domain.ActionLevelBasic,
+		ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 	}
 
 	tests := []struct {
