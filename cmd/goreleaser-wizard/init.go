@@ -30,6 +30,9 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	// Apply defaults to ensure complete configuration
+	config.ApplyDefaults()
+
 	// If interactive mode, prompt for confirmation/changes
 	if interactive {
 		if err := runInteractiveWizard(config); err != nil {

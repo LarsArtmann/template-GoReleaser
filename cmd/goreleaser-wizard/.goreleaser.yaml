@@ -4,7 +4,7 @@
 
 version: 2
 
-project_name: test-github-actions
+project_name: concurrent-test-1
 
 before:
   hooks:
@@ -13,21 +13,16 @@ before:
     - go test ./...
 
 builds:
-  - id: GoReleaser-Wizard
+  - id: wizard-concurrent-12891869995
     main: .
-    binary: GoReleaser-Wizard
+    binary: wizard-concurrent-12891869995
     
     env:
       - CGO_ENABLED=
     
     goos:
-      - linux
-      - darwin
-      - windows
 
     goarch:
-      - amd64
-      - arm64
 
 
     # Ignore certain platform combinations
@@ -41,7 +36,7 @@ builds:
 
 archives:
   - id: default
-    name_template: "test-github-actions_81d04b0-dirty_{{.Os}}_{{.Arch}}"
+    name_template: "concurrent-test-1_v0.1.0_{{.Os}}_{{.Arch}}"
     
     format_overrides:
       - goos: windows
@@ -57,7 +52,7 @@ checksum:
   algorithm: sha256
 
 snapshot:
-  version_template: "81d04b0-dirty-next-next"
+  version_template: "v0.1.1-next-next"
 
 changelog:
   sort: asc
@@ -72,8 +67,8 @@ changelog:
 
 release:
   github:
-    owner: "LarsArtmann"
-    name: "GoReleaser-Wizard"
+    owner: "owner"
+    name: "repo"
   
   draft: false
   prerelease: auto
@@ -86,17 +81,17 @@ release:
 
 dockers:
   - image_templates:
-      - "GitHub Container Registry/test-github-actions:81d04b0-dirty"
-      - "GitHub Container Registry/test-github-actions:v81d04b0-dirty"
-      - "GitHub Container Registry/test-github-actions:latest"
+      - "/concurrent-test-1:v0.1.0"
+      - "/concurrent-test-1:v0"
+      - "/concurrent-test-1:latest"
     
     dockerfile: Dockerfile
     
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created=2025-12-13"
-      - "--label=org.opencontainers.image.title=test-github-actions"
-      - "--label=org.opencontainers.image.revision=81d04b0becd20783ad978d57cc1aee7f9242b0c8"
-      - "--label=org.opencontainers.image.version=81d04b0-dirty"
+      - "--label=org.opencontainers.image.title=concurrent-test-1"
+      - "--label=org.opencontainers.image.revision=unknown"
+      - "--label=org.opencontainers.image.version=v0.1.0"
       - "--platform=linux/amd64"
 

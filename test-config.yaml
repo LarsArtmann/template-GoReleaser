@@ -1,0 +1,7 @@
+project_name: "test-github-actions"
+binary_name: "test-github-actions"
+main_path: "./main.go"
+project_type: "CLI Application"
+action_level: "basic"
+actions_on: ["version-tags"]
+git_provider: "GitHub"

@@ -37,8 +37,8 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				"- amd64",
 				"- arm64",
 				"CGO_ENABLED=0",
-				`owner: "owner"`,  // Template renders to actual value
-				`name: "repo"`,     // Template renders to actual value
+				`owner: "owner"`, // Template renders to actual value
+				`name: "repo"`,   // Template renders to actual value
 			},
 		},
 		{

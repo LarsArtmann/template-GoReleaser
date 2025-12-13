@@ -122,8 +122,8 @@ dockers:
 const githubActionsTemplateContent = `name: Release
 
 on:
-{{range .Triggers}}  {{.}}
-{{end}}
+[[range .Triggers]]  [[.]]
+[[end]]
 
 permissions:
   contents: write
@@ -144,17 +144,17 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache: true
-{{if .DockerEnabled}}
+[[if .DockerEnabled]]
       - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
-          registry: {{.DockerRegistry}}
-          username: ${{ "{{ secrets.DOCKER_USERNAME }}" }}
-          password: ${{ "{{ secrets.DOCKER_PASSWORD }}" }}
-{{end}}{{if .SigningEnabled}}
+          registry: [[.DockerRegistry]]
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+[[end]][[if .SigningEnabled]]
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
-{{end}}
+[[end]]
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
@@ -240,8 +240,8 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 		return fmt.Errorf("embedded GitHub Actions template is empty")
 	}
 
-	// Create template (no special functions needed for GitHub Actions)
-	tmpl := template.New("github-actions")
+	// Create template with custom delimiters to avoid GitHub Actions syntax conflict
+	tmpl := template.New("github-actions").Delims("[[", "]]")
 
 	tmpl, err := tmpl.Parse(templateContent)
 	if err != nil {
@@ -639,15 +639,15 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 	version := getVersion()
 
 	data := map[string]any{
-		"ProjectName":    config.ProjectName,
-		"BinaryName":     config.BinaryName,
-		"MainPath":       config.MainPath,
-		"Version":        version,
-		"Tag":            version,
-		"Major":          getMajorVersion(version),
-		"Date":           getCurrentDate(),
-		"FullCommit":     getCommitHash(),
-		"CGOEnabled":     map[domain.CGOStatus]string{
+		"ProjectName": config.ProjectName,
+		"BinaryName":  config.BinaryName,
+		"MainPath":    config.MainPath,
+		"Version":     version,
+		"Tag":         version,
+		"Major":       getMajorVersion(version),
+		"Date":        getCurrentDate(),
+		"FullCommit":  getCommitHash(),
+		"CGOEnabled": map[domain.CGOStatus]string{
 			domain.CGOStatusDisabled: "0",
 			domain.CGOStatusEnabled:  "1",
 			domain.CGOStatusRequired: "1",
@@ -716,11 +716,11 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 		"SigningEnabled": config.SigningLevel.IsEnabled(),
 	}
 
-	// Convert action triggers
+	// Convert action triggers to GitHub patterns
 	if len(config.ActionsOn) > 0 {
 		triggers := make([]string, len(config.ActionsOn))
 		for i, trigger := range config.ActionsOn {
-			triggers[i] = trigger.String()
+			triggers[i] = trigger.GitHubPattern()
 		}
 		data["Triggers"] = triggers
 	}

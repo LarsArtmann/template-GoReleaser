@@ -96,7 +96,7 @@ func (spc *SafeProjectConfig) ApplyDefaults() {
 	}
 
 	// Apply action level defaults
-	if spc.ActionLevel == ActionLevelNone && spc.GitProvider.ActionsSupported() {
+	if (spc.ActionLevel == ActionLevelNone || spc.ActionLevel == "") && spc.GitProvider.ActionsSupported() {
 		spc.ActionLevel = ActionLevelBasic
 		if spc.ActionsOn == nil || len(spc.ActionsOn) == 0 {
 			spc.ActionsOn = GetRecommendedTriggers(spc.ProjectType)

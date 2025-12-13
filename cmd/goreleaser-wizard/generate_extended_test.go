@@ -220,8 +220,12 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
+			// Apply defaults to ensure config is complete
+			config := (*domain.SafeProjectConfig)(&tt.config)
+			config.ApplyDefaults()
+
 			// Generate actions
-			err := generateGitHubActions(&tt.config)
+			err := generateGitHubActions(config)
 
 			// Check error
 			if (err != nil) != tt.expectError {
