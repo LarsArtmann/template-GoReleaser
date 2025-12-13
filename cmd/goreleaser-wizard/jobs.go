@@ -149,8 +149,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: {{.DockerRegistry}}
-          username: ${{secrets.DOCKER_USERNAME}}
-          password: ${{secrets.DOCKER_PASSWORD}}
+          username: ${{ "{{ secrets.DOCKER_USERNAME }}" }}
+          password: ${{ "{{ secrets.DOCKER_PASSWORD }}" }}
 {{end}}{{if .SigningEnabled}}
       - name: Install Cosign
         uses: sigstore/cosign-installer@v3
@@ -161,9 +161,9 @@ jobs:
           version: latest
           args: release --clean
         env:
-          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-          GITHUB_OWNER: ${{github.repository_owner}}
-          GITHUB_REPO: ${{github.event.repository.name}}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_OWNER: ${{ github.repository_owner }}
+          GITHUB_REPO: ${{ github.event.repository.name }}
 `
 
 // generateGoReleaserConfig generates GoReleaser configuration from SafeProjectConfig
@@ -616,7 +616,8 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 	if safeConfig.GetDockerEnabled() {
 		dependencies = append(dependencies, "docker")
 	}
-	if safeConfig.GetSigning() {
+	// Only require cosign for advanced signing levels (basic can work without installation)
+	if safeConfig.SigningLevel == domain.SigningLevelAdvanced || safeConfig.SigningLevel == domain.SigningLevelEnterprise {
 		dependencies = append(dependencies, "cosign")
 	}
 	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
@@ -646,7 +647,11 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		"Major":          getMajorVersion(version),
 		"Date":           getCurrentDate(),
 		"FullCommit":     getCommitHash(),
-		"CGOEnabled":     config.CGOStatus.String(),
+		"CGOEnabled":     map[domain.CGOStatus]string{
+			domain.CGOStatusDisabled: "0",
+			domain.CGOStatusEnabled:  "1",
+			domain.CGOStatusRequired: "1",
+		}[config.CGOStatus],
 		"DockerEnabled":  config.DockerSupport.IsEnabled(),
 		"SigningEnabled": config.SigningLevel.IsEnabled(),
 
@@ -665,7 +670,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 	if len(config.Platforms) > 0 {
 		platforms := make([]string, len(config.Platforms))
 		for i, platform := range config.Platforms {
-			platforms[i] = platform.String()
+			platforms[i] = string(platform) // Use raw constant value
 		}
 		data["Platforms"] = platforms
 	}
@@ -674,7 +679,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 	if len(config.Architectures) > 0 {
 		architectures := make([]string, len(config.Architectures))
 		for i, arch := range config.Architectures {
-			architectures[i] = arch.String()
+			architectures[i] = string(arch) // Use raw constant value
 		}
 		data["Architectures"] = architectures
 	}

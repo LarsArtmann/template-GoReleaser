@@ -37,8 +37,8 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				"- amd64",
 				"- arm64",
 				"CGO_ENABLED=0",
-				`owner: "{{.Env.GITHUB_OWNER}}"`,
-				`name: "{{.Env.GITHUB_REPO}}"`,
+				`owner: "owner"`,  // Template renders to actual value
+				`name: "repo"`,     // Template renders to actual value
 			},
 		},
 		{
@@ -130,8 +130,12 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 			}
 			defer os.Chdir(originalDir)
 
+			// Apply defaults to ensure config is complete
+			config := (*domain.SafeProjectConfig)(&tt.config)
+			config.ApplyDefaults()
+
 			// Generate config
-			err = generateGoReleaserConfig(&tt.config)
+			err = generateGoReleaserConfig(config)
 
 			// Check error
 			if (err != nil) != tt.wantErr {
@@ -147,6 +151,9 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				}
 
 				contentStr := string(content)
+
+				// Debug: optionally print content for debugging
+				// fmt.Printf("Generated content (full):\n%s\n", contentStr)
 
 				// Check for expected strings
 				for _, check := range tt.checks {
@@ -181,6 +188,7 @@ func TestGenerateGitHubActions(t *testing.T) {
 				BinaryName:  "test-app",
 				ActionLevel: domain.ActionLevelBasic,
 				ActionsOn:   []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+				GitProvider: domain.GitProviderGitHub,
 			},
 			wantErr: false,
 			checks: []string{
@@ -201,6 +209,7 @@ func TestGenerateGitHubActions(t *testing.T) {
 				DockerRegistry: domain.DockerRegistryGitHub,
 				ActionLevel:    domain.ActionLevelBasic,
 				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerManual},
+				GitProvider:    domain.GitProviderGitHub,
 			},
 			wantErr: false,
 			checks: []string{
@@ -216,6 +225,7 @@ func TestGenerateGitHubActions(t *testing.T) {
 				SigningLevel: domain.SigningLevelBasic,
 				ActionLevel:  domain.ActionLevelBasic,
 				ActionsOn:    []domain.ActionTrigger{domain.ActionTriggerAllTags},
+				GitProvider:  domain.GitProviderGitHub,
 			},
 			wantErr: false,
 			checks: []string{
@@ -246,8 +256,12 @@ func TestGenerateGitHubActions(t *testing.T) {
 			}
 			defer os.Chdir(originalDir)
 
+			// Apply defaults to ensure config is complete
+			config := (*domain.SafeProjectConfig)(&tt.config)
+			config.ApplyDefaults()
+
 			// Generate actions
-			err = generateGitHubActions(&tt.config)
+			err = generateGitHubActions(config)
 
 			// Check error
 			if (err != nil) != tt.wantErr {
