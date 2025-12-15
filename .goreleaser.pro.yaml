@@ -18,40 +18,40 @@ before:
 builds:
   - id: main
     main: ./cmd/{{.ProjectName}}
-    binary: '{{.ProjectName}}'
-    
+    binary: "{{.ProjectName}}"
+
     flags:
       - -trimpath
       - -v
-    
+
     ldflags:
       - -s -w
       - -X main.version={{.Version}}
       - -X main.commit={{.Commit}}
       - -X main.date={{.Date}}
       - -X main.builtBy=goreleaser-pro
-    
+
     env:
       - CGO_ENABLED=0
-    
+
     goos:
       - linux
       - darwin
       - windows
       - freebsd
       - openbsd
-    
+
     goarch:
       - amd64
       - arm64
       - arm
       - 386
       - riscv64
-    
+
     goarm:
       - "6"
       - "7"
-    
+
     ignore:
       - goos: darwin
         goarch: 386
@@ -59,9 +59,9 @@ builds:
         goarch: arm
       - goos: windows
         goarch: arm
-    
-    mod_timestamp: '{{ .CommitTimestamp }}'
-    
+
+    mod_timestamp: "{{ .CommitTimestamp }}"
+
     tags:
       - netgo
       - osusergo
@@ -71,7 +71,7 @@ universal_binaries:
   - id: main
     ids:
       - main
-    name_template: '{{.ProjectName}}'
+    name_template: "{{.ProjectName}}"
     replace: true
 
 # Archives configuration
@@ -85,7 +85,7 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
-    
+
     files:
       - LICENSE*
       - README*
@@ -96,7 +96,7 @@ archives:
 
 # Checksum generation
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   algorithm: sha256
 
 # Signing configuration (Pro feature)
@@ -119,26 +119,26 @@ dockers:
     image_templates:
       - "ghcr.io/larsartmann/{{.ProjectName}}:latest-amd64"
       - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-amd64"
-    
+
     dockerfile: Dockerfile
     use: buildx
-    
+
     build_flag_templates:
       - "--pull"
       - "--platform=linux/amd64"
       - "--label=org.opencontainers.image.title={{.ProjectName}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
       - "--label=org.opencontainers.image.source=https://github.com/LarsArtmann/GoReleaser-Wizard"
-  
+
   - id: arm64
     image_templates:
       - "ghcr.io/larsartmann/{{.ProjectName}}:latest-arm64"
       - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-arm64"
-    
+
     dockerfile: Dockerfile
     use: buildx
     goarch: arm64
-    
+
     build_flag_templates:
       - "--pull"
       - "--platform=linux/arm64"
@@ -151,7 +151,7 @@ docker_manifests:
     image_templates:
       - "ghcr.io/larsartmann/{{.ProjectName}}:latest-amd64"
       - "ghcr.io/larsartmann/{{.ProjectName}}:latest-arm64"
-  
+
   - name_template: "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}"
     image_templates:
       - "ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}-amd64"
@@ -178,12 +178,12 @@ nfpms:
     maintainer: "Lars Artmann <lars@example.com>"
     description: "{{.ProjectName}} - A great Go application"
     license: MIT
-    
+
     formats:
       - deb
       - rpm
       - apk
-    
+
     dependencies:
       - git
 
@@ -194,11 +194,11 @@ brews:
       owner: "LarsArtmann"
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    
+
     homepage: "https://github.com/LarsArtmann/GoReleaser-Wizard"
     description: "{{.ProjectName}} - A great Go application"
     license: MIT
-    
+
     install: |
       bin.install "{{.ProjectName}}"
 
@@ -208,7 +208,7 @@ scoops:
       owner: "LarsArtmann"
       name: scoop-bucket
       token: "{{ .Env.SCOOP_GITHUB_TOKEN }}"
-    
+
     homepage: "https://github.com/LarsArtmann/GoReleaser-Wizard"
     description: "{{.ProjectName}} - A great Go application"
     license: MIT
@@ -217,24 +217,24 @@ scoops:
 changelog:
   sort: asc
   use: github
-  
+
   groups:
-    - title: '🚀 Features'
+    - title: "🚀 Features"
       regexp: '^.*feat(\([[:word:]]+\))??!?:.+$'
       order: 0
-    - title: '🐛 Bug Fixes'
+    - title: "🐛 Bug Fixes"
       regexp: '^.*fix(\([[:word:]]+\))??!?:.+$'
       order: 1
-    - title: '📚 Documentation'
+    - title: "📚 Documentation"
       regexp: '^.*docs(\([[:word:]]+\))??!?:.+$'
       order: 2
-    - title: '⚙️ Other'
+    - title: "⚙️ Other"
       order: 999
-  
+
   filters:
     exclude:
-      - '^chore:'
-      - 'merge conflict'
+      - "^chore:"
+      - "merge conflict"
       - Merge pull request
       - Merge remote-tracking branch
       - Merge branch
@@ -242,29 +242,29 @@ changelog:
 # Release configuration
 release:
   github:
-    owner: 'LarsArtmann'
-    name: 'template-GoReleaser'
-  
+    owner: "LarsArtmann"
+    name: "template-GoReleaser"
+
   name_template: "{{.ProjectName}} v{{.Version}}"
   disable: false
   draft: false
   prerelease: auto
-  
+
   footer: |
     ## Installation
-    
+
     ### Homebrew
     ```bash
     brew tap LarsArtmann/tap
     brew install {{.ProjectName}}
     ```
-    
+
     ### Scoop
     ```powershell
     scoop bucket add LarsArtmann https://github.com/LarsArtmann/scoop-bucket
     scoop install {{.ProjectName}}
     ```
-    
+
     ### Docker
     ```bash
     docker pull ghcr.io/larsartmann/{{.ProjectName}}:{{.Version}}
@@ -277,7 +277,7 @@ snapshot:
 # Source archive
 source:
   enabled: true
-  name_template: '{{ .ProjectName }}_{{ .Version }}_source'
+  name_template: "{{ .ProjectName }}_{{ .Version }}_source"
 
 # Git configuration
 git:

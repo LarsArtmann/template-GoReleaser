@@ -15,6 +15,7 @@ The GoReleaser-Wizard project has excellent architecture but completely missing 
 ## Current State
 
 ### What We Have ✅
+
 - Beautiful domain architecture with proper separation of concerns
 - Comprehensive error handling with domain types
 - Job management and workflow orchestration framework
@@ -24,6 +25,7 @@ The GoReleaser-Wizard project has excellent architecture but completely missing 
 - Configuration management with Viper
 
 ### What We Don't Have ❌
+
 - **ANY ACTUAL FUNCTIONALITY** - Core commands just print messages
 - **NO FILE CREATION** - Commands don't create any files
 - **NO Yaml Generation** - No real GoReleaser config output
@@ -39,6 +41,7 @@ The GoReleaser-Wizard project has excellent architecture but completely missing 
 **Goal: Make commands actually DO something**
 
 #### 0.1 Fix Placeholder Functions (HIGH PRIORITY)
+
 ```go
 // In jobs.go - MUST REPLACE ALL TODOs
 func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
@@ -55,12 +58,14 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 ```
 
 #### 0.2 Fix Core Commands (HIGH PRIORITY)
+
 - Make `init` command create actual configuration files
 - Make `generate` command produce working output
 - Add file creation to all workflow jobs
 - Implement basic validation and feedback
 
 #### 0.3 Create Basic Templates (MEDIUM PRIORITY)
+
 - Create simple GoReleaser YAML template
 - Create basic GitHub Actions workflow template
 - Add template rendering functionality
@@ -72,6 +77,7 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 **Goal: Working MVP that generates valid configurations**
 
 #### 1.1 YAML Template System
+
 ```go
 // templates/goreleaser.yaml.template
 version: 2
@@ -93,6 +99,7 @@ builds:
 ```
 
 #### 1.2 Template Renderer
+
 ```go
 type TemplateRenderer struct {
     templates map[string]*template.Template
@@ -106,6 +113,7 @@ func (tr *TemplateRenderer) RenderGoReleaser(config *domain.SafeProjectConfig) (
 ```
 
 #### 1.3 Enhanced Project Detection
+
 ```go
 func detectProjectStructure(wd string) (mainPath, binaryName, projectType string) {
     // IMPLEMENT: Check for common patterns
@@ -121,6 +129,7 @@ func detectProjectStructure(wd string) (mainPath, binaryName, projectType string
 **Goal: Smooth, helpful wizard experience**
 
 #### 2.1 Interactive Wizard
+
 ```go
 func runInteractiveWizard(config *domain.SafeProjectConfig) error {
     // IMPLEMENT: Ask questions with defaults
@@ -131,6 +140,7 @@ func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 ```
 
 #### 2.2 Configuration Validation
+
 ```go
 func validateGoReleaserConfig(yamlPath string) error {
     // IMPLEMENT: YAML syntax validation
@@ -141,6 +151,7 @@ func validateGoReleaserConfig(yamlPath string) error {
 ```
 
 #### 2.3 Error Messages & Guidance
+
 - Implement helpful error messages
 - Add suggestions for common issues
 - Create troubleshooting documentation
@@ -153,18 +164,21 @@ func validateGoReleaserConfig(yamlPath string) error {
 **Goal: Production-ready tool with comprehensive features**
 
 #### 3.1 Multi-Project Support
+
 - Monorepo detection and handling
 - Multiple binary configurations
 - Shared configuration patterns
 - Workspace-based projects
 
 #### 3.2 Configuration Customization
+
 - Advanced build flags
 - Custom hooks and scripts
 - Multiple deployment targets
 - Version management
 
 #### 3.3 Integration Features
+
 - Git provider detection (GitHub, GitLab, etc.)
 - CI/CD platform integration
 - Team collaboration features
@@ -175,18 +189,21 @@ func validateGoReleaserConfig(yamlPath string) error {
 ## CONCRETE IMPLEMENTATION PLAN
 
 ### Day 1 (Next 12 Hours)
+
 1. **Replace ALL placeholder functions** with basic implementations
 2. **Create simple GoReleaser template** that generates valid YAML
 3. **Make init command** actually create files
 4. **Test basic functionality** with simple Go project
 
 ### Day 2 (Following 12-36 Hours)
+
 1. **Implement GitHub Actions template** generation
 2. **Add configuration validation** with goreleaser check
 3. **Create comprehensive project detection** for common patterns
 4. **Add proper error handling** and user feedback
 
 ### Day 3 (Following 36-48 Hours)
+
 1. **Test with real projects** and fix edge cases
 2. **Add interactive wizard** with proper prompting
 3. **Create documentation** and examples
@@ -197,7 +214,9 @@ func validateGoReleaserConfig(yamlPath string) error {
 ## TECHNICAL DECISIONS NEEDED
 
 ### 1. Template System Architecture
+
 **Question:** Should template rendering be:
+
 - A) Separate service injected into jobs?
 - B) Part of job implementations?
 - C) Standalone functions called by jobs?
@@ -205,7 +224,9 @@ func validateGoReleaserConfig(yamlPath string) error {
 **Recommendation:** A) Separate service for testability and separation of concerns
 
 ### 2. Configuration Storage
+
 **Question:** Should we:
+
 - A) Generate files directly?
 - B) Create in-memory representations first?
 - C) Use a database for configurations?
@@ -213,7 +234,9 @@ func validateGoReleaserConfig(yamlPath string) error {
 **Recommendation:** B) In-memory with validation, then write files
 
 ### 3. User Input Handling
+
 **Question:** Should interactive mode:
+
 - A) Use a dedicated UI library?
 - B) Simple command-line prompts?
 - C) Web-based interface?
@@ -225,6 +248,7 @@ func validateGoReleaserConfig(yamlPath string) error {
 ## SUCCESS METRICS
 
 ### Technical Metrics
+
 - [ ] Commands create actual files (init/generate)
 - [ ] Generated configurations pass `goreleaser check`
 - [ ] All placeholder functions removed
@@ -232,6 +256,7 @@ func validateGoReleaserConfig(yamlPath string) error {
 - [ ] 100% test coverage for implemented features
 
 ### User Experience Metrics
+
 - [ ] `goreleaser-wizard init` works without errors
 - [ ] `goreleaser-wizard validate` provides useful feedback
 - [ ] Generated configurations work with real projects
@@ -243,11 +268,13 @@ func validateGoReleaserConfig(yamlPath string) error {
 ## RISKS & MITIGATION
 
 ### Technical Risks
+
 1. **Architecture complexity** - Keep focus on simple implementations
 2. **Template limitations** - Start with basic templates, expand gradually
 3. **Testing gaps** - Implement comprehensive testing from the start
 
 ### Timeline Risks
+
 1. **Scope creep** - Focus on core functionality first
 2. **Perfectionism** - MVP approach with iterative improvement
 3. **Integration issues** - Test with real projects early
@@ -268,6 +295,7 @@ func validateGoReleaserConfig(yamlPath string) error {
 ## TEAM ALLOCATION
 
 If working with team:
+
 - **Frontend/UX**: Focus on wizard and user experience
 - **Backend**: Template system and configuration generation
 - **DevOps**: GitHub Actions and CI/CD integration

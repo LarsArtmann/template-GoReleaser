@@ -1,3 +1,16 @@
+// CRITICAL ARCHITECTURE TODO: This file is 429 lines - SPLIT IMMEDIATELY by entity:
+// 1. enums_platform.go - Platform and Architecture enums
+// 2. enums_build.go - CGOStatus, BuildTag, BuildLevel enums
+// 3. enums_release.go - GitProvider, DockerRegistry, SigningLevel enums
+// 4. enums_project.go - ProjectType, FeatureLevel enums
+// 5. enums_actions.go - ActionLevel, ActionTrigger enums
+// 6. enums_state.go - ConfigState and state-related enums
+//
+// TODO: Replace string-based enums with proper typed enums
+// TODO: Add enum validation methods
+// TODO: Create enum conversion utilities
+// TODO: Implement proper enum serialization/deserialization
+// TODO: Add enum compatibility checking methods
 package domain
 
 import (

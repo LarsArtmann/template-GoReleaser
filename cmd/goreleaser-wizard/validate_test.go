@@ -1,3 +1,16 @@
+// CRITICAL ARCHITECTURE TODO: This file is 489 lines - SPLIT IMMEDIATELY into:
+// 1. validate_unit_test.go - Unit tests for validation
+// 2. validate_integration_test.go - Integration tests
+// 3. validate_fix_test.go - Auto-fix functionality tests
+// 4. validate_performance_test.go - Performance tests
+// 5. validate_test_helpers.go - Test utilities and factories
+//
+// TODO: Implement proper test data builders
+// TODO: Create mock repositories for testing
+// TODO: Add benchmark tests for validation performance
+// TODO: Implement proper test isolation
+// TODO: Add fuzz testing for validation edge cases
+// TODO: Create test scenarios for all validation rules
 package main
 
 import (

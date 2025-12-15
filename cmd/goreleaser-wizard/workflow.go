@@ -1,3 +1,16 @@
+// CRITICAL ARCHITECTURE TODO: This file is 415 lines - SPLIT IMMEDIATELY:
+// 1. workflow_core.go - Core Workflow struct and basic methods
+// 2. workflow_execution.go - Execution logic and state management
+// 3. workflow_types.go - Workflow-related types and enums
+// 4. workflow_templates.go - Workflow templates and factories
+// 5. workflow_validation.go - Workflow validation logic
+//
+// TODO: Implement proper workflow state machine
+// TODO: Add workflow persistence and recovery
+// TODO: Create workflow visualization capabilities
+// TODO: Implement workflow branching and conditional execution
+// TODO: Add workflow metrics and observability
+// TODO: Create workflow templates for common scenarios
 package main
 
 import (

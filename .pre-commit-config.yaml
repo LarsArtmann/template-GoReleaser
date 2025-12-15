@@ -13,7 +13,7 @@ repos:
         language: system
         files: '\.go$'
         args: [-w, -s]
-      
+
       - id: go-imports
         name: Go Imports
         description: Runs goimports, requires golang.org/x/tools/cmd/goimports
@@ -84,44 +84,44 @@ repos:
         name: Trim Trailing Whitespace
         description: Trims trailing whitespace
         args: [--markdown-linebreak-ext=md]
-      
+
       - id: end-of-file-fixer
         name: Fix End of Files
         description: Makes sure files end in a newline and only a newline
-      
+
       - id: check-yaml
         name: Check YAML
         description: Attempts to load all yaml files to verify syntax
-      
+
       - id: check-json
-        name: Check JSON  
+        name: Check JSON
         description: Attempts to load all json files to verify syntax
-      
+
       - id: check-toml
         name: Check TOML
         description: Attempts to load all toml files to verify syntax
-      
+
       - id: check-merge-conflict
         name: Check for merge conflicts
         description: Check for files that contain merge conflict strings
-      
+
       - id: check-added-large-files
         name: Check for added large files
         description: Prevent giant files from being committed (default=500kB)
-        args: ['--maxkb=1000']
-      
+        args: ["--maxkb=1000"]
+
       - id: check-case-conflict
         name: Check for case conflicts
         description: Check for files with names that would conflict on case-insensitive filesystems
-      
+
       - id: check-executables-have-shebangs
         name: Check that executables have shebangs
         description: Checks that non-binary executables have a proper shebang
-      
+
       - id: check-shebang-scripts-are-executable
         name: Check that scripts with shebangs are executable
         description: Checks that scripts with shebangs are executable
-      
+
       - id: mixed-line-ending
         name: Mixed line ending
         description: Replaces or checks mixed line ending
@@ -133,7 +133,7 @@ repos:
       - id: hadolint-docker
         name: Dockerfile Lint
         description: Runs hadolint Docker linter
-        files: '^Dockerfile.*'
+        files: "^Dockerfile.*"
 
   # Markdown linting
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -143,7 +143,7 @@ repos:
         name: Markdown Lint
         description: Run markdownlint on markdown files
         files: '\.md$'
-        args: ['--fix', '--disable', 'MD013', 'MD033', 'MD041']
+        args: ["--fix", "--disable", "MD013", "MD033", "MD041"]
 
   # Shell script linting
   - repo: https://github.com/shellcheck-py/shellcheck-py
@@ -173,8 +173,8 @@ ci:
 
     for more information, see https://pre-commit.ci
   autofix_prs: true
-  autoupdate_branch: ''
-  autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "[pre-commit.ci] pre-commit autoupdate"
   autoupdate_schedule: weekly
   skip: []
   submodules: false

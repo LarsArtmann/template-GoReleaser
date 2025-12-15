@@ -10,6 +10,7 @@
 Fix version constraint conflict where module was declared as `github.com/LarsArtmann/template-GoReleaser` but installation command expects `github.com/LarsArtmann/GoReleaser-Wizard`.
 
 **Original Error:**
+
 ```
 go: github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest: version constraints conflict:
     github.com/LarsArtmann/template-GoReleaser@v0.0.0-20251211230812-8d779b5f2123: parsing go.mod:
@@ -20,12 +21,15 @@ go: github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest: versi
 ## ✅ COMPLETED WORK
 
 ### Core Module Changes
+
 - **go.mod**: Changed module declaration from `github.com/LarsArtmann/template-GoReleaser` to `github.com/LarsArtmann/GoReleaser-Wizard`
 - **go.sum**: Regenerated with `go mod tidy` after removing self-referential dependency
 - **Dependencies**: Removed problematic self-reference in go.mod
 
 ### Import Statement Updates
+
 Updated ALL Go files containing old module path:
+
 - `cmd/goreleaser-wizard/main.go`
 - `cmd/goreleaser-wizard/validate.go`
 - `cmd/goreleaser-wizard/init_test.go`
@@ -36,22 +40,26 @@ Updated ALL Go files containing old module path:
 - `debug_docker.go`
 
 ### Documentation Updates
+
 - **README.md**: Updated ALL installation commands (Quick Start + Using Go sections)
 - **CONTRIBUTING.md**: Fixed clone URL and directory name
 - **cmd/goreleaser-wizard/errors_test.go**: Fixed issue reporting URL
 
 ### Configuration File Updates
+
 - **.goreleaser.pro.yaml**: Updated 3 repository references
 - **.pre-commit-config.yaml**: Updated goimports local import path
 - **.readme/configs/readme-config.yaml**: Updated project metadata and URLs
 
 ### Build System Fixes
+
 - **Interface Conflicts**: Resolved duplicate interface definitions
 - **Build Success**: Module now compiles successfully with `go build`
 
 ## 🔄 IN PROGRESS
 
 ### Verification Stage
+
 - Module builds successfully locally
 - All tests compile without interface conflicts
 - **PENDING**: Final `go install` verification from remote repository
@@ -59,6 +67,7 @@ Updated ALL Go files containing old module path:
 ## 🚨 CRITICAL BLOCKERS
 
 ### The Final Test Cannot Be Completed Until:
+
 1. ✅ Changes are committed and pushed to GitHub
 2. ✅ New release/tag is created
 3. ✅ Go module proxy caches the new version
@@ -67,6 +76,7 @@ Updated ALL Go files containing old module path:
 ## 📋 VERIFICATION CHECKLIST
 
 ### ✅ Completed
+
 - [x] go.mod module declaration fixed
 - [x] All import statements updated
 - [x] Documentation updated (README.md, CONTRIBUTING.md)
@@ -76,6 +86,7 @@ Updated ALL Go files containing old module path:
 - [x] go.sum regenerated
 
 ### 🔄 Pending Final Verification
+
 - [ ] `git push` changes to remote repository
 - [ ] Create release/tag for fixed version
 - [ ] Test `go install github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest`
@@ -85,12 +96,14 @@ Updated ALL Go files containing old module path:
 ## 🔧 ROOT CAUSE ANALYSIS
 
 ### What Went Wrong
+
 1. **Module Name Mismatch**: Repository was renamed but go.mod wasn't updated
 2. **Self-Referential Dependency**: go.mod contained reference to itself with old name
 3. **Documentation Drift**: Documentation still referenced old repository name
 4. **Configuration Drift**: Config files still had old repository URLs
 
 ### How We Fixed It
+
 1. **Comprehensive Discovery**: Used `git grep` to find ALL references
 2. **Systematic Replacement**: Updated every occurrence methodically
 3. **Build Verification**: Ensured module compiles after changes
@@ -99,12 +112,14 @@ Updated ALL Go files containing old module path:
 ## 🎯 LESSONS LEARNED
 
 ### Process Improvements Implemented
+
 1. **Pre-change Analysis**: Always use `git grep` before making changes
 2. **Incremental Testing**: Test compilation after each major change group
 3. **Duplicate Handling**: Use `replace_all=true` or specific context for duplicates
 4. **Interface Organization**: Maintain clear separation between interfaces and implementations
 
 ### Future Prevention
+
 1. **Repository Rename Checklist**: Always update go.mod first, then all references
 2. **Documentation Synchronization**: Keep documentation in sync with code changes
 3. **Automated Verification**: Add tests to catch module name mismatches
@@ -113,12 +128,14 @@ Updated ALL Go files containing old module path:
 ## 🚀 NEXT CRITICAL ACTIONS
 
 ### Immediate (Priority: CRITICAL)
+
 1. **Push Changes**: `git push origin master`
 2. **Create Release**: Tag and release the fixed version
 3. **Test Install**: Verify `go install` command works from clean environment
 4. **Update Documentation**: Add installation verification to README
 
 ### Short-term (Priority: HIGH)
+
 1. **Add Verification Test**: Create test to catch future module name mismatches
 2. **Update Build Pipeline**: Add module name checks to CI/CD
 3. **Documentation Review**: Ensure all docs reference correct repository name
@@ -127,12 +144,14 @@ Updated ALL Go files containing old module path:
 ## 📊 IMPACT ASSESSMENT
 
 ### Before Fix
+
 - **Installation Status**: ❌ FAILED - `go install` command broken
 - **Developer Experience**: ❌ BROKEN - Cannot install via standard method
 - **CI/CD Impact**: ❌ BROKEN - Automated installations fail
 - **User Impact**: ❌ CRITICAL - Blocks all new users
 
 ### After Fix
+
 - **Installation Status**: ✅ WORKING (pending final verification)
 - **Developer Experience**: ✅ RESTORED - Standard installation method works
 - **CI/CD Impact**: ✅ RESTORED - Automated installations work
@@ -141,6 +160,7 @@ Updated ALL Go files containing old module path:
 ## 🏁 SUCCESS CRITERIA
 
 The fix is considered **COMPLETE** when:
+
 1. ✅ All code uses new module name
 2. ✅ All documentation updated
 3. ✅ Module compiles successfully
@@ -150,7 +170,8 @@ The fix is considered **COMPLETE** when:
 
 ## 📈 CONFIDENCE LEVEL
 
-**Current Confidence: 95%** 
+**Current Confidence: 95%**
+
 - High confidence in code changes
 - High confidence in documentation updates
 - High confidence in build system fixes
@@ -168,4 +189,4 @@ The fix is considered **COMPLETE** when:
 **Next Action:** Push changes and test `go install` command  
 **ETA:** Complete within 1 hour after push
 
-*Generated as part of GoReleaser-Wizard development workflow*
+_Generated as part of GoReleaser-Wizard development workflow_

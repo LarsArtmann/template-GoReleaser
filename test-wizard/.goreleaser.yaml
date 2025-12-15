@@ -16,27 +16,26 @@ builds:
   - id: test-wizard
     main: .
     binary: test-wizard
-    
+
     env:
       - CGO_ENABLED=0
-    
+
     goos:
       - linux
       - darwin
       - windows
-    
+
     goarch:
       - amd64
       - arm64
-    
-    
+
     # Ignore certain platform combinations
     ignore:
       - goos: darwin
         goarch: 386
       - goos: windows
         goarch: arm64
-    
+
     # Build tags for pure Go builds
     tags:
       - netgo
@@ -51,18 +50,18 @@ archives:
       {{if eq .Arch "amd64"}}x86_64
       {{else if eq .Arch "386"}}i386
       {{else}}{{.Arch}}{{end}}
-    
+
     format_overrides:
       - goos: windows
         format: zip
-    
+
     files:
       - LICENSE*
       - README*
       - CHANGELOG*
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   algorithm: sha256
 
 snapshot:
@@ -73,9 +72,9 @@ changelog:
   use: github
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
       - Merge pull request
       - Merge branch
 
@@ -83,20 +82,20 @@ release:
   github:
     owner: "{{.Env.GITHUB_OWNER}}"
     name: "{{.Env.GITHUB_REPO}}"
-  
+
   draft: false
   prerelease: auto
   mode: append
-  
+
   footer: |
     ## Installation
     Download the appropriate archive for your platform from the assets below.
-    
+
     ### Quick Install
     ```bash
     # macOS/Linux
     curl -sfL https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/download/{{.Tag}}/{{.ProjectName}}_{{.Version}}_{{title .Os}}_{{.Arch}}.tar.gz | tar -xz
-    
+
     # Windows (PowerShell)
     Invoke-WebRequest -Uri "https://github.com/{{.Env.GITHUB_OWNER}}/{{.Env.GITHUB_REPO}}/releases/download/{{.Tag}}/{{.ProjectName}}_{{.Version}}_Windows_x86_64.zip" -OutFile "test-wizard.zip"
     ```

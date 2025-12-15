@@ -1,3 +1,17 @@
+// CRITICAL ARCHITECTURE TODO: This file is 405 lines - SPLIT RESPONSIBILITIES IMMEDIATELY:
+// 1. config_core.go - Core SafeProjectConfig struct
+// 2. config_defaults.go - ApplyDefaults and default logic
+// 3. config_validation.go - Config validation methods
+// 4. config_compatibility.go - Compatibility checking methods
+// 5. config_docker.go - Docker-related methods
+// 6. config_actions.go - Actions-related methods
+//
+// TODO: Implement Builder pattern for config construction
+// TODO: Add proper validation decorators
+// TODO: Create config factories for different project types
+// TODO: Implement proper state machine for ConfigState
+// TODO: Add config clone/copy methods with deep copy semantics
+// TODO: Create config versioning and migration system
 package domain
 
 import (

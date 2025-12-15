@@ -1,24 +1,29 @@
 #!/bin/bash
 
 # GitHub Issues Organization Automation Scripts
+
 # Execute in order to reorganize all issues into proper milestones
 
 echo "=== GITHUB ISSUES ORGANIZATION WORKFLOW ==="
 echo ""
 
 # Step 1: Create critical missing issue
+
 echo "STEP 1: Creating critical build recovery issue..."
 ./create_critical_issue.sh
 
 # Step 2: Add status comments to architecture issues
+
 echo "STEP 2: Adding status comments to architecture issues..."
 ./add_architecture_comments.sh
 
 # Step 3: Create all project milestones
+
 echo "STEP 3: Creating project milestones..."
 ./create_milestones.sh
 
 # Step 4: Assign all issues to appropriate milestones
+
 echo "STEP 4: Assigning issues to milestones..."
 ./assign_milestones.sh
 

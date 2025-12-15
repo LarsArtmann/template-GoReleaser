@@ -90,6 +90,7 @@ goreleaser-wizard init
 ```
 
 Options:
+
 - `--force` - Overwrite existing configuration
 - `--minimal` - Create minimal configuration
 - `--pro` - Include GoReleaser Pro features
@@ -124,6 +125,7 @@ goreleaser-wizard validate --verbose
 ## 🎯 What It Creates
 
 ### `.goreleaser.yaml`
+
 - Optimized build configuration
 - Multi-platform support
 - Archive generation
@@ -132,6 +134,7 @@ goreleaser-wizard validate --verbose
 - Release configuration
 
 ### `.github/workflows/release.yml`
+
 - Automated releases on tags
 - Docker image building
 - Code signing with cosign
@@ -158,6 +161,7 @@ goreleaser-wizard init --pro
 ```
 
 Adds support for:
+
 - Custom publishers
 - Advanced templating
 - Nightlies
@@ -167,6 +171,7 @@ Adds support for:
 ### Docker Integration
 
 When Docker is enabled, the wizard:
+
 - Detects your registry (ghcr.io, Docker Hub, etc.)
 - Configures multi-platform images
 - Sets up proper labels
@@ -175,6 +180,7 @@ When Docker is enabled, the wizard:
 ### Package Managers
 
 Optional support for:
+
 - **Homebrew** - macOS/Linux formula
 - **Snap** - Linux snap packages
 - **Scoop** - Windows package manager

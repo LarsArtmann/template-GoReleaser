@@ -255,7 +255,47 @@ linters-settings:
     dot-import-whitelist:
       - fmt
     # https://staticcheck.io/docs/options#initialisms
-    initialisms: ["ACL", "API", "ASCII", "CPU", "CSS", "DNS", "EOF", "GUID", "HTML", "HTTP", "HTTPS", "ID", "IP", "JSON", "QPS", "RAM", "RPC", "SLA", "SMTP", "SQL", "SSH", "TCP", "TLS", "TTL", "UDP", "UI", "GID", "UID", "UUID", "URI", "URL", "UTF8", "VM", "XML", "XMPP", "XSRF", "XSS", "YAML"]
+    initialisms:
+      [
+        "ACL",
+        "API",
+        "ASCII",
+        "CPU",
+        "CSS",
+        "DNS",
+        "EOF",
+        "GUID",
+        "HTML",
+        "HTTP",
+        "HTTPS",
+        "ID",
+        "IP",
+        "JSON",
+        "QPS",
+        "RAM",
+        "RPC",
+        "SLA",
+        "SMTP",
+        "SQL",
+        "SSH",
+        "TCP",
+        "TLS",
+        "TTL",
+        "UDP",
+        "UI",
+        "GID",
+        "UID",
+        "UUID",
+        "URI",
+        "URL",
+        "UTF8",
+        "VM",
+        "XML",
+        "XMPP",
+        "XSRF",
+        "XSS",
+        "YAML",
+      ]
     # https://staticcheck.io/docs/options#http_status_code_whitelist
     http-status-code-whitelist: ["200", "400", "404", "500"]
 
@@ -272,7 +312,7 @@ linters-settings:
     go: "1.22"
 
   whitespace:
-    multi-if: false   # Enforces newlines (or comments) after every multi-line if statement
+    multi-if: false # Enforces newlines (or comments) after every multi-line if statement
     multi-func: false # Enforces newlines (or comments) after every multi-line function signature
 
   wsl:

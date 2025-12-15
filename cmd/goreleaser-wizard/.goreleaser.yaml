@@ -16,14 +16,13 @@ builds:
   - id: wizard-concurrent-12891869995
     main: .
     binary: wizard-concurrent-12891869995
-    
+
     env:
       - CGO_ENABLED=
-    
+
     goos:
 
     goarch:
-
 
     # Ignore certain platform combinations
     ignore:
@@ -32,23 +31,21 @@ builds:
       - goos: windows
         goarch: arm64
 
-
-
 archives:
   - id: default
     name_template: "concurrent-test-1_v0.1.0_{{.Os}}_{{.Arch}}"
-    
+
     format_overrides:
       - goos: windows
         format: zip
-    
+
     files:
       - LICENSE*
       - README*
       - CHANGELOG*
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   algorithm: sha256
 
 snapshot:
@@ -59,9 +56,9 @@ changelog:
   use: github
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
       - Merge pull request
       - Merge branch
 
@@ -69,24 +66,23 @@ release:
   github:
     owner: "owner"
     name: "repo"
-  
+
   draft: false
   prerelease: auto
   mode: append
-  
+
   footer: |
     ## Installation
     Download the appropriate archive for your platform from the assets below.
-
 
 dockers:
   - image_templates:
       - "/concurrent-test-1:v0.1.0"
       - "/concurrent-test-1:v0"
       - "/concurrent-test-1:latest"
-    
+
     dockerfile: Dockerfile
-    
+
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created=2025-12-13"
@@ -94,4 +90,3 @@ dockers:
       - "--label=org.opencontainers.image.revision=unknown"
       - "--label=org.opencontainers.image.version=v0.1.0"
       - "--platform=linux/amd64"
-

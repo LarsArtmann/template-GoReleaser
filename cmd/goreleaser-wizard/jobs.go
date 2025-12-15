@@ -1,3 +1,14 @@
+// CRITICAL ARCHITECTURE TODO: This file is 848 lines - SPLIT IMMEDIATELY into:
+// 1. template_generator.go - Template generation logic
+// 2. job_implementations.go - Job execution logic
+// 3. git_utilities.go - Git helper functions
+// 4. template_data_preparation.go - Data preparation logic
+//
+// TODO: Extract embedded templates to separate files in templates/
+// TODO: Implement proper dependency injection instead of direct function calls
+// TODO: Create proper error types instead of fmt.Errorf everywhere
+// TODO: Implement repository pattern for file operations
+// TODO: Use command pattern for jobs instead of massive structs
 package main
 
 import (
@@ -634,6 +645,16 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 }
 
 // prepareGoReleaserData prepares template data for GoReleaser configuration
+// CRITICAL TODO: Replace map[string]any with strongly typed structs
+// This type safety violation MUST be fixed immediately
+//
+// TODO: Create proper type-safe template data structures:
+// type GoReleaserTemplateData struct { ... }
+// type GitHubActionsTemplateData struct { ... }
+//
+// TODO: Eliminate all map[string]any usage - this is unacceptable
+// TODO: Make impossible states unrepresentable through strong types
+// TODO: Use proper enums instead of string types throughout
 func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 	// Get version info
 	version := getVersion()
@@ -709,6 +730,9 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 }
 
 // prepareGitHubActionsData prepares template data for GitHub Actions workflow
+// CRITICAL TODO: Replace map[string]any with strongly typed structs
+// TODO: Create GitHubActionsTemplateData struct with proper field types
+// TODO: Validate all data at compile-time instead of runtime
 func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 	data := map[string]any{
 		"ProjectName":    config.ProjectName,

@@ -32,24 +32,29 @@ just ci
 ### Go Code Security Issues (Previously Found by gosec)
 
 ✅ **Fixed**: Path traversal vulnerabilities (G304)
+
 - Added `#nosec G304` annotations with justification for test helper functions
 - Test functions validated paths are controlled by test environment
 
 ✅ **Fixed**: File permission issues (G301, G306)
+
 - Changed directory permissions from `0755` to `0750` (more restrictive)
 - Changed file permissions from `0644` to `0600` (owner-only access)
 
 ✅ **Fixed**: Unhandled errors (G104)
+
 - Added explicit error handling with `_` assignments for cleanup operations
 - Added comments explaining why error handling is not critical in specific contexts
 
 ### Dockerfile Security Issues
 
 ✅ **Fixed**: Package version pinning (DL3018)
+
 - Pinned versions for `git`, `ca-certificates`, and `tzdata` packages
 - Consolidated RUN instructions to reduce layers (DL3059)
 
 ✅ **Fixed**: HEALTHCHECK syntax issue
+
 - Corrected HEALTHCHECK command syntax from shell form to exec form
 - Changed from `CMD [...] || exit 1` to proper `CMD [...]` format
 
@@ -97,7 +102,7 @@ These must be set as GitHub repository secrets:
 ```bash
 # Core functionality
 GITHUB_TOKEN          # GitHub API access
-DOCKER_USERNAME       # Docker Hub username  
+DOCKER_USERNAME       # Docker Hub username
 DOCKER_TOKEN          # Docker Hub access token
 
 # Pro features (if using .goreleaser.pro.yaml)
@@ -124,6 +129,7 @@ SMTP_PASSWORD         # Email notifications
 ### Validation
 
 Environment variables are validated by:
+
 - `validate-env.sh` script with format validation
 - GitHub Actions workflow checks
 - GoReleaser configuration validation
@@ -133,6 +139,7 @@ Environment variables are validated by:
 ### Permissions
 
 Workflow uses minimal required permissions:
+
 ```yaml
 permissions:
   contents: write    # For creating releases
@@ -175,7 +182,7 @@ go list -json -m all | nancy sleuth
 # Check for leaked secrets (if truffleHog installed)
 trufflehog git file://. --only-verified
 
-# Filesystem scan (if trivy installed)  
+# Filesystem scan (if trivy installed)
 trivy fs .
 ```
 
@@ -199,11 +206,13 @@ We take the security of our software seriously. If you believe you have found a 
 ### How to Report
 
 **Please do NOT:**
+
 - Open a public GitHub issue
 - Post about it on social media
 - Exploit the vulnerability for malicious purposes
 
 **Please DO:**
+
 - Create a private security advisory on GitHub
 - Email security@example.com (replace with your actual email)
 - Provide sufficient information to reproduce the issue
@@ -281,6 +290,7 @@ just validate
 ### Audit Trail
 
 All security-related changes are:
+
 - Tracked in git commit history
 - Documented in this security guide
 - Validated by automated testing

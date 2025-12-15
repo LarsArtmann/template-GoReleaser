@@ -28,11 +28,13 @@ go build -o goreleaser-cli ./cmd/goreleaser-cli
 ## GoReleaser Examples
 
 ### Building a snapshot (without releasing)
+
 ```bash
 goreleaser build --snapshot --clean
 ```
 
 ### Creating a release locally
+
 ```bash
 # Requires a git tag
 git tag -a v1.0.0 -m "Release v1.0.0"
@@ -40,6 +42,7 @@ goreleaser release --clean
 ```
 
 ### Validating configuration
+
 ```bash
 goreleaser check
 ```
@@ -47,7 +50,8 @@ goreleaser check
 ## GitHub Actions Integration
 
 The template includes a complete GitHub Actions workflow that:
-- Triggers on version tags (v*)
+
+- Triggers on version tags (v\*)
 - Builds binaries for multiple platforms
 - Creates GitHub releases with artifacts
 - Supports both free and pro GoReleaser versions

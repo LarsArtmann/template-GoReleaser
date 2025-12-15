@@ -49,6 +49,7 @@ There are many ways to contribute to this project:
 - **Documentation Issues**: Report unclear or missing documentation
 
 When reporting issues:
+
 - Use a clear and descriptive title
 - Provide detailed steps to reproduce the problem
 - Include relevant system information (Go version, OS, etc.)
@@ -57,12 +58,14 @@ When reporting issues:
 ### Contributing Code
 
 1. **Fork the Repository**
+
    ```bash
    gh repo fork LarsArtmann/template-GoReleaser
    cd template-GoReleaser
    ```
 
 2. **Create a Feature Branch**
+
    ```bash
    git checkout -b feature/your-feature-name
    # or
@@ -75,6 +78,7 @@ When reporting issues:
    - Update documentation as needed
 
 4. **Test Your Changes**
+
    ```bash
    just ci
    just validate
@@ -109,23 +113,27 @@ When reporting issues:
 ### Initial Setup
 
 1. **Clone the Repository**
+
    ```bash
    git clone https://github.com/LarsArtmann/GoReleaser-Wizard.git
    cd GoReleaser-Wizard
    ```
 
 2. **Install Development Tools**
+
    ```bash
    just install-tools
    ```
 
 3. **Set Up Environment**
+
    ```bash
    just setup-env
    # Edit .env file with your configuration
    ```
 
 4. **Initialize Project**
+
    ```bash
    just init
    ```
@@ -167,6 +175,7 @@ Run `just --list` to see all available commands or `just help` for detailed desc
 ### Writing Tests
 
 1. **Use Table-Driven Tests** for multiple test cases:
+
    ```go
    func TestFunction(t *testing.T) {
        tests := []struct {
@@ -177,7 +186,7 @@ Run `just --list` to see all available commands or `just help` for detailed desc
        }{
            // test cases
        }
-       
+
        for _, tt := range tests {
            t.Run(tt.name, func(t *testing.T) {
                // test logic
@@ -187,9 +196,10 @@ Run `just --list` to see all available commands or `just help` for detailed desc
    ```
 
 2. **Use testify/assert** for assertions:
+
    ```go
    import "github.com/stretchr/testify/assert"
-   
+
    assert.Equal(t, expected, actual)
    assert.NoError(t, err)
    assert.True(t, condition)
@@ -281,11 +291,13 @@ Closes #123
 ### Before Submitting
 
 1. **Ensure Tests Pass**
+
    ```bash
    just ci
    ```
 
 2. **Validate Configurations**
+
    ```bash
    just validate
    just validate-strict
@@ -423,6 +435,7 @@ By contributing to this project, you agree that your contributions will be licen
 **Thank you for contributing to the GoReleaser Template project!**
 
 For additional help or questions, feel free to:
+
 - Open an issue on GitHub
 - Start a discussion in GitHub Discussions
 - Review existing documentation and examples

@@ -1,3 +1,16 @@
+// CRITICAL ARCHITECTURE TODO: This file is 412 lines - SPLIT IMMEDIATELY into:
+// 1. job_manager_test.go - JobManager functionality tests
+// 2. workflow_test.go - Workflow execution tests
+// 3. integration_test.go - End-to-end integration tests
+// 4. performance_test.go - Performance and benchmark tests
+// 5. test_fixtures.go - Test data and factories
+//
+// TODO: Implement proper test hierarchy and organization
+// TODO: Add contract tests for interfaces
+// TODO: Create property-based tests for critical business logic
+// TODO: Implement chaos engineering tests for resilience
+// TODO: Add performance regression tests
+// TODO: Create test scenarios for all failure modes
 package main
 
 import (

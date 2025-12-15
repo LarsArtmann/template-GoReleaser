@@ -16,10 +16,10 @@ builds:
   - id: GoReleaser-Wizard
     main: .
     binary: GoReleaser-Wizard
-    
+
     env:
       - CGO_ENABLED=
-    
+
     goos:
       - linux
       - darwin
@@ -29,7 +29,6 @@ builds:
       - amd64
       - arm64
 
-
     # Ignore certain platform combinations
     ignore:
       - goos: darwin
@@ -37,23 +36,21 @@ builds:
       - goos: windows
         goarch: arm64
 
-
-
 archives:
   - id: default
     name_template: "test-github-actions_81d04b0-dirty_{{.Os}}_{{.Arch}}"
-    
+
     format_overrides:
       - goos: windows
         format: zip
-    
+
     files:
       - LICENSE*
       - README*
       - CHANGELOG*
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   algorithm: sha256
 
 snapshot:
@@ -64,9 +61,9 @@ changelog:
   use: github
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
       - Merge pull request
       - Merge branch
 
@@ -74,24 +71,23 @@ release:
   github:
     owner: "LarsArtmann"
     name: "GoReleaser-Wizard"
-  
+
   draft: false
   prerelease: auto
   mode: append
-  
+
   footer: |
     ## Installation
     Download the appropriate archive for your platform from the assets below.
-
 
 dockers:
   - image_templates:
       - "GitHub Container Registry/test-github-actions:81d04b0-dirty"
       - "GitHub Container Registry/test-github-actions:v81d04b0-dirty"
       - "GitHub Container Registry/test-github-actions:latest"
-    
+
     dockerfile: Dockerfile
-    
+
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created=2025-12-13"
@@ -99,4 +95,3 @@ dockers:
       - "--label=org.opencontainers.image.revision=81d04b0becd20783ad978d57cc1aee7f9242b0c8"
       - "--label=org.opencontainers.image.version=81d04b0-dirty"
       - "--platform=linux/amd64"
-

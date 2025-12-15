@@ -1,3 +1,15 @@
+// CRITICAL ARCHITECTURE TODO: This file is 450 lines - SPLIT IMMEDIATELY by domain:
+// 1. interfaces_filesystem.go - FileSystemRepository and related
+// 2. interfaces_template.go - TemplateRepository and related
+// 3. interfaces_goreleaser.go - GoReleaserRepository and related
+// 4. interfaces_github.go - GitHubRepository and related
+// 5. interfaces_jobs.go - Job interfaces and execution
+// 6. interfaces_validation.go - Validation interfaces
+//
+// TODO: Apply Interface Segregation Principle - interfaces too large
+// TODO: Create more focused, single-purpose interfaces
+// TODO: Remove unused interface methods
+// TODO: Add proper context handling to all interfaces
 package domain
 
 import (
