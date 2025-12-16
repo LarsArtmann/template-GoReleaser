@@ -204,16 +204,67 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 
 // runInteractiveWizard runs an interactive wizard for configuration
 func runInteractiveWizard(config *domain.SafeProjectConfig) error {
-	fmt.Println(infoStyle.Render("📋 Project Information Detected:"))
-	fmt.Printf("  Project Name: %s\n", config.ProjectName)
-	fmt.Printf("  Main Path: %s\n", config.MainPath)
-	fmt.Printf("  Binary Name: %s\n", config.BinaryName)
-	fmt.Printf("  Project Type: %s\n", config.ProjectType)
-	fmt.Println()
+	prompter := NewInteractivePrompter()
+	
+	// Confirm and modify detected information
+	var err error
+	config, err = prompter.confirmDetectedInfo(config)
+	if err != nil {
+		return err
+	}
 
-	// In a real implementation, this would prompt for user input
-	// For now, we'll just confirm the detected values
-	fmt.Println(infoStyle.Render("ℹ️  Using detected values. Use flags to customize if needed."))
+	// Prompt for platforms
+	config.Platforms, err = prompter.promptPlatforms(config.Platforms)
+	if err != nil {
+		return err
+	}
+
+	// Prompt for architectures
+	config.Architectures, err = prompter.promptArchitectures(config.Architectures)
+	if err != nil {
+		return err
+	}
+
+	// Prompt for CGO configuration
+	config.CGOStatus, err = prompter.promptCGO(config.CGOStatus)
+	if err != nil {
+		return err
+	}
+
+	// Prompt for Docker support
+	config.DockerSupport, err = prompter.promptDocker(config.DockerSupport)
+	if err != nil {
+		return err
+	}
+
+	// Prompt for Git provider
+	config.GitProvider, err = prompter.promptGitProvider(config.GitProvider)
+	if err != nil {
+		return err
+	}
+
+	// Prompt for advanced options
+	if err := prompter.promptAdvancedOptions(config); err != nil {
+		return err
+	}
+
+	// Apply any needed defaults based on selections
+	config.ApplyDefaults()
+
+	// Show final configuration
+	fmt.Println(titleStyle.Render("\n📋 Final Configuration:"))
+	fmt.Printf("  Project: %s (%s)\n", config.ProjectName, config.ProjectType)
+	fmt.Printf("  Binary: %s\n", config.BinaryName)
+	fmt.Printf("  Main: %s\n", config.MainPath)
+	fmt.Printf("  Platforms: %v\n", config.Platforms)
+	fmt.Printf("  Architectures: %v\n", config.Architectures)
+	fmt.Printf("  CGO: %s\n", config.CGOStatus)
+	fmt.Printf("  Docker: %s\n", config.DockerSupport)
+	fmt.Printf("  Git Provider: %s\n", config.GitProvider)
+	fmt.Printf("  Code Signing: %s\n", config.SigningLevel)
+	fmt.Printf("  Homebrew: %v\n", config.Homebrew)
+	fmt.Printf("  GitHub Actions: %v\n", config.ActionLevel != domain.ActionLevelNone)
+	fmt.Println()
 
 	return nil
 }

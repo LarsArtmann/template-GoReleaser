@@ -378,3 +378,163 @@ func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Dependency check rollback is a no-op")
 	return nil
 }
+
+// DockerfileGenerationJob generates Dockerfile
+type DockerfileGenerationJob struct {
+	id        string
+	config    *domain.SafeProjectConfig
+	force     bool
+	logger    Logger
+	generator *generators.DockerfileGenerator
+}
+
+// NewDockerfileGenerationJob creates a new Dockerfile generation job
+func NewDockerfileGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *DockerfileGenerationJob {
+	return &DockerfileGenerationJob{
+		id:        "dockerfile-generation",
+		config:    config,
+		force:     force,
+		logger:    logger,
+		generator: generators.NewDockerfileGenerator(config, logger),
+	}
+}
+
+func (j *DockerfileGenerationJob) ID() string {
+	return j.id
+}
+
+func (j *DockerfileGenerationJob) Name() string {
+	return "Generate Dockerfile"
+}
+
+func (j *DockerfileGenerationJob) GetMetadata() JobMetadata {
+	return JobMetadata{
+		Description:   "Generates Dockerfile for container builds",
+		EstimatedTime: 3 * time.Second,
+		Retryable:     false,
+		MaxRetries:    0,
+		Dependencies:  []string{},
+		Tags:          []string{"docker", "container"},
+	}
+}
+
+func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
+	j.logger.Info("Generating Dockerfile")
+
+	// Skip if Docker support is disabled
+	if !j.config.DockerSupport.ShouldBuild() {
+		j.logger.Info("Docker support disabled, skipping Dockerfile generation")
+		return nil
+	}
+
+	// Check context
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	// Generate Dockerfile
+	err := j.generator.Generate(ctx)
+	if err != nil {
+		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate Dockerfile")
+	}
+
+	j.logger.Info("Dockerfile generated successfully")
+	return nil
+}
+
+func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
+	j.logger.Info("Rolling back Dockerfile generation")
+	
+	// Check context
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	// Rollback generation
+	err := j.generator.Rollback(ctx)
+	if err != nil {
+		return errors.WrapError(err, errors.ErrWorkflowExecution, "Failed to rollback Dockerfile generation")
+	}
+
+	return nil
+}
+
+// HomebrewGenerationJob generates Homebrew formula
+type HomebrewGenerationJob struct {
+	id        string
+	config    *domain.SafeProjectConfig
+	force     bool
+	logger    Logger
+	generator *generators.HomebrewGenerator
+}
+
+// NewHomebrewGenerationJob creates a new Homebrew generation job
+func NewHomebrewGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *HomebrewGenerationJob {
+	return &HomebrewGenerationJob{
+		id:        "homebrew-generation",
+		config:    config,
+		force:     force,
+		logger:    logger,
+		generator: generators.NewHomebrewGenerator(config, logger),
+	}
+}
+
+func (j *HomebrewGenerationJob) ID() string {
+	return j.id
+}
+
+func (j *HomebrewGenerationJob) Name() string {
+	return "Generate Homebrew Formula"
+}
+
+func (j *HomebrewGenerationJob) GetMetadata() JobMetadata {
+	return JobMetadata{
+		Description:   "Generates Homebrew formula for package distribution",
+		EstimatedTime: 3 * time.Second,
+		Retryable:     false,
+		MaxRetries:    0,
+		Dependencies:  []string{},
+		Tags:          []string{"homebrew", "package", "distribution"},
+	}
+}
+
+func (j *HomebrewGenerationJob) Execute(ctx context.Context) error {
+	j.logger.Info("Generating Homebrew formula")
+
+	// Skip if Homebrew support is disabled
+	if !j.config.Homebrew {
+		j.logger.Info("Homebrew support disabled, skipping formula generation")
+		return nil
+	}
+
+	// Check context
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	// Generate formula
+	err := j.generator.Generate(ctx)
+	if err != nil {
+		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate Homebrew formula")
+	}
+
+	j.logger.Info("Homebrew formula generated successfully")
+	return nil
+}
+
+func (j *HomebrewGenerationJob) Rollback(ctx context.Context) error {
+	j.logger.Info("Rolling back Homebrew formula generation")
+	
+	// Check context
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+
+	// Rollback generation
+	err := j.generator.Rollback(ctx)
+	if err != nil {
+		return errors.WrapError(err, errors.ErrWorkflowExecution, "Failed to rollback Homebrew formula generation")
+	}
+
+	return nil
+}

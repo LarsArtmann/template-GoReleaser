@@ -10,13 +10,16 @@ Stop copy-pasting configs. Stop guessing at YAML. Get a production-ready GoRelea
 
 ## ✨ Features
 
-- 🎯 **Interactive wizard** - Guides you through every option
+- 🎯 **Interactive wizard** - Rich CLI prompts guide you through every option
 - 🧠 **Smart defaults** - Detects your project structure automatically
 - 🚀 **GitHub Actions included** - Complete CI/CD pipeline ready to go
 - 📦 **Multi-platform builds** - Linux, macOS, Windows, ARM, and more
-- 🐳 **Docker support** - Multi-arch container images
-- 🔒 **Security built-in** - Code signing, SBOM generation
-- ✅ **Validation** - Check your config before releasing
+- 🐳 **Docker support** - Multi-stage container builds with security best practices
+- 🍺 **Homebrew formulas** - Automatic package manager formula generation
+- 🔒 **Security built-in** - Code signing, SBOM generation, non-root containers
+- ✅ **Validation** - Comprehensive configuration checking with detailed reporting
+- 📋 **Preview mode** - See generated configurations before writing files
+- 🔄 **Rollback support** - Automatic cleanup if generation fails
 
 ## 🎬 Quick Start
 
@@ -179,12 +182,12 @@ When Docker is enabled, the wizard:
 
 ### Package Managers
 
-Optional support for:
+Built-in support for:
 
-- **Homebrew** - macOS/Linux formula
-- **Snap** - Linux snap packages
-- **Scoop** - Windows package manager
-- **AUR** - Arch Linux (Pro)
+- **Homebrew** - macOS/Linux formula with automatic naming
+- **Snap** - Linux snap packages (planned)
+- **Scoop** - Windows package manager (planned)
+- **AUR** - Arch Linux (planned)
 
 ## 🧪 Testing Your Configuration
 

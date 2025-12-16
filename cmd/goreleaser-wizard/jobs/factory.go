@@ -39,6 +39,16 @@ func (jf *JobFactory) CreateFullWizardJobs(config *domain.SafeProjectConfig, for
 	// Add config generation job
 	jobs = append(jobs, NewConfigGenerationJob(safeConfig, force, jf.logger))
 
+	// Add Dockerfile generation job
+	if safeConfig.DockerSupport.ShouldBuild() {
+		jobs = append(jobs, NewDockerfileGenerationJob(safeConfig, force, jf.logger))
+	}
+
+	// Add Homebrew generation job
+	if safeConfig.Homebrew {
+		jobs = append(jobs, NewHomebrewGenerationJob(safeConfig, force, jf.logger))
+	}
+
 	// Add GitHub Actions generation job
 	if safeConfig.ShouldGenerateActionsFiles() {
 		jobs = append(jobs, NewGitHubActionsGenerationJob(safeConfig, jf.logger))
@@ -159,7 +169,7 @@ func (jf *JobFactory) createJobRollback(jobID string, config *domain.SafeProject
 func (jf *JobFactory) getRequiredDependencies(config *domain.SafeProjectConfig) []string {
 	dependencies := []string{"go"}
 
-	if config.GetDockerEnabled() {
+	if config.DockerSupport.ShouldBuild() || config.DockerSupport.ShouldPublish() {
 		dependencies = append(dependencies, "docker")
 	}
 
