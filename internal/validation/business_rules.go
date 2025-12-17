@@ -1,8 +1,8 @@
 package validation
 
 import (
-	"exec"
 	"fmt"
+	"os/exec"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
