@@ -1,11 +1,9 @@
-package config
+package domain
 
 import (
 	"fmt"
 	"slices"
 	"strings"
-
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // ApplyDefaults applies smart defaults based on project type and context

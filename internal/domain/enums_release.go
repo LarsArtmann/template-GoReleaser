@@ -1,4 +1,4 @@
-package interfaces
+package domain
 
 // GitProvider represents supported Git hosting providers
 // This enum replaces string-based Git provider types for type safety

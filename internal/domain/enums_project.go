@@ -1,4 +1,4 @@
-package interfaces
+package domain
 
 // ProjectType represents different types of Go projects
 // This enum replaces string-based project types for type safety

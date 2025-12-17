@@ -1,14 +1,11 @@
-package config
+package domain
 
 import (
 	"encoding/json"
-	"exec"
 	"fmt"
+	"os/exec"
 
 	"gopkg.in/yaml.v3"
-
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 )
 
 // SafeProjectConfig represents single source of truth for project configuration
@@ -73,20 +70,20 @@ func NewSafeProjectConfig() *SafeProjectConfig {
 // Validate validates the configuration
 func (spc *SafeProjectConfig) Validate() error {
 	// Validate basic fields
-	if err := validation.ValidateProjectName(spc.ProjectName); err != nil {
+	if err := ValidateProjectName(spc.ProjectName); err != nil {
 		return err
 	}
 
-	if err := validation.ValidateBinaryName(spc.BinaryName); err != nil {
+	if err := ValidateBinaryName(spc.BinaryName); err != nil {
 		return err
 	}
 
-	if err := validation.ValidateMainPath(spc.MainPath); err != nil {
+	if err := ValidateMainPath(spc.MainPath); err != nil {
 		return err
 	}
 
 	if spc.ProjectDescription != "" {
-		if err := validation.ValidateProjectDescription(spc.ProjectDescription); err != nil {
+		if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
 			return err
 		}
 	}

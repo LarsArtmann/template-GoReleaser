@@ -1,4 +1,4 @@
-package interfaces
+package domain
 
 // Platform represents supported operating systems
 // This enum replaces string-based platform types for type safety

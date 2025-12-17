@@ -1,4 +1,4 @@
-package interfaces
+package domain
 
 // BuildTag represents a build tag for conditional compilation
 // This type-safe enum replaces string-based build tags
