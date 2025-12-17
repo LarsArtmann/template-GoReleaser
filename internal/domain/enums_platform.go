@@ -5,14 +5,22 @@ package domain
 type Platform string
 
 const (
-	PlatformLinux   Platform = "linux"
-	PlatformDarwin  Platform = "darwin"
+	// PlatformLinux represents Linux distributions
+	PlatformLinux Platform = "linux"
+	// PlatformDarwin represents macOS (Apple)
+	PlatformDarwin Platform = "darwin"
+	// PlatformWindows represents Microsoft Windows
 	PlatformWindows Platform = "windows"
+	// PlatformFreeBSD represents FreeBSD
 	PlatformFreeBSD Platform = "freebsd"
+	// PlatformOpenBSD represents OpenBSD
 	PlatformOpenBSD Platform = "openbsd"
-	PlatformNetBSD  Platform = "netbsd"
+	// PlatformNetBSD represents NetBSD
+	PlatformNetBSD Platform = "netbsd"
+	// PlatformAndroid represents Android OS
 	PlatformAndroid Platform = "android"
-	PlatformIOS     Platform = "ios"
+	// PlatformIOS represents iOS (Apple mobile)
+	PlatformIOS Platform = "ios"
 )
 
 // IsValid returns true if Platform is valid
@@ -53,46 +61,95 @@ func (p Platform) String() string {
 
 // IsUnix returns true for Unix-like platforms
 func (p Platform) IsUnix() bool {
-	return p == PlatformLinux || p == PlatformDarwin ||
-		p == PlatformFreeBSD || p == PlatformOpenBSD || p == PlatformNetBSD
+	switch p {
+	case PlatformLinux, PlatformDarwin, PlatformFreeBSD, 
+		PlatformOpenBSD, PlatformNetBSD:
+		return true
+	default:
+		return false
+	}
 }
 
 // IsMobile returns true for mobile platforms
 func (p Platform) IsMobile() bool {
-	return p == PlatformAndroid || p == PlatformIOS
+	switch p {
+	case PlatformAndroid, PlatformIOS:
+		return true
+	default:
+		return false
+	}
 }
 
 // IsDesktop returns true for desktop platforms
 func (p Platform) IsDesktop() bool {
-	return p == PlatformLinux || p == PlatformDarwin || p == PlatformWindows
+	return !p.IsMobile()
 }
 
-// IsServer returns true for server platforms
-func (p Platform) IsServer() bool {
-	return p == PlatformLinux || p == PlatformFreeBSD ||
-		p == PlatformOpenBSD || p == PlatformNetBSD
+// IsWindows returns true for Windows platform
+func (p Platform) IsWindows() bool {
+	return p == PlatformWindows
 }
 
-// GetFamily returns the OS family
-func (p Platform) GetFamily() string {
+// IsApple returns true for Apple platforms
+func (p Platform) IsApple() bool {
 	switch p {
-	case PlatformLinux, PlatformFreeBSD, PlatformOpenBSD, PlatformNetBSD:
-		return "unix"
-	case PlatformDarwin:
-		return "darwin"
-	case PlatformWindows:
-		return "windows"
-	case PlatformAndroid:
-		return "android"
-	case PlatformIOS:
-		return "ios"
+	case PlatformDarwin, PlatformIOS:
+		return true
 	default:
-		return "unknown"
+		return false
 	}
 }
 
-// GetExecutableExtension returns the executable file extension
-func (p Platform) GetExecutableExtension() string {
+// SupportsCGO returns true if platform supports CGO
+func (p Platform) SupportsCGO() bool {
+	switch p {
+	case PlatformLinux, PlatformDarwin, PlatformWindows, PlatformFreeBSD:
+		return true
+	case PlatformOpenBSD, PlatformNetBSD:
+		return false // Limited CGO support
+	case PlatformAndroid, PlatformIOS:
+		return true // Via NDK/XCode
+	}
+}
+
+// GetDefaultArchitectures returns default architectures for platform
+func (p Platform) GetDefaultArchitectures() []Architecture {
+	switch p {
+	case PlatformLinux:
+		return []Architecture{ArchitectureAMD64, ArchitectureARM64}
+	case PlatformDarwin:
+		return []Architecture{ArchitectureARM64, ArchitectureAMD64}
+	case PlatformWindows:
+		return []Architecture{ArchitectureAMD64, ArchitectureARM64}
+	case PlatformFreeBSD, PlatformOpenBSD, PlatformNetBSD:
+		return []Architecture{ArchitectureAMD64}
+	case PlatformAndroid:
+		return []Architecture{ArchitectureARM64}
+	case PlatformIOS:
+		return []Architecture{ArchitectureARM64}
+	default:
+		return []Architecture{}
+	}
+}
+
+// GetPackageFormat returns preferred package format for platform
+func (p Platform) GetPackageFormat() string {
+	switch p {
+	case PlatformLinux:
+		return "tar.gz"
+	case PlatformDarwin:
+		return "tar.gz"
+	case PlatformWindows:
+		return "zip"
+	case PlatformFreeBSD, PlatformOpenBSD, PlatformNetBSD:
+		return "tar.gz"
+	default:
+		return "tar.gz"
+	}
+}
+
+// GetBinaryExtension returns binary extension for platform
+func (p Platform) GetBinaryExtension() string {
 	switch p {
 	case PlatformWindows:
 		return ".exe"
@@ -101,194 +158,39 @@ func (p Platform) GetExecutableExtension() string {
 	}
 }
 
-// GetArchiveFormat returns preferred archive format
-func (p Platform) GetArchiveFormat() string {
+// IsProductionReady returns true if platform is production-ready
+func (p Platform) IsProductionReady() bool {
 	switch p {
-	case PlatformWindows:
-		return "zip"
-	default:
-		return "tar.gz"
-	}
-}
-
-// Architecture represents supported CPU architectures
-// This enum replaces string-based architecture types for type safety
-type Architecture string
-
-const (
-	Architecture386      Architecture = "386"
-	ArchitectureAMD64    Architecture = "amd64"
-	ArchitectureARM      Architecture = "arm"
-	ArchitectureARM64    Architecture = "arm64"
-	ArchitecturePPC64    Architecture = "ppc64"
-	ArchitecturePPC64LE  Architecture = "ppc64le"
-	ArchitectureS390X    Architecture = "s390x"
-	ArchitectureMIPS     Architecture = "mips"
-	ArchitectureMIPSLE   Architecture = "mipsle"
-	ArchitectureMIPS64   Architecture = "mips64"
-	ArchitectureMIPS64LE Architecture = "mips64le"
-	ArchitectureRISCV64  Architecture = "riscv64"
-)
-
-// IsValid returns true if Architecture is valid
-func (a Architecture) IsValid() bool {
-	switch a {
-	case Architecture386, ArchitectureAMD64, ArchitectureARM, ArchitectureARM64,
-		ArchitecturePPC64, ArchitecturePPC64LE, ArchitectureS390X,
-		ArchitectureMIPS, ArchitectureMIPSLE, ArchitectureMIPS64, ArchitectureMIPS64LE,
-		ArchitectureRISCV64:
+	case PlatformLinux, PlatformDarwin, PlatformWindows:
 		return true
-	default:
-		return false
-	}
-}
-
-// String returns human-readable display name
-func (a Architecture) String() string {
-	switch a {
-	case Architecture386:
-		return "x86 (32-bit)"
-	case ArchitectureAMD64:
-		return "x86_64"
-	case ArchitectureARM:
-		return "ARM (32-bit)"
-	case ArchitectureARM64:
-		return "ARM64"
-	case ArchitecturePPC64:
-		return "PowerPC64"
-	case ArchitecturePPC64LE:
-		return "PowerPC64LE"
-	case ArchitectureS390X:
-		return "s390x"
-	case ArchitectureMIPS:
-		return "MIPS (32-bit)"
-	case ArchitectureMIPSLE:
-		return "MIPSLE (32-bit)"
-	case ArchitectureMIPS64:
-		return "MIPS64"
-	case ArchitectureMIPS64LE:
-		return "MIPS64LE"
-	case ArchitectureRISCV64:
-		return "RISC-V 64"
-	default:
-		return "Unknown"
-	}
-}
-
-// Is64Bit returns true for 64-bit architectures
-func (a Architecture) Is64Bit() bool {
-	switch a {
-	case ArchitectureAMD64, ArchitectureARM64, ArchitecturePPC64, ArchitecturePPC64LE,
-		ArchitectureS390X, ArchitectureMIPS64, ArchitectureMIPS64LE, ArchitectureRISCV64:
-		return true
-	default:
-		return false
-	}
-}
-
-// Is32Bit returns true for 32-bit architectures
-func (a Architecture) Is32Bit() bool {
-	return !a.Is64Bit()
-}
-
-// IsBigEndian returns true for big-endian architectures
-func (a Architecture) IsBigEndian() bool {
-	switch a {
-	case ArchitecturePPC64, ArchitectureS390X, ArchitectureMIPS64:
-		return true
-	default:
-		return false
-	}
-}
-
-// IsLittleEndian returns true for little-endian architectures
-func (a Architecture) IsLittleEndian() bool {
-	return !a.IsBigEndian()
-}
-
-// GetFamily returns the CPU architecture family
-func (a Architecture) GetFamily() string {
-	switch a {
-	case Architecture386, ArchitectureAMD64:
-		return "x86"
-	case ArchitectureARM, ArchitectureARM64:
-		return "arm"
-	case ArchitecturePPC64, ArchitecturePPC64LE:
-		return "ppc"
-	case ArchitectureS390X:
-		return "s390"
-	case ArchitectureMIPS, ArchitectureMIPSLE, ArchitectureMIPS64, ArchitectureMIPS64LE:
-		return "mips"
-	case ArchitectureRISCV64:
-		return "riscv"
-	default:
-		return "unknown"
-	}
-}
-
-// IsCompatibleWith checks if architecture is compatible with platform
-func (a Architecture) IsCompatibleWith(platform Platform) bool {
-	// Basic compatibility rules
-	switch platform {
-	case PlatformLinux:
-		// Linux supports most architectures
-		return a.IsValid()
-	case PlatformDarwin:
-		// macOS supports x86_64 and ARM64
-		return a == ArchitectureAMD64 || a == ArchitectureARM64
-	case PlatformWindows:
-		// Windows supports x86 architectures
-		return a == Architecture386 || a == ArchitectureAMD64
 	case PlatformFreeBSD:
-		// FreeBSD supports x86 and ARM
-		return a == Architecture386 || a == ArchitectureAMD64 || a == ArchitectureARM64
+		return true // Stable but limited usage
 	case PlatformOpenBSD, PlatformNetBSD:
-		// OpenBSD/NetBSD support x86 and ARM64
-		return a == Architecture386 || a == ArchitectureAMD64 || a == ArchitectureARM64
-	case PlatformAndroid:
-		// Android supports ARM
-		return a == ArchitectureARM || a == ArchitectureARM64
-	case PlatformIOS:
-		// iOS supports ARM64
-		return a == ArchitectureARM64
+		return false // Security-focused, limited Go support
+	case PlatformAndroid, PlatformIOS:
+		return true // Via cross-compilation
 	default:
 		return false
 	}
 }
 
-// GetRecommendedArchitectures returns recommended architectures for platform
-func GetRecommendedArchitectures(platform Platform) []Architecture {
-	switch platform {
-	case PlatformLinux:
-		return []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386}
-	case PlatformDarwin:
-		return []Architecture{ArchitectureAMD64, ArchitectureARM64}
-	case PlatformWindows:
-		return []Architecture{ArchitectureAMD64, Architecture386}
-	case PlatformFreeBSD:
-		return []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386}
-	case PlatformOpenBSD, PlatformNetBSD:
-		return []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386}
-	case PlatformAndroid:
-		return []Architecture{ArchitectureARM64, ArchitectureARM}
-	case PlatformIOS:
-		return []Architecture{ArchitectureARM64}
-	default:
-		return []Architecture{ArchitectureAMD64}
+// ValidatePlatform validates a platform
+func ValidatePlatform(platform Platform) error {
+	if !platform.IsValid() {
+		return NewValidationError(
+			ErrInvalidPlatform,
+			"Invalid platform",
+			fmt.Sprintf("'%s' is not a valid platform", platform),
+		)
 	}
+	return nil
 }
 
-// GetServerRecommendedArchitectures returns recommended server architectures
-func GetServerRecommendedArchitectures() []Architecture {
-	return []Architecture{ArchitectureAMD64, ArchitectureARM64}
-}
-
-// GetDesktopRecommendedArchitectures returns recommended desktop architectures
-func GetDesktopRecommendedArchitectures() []Architecture {
-	return []Architecture{ArchitectureAMD64, ArchitectureARM64, Architecture386}
-}
-
-// GetMobileRecommendedArchitectures returns recommended mobile architectures
-func GetMobileRecommendedArchitectures() []Architecture {
-	return []Architecture{ArchitectureARM64, ArchitectureARM}
+// GetRecommendedPlatforms returns recommended platforms for projects
+func GetRecommendedPlatforms() []Platform {
+	return []Platform{
+		PlatformLinux,   // Primary server platform
+		PlatformDarwin,  // Primary development platform
+		PlatformWindows,  // Windows development platform
+	}
 }

@@ -144,64 +144,7 @@ func ValidateSigningLevel(level SigningLevel) error {
 	return nil
 }
 
-// FeatureLevel represents feature tier with compile-time safety
-// Replaces bool ProVersion for better type safety and semantic clarity
-type FeatureLevel string
 
-const (
-	// FeatureLevelBasic includes basic features for standard projects
-	FeatureLevelBasic FeatureLevel = "basic"
-	// FeatureLevelProfessional includes professional features for larger projects
-	FeatureLevelProfessional FeatureLevel = "professional"
-	// FeatureLevelEnterprise includes enterprise features with full compliance
-	FeatureLevelEnterprise FeatureLevel = "enterprise"
-)
-
-// IsValid returns true if FeatureLevel is valid
-func (fl FeatureLevel) IsValid() bool {
-	switch fl {
-	case FeatureLevelBasic, FeatureLevelProfessional, FeatureLevelEnterprise:
-		return true
-	default:
-		return false
-	}
-}
-
-// String returns human-readable display name
-func (fl FeatureLevel) String() string {
-	switch fl {
-	case FeatureLevelBasic:
-		return "Basic"
-	case FeatureLevelProfessional:
-		return "Professional"
-	case FeatureLevelEnterprise:
-		return "Enterprise"
-	default:
-		return "Unknown"
-	}
-}
-
-// IsPro returns true if professional or enterprise features are enabled
-func (fl FeatureLevel) IsPro() bool {
-	return fl == FeatureLevelProfessional || fl == FeatureLevelEnterprise
-}
-
-// ToBool converts to legacy boolean for compatibility
-func (fl FeatureLevel) ToBool() bool {
-	return fl.IsPro()
-}
-
-// ValidateFeatureLevel validates a feature level
-func ValidateFeatureLevel(level FeatureLevel) error {
-	if !level.IsValid() {
-		return NewValidationError(
-			ErrInvalidCharacters,
-			"Invalid feature level",
-			fmt.Sprintf("'%s' is not a valid feature level", level),
-		)
-	}
-	return nil
-}
 
 // Enum migration utilities for backward compatibility
 
