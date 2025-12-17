@@ -18,8 +18,6 @@ import (
 	"fmt"
 	"slices"
 	"strings"
-
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 )
 
 // SafeProjectConfig represents single source of truth for project configuration
@@ -140,19 +138,19 @@ func (spc *SafeProjectConfig) ApplyDefaults() {
 // ValidateInvariants enforces domain invariants and returns any violations
 func (spc *SafeProjectConfig) ValidateInvariants() error {
 	// Basic validation
-	if err := validation.ValidateProjectName(spc.ProjectName); err != nil {
+	if err := ValidateProjectName(spc.ProjectName); err != nil {
 		return err
 	}
 
-	if err := validation.ValidateBinaryName(spc.BinaryName); err != nil {
+	if err := ValidateBinaryName(spc.BinaryName); err != nil {
 		return err
 	}
 
-	if err := validation.ValidateMainPath(spc.MainPath); err != nil {
+	if err := ValidateMainPath(spc.MainPath); err != nil {
 		return err
 	}
 
-	if err := validation.ValidateProjectDescription(spc.ProjectDescription); err != nil {
+	if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
 		return err
 	}
 

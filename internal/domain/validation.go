@@ -17,8 +17,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strings"
-
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 )
 
 // Validation use case implementation
@@ -86,23 +84,23 @@ func (vu *ValidationUseCase) ValidateConfiguration(ctx context.Context, config *
 // validateBasicFields validates basic required fields
 func (vu *ValidationUseCase) validateBasicFields(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	// Project name validation
-	if err := validation.ValidateProjectName(config.ProjectName); err != nil {
+	if err := ValidateProjectName(config.ProjectName); err != nil {
 		return NewValidationError(ErrInvalidProjectName, "Project name validation failed", err.Error()).WithContext("project_name")
 	}
 
 	// Binary name validation
-	if err := validation.ValidateBinaryName(config.BinaryName); err != nil {
+	if err := ValidateBinaryName(config.BinaryName); err != nil {
 		return NewValidationError(ErrInvalidBinaryName, "Binary name validation failed", err.Error()).WithContext("binary_name")
 	}
 
 	// Main path validation
-	if err := validation.ValidateMainPath(config.MainPath); err != nil {
+	if err := ValidateMainPath(config.MainPath); err != nil {
 		return NewValidationError(ErrInvalidMainPath, "Main path validation failed", err.Error()).WithContext("main_path")
 	}
 
 	// Project description validation (optional)
 	if config.ProjectDescription != "" {
-		if err := validation.ValidateProjectDescription(config.ProjectDescription); err != nil {
+		if err := ValidateProjectDescription(config.ProjectDescription); err != nil {
 			return NewValidationError(ErrInvalidProjectDescription, "Project description validation failed", err.Error()).WithContext("project_description")
 		}
 	}
