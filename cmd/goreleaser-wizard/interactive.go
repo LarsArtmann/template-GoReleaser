@@ -8,7 +8,6 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/charmbracelet/lipgloss"
 )
 
 // InteractivePrompter handles user interaction during init
@@ -89,7 +88,7 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 // promptProjectType prompts for project type selection
 func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (domain.ProjectType, error) {
 	fmt.Println(infoStyle.Render("\n🎯 Select Project Type:"))
-	
+
 	types := []domain.ProjectType{
 		domain.ProjectTypeCLIApplication,
 		domain.ProjectTypeWebService,
@@ -116,7 +115,7 @@ func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (do
 // promptPlatforms prompts for target platforms
 func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]domain.Platform, error) {
 	fmt.Println(infoStyle.Render("\n🖥️  Select Target Platforms:"))
-	
+
 	available := []domain.Platform{
 		domain.PlatformLinux,
 		domain.PlatformDarwin,
@@ -147,7 +146,7 @@ func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]dom
 // promptArchitectures prompts for target architectures
 func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture) ([]domain.Architecture, error) {
 	fmt.Println(infoStyle.Render("\n🏗️  Select Target Architectures:"))
-	
+
 	available := []domain.Architecture{
 		domain.ArchitectureAmd64,
 		domain.ArchitectureArm64,
@@ -177,7 +176,7 @@ func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture
 // promptCGO prompts for CGO configuration
 func (ip *InteractivePrompter) promptCGO(current domain.CGOStatus) (domain.CGOStatus, error) {
 	fmt.Println(infoStyle.Render("\n⚙️  CGO Configuration:"))
-	
+
 	statuses := []domain.CGOStatus{
 		domain.CGOStatusDisabled,
 		domain.CGOStatusEnabled,
@@ -203,7 +202,7 @@ func (ip *InteractivePrompter) promptCGO(current domain.CGOStatus) (domain.CGOSt
 // promptDocker prompts for Docker configuration
 func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domain.DockerSupport, error) {
 	fmt.Println(infoStyle.Render("\n🐳 Docker Support:"))
-	
+
 	levels := []domain.DockerSupport{
 		domain.DockerSupportNone,
 		domain.DockerSupportBuild,
@@ -230,7 +229,7 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 // promptGitProvider prompts for Git provider
 func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (domain.GitProvider, error) {
 	fmt.Println(infoStyle.Render("\n🔗 Git Provider:"))
-	
+
 	providers := []domain.GitProvider{
 		domain.GitProviderGitHub,
 		domain.GitProviderGitLab,
@@ -385,7 +384,7 @@ func (ip *InteractivePrompter) promptMultiInt(label string, min, max int) ([]int
 
 		input := strings.TrimSpace(ip.scanner.Text())
 		if input == "" {
-			return []int{1}, // Default to first option
+			return []int{1} // Default to first option
 		}
 
 		parts := strings.Split(input, ",")

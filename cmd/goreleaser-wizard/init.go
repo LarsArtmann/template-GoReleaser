@@ -205,7 +205,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 // runInteractiveWizard runs an interactive wizard for configuration
 func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 	prompter := NewInteractivePrompter()
-	
+
 	// Confirm and modify detected information
 	var err error
 	config, err = prompter.confirmDetectedInfo(config)

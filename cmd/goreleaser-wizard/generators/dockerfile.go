@@ -19,18 +19,18 @@ type DockerfileGenerator struct {
 
 // DockerfileTemplateData contains data for Dockerfile template
 type DockerfileTemplateData struct {
-	ProjectName  string
-	GoVersion    string
+	ProjectName   string
+	GoVersion     string
 	AlpineVersion string
-	CGOEnabled   string
-	TargetOS     string
-	TargetArch   string
-	LDFlags      string
-	MainPath     string
-	ConfigFiles  []string
-	ExposePort   string
-	EnvVars      []EnvVar
-	HealthCheck  *HealthCheck
+	CGOEnabled    string
+	TargetOS      string
+	TargetArch    string
+	LDFlags       string
+	MainPath      string
+	ConfigFiles   []string
+	ExposePort    string
+	EnvVars       []EnvVar
+	HealthCheck   *HealthCheck
 }
 
 // EnvVar represents an environment variable
@@ -59,18 +59,18 @@ func NewDockerfileGenerator(config *domain.SafeProjectConfig, logger Logger) *Do
 // createDockerfileTemplateData creates template data from project config
 func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileTemplateData {
 	data := &DockerfileTemplateData{
-		ProjectName:  config.ProjectName,
-		GoVersion:    "1.21", // Default Go version
+		ProjectName:   config.ProjectName,
+		GoVersion:     "1.21", // Default Go version
 		AlpineVersion: "latest",
-		CGOEnabled:   "false",
-		TargetOS:     "linux",
-		TargetArch:   "amd64",
-		LDFlags:      "-s -w",
-		MainPath:     config.MainPath,
-		ConfigFiles:  []string{},
-		ExposePort:   "",
-		EnvVars:      []EnvVar{},
-		HealthCheck:  nil,
+		CGOEnabled:    "false",
+		TargetOS:      "linux",
+		TargetArch:    "amd64",
+		LDFlags:       "-s -w",
+		MainPath:      config.MainPath,
+		ConfigFiles:   []string{},
+		ExposePort:    "",
+		EnvVars:       []EnvVar{},
+		HealthCheck:   nil,
 	}
 
 	// Set CGO based on configuration

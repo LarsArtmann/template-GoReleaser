@@ -21,18 +21,18 @@ type HomebrewGenerator struct {
 
 // HomebrewTemplateData contains data for Homebrew formula template
 type HomebrewTemplateData struct {
-	FormulaName   string
-	ProjectName   string
+	FormulaName        string
+	ProjectName        string
 	ProjectDescription string
-	Homepage      string
-	ArchiveURL    string
-	Checksum      string
-	License       string
-	MainPath      string
-	LDFlags       string
-	BinaryName    string
-	TestOutput    string
-	Service       bool
+	Homepage           string
+	ArchiveURL         string
+	Checksum           string
+	License            string
+	MainPath           string
+	LDFlags            string
+	BinaryName         string
+	TestOutput         string
+	Service            bool
 }
 
 // NewHomebrewGenerator creates a new Homebrew generator
@@ -55,9 +55,9 @@ func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTempl
 	}
 
 	return &HomebrewTemplateData{
-		FormulaName:         formulaName,
-		ProjectName:         config.ProjectName,
-		ProjectDescription:  description,
+		FormulaName:        formulaName,
+		ProjectName:        config.ProjectName,
+		ProjectDescription: description,
 		Homepage:           "https://github.com/user/" + config.ProjectName,
 		ArchiveURL:         fmt.Sprintf("https://github.com/user/%s/archive/v{{version}}.tar.gz", config.ProjectName),
 		Checksum:           "{{sha256}}", // Will be filled by GoReleaser
@@ -74,14 +74,14 @@ func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTempl
 func toCamelCase(s string) string {
 	// Handle kebab-case and snake_case
 	words := splitWords(s)
-	
+
 	result := ""
 	for _, word := range words {
 		if len(word) > 0 {
 			result += strings.ToUpper(word[:1]) + strings.ToLower(word[1:])
 		}
 	}
-	
+
 	return result
 }
 
@@ -89,7 +89,7 @@ func toCamelCase(s string) string {
 func splitWords(s string) []string {
 	var words []string
 	current := ""
-	
+
 	for _, r := range s {
 		if r == '-' || r == '_' || r == ' ' {
 			if current != "" {
@@ -100,11 +100,11 @@ func splitWords(s string) []string {
 			current += string(r)
 		}
 	}
-	
+
 	if current != "" {
 		words = append(words, current)
 	}
-	
+
 	return words
 }
 

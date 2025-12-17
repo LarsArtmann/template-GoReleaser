@@ -444,7 +444,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 
 func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back Dockerfile generation")
-	
+
 	// Check context
 	if ctx.Err() != nil {
 		return ctx.Err()
@@ -524,7 +524,7 @@ func (j *HomebrewGenerationJob) Execute(ctx context.Context) error {
 
 func (j *HomebrewGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back Homebrew formula generation")
-	
+
 	// Check context
 	if ctx.Err() != nil {
 		return ctx.Err()
