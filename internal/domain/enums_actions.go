@@ -1,4 +1,6 @@
-package interfaces
+package domain
+
+import "fmt"
 
 // ActionLevel represents GitHub Actions complexity levels
 // This enum replaces string-based action levels for type safety
@@ -120,182 +122,6 @@ func (al ActionLevel) GetEnvironmentCount() int {
 	}
 }
 
-// ActionTrigger represents GitHub Actions triggers
-// This enum replaces string-based triggers for type safety
-type ActionTrigger string
-
-const (
-	ActionTriggerManual      ActionTrigger = "manual"
-	ActionTriggerVersionTags ActionTrigger = "version-tags"
-	ActionTriggerAllTags     ActionTrigger = "all-tags"
-	ActionTriggerMainPush    ActionTrigger = "main-push"
-	ActionTriggerAllPush     ActionTrigger = "all-push"
-	ActionTriggerPullRequest ActionTrigger = "pull-request"
-	ActionTriggerSchedule    ActionTrigger = "schedule"
-	ActionTriggerWebhook     ActionTrigger = "webhook"
-	ActionTriggerWorkflow    ActionTrigger = "workflow"
-)
-
-// IsValid returns true if ActionTrigger is valid
-func (at ActionTrigger) IsValid() bool {
-	switch at {
-	case ActionTriggerManual, ActionTriggerVersionTags, ActionTriggerAllTags,
-		ActionTriggerMainPush, ActionTriggerAllPush, ActionTriggerPullRequest,
-		ActionTriggerSchedule, ActionTriggerWebhook, ActionTriggerWorkflow:
-		return true
-	default:
-		return false
-	}
-}
-
-// String returns human-readable display name
-func (at ActionTrigger) String() string {
-	switch at {
-	case ActionTriggerManual:
-		return "Manual Dispatch"
-	case ActionTriggerVersionTags:
-		return "Version Tags"
-	case ActionTriggerAllTags:
-		return "All Tags"
-	case ActionTriggerMainPush:
-		return "Main Branch Push"
-	case ActionTriggerAllPush:
-		return "All Branches Push"
-	case ActionTriggerPullRequest:
-		return "Pull Request"
-	case ActionTriggerSchedule:
-		return "Scheduled"
-	case ActionTriggerWebhook:
-		return "Webhook"
-	case ActionTriggerWorkflow:
-		return "Workflow Dispatch"
-	default:
-		return "Unknown"
-	}
-}
-
-// GitHubPattern returns the GitHub Actions syntax for this trigger
-func (at ActionTrigger) GitHubPattern() string {
-	switch at {
-	case ActionTriggerManual:
-		return "workflow_dispatch:"
-	case ActionTriggerVersionTags:
-		return "push:\n  tags:\n    - 'v*'"
-	case ActionTriggerAllTags:
-		return "push:\n  tags:\n    - '*'"
-	case ActionTriggerMainPush:
-		return "push:\n  branches:\n    - 'main'"
-	case ActionTriggerAllPush:
-		return "push:"
-	case ActionTriggerPullRequest:
-		return "pull_request:"
-	case ActionTriggerSchedule:
-		return "schedule:\n  - cron: '0 2 * * 0'" // Weekly on Sunday 2 AM
-	case ActionTriggerWebhook:
-		return "repository_dispatch:"
-	case ActionTriggerWorkflow:
-		return "workflow_run:"
-	default:
-		return ""
-	}
-}
-
-// IsManual returns true if trigger is manual
-func (at ActionTrigger) IsManual() bool {
-	return at == ActionTriggerManual || at == ActionTriggerWorkflow
-}
-
-// IsAutomated returns true if trigger is automated
-func (at ActionTrigger) IsAutomated() bool {
-	return !at.IsManual()
-}
-
-// IsSecuritySensitive returns true if trigger is security-sensitive
-func (at ActionTrigger) IsSecuritySensitive() bool {
-	switch at {
-	case ActionTriggerWebhook, ActionTriggerSchedule:
-		return true
-	default:
-		return false
-	}
-}
-
-// RequiresApproval returns true if trigger requires approval
-func (at ActionTrigger) RequiresApproval() bool {
-	switch at {
-	case ActionTriggerSchedule, ActionTriggerWebhook:
-		return true
-	default:
-		return false
-	}
-}
-
-// CanTriggerOnPush returns true if trigger can be triggered by push
-func (at ActionTrigger) CanTriggerOnPush() bool {
-	switch at {
-	case ActionTriggerVersionTags, ActionTriggerAllTags, ActionTriggerMainPush, ActionTriggerAllPush:
-		return true
-	default:
-		return false
-	}
-}
-
-// CanTriggerOnTag returns true if trigger can be triggered by tag
-func (at ActionTrigger) CanTriggerOnTag() bool {
-	switch at {
-	case ActionTriggerVersionTags, ActionTriggerAllTags:
-		return true
-	default:
-		return false
-	}
-}
-
-// CanTriggerOnBranch returns true if trigger can be triggered by branch push
-func (at ActionTrigger) CanTriggerOnBranch() bool {
-	switch at {
-	case ActionTriggerMainPush, ActionTriggerAllPush:
-		return true
-	default:
-		return false
-	}
-}
-
-// CanTriggerOnSchedule returns true if trigger can be scheduled
-func (at ActionTrigger) CanTriggerOnSchedule() bool {
-	return at == ActionTriggerSchedule
-}
-
-// CanTriggerOnWebhook returns true if trigger can be triggered by webhook
-func (at ActionTrigger) CanTriggerOnWebhook() bool {
-	return at == ActionTriggerWebhook
-}
-
-// GetRecommendedBranches returns recommended branches for this trigger
-func (at ActionTrigger) GetRecommendedBranches() []string {
-	switch at {
-	case ActionTriggerMainPush:
-		return []string{"main", "master"}
-	case ActionTriggerAllPush:
-		return []string{"main", "master", "develop", "feature/*", "hotfix/*"}
-	case ActionTriggerPullRequest:
-		return []string{"main", "master", "develop"}
-	default:
-		return []string{}
-	}
-}
-
-// GetRecommendedTags returns recommended tag patterns for this trigger
-func (at ActionTrigger) GetRecommendedTags() []string {
-	switch at {
-	case ActionTriggerVersionTags:
-		return []string{"v*", "release/*"}
-	case ActionTriggerAllTags:
-		return []string{"*"}
-	default:
-		return []string{}
-	}
-}
-
 // DockerSupport represents Docker build and deployment options
 // This enum replaces boolean docker flags for type safety
 type DockerSupport string
@@ -348,49 +174,25 @@ func (ds DockerSupport) IsDeployEnabled() bool {
 	return ds == DockerSupportDeploy || ds == DockerSupportBoth
 }
 
-// RequiresRegistry returns true if requires container registry
-func (ds DockerSupport) RequiresRegistry() bool {
+// ShouldBuild returns true if Docker images should be built
+func (ds DockerSupport) ShouldBuild() bool {
+	return ds.IsBuildEnabled()
+}
+
+// ShouldPublish returns true if Docker images should be published
+func (ds DockerSupport) ShouldPublish() bool {
 	return ds.IsDeployEnabled()
 }
 
-// RequiresDockerfile returns true if requires Dockerfile
-func (ds DockerSupport) RequiresDockerfile() bool {
+// ToBool converts to legacy boolean for compatibility
+func (ds DockerSupport) ToBool() bool {
 	return ds.IsEnabled()
 }
 
-// GetRequiredDockerfile returns type of Dockerfile required
-func (ds DockerSupport) GetRequiredDockerfile() string {
-	switch ds {
-	case DockerSupportNone:
-		return ""
-	case DockerSupportBuild, DockerSupportDeploy, DockerSupportBoth:
-		return "Dockerfile"
-	default:
-		return ""
+// ValidateDockerSupport validates a Docker support level
+func ValidateDockerSupport(support DockerSupport) error {
+	if !support.IsValid() {
+		return fmt.Errorf("invalid Docker support level: %s", support)
 	}
-}
-
-// GetBuildContext returns recommended build context
-func (ds DockerSupport) GetBuildContext() string {
-	switch ds {
-	case DockerSupportBuild, DockerSupportDeploy, DockerSupportBoth:
-		return "."
-	default:
-		return ""
-	}
-}
-
-// GetRequiredArgs returns required Docker build arguments
-func (ds DockerSupport) GetRequiredArgs() []string {
-	var args []string
-
-	if ds.IsBuildEnabled() {
-		args = append(args, "--pull", "--label=org.opencontainers.image.created={{.Date}}")
-	}
-
-	if ds.IsDeployEnabled() {
-		args = append(args, "--platform=linux/amd64")
-	}
-
-	return args
+	return nil
 }
