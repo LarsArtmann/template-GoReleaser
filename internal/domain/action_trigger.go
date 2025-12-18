@@ -16,6 +16,9 @@ const (
 	ActionTriggerManual      ActionTrigger = "manual"       // Manual Trigger
 	ActionTriggerMain        ActionTrigger = "main"         // Push to Main
 	ActionTriggerRelease     ActionTrigger = "release"      // Published Release
+	ActionTriggerMainPush    ActionTrigger = "main-push"    // Push to Main (explicit)
+	ActionTriggerPullRequest ActionTrigger = "pull-request" // Pull Request
+	ActionTriggerSchedule    ActionTrigger = "schedule"     // Scheduled Trigger
 )
 
 // ActionTrigger metadata - generated from TypeSpec invariants

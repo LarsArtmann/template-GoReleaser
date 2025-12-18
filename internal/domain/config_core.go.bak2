@@ -155,7 +155,7 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	if !spc.State.IsValid() {
 		return NewValidationError(
-			ErrInvalidConfigState,
+			ErrInvalidProjectNameState,
 			"Invalid config state",
 			string(spc.State),
 		).WithField("state")
@@ -284,7 +284,7 @@ func (spc *SafeProjectConfig) validateSigningConfiguration() error {
 		for _, tool := range requiredTools {
 			if _, err := exec.LookPath(tool); err != nil {
 				return NewValidationError(
-					ErrExternalToolNotFound,
+					ErrDependencyMissing,
 					"Required signing tool not found",
 					tool,
 				).WithField("signing_tools")

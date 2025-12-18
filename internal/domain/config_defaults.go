@@ -23,9 +23,9 @@ func (spc *SafeProjectConfig) applyProjectTypeDefaults() {
 	// Set CGO status based on project type
 	if spc.CGOStatus == "" {
 		if spc.ProjectType.DefaultCGOEnabled() {
-			spc.CGOStatus = domain.CGOStatusEnabled
+			spc.CGOStatus = CGOStatusEnabled
 		} else {
-			spc.CGOStatus = domain.CGOStatusDisabled
+			spc.CGOStatus = CGOStatusDisabled
 		}
 	}
 
@@ -42,15 +42,15 @@ func (spc *SafeProjectConfig) applyProjectTypeDefaults() {
 	// Set Docker support based on project type
 	if spc.DockerSupport == "" {
 		if spc.ProjectType.DockerSupported() {
-			spc.DockerSupport = domain.DockerSupportBuild
+			spc.DockerSupport = DockerSupportBuild
 		} else {
-			spc.DockerSupport = domain.DockerSupportNone
+			spc.DockerSupport = DockerSupportNone
 		}
 	}
 
 	// Set CI/CD requirements based on project type
 	if spc.ActionLevel == "" && spc.ProjectType.RequiresCI() {
-		spc.ActionLevel = domain.ActionLevelBasic
+		spc.ActionLevel = ActionLevelBasic
 	}
 }
 
@@ -100,7 +100,7 @@ func (spc *SafeProjectConfig) applyGeneralDefaults() {
 
 	// Set default state
 	if spc.State == "" {
-		spc.State = domain.ConfigStateDraft
+		spc.State = ConfigStateDraft
 	}
 
 	// Set default main path
@@ -119,8 +119,8 @@ func (spc *SafeProjectConfig) applyGeneralDefaults() {
 	}
 
 	// Set default build tags based on CGO status
-	if spc.CGOStatus.IsDisabled() && !slices.Contains(spc.BuildTags, domain.BuildTagPureGo) {
-		spc.BuildTags = append(spc.BuildTags, domain.BuildTagPureGo)
+	if spc.CGOStatus.IsDisabled() && !slices.Contains(spc.BuildTags, CreateBuildTag("pure", "Pure Go compilation")) {
+		spc.BuildTags = append(spc.BuildTags, CreateBuildTag("pure", "Pure Go compilation"))
 	}
 }
 
@@ -146,14 +146,15 @@ func (spc *SafeProjectConfig) GetDockerRegistryURL() string {
 	baseURL := spc.DockerRegistry.GetURL()
 
 	// For GitHub, append username
-	if spc.DockerRegistry == domain.DockerRegistryGitHub && spc.GetDockerOwner() != "" {
+	if spc.DockerRegistry == DockerRegistryGitHub && spc.GetDockerOwner() != "" {
 		return fmt.Sprintf("%s/%s", baseURL, spc.GetDockerOwner())
 	}
 
-	// For Azure, append registry name
-	if spc.DockerRegistry == domain.DockerRegistryAzure {
-		if spc.GetAzureContainerRegistry() != "" {
-			return fmt.Sprintf("%s%s", spc.GetAzureContainerRegistry(), baseURL)
+	// For Azure, handle registry differently
+	if spc.DockerRegistry == DockerRegistryCustom {
+		// Azure registries end with .azurecr.io
+		if strings.Contains(baseURL, "azurecr.io") {
+			return baseURL
 		}
 	}
 
@@ -163,7 +164,7 @@ func (spc *SafeProjectConfig) GetDockerRegistryURL() string {
 // GetDockerOwner returns Docker image owner
 func (spc *SafeProjectConfig) GetDockerOwner() string {
 	// Try to get from git remote
-	if owner := GetGitHubOwner(); owner != "owner" {
+	if owner := GetGitHubOwner(spc.ProjectName); owner != "owner" {
 		return owner
 	}
 
@@ -265,8 +266,8 @@ func (spc *SafeProjectConfig) IsProductionReady() bool {
 
 // IsMinimal returns true if configuration is minimal
 func (spc *SafeProjectConfig) IsMinimal() bool {
-	return spc.FeatureLevel == domain.FeatureLevelNone ||
-		spc.FeatureLevel == domain.FeatureLevelBasic
+	return spc.FeatureLevel == FeatureLevelNone ||
+		spc.FeatureLevel == FeatureLevelBasic
 }
 
 // RequiresCrossCompilation returns true if cross-compilation is required
@@ -317,7 +318,7 @@ func (spc *SafeProjectConfig) GetBuildComplexity() int {
 
 	// Add complexity from signing
 	if spc.SigningLevel.IsEnabled() {
-		complexity += spc.SigningLevel.GetRequiredTools().Length() * 3
+		complexity += len(spc.SigningLevel.GetRequiredTools()) * 3
 	}
 
 	return complexity

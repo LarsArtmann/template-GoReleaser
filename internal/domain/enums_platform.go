@@ -111,6 +111,8 @@ func (p Platform) SupportsCGO() bool {
 		return false // Limited CGO support
 	case PlatformAndroid, PlatformIOS:
 		return true // Via NDK/XCode
+	default:
+		return false
 	}
 }
 

@@ -59,6 +59,11 @@ func (cs CGOStatus) IsEnabled() bool {
 	return cs == CGOStatusEnabled || cs == CGOStatusRequired
 }
 
+// IsDisabled returns true if CGO is disabled
+func (cs CGOStatus) IsDisabled() bool {
+	return cs == CGOStatusDisabled
+}
+
 // IsRequired returns true if CGO is required
 func (cs CGOStatus) IsRequired() bool {
 	return cs == CGOStatusRequired
@@ -127,6 +132,42 @@ func (sl SigningLevel) IsEnabled() bool {
 	return sl != SigningLevelNone
 }
 
+// RequiresCosign returns true if level requires cosign
+func (sl SigningLevel) RequiresCosign() bool {
+	switch sl {
+	case SigningLevelAdvanced, SigningLevelEnterprise:
+		return true
+	default:
+		return false
+	}
+}
+
+// RequiresKeyManagement returns true if level requires key management
+func (sl SigningLevel) RequiresKeyManagement() bool {
+	switch sl {
+	case SigningLevelBasic, SigningLevelAdvanced, SigningLevelEnterprise:
+		return true
+	default:
+		return false
+	}
+}
+
+// GetRequiredTools returns tools required for this signing level
+func (sl SigningLevel) GetRequiredTools() []string {
+	switch sl {
+	case SigningLevelNone:
+		return []string{}
+	case SigningLevelBasic:
+		return []string{"gpg"}
+	case SigningLevelAdvanced:
+		return []string{"gpg", "cosign"}
+	case SigningLevelEnterprise:
+		return []string{"gpg", "cosign", "openssl"}
+	default:
+		return []string{}
+	}
+}
+
 // ToBool converts to legacy boolean for compatibility
 func (sl SigningLevel) ToBool() bool {
 	return sl.IsEnabled()
@@ -181,7 +222,7 @@ func ActionLevelFromBool(enabled bool) ActionLevel {
 // FeatureLevelFromBool converts legacy boolean to FeatureLevel
 func FeatureLevelFromBool(enabled bool) FeatureLevel {
 	if enabled {
-		return FeatureLevelProfessional
+		return FeatureLevelStandard
 	}
 	return FeatureLevelBasic
 }
@@ -207,9 +248,9 @@ func GetDefaultDockerSupport(projectType ProjectType) DockerSupport {
 // GetRecommendedActionLevel returns recommended action level based on project type
 func GetRecommendedActionLevel(projectType ProjectType) ActionLevel {
 	switch projectType {
-	case ProjectTypeCLI, ProjectTypeAPI:
+	case ProjectTypeCLI, ProjectTypeWebAPI:
 		return ActionLevelAdvanced
-	case ProjectTypeWeb:
+	case ProjectTypeMicroservice:
 		return ActionLevelBasic
 	case ProjectTypeLibrary:
 		return ActionLevelBasic
@@ -225,7 +266,7 @@ func GetRecommendedSigningLevel(projectType ProjectType) SigningLevel {
 	switch projectType {
 	case ProjectTypeCLI:
 		return SigningLevelBasic
-	case ProjectTypeWeb, ProjectTypeAPI:
+	case ProjectTypeWebAPI, ProjectTypeGRPCService:
 		return SigningLevelAdvanced
 	case ProjectTypeDesktop:
 		return SigningLevelEnterprise
@@ -239,8 +280,8 @@ func GetRecommendedSigningLevel(projectType ProjectType) SigningLevel {
 // GetRecommendedFeatureLevel returns recommended feature level based on project type
 func GetRecommendedFeatureLevel(projectType ProjectType) FeatureLevel {
 	switch projectType {
-	case ProjectTypeAPI, ProjectTypeWeb:
-		return FeatureLevelProfessional
+	case ProjectTypeWebAPI, ProjectTypeGRPCService:
+		return FeatureLevelStandard
 	case ProjectTypeDesktop:
 		return FeatureLevelEnterprise
 	case ProjectTypeCLI, ProjectTypeLibrary:

@@ -3,6 +3,7 @@ package types
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
@@ -145,7 +146,7 @@ func (vr *ValidationResult) GetWarningsByField() map[string][]*ValidationWarning
 		if field == "" {
 			field = "general"
 		}
-		fieldWarnings[field] = append(fieldWarnings, warn)
+		fieldWarnings[field] = append(fieldWarnings[field], warn)
 	}
 	return fieldWarnings
 }
@@ -224,7 +225,7 @@ func (vr *ValidationResult) ToJSON() ([]byte, error) {
 // Merge merges another validation result into this one
 func (vr *ValidationResult) Merge(other *ValidationResult) {
 	vr.Errors = append(vr.Errors, other.Errors...)
-	vr.Warnings = append(vr.Warnings, other.Warnings)
+	vr.Warnings = append(vr.Warnings, other.Warnings...)
 
 	if other.HasErrors() {
 		vr.IsValid = false
@@ -631,37 +632,17 @@ func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
 
 // Helper functions
 func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 func containsErrorLevels(slice []ErrorLevel, item ErrorLevel) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 func containsErrorCodes(slice []errors.ErrorCode, item errors.ErrorCode) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 func containsWarningLevels(slice []WarningLevel, item WarningLevel) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }

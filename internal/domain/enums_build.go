@@ -103,15 +103,15 @@ func (bl BuildLevel) GetOptimizationFlags() []string {
 func (bl BuildLevel) GetBuildTags() []BuildTag {
 	switch bl {
 	case BuildLevelMinimal:
-		return []BuildTag{BuildTagPureGo}
+		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation")}
 	case BuildLevelBasic:
-		return []BuildTag{BuildTagPureGo}
+		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation")}
 	case BuildLevelStandard:
-		return []BuildTag{BuildTagPureGo, BuildTagStatic}
+		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation"), CreateBuildTag("static", "Static linking")}
 	case BuildLevelAdvanced:
-		return []BuildTag{BuildTagPureGo, BuildTagStatic}
+		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation"), CreateBuildTag("static", "Static linking")}
 	case BuildLevelEnterprise:
-		return []BuildTag{BuildTagPureGo, BuildTagStatic}
+		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation"), CreateBuildTag("static", "Static linking")}
 	default:
 		return []BuildTag{}
 	}
