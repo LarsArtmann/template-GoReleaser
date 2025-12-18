@@ -1,0 +1,160 @@
+package domain
+
+// GitProvider represents supported Git hosting providers
+// This enum replaces string-based Git provider types for type safety
+type GitProvider string
+
+const (
+	GitProviderGitHub      GitProvider = "github"
+	GitProviderGitLab      GitProvider = "gitlab"
+	GitProviderBitbucket   GitProvider = "bitbucket"
+	GitProviderGitea       GitProvider = "gitea"
+	GitProviderGogs        GitProvider = "gogs"
+	GitProviderAzureDevOps GitProvider = "azure-devops"
+	GitProviderSelfHosted  GitProvider = "self-hosted"
+)
+
+// IsValid returns true if GitProvider is valid
+func (gp GitProvider) IsValid() bool {
+	switch gp {
+	case GitProviderGitHub, GitProviderGitLab, GitProviderBitbucket,
+		GitProviderGitea, GitProviderGogs, GitProviderAzureDevOps, GitProviderSelfHosted:
+		return true
+	default:
+		return false
+	}
+}
+
+// String returns human-readable display name
+func (gp GitProvider) String() string {
+	switch gp {
+	case GitProviderGitHub:
+		return "GitHub"
+	case GitProviderGitLab:
+		return "GitLab"
+	case GitProviderBitbucket:
+		return "Bitbucket"
+	case GitProviderGitea:
+		return "Gitea"
+	case GitProviderGogs:
+		return "Gogs"
+	case GitProviderAzureDevOps:
+		return "Azure DevOps"
+	case GitProviderSelfHosted:
+		return "Self-Hosted"
+	default:
+		return "Unknown"
+	}
+}
+
+// IsGitBased returns true for Git-based providers
+func (gp GitProvider) IsGitBased() bool {
+	return gp != GitProviderAzureDevOps
+}
+
+// IsOpenSource returns true for open-source platforms
+func (gp GitProvider) IsOpenSource() bool {
+	switch gp {
+	case GitProviderGitHub, GitProviderGitLab, GitProviderGitea, GitProviderGogs:
+		return true
+	case GitProviderBitbucket, GitProviderAzureDevOps, GitProviderSelfHosted:
+		return false
+	default:
+		return false
+	}
+}
+
+// IsCommercial returns true for commercial platforms
+func (gp GitProvider) IsCommercial() bool {
+	switch gp {
+	case GitProviderGitHub, GitProviderBitbucket, GitProviderAzureDevOps:
+		return true
+	case GitProviderGitLab, GitProviderGitea, GitProviderGogs, GitProviderSelfHosted:
+		return false
+	default:
+		return false
+	}
+}
+
+// SupportsSelfHosting returns true if provider supports self-hosting
+func (gp GitProvider) SupportsSelfHosting() bool {
+	switch gp {
+	case GitProviderGitLab, GitProviderGitea, GitProviderGogs:
+		return true
+	case GitProviderGitHub, GitProviderBitbucket, GitProviderAzureDevOps:
+		return false
+	default:
+		return false
+	}
+}
+
+// ActionsSupported returns true if provider supports CI/CD actions
+func (gp GitProvider) ActionsSupported() bool {
+	switch gp {
+	case GitProviderGitHub, GitProviderGitLab, GitProviderAzureDevOps:
+		return true
+	case GitProviderBitbucket, GitProviderGitea, GitProviderGogs:
+		return false
+	default:
+		return false
+	}
+}
+
+// DefaultRegistry returns the default container registry for provider
+func (gp GitProvider) DefaultRegistry() DockerRegistry {
+	switch gp {
+	case GitProviderGitHub:
+		return DockerRegistryGitHub
+	case GitProviderGitLab:
+		return DockerRegistryGitLab
+	case GitProviderAzureDevOps:
+		return DockerRegistryAzure
+	case GitProviderBitbucket:
+		return DockerRegistryBitbucket
+	default:
+		return DockerRegistryDockerHub
+	}
+}
+
+// GetAPIURL returns the API URL for provider
+func (gp GitProvider) GetAPIURL() string {
+	switch gp {
+	case GitProviderGitHub:
+		return "https://api.github.com"
+	case GitProviderGitLab:
+		return "https://gitlab.com/api/v4"
+	case GitProviderBitbucket:
+		return "https://api.bitbucket.org/2.0"
+	case GitProviderGitea:
+		return "" // Configurable per instance
+	case GitProviderGogs:
+		return "" // Configurable per instance
+	case GitProviderAzureDevOps:
+		return "https://dev.azure.com"
+	default:
+		return ""
+	}
+}
+
+// GetWebURL returns the web URL for provider
+func (gp GitProvider) GetWebURL() string {
+	switch gp {
+	case GitProviderGitHub:
+		return "https://github.com"
+	case GitProviderGitLab:
+		return "https://gitlab.com"
+	case GitProviderBitbucket:
+		return "https://bitbucket.org"
+	case GitProviderGitea:
+		return "" // Configurable per instance
+	case GitProviderGogs:
+		return "" // Configurable per instance
+	case GitProviderAzureDevOps:
+		return "https://dev.azure.com"
+	default:
+		return ""
+	}
+}
+
+
+

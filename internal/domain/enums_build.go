@@ -1,5 +1,7 @@
 package domain
 
+import "fmt"
+
 // BuildLevel represents build complexity levels
 // This enum replaces bool flags for build configuration
 type BuildLevel string

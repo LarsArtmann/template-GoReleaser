@@ -29,7 +29,7 @@ var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 	ActionTriggerVersionTags: {
 		githubPattern:  "push:\n  tags:\n    - 'v*'",
 		description:    "Triggers on version tags like v1.0.0",
-		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWeb, ProjectTypeAPI},
+		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWebAPI, ProjectTypeGRPCService},
 	},
 	ActionTriggerAllTags: {
 		githubPattern:  "push:\n  tags:\n    - '*'",
@@ -39,17 +39,17 @@ var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 	ActionTriggerManual: {
 		githubPattern:  "workflow_dispatch:",
 		description:    "Can be triggered manually from GitHub UI",
-		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWeb, ProjectTypeAPI, ProjectTypeDesktop},
+		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeDesktop},
 	},
 	ActionTriggerMain: {
 		githubPattern:  "push:\n  branches:\n    - main",
 		description:    "Triggers on pushes to main branch",
-		recommendedFor: []ProjectType{ProjectTypeWeb, ProjectTypeAPI},
+		recommendedFor: []ProjectType{ProjectTypeWebAPI, ProjectTypeGRPCService},
 	},
 	ActionTriggerRelease: {
 		githubPattern:  "release:\n    types: [published]",
 		description:    "Triggers when a GitHub release is published",
-		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWeb, ProjectTypeAPI, ProjectTypeDesktop},
+		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeDesktop},
 	},
 }
 

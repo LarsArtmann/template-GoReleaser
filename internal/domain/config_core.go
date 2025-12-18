@@ -12,38 +12,38 @@ import (
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
 type SafeProjectConfig struct {
 	// Basic Information
-	ProjectName        string             `json:"project_name" yaml:"project_name"`
-	ProjectDescription string             `json:"project_description,omitempty" yaml:"project_description,omitempty"`
-	ProjectType        domain.ProjectType `json:"project_type" yaml:"project_type"`
-	BinaryName         string             `json:"binary_name" yaml:"binary_name"`
-	MainPath           string             `json:"main_path" yaml:"main_path"`
+	ProjectName        string      `json:"project_name" yaml:"project_name"`
+	ProjectDescription string      `json:"project_description,omitempty" yaml:"project_description,omitempty"`
+	ProjectType        ProjectType `json:"project_type" yaml:"project_type"`
+	BinaryName         string      `json:"binary_name" yaml:"binary_name"`
+	MainPath           string      `json:"main_path" yaml:"main_path"`
 
 	// Build Configuration
-	Platforms     []domain.Platform     `json:"platforms" yaml:"platforms"`
-	Architectures []domain.Architecture `json:"architectures" yaml:"architectures"`
-	CGOStatus     domain.CGOStatus      `json:"cgo_status" yaml:"cgo_status"`
-	BuildTags     []domain.BuildTag     `json:"build_tags,omitempty" yaml:"build_tags,omitempty"`
-	LDFlags       bool                  `json:"ldflags" yaml:"ldflags"`
+	Platforms     []Platform     `json:"platforms" yaml:"platforms"`
+	Architectures []Architecture `json:"architectures" yaml:"architectures"`
+	CGOStatus     CGOStatus      `json:"cgo_status" yaml:"cgo_status"`
+	BuildTags     []BuildTag     `json:"build_tags,omitempty" yaml:"build_tags,omitempty"`
+	LDFlags       bool           `json:"ldflags" yaml:"ldflags"`
 
 	// Release Configuration
-	GitProvider    domain.GitProvider    `json:"git_provider" yaml:"git_provider"`
-	DockerSupport  domain.DockerSupport  `json:"docker_support" yaml:"docker_support"`
-	DockerRegistry domain.DockerRegistry `json:"docker_registry" yaml:"docker_registry"`
-	DockerImage    string                `json:"docker_image,omitempty" yaml:"docker_image,omitempty"`
-	SigningLevel   domain.SigningLevel   `json:"signing_level" yaml:"signing_level"`
-	Homebrew       bool                  `json:"homebrew" yaml:"homebrew"`
-	Snap           bool                  `json:"snap" yaml:"snap"`
-	SBOM           bool                  `json:"sbom" yaml:"sbom"`
+	GitProvider    GitProvider    `json:"git_provider" yaml:"git_provider"`
+	DockerSupport  DockerSupport  `json:"docker_support" yaml:"docker_support"`
+	DockerRegistry DockerRegistry `json:"docker_registry" yaml:"docker_registry"`
+	DockerImage    string         `json:"docker_image,omitempty" yaml:"docker_image,omitempty"`
+	SigningLevel   SigningLevel   `json:"signing_level" yaml:"signing_level"`
+	Homebrew       bool           `json:"homebrew" yaml:"homebrew"`
+	Snap           bool           `json:"snap" yaml:"snap"`
+	SBOM           bool           `json:"sbom" yaml:"sbom"`
 
 	// CI/CD Configuration
-	ActionLevel domain.ActionLevel     `json:"action_level" yaml:"action_level"`
-	ActionsOn   []domain.ActionTrigger `json:"actions_on" yaml:"actions_on"`
+	ActionLevel ActionLevel     `json:"action_level" yaml:"action_level"`
+	ActionsOn   []ActionTrigger `json:"actions_on" yaml:"actions_on"`
 
 	// Advanced Features
-	FeatureLevel domain.FeatureLevel `json:"feature_level" yaml:"feature_level"`
+	FeatureLevel FeatureLevel `json:"feature_level" yaml:"feature_level"`
 
 	// State Management
-	State domain.ConfigState `json:"state" yaml:"state"`
+	State ConfigState `json:"state" yaml:"state"`
 }
 
 // NewSafeProjectConfig creates a new safe configuration with smart defaults
@@ -55,11 +55,11 @@ func NewSafeProjectConfig() *SafeProjectConfig {
 		Architectures:  GetRecommendedArchitectures(),
 		GitProvider:    GetRecommendedGitProvider(),
 		DockerRegistry: GetRecommendedDockerRegistry(),
-		CGOStatus:      domain.CGOStatusDisabled,
-		ActionLevel:    domain.ActionLevelBasic,
-		SigningLevel:   domain.SigningLevelNone,
-		FeatureLevel:   domain.FeatureLevelBasic,
-		State:          domain.ConfigStateDraft,
+		CGOStatus:      CGOStatusDisabled,
+		ActionLevel:    ActionLevelBasic,
+		SigningLevel:   SigningLevelNone,
+		FeatureLevel:   FeatureLevelBasic,
+		State:          ConfigStateDraft,
 		LDFlags:        true,
 		Homebrew:       false,
 		Snap:           false,
@@ -90,48 +90,48 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	// Validate enums
 	if !spc.ProjectType.IsValid() {
-		return domain.NewValidationError(
-			domain.ErrInvalidProject,
+		return NewValidationError(
+			ErrInvalidProject,
 			"Invalid project type",
 			string(spc.ProjectType),
 		).WithField("project_type")
 	}
 
 	if !spc.GitProvider.IsValid() {
-		return domain.NewValidationError(
-			domain.ErrInvalidConfig,
+		return NewValidationError(
+			ErrInvalidConfig,
 			"Invalid Git provider",
 			string(spc.GitProvider),
 		).WithField("git_provider")
 	}
 
 	if !spc.CGOStatus.IsValid() {
-		return domain.NewValidationError(
-			domain.ErrInvalidConfig,
+		return NewValidationError(
+			ErrInvalidConfig,
 			"Invalid CGO status",
 			string(spc.CGOStatus),
 		).WithField("cgo_status")
 	}
 
 	if !spc.DockerSupport.IsValid() {
-		return domain.NewValidationError(
-			domain.ErrInvalidConfig,
+		return NewValidationError(
+			ErrInvalidConfig,
 			"Invalid Docker support",
 			string(spc.DockerSupport),
 		).WithField("docker_support")
 	}
 
 	if !spc.DockerRegistry.IsValid() {
-		return domain.NewValidationError(
-			domain.ErrInvalidConfig,
+		return NewValidationError(
+			ErrInvalidConfig,
 			"Invalid Docker registry",
 			string(spc.DockerRegistry),
 		).WithField("docker_registry")
 	}
 
 	if !spc.SigningLevel.IsValid() {
-		return domain.NewValidationError(
-			domain.ErrInvalidConfig,
+		return NewValidationError(
+			ErrInvalidConfig,
 			"Invalid signing level",
 			string(spc.SigningLevel),
 		).WithField("signing_level")

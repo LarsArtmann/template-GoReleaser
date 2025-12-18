@@ -144,8 +144,6 @@ func ValidateSigningLevel(level SigningLevel) error {
 	return nil
 }
 
-
-
 // Enum migration utilities for backward compatibility
 
 // CGOStatusFromBool converts legacy boolean to CGOStatus

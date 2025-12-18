@@ -288,11 +288,11 @@ func (spc *SafeProjectConfig) RequiresCrossCompilation() bool {
 }
 
 // isNativePlatform returns true if platform/arch is native to current system
-func isNativePlatform(platform domain.Platform, arch domain.Architecture) bool {
+func isNativePlatform(platform Platform, arch Architecture) bool {
 	// This is a simplified check - in reality would need to detect current platform
-	return (platform == domain.PlatformLinux && arch == domain.ArchitectureAMD64) ||
-		(platform == domain.PlatformDarwin && arch == domain.ArchitectureAMD64) ||
-		(platform == domain.PlatformWindows && arch == domain.ArchitectureAMD64)
+	return (platform == PlatformLinux && arch == ArchitectureAMD64) ||
+		(platform == PlatformDarwin && arch == ArchitectureAMD64) ||
+		(platform == PlatformWindows && arch == ArchitectureAMD64)
 }
 
 // GetBuildComplexity returns build complexity score

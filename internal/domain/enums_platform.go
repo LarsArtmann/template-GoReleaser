@@ -1,5 +1,7 @@
 package domain
 
+import "fmt"
+
 // Platform represents supported operating systems
 // This enum replaces string-based platform types for type safety
 type Platform string
@@ -62,7 +64,7 @@ func (p Platform) String() string {
 // IsUnix returns true for Unix-like platforms
 func (p Platform) IsUnix() bool {
 	switch p {
-	case PlatformLinux, PlatformDarwin, PlatformFreeBSD, 
+	case PlatformLinux, PlatformDarwin, PlatformFreeBSD,
 		PlatformOpenBSD, PlatformNetBSD:
 		return true
 	default:
@@ -191,6 +193,6 @@ func GetRecommendedPlatforms() []Platform {
 	return []Platform{
 		PlatformLinux,   // Primary server platform
 		PlatformDarwin,  // Primary development platform
-		PlatformWindows,  // Windows development platform
+		PlatformWindows, // Windows development platform
 	}
 }
