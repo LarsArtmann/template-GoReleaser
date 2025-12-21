@@ -1,6 +1,9 @@
 package types
 
 import (
+	"os/exec"
+	"strings"
+
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
@@ -186,8 +189,8 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 		BinaryName:  config.BinaryName,
 		MainPath:    config.MainPath,
 		Env: map[string]string{
-			"GITHUB_OWNER": getGitHubOwner(),
-			"GITHUB_REPO":  getGitHubRepo(),
+			"GITHUB_OWNER": GetGitHubOwner(),
+			"GITHUB_REPO":  GetGitHubRepo(),
 		},
 		IgnoreCombinations: []PlatformIgnored{
 			{GoOS: "darwin", GoArch: "386"},
@@ -259,4 +262,50 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 	}
 
 	return data
+}
+
+// GetGitHubOwner tries to get GitHub owner from git remote
+func GetGitHubOwner() string {
+	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
+		if output, err := cmd.Output(); err == nil {
+			remote := strings.TrimSpace(string(output))
+			// Parse GitHub URL: git@github.com:owner/repo.git or https://github.com/owner/repo.git
+			if strings.Contains(remote, "github.com") {
+				parts := strings.Split(remote, "github.com")
+				if len(parts) > 1 {
+					repoPath := strings.TrimPrefix(parts[1], ":")
+					repoPath = strings.TrimPrefix(repoPath, "/")
+					repoPath = strings.TrimSuffix(repoPath, ".git")
+					pathParts := strings.Split(repoPath, "/")
+					if len(pathParts) > 0 {
+						return pathParts[0]
+					}
+				}
+			}
+		}
+	}
+	return "owner" // fallback
+}
+
+// GetGitHubRepo tries to get GitHub repo from git remote
+func GetGitHubRepo() string {
+	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
+		if output, err := cmd.Output(); err == nil {
+			remote := strings.TrimSpace(string(output))
+			// Parse GitHub URL: git@github.com:owner/repo.git or https://github.com/owner/repo.git
+			if strings.Contains(remote, "github.com") {
+				parts := strings.Split(remote, "github.com")
+				if len(parts) > 1 {
+					repoPath := strings.TrimPrefix(parts[1], ":")
+					repoPath = strings.TrimPrefix(repoPath, "/")
+					repoPath = strings.TrimSuffix(repoPath, ".git")
+					pathParts := strings.Split(repoPath, "/")
+					if len(pathParts) > 1 {
+						return pathParts[1]
+					}
+				}
+			}
+		}
+	}
+	return "repo" // fallback
 }

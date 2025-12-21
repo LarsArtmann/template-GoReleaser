@@ -101,7 +101,7 @@ func (g *GitHubActionsGenerator) ValidateTemplate() error {
 	_, err := tmpl.Parse(templates.GitHubActionsTemplate)
 	if err != nil {
 		return errors.NewConfigError(
-			errors.ErrTemplateValidation,
+			errors.ErrInvalidTemplate,
 			"GitHub Actions template validation failed",
 			err.Error(),
 		).WithCause(err)

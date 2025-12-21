@@ -79,7 +79,7 @@ func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileT
 	}
 
 	// Add common config files
-	if config.ProjectType == domain.ProjectTypeWebService {
+	if config.ProjectType == domain.ProjectTypeWebAPI {
 		data.ConfigFiles = []string{"config.yaml", ".env.example"}
 		data.ExposePort = "8080"
 		data.EnvVars = []EnvVar{
@@ -149,7 +149,7 @@ func (g *DockerfileGenerator) ValidateTemplate() error {
 	_, err := tmpl.Parse(templates.DockerfileTemplate)
 	if err != nil {
 		return errors.NewConfigError(
-			errors.ErrTemplateValidation,
+			errors.ErrInvalidTemplate,
 			"Dockerfile template validation failed",
 			err.Error(),
 		).WithCause(err)

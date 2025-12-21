@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -90,10 +91,9 @@ func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (do
 	fmt.Println(infoStyle.Render("\n🎯 Select Project Type:"))
 
 	types := []domain.ProjectType{
-		domain.ProjectTypeCLIApplication,
-		domain.ProjectTypeWebService,
+		domain.ProjectTypeCLI,
+		domain.ProjectTypeWebAPI,
 		domain.ProjectTypeLibrary,
-		domain.ProjectTypeLibraryWithCLI,
 	}
 
 	for i, pt := range types {
@@ -148,8 +148,8 @@ func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture
 	fmt.Println(infoStyle.Render("\n🏗️  Select Target Architectures:"))
 
 	available := []domain.Architecture{
-		domain.ArchitectureAmd64,
-		domain.ArchitectureArm64,
+		domain.ArchitectureAMD64,
+		domain.ArchitectureARM64,
 	}
 
 	for i, arch := range available {
@@ -206,7 +206,7 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 	levels := []domain.DockerSupport{
 		domain.DockerSupportNone,
 		domain.DockerSupportBuild,
-		domain.DockerSupportPublish,
+		domain.DockerSupportDeploy,
 		domain.DockerSupportBoth,
 	}
 
@@ -384,7 +384,7 @@ func (ip *InteractivePrompter) promptMultiInt(label string, min, max int) ([]int
 
 		input := strings.TrimSpace(ip.scanner.Text())
 		if input == "" {
-			return []int{1} // Default to first option
+			return []int{1}, nil // Default to first option
 		}
 
 		parts := strings.Split(input, ",")
@@ -434,7 +434,7 @@ func (ip *InteractivePrompter) getDockerDescription(level domain.DockerSupport) 
 		return "No Docker support"
 	case domain.DockerSupportBuild:
 		return "Build Docker images only"
-	case domain.DockerSupportPublish:
+	case domain.DockerSupportDeploy:
 		return "Publish Docker images only"
 	case domain.DockerSupportBoth:
 		return "Build and publish Docker images"
@@ -445,20 +445,10 @@ func (ip *InteractivePrompter) getDockerDescription(level domain.DockerSupport) 
 
 // containsPlatform checks if platform is in the list
 func containsPlatform(platforms []domain.Platform, target domain.Platform) bool {
-	for _, p := range platforms {
-		if p == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(platforms, target)
 }
 
 // containsArchitecture checks if architecture is in the list
 func containsArchitecture(architectures []domain.Architecture, target domain.Architecture) bool {
-	for _, a := range architectures {
-		if a == target {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(architectures, target)
 }

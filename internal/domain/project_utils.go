@@ -17,8 +17,3 @@ func (spc *SafeProjectConfig) GetGenerateActions() bool {
 	// Simple logic - generate actions for non-library types
 	return !spc.ProjectType.IsLibrary()
 }
-
-// AllowsGeneration returns true if config state allows generation
-func (cs ConfigState) AllowsGeneration() bool {
-	return cs == ConfigStateProcessing || cs == ConfigStateGenerated
-}

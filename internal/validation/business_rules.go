@@ -6,11 +6,12 @@ import (
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/types"
 )
 
 // ValidateConfiguration performs comprehensive validation of project configuration
-func ValidateConfiguration(config *domain.SafeProjectConfig) (*ValidationResult, error) {
-	result := &ValidationResult{
+func ValidateConfiguration(config *domain.SafeProjectConfig) (*types.ValidationResult, error) {
+	result := &types.ValidationResult{
 		IsValid:  true,
 		Errors:   []*ValidationError{},
 		Warnings: []*ValidationWarning{},
@@ -51,7 +52,7 @@ func ValidateConfiguration(config *domain.SafeProjectConfig) (*ValidationResult,
 }
 
 // validateBasicFields validates basic required fields
-func validateBasicFields(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateBasicFields(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Project name validation
 	if err := ValidateProjectName(config.ProjectName); err != nil {
 		result.AddError(&ValidationError{
@@ -102,7 +103,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *ValidationRes
 }
 
 // validateTypes validates enum types
-func validateTypes(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Project type validation
 	if !config.ProjectType.IsValid() {
 		result.AddError(&ValidationError{
@@ -206,7 +207,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *ValidationResult) e
 }
 
 // validatePlatformArchCompatibility validates platform-architecture combinations
-func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Validate platforms
 	for i, platform := range config.Platforms {
 		if !platform.IsValid() {
@@ -277,7 +278,7 @@ func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result 
 }
 
 // validateBusinessRules validates business logic rules
-func validateBusinessRules(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Docker configuration validation
 	if err := validateDockerBusinessRules(config, result); err != nil {
 		return err
@@ -302,7 +303,7 @@ func validateBusinessRules(config *domain.SafeProjectConfig, result *ValidationR
 }
 
 // validateDockerBusinessRules validates Docker business rules
-func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Docker support must be compatible with project type
 	if config.DockerSupport.IsEnabled() && !config.ProjectType.DockerSupported() {
 		result.AddError(&ValidationError{
@@ -358,7 +359,7 @@ func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *Valid
 }
 
 // validateSigningBusinessRules validates signing business rules
-func validateSigningBusinessRules(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateSigningBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Signing tools availability
 	if config.SigningLevel.IsEnabled() {
 		requiredTools := config.SigningLevel.GetRequiredTools()
@@ -392,7 +393,7 @@ func validateSigningBusinessRules(config *domain.SafeProjectConfig, result *Vali
 }
 
 // validateActionsBusinessRules validates Actions business rules
-func validateActionsBusinessRules(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateActionsBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Actions must be compatible with Git provider
 	if config.ActionLevel.IsEnabled() && !config.GitProvider.ActionsSupported() {
 		result.AddError(&ValidationError{
@@ -432,7 +433,7 @@ func validateActionsBusinessRules(config *domain.SafeProjectConfig, result *Vali
 }
 
 // validateProjectTypeBusinessRules validates project type-specific business rules
-func validateProjectTypeBusinessRules(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateProjectTypeBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// CGO requirements based on project type
 	if config.ProjectType.DefaultCGOEnabled() && config.CGOStatus.IsDisabled() {
 		result.AddWarning(&ValidationWarning{
@@ -463,7 +464,7 @@ func validateProjectTypeBusinessRules(config *domain.SafeProjectConfig, result *
 }
 
 // validateSecurity validates security-related configurations
-func validateSecurity(config *domain.SafeProjectConfig, result *ValidationResult) error {
+func validateSecurity(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Security level consistency
 	if config.FeatureLevel.IncludesAdvanced() && config.SigningLevel == domain.SigningLevelNone {
 		result.AddWarning(&ValidationWarning{
@@ -504,7 +505,7 @@ func validateSecurity(config *domain.SafeProjectConfig, result *ValidationResult
 }
 
 // generateWarnings generates helpful warnings based on configuration
-func generateWarnings(config *domain.SafeProjectConfig, result *ValidationResult) {
+func generateWarnings(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Performance warnings
 	if len(config.Platforms)*len(config.Architectures) > 8 {
 		result.AddWarning(&ValidationWarning{

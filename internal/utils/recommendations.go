@@ -47,14 +47,14 @@ func GetRecommendedPlatforms() []domain.Platform {
 
 // GetRecommendedArchitectures returns recommended architectures based on current arch
 func GetRecommendedArchitectures() []domain.Architecture {
-	architectures := []domain.Architecture{domain.PlatformAMD64} // Always include AMD64
+	architectures := []domain.Architecture{domain.ArchitectureAMD64} // Always include AMD64
 
 	// Add current architecture if supported
 	switch runtime.GOARCH {
 	case "arm64":
-		architectures = append(architectures, domain.PlatformARM64)
+		architectures = append(architectures, domain.ArchitectureARM64)
 	case "386":
-		architectures = append(architectures, domain.Platform386)
+		architectures = append(architectures, domain.Architecture386)
 	}
 
 	return architectures

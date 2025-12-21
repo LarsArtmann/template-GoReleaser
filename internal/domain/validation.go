@@ -378,9 +378,9 @@ func (vu *ValidationUseCase) inferProjectType(ctx context.Context, info *Project
 	if strings.Contains(info.MainFilePath, "cmd/") {
 		info.ProjectType = ProjectTypeCLI
 	} else if strings.Contains(info.MainFilePath, "server/") || strings.Contains(info.MainFilePath, "api/") {
-		info.ProjectType = ProjectTypeAPI
+		info.ProjectType = ProjectTypeWebAPI
 	} else if strings.Contains(info.MainFilePath, "web/") {
-		info.ProjectType = ProjectTypeWeb
+		info.ProjectType = ProjectTypeWebAPI
 	} else {
 		info.ProjectType = ProjectTypeLibrary
 	}

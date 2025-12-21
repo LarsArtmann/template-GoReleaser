@@ -66,7 +66,7 @@ func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTempl
 		LDFlags:            "-s -w -X main.version={{version}}",
 		BinaryName:         config.BinaryName,
 		TestOutput:         fmt.Sprintf("%s version", config.BinaryName),
-		Service:            config.ProjectType == domain.ProjectTypeWebService,
+		Service:            config.ProjectType == domain.ProjectTypeWebAPI,
 	}
 }
 
@@ -75,14 +75,14 @@ func toCamelCase(s string) string {
 	// Handle kebab-case and snake_case
 	words := splitWords(s)
 
-	result := ""
+	var result strings.Builder
 	for _, word := range words {
 		if len(word) > 0 {
-			result += strings.ToUpper(word[:1]) + strings.ToLower(word[1:])
+			result.WriteString(strings.ToUpper(word[:1]) + strings.ToLower(word[1:]))
 		}
 	}
 
-	return result
+	return result.String()
 }
 
 // splitWords splits a string into words by common separators
@@ -170,7 +170,7 @@ func (g *HomebrewGenerator) ValidateTemplate() error {
 	_, err := tmpl.Parse(templates.HomebrewTemplate)
 	if err != nil {
 		return errors.NewConfigError(
-			errors.ErrTemplateValidation,
+			errors.ErrInvalidTemplate,
 			"Homebrew template validation failed",
 			err.Error(),
 		).WithCause(err)

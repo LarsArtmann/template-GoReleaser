@@ -168,7 +168,7 @@ func (g *GoReleaserGenerator) ValidateTemplate() error {
 	_, err := tmpl.Parse(templates.GoReleaserTemplate)
 	if err != nil {
 		return errors.NewConfigError(
-			errors.ErrTemplateValidation,
+			errors.ErrInvalidTemplate,
 			"GoReleaser template validation failed",
 			err.Error(),
 		).WithCause(err)
