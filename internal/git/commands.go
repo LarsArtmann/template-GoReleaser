@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/exec"
 	"strings"

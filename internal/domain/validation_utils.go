@@ -1,6 +1,9 @@
 package domain
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+)
 
 // ValidatePlatforms validates slice of platforms.
 func ValidatePlatforms(platforms []Platform) error {
