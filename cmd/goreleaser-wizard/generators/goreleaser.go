@@ -15,13 +15,13 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
 
-// GoReleaserGenerator handles GoReleaser configuration generation
+// GoReleaserGenerator handles GoReleaser configuration generation.
 type GoReleaserGenerator struct {
 	templateData *types.GoReleaserTemplateData
 	logger       Logger
 }
 
-// Logger interface for dependency injection
+// Logger interface for dependency injection.
 type Logger interface {
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
@@ -29,7 +29,7 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
-// NewGoReleaserGenerator creates a new GoReleaser generator
+// NewGoReleaserGenerator creates a new GoReleaser generator.
 func NewGoReleaserGenerator(config *domain.SafeProjectConfig, logger Logger) *GoReleaserGenerator {
 	return &GoReleaserGenerator{
 		templateData: types.NewGoReleaserTemplateData(config),
@@ -37,7 +37,7 @@ func NewGoReleaserGenerator(config *domain.SafeProjectConfig, logger Logger) *Go
 	}
 }
 
-// Generate generates the GoReleaser configuration
+// Generate generates the GoReleaser configuration.
 func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	g.logger.Info("Generating GoReleaser configuration")
 
@@ -96,7 +96,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	return nil
 }
 
-// createBackup creates a backup of existing file
+// createBackup creates a backup of existing file.
 func (g *GoReleaserGenerator) createBackup(filename string) error {
 	if _, err := os.Stat(filename); err == nil {
 		backupPath := filename + ".backup"
@@ -112,7 +112,7 @@ func (g *GoReleaserGenerator) createBackup(filename string) error {
 	return nil
 }
 
-// prepareTemplateData prepares complete template data including git information
+// prepareTemplateData prepares complete template data including git information.
 func (g *GoReleaserGenerator) prepareTemplateData(ctx context.Context) (*types.GoReleaserTemplateData, error) {
 	// Get version information from git
 	versionInfo, err := git.GetVersionInfo(ctx)
@@ -142,7 +142,7 @@ func (g *GoReleaserGenerator) prepareTemplateData(ctx context.Context) (*types.G
 	return &data, nil
 }
 
-// incpatchVersion increments the patch version for snapshots
+// incpatchVersion increments the patch version for snapshots.
 func incpatchVersion(v string) string {
 	if strings.HasPrefix(v, "v") {
 		v = v[1:]
@@ -159,7 +159,7 @@ func incpatchVersion(v string) string {
 	return v + "-next"
 }
 
-// ValidateTemplate validates the GoReleaser template
+// ValidateTemplate validates the GoReleaser template.
 func (g *GoReleaserGenerator) ValidateTemplate() error {
 	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
 		"incpatch": incpatchVersion,
@@ -177,7 +177,7 @@ func (g *GoReleaserGenerator) ValidateTemplate() error {
 	return nil
 }
 
-// GeneratePreview generates a preview without writing to file
+// GeneratePreview generates a preview without writing to file.
 func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, error) {
 	g.logger.Debug("Generating GoReleaser configuration preview")
 

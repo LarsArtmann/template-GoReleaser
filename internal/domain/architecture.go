@@ -5,7 +5,7 @@ import (
 )
 
 // Architecture represents supported CPU architectures
-// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
+// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type Architecture string
 
 const (
@@ -20,7 +20,7 @@ const (
 	ArchitectureMIPSLE  Architecture = "mipsle"  // 32-bit MIPS (little endian)
 )
 
-// Architecture metadata - generated from TypeSpec invariants
+// Architecture metadata - generated from TypeSpec invariants.
 type architectureMeta struct {
 	supportedByAllPlatforms bool
 	is64Bit                 bool
@@ -75,13 +75,13 @@ var architectureMetaMap = map[Architecture]architectureMeta{
 	},
 }
 
-// IsValid returns true if Architecture is valid
+// IsValid returns true if Architecture is valid.
 func (a Architecture) IsValid() bool {
 	_, exists := architectureMetaMap[a]
 	return exists
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (a Architecture) String() string {
 	switch a {
 	case ArchitectureAMD64:
@@ -107,7 +107,7 @@ func (a Architecture) String() string {
 	}
 }
 
-// SupportedByAllPlatforms returns true if architecture is supported by all platforms
+// SupportedByAllPlatforms returns true if architecture is supported by all platforms.
 func (a Architecture) SupportedByAllPlatforms() bool {
 	if meta, exists := architectureMetaMap[a]; exists {
 		return meta.supportedByAllPlatforms
@@ -115,7 +115,7 @@ func (a Architecture) SupportedByAllPlatforms() bool {
 	return false
 }
 
-// Is64Bit returns true if architecture is 64-bit
+// Is64Bit returns true if architecture is 64-bit.
 func (a Architecture) Is64Bit() bool {
 	if meta, exists := architectureMetaMap[a]; exists {
 		return meta.is64Bit
@@ -123,7 +123,7 @@ func (a Architecture) Is64Bit() bool {
 	return false
 }
 
-// GoSupport returns Go support level for this architecture
+// GoSupport returns Go support level for this architecture.
 func (a Architecture) GoSupport() string {
 	if meta, exists := architectureMetaMap[a]; exists {
 		return meta.goSupport
@@ -131,10 +131,10 @@ func (a Architecture) GoSupport() string {
 	return "unknown"
 }
 
-// ValidateArchitectures validates a slice of architectures
+// ValidateArchitectures validates a slice of architectures.
 func ValidateArchitectures(architectures []Architecture) error {
 	if len(architectures) == 0 {
-		return fmt.Errorf("at least one architecture is required")
+		return errors.New("at least one architecture is required")
 	}
 
 	for _, arch := range architectures {
@@ -146,12 +146,12 @@ func ValidateArchitectures(architectures []Architecture) error {
 	return nil
 }
 
-// GetRecommendedArchitectures returns recommended architectures for common use cases
+// GetRecommendedArchitectures returns recommended architectures for common use cases.
 func GetRecommendedArchitectures() []Architecture {
 	return []Architecture{ArchitectureAMD64, ArchitectureARM64}
 }
 
-// GetAllArchitectures returns all supported architectures
+// GetAllArchitectures returns all supported architectures.
 func GetAllArchitectures() []Architecture {
 	return []Architecture{
 		ArchitectureAMD64, ArchitectureARM64, Architecture386, ArchitectureARM,

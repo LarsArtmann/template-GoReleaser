@@ -7,7 +7,7 @@ import (
 )
 
 // DockerRegistry represents Docker registry types
-// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
+// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type DockerRegistry string
 
 const (
@@ -18,7 +18,7 @@ const (
 	DockerRegistryCustom    DockerRegistry = "custom"              // Custom Registry
 )
 
-// DockerRegistry metadata - generated from TypeSpec invariants
+// DockerRegistry metadata - generated from TypeSpec invariants.
 type dockerRegistryMeta struct {
 	urlPattern             string
 	supportsHTTPSOnly      bool
@@ -59,13 +59,13 @@ var dockerRegistryMetaMap = map[DockerRegistry]dockerRegistryMeta{
 	},
 }
 
-// IsValid returns true if DockerRegistry is valid
+// IsValid returns true if DockerRegistry is valid.
 func (dr DockerRegistry) IsValid() bool {
 	_, exists := dockerRegistryMetaMap[dr]
 	return exists
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (dr DockerRegistry) String() string {
 	switch dr {
 	case DockerRegistryDockerHub:
@@ -83,7 +83,7 @@ func (dr DockerRegistry) String() string {
 	}
 }
 
-// URLPattern returns the URL validation pattern for this registry
+// URLPattern returns the URL validation pattern for this registry.
 func (dr DockerRegistry) URLPattern() string {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.urlPattern
@@ -91,7 +91,7 @@ func (dr DockerRegistry) URLPattern() string {
 	return ""
 }
 
-// SupportsHTTPSOnly returns true if registry only supports HTTPS
+// SupportsHTTPSOnly returns true if registry only supports HTTPS.
 func (dr DockerRegistry) SupportsHTTPSOnly() bool {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.supportsHTTPSOnly
@@ -99,7 +99,7 @@ func (dr DockerRegistry) SupportsHTTPSOnly() bool {
 	return true
 }
 
-// RequiresAuthentication returns true if registry requires authentication
+// RequiresAuthentication returns true if registry requires authentication.
 func (dr DockerRegistry) RequiresAuthentication() bool {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.requiresAuthentication
@@ -107,7 +107,7 @@ func (dr DockerRegistry) RequiresAuthentication() bool {
 	return true
 }
 
-// DefaultNamespace returns the default namespace for this registry
+// DefaultNamespace returns the default namespace for this registry.
 func (dr DockerRegistry) DefaultNamespace() string {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.defaultNamespace
@@ -115,7 +115,7 @@ func (dr DockerRegistry) DefaultNamespace() string {
 	return ""
 }
 
-// ValidateDockerRegistry validates a Docker registry
+// ValidateDockerRegistry validates a Docker registry.
 func ValidateDockerRegistry(registry DockerRegistry) error {
 	if !registry.IsValid() {
 		return NewValidationError(
@@ -127,26 +127,27 @@ func ValidateDockerRegistry(registry DockerRegistry) error {
 	return nil
 }
 
-// ValidateDockerRegistryURL validates a Docker registry URL
+// ValidateDockerRegistryURL validates a Docker registry URL.
 func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	if !registry.IsValid() {
 		return fmt.Errorf("invalid Docker registry: %s", registry)
 	}
 
 	if url == "" {
-		return fmt.Errorf("Docker registry URL cannot be empty")
+		return errors.New("Docker registry URL cannot be empty")
 	}
 
 	url = strings.TrimSpace(url)
 
-	if registry == DockerRegistryDockerHub {
+	switch registry {
+	case DockerRegistryDockerHub:
 		// Docker Hub allows simple usernames or full registry URLs
 		if !strings.Contains(url, "docker.io") && !strings.Contains(url, "/") {
-			return fmt.Errorf("Docker Hub registry should include docker.io or be a valid username")
+			return errors.New("Docker Hub registry should include docker.io or be a valid username")
 		}
-	} else if registry == DockerRegistryGitHub {
+	case DockerRegistryGitHub:
 		if !strings.Contains(url, "ghcr.io") {
-			return fmt.Errorf("GitHub Container Registry should include ghcr.io")
+			return errors.New("GitHub Container Registry should include ghcr.io")
 		}
 	}
 
@@ -154,7 +155,7 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	pattern := registry.URLPattern()
 	if pattern != "" {
 		if matched, err := regexp.MatchString(pattern, url); err != nil {
-			return fmt.Errorf("invalid URL pattern for registry %s: %v", registry, err)
+			return fmt.Errorf("invalid URL pattern for registry %s: %w", registry, err)
 		} else if !matched {
 			return fmt.Errorf("URL '%s' does not match expected pattern for registry %s", url, registry)
 		}
@@ -163,21 +164,21 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	return nil
 }
 
-// ValidateDockerImageName validates a Docker image name
+// ValidateDockerImageName validates a Docker image name.
 func ValidateDockerImageName(name string) error {
 	if len(name) == 0 {
 		return nil // Empty is allowed, will default to project name
 	}
 
 	if len(name) > 255 {
-		return fmt.Errorf("Docker image name must be 255 characters or less")
+		return errors.New("Docker image name must be 255 characters or less")
 	}
 
 	// Docker image name pattern: lowercase, numbers, dots, hyphens, underscores, forward slashes
 	pattern := `^[a-z0-9][a-z0-9/_.-]*$`
 	matched, err := regexp.MatchString(pattern, name)
 	if err != nil {
-		return fmt.Errorf("invalid image name pattern: %v", err)
+		return fmt.Errorf("invalid image name pattern: %w", err)
 	}
 	if !matched {
 		return fmt.Errorf("Docker image name '%s' must start with lowercase letter/number and contain only lowercase letters, numbers, dots, hyphens, underscores, and forward slashes", name)
@@ -186,7 +187,7 @@ func ValidateDockerImageName(name string) error {
 	return nil
 }
 
-// GetAllDockerRegistries returns all available Docker registries
+// GetAllDockerRegistries returns all available Docker registries.
 func GetAllDockerRegistries() []DockerRegistry {
 	return []DockerRegistry{
 		DockerRegistryDockerHub, DockerRegistryGitHub, DockerRegistryGitLab,
@@ -194,12 +195,12 @@ func GetAllDockerRegistries() []DockerRegistry {
 	}
 }
 
-// GetRecommendedDockerRegistry returns recommended registry (Docker Hub)
+// GetRecommendedDockerRegistry returns recommended registry (Docker Hub).
 func GetRecommendedDockerRegistry() DockerRegistry {
 	return DockerRegistryDockerHub
 }
 
-// ConvertToDockerRegistry converts string display name to DockerRegistry
+// ConvertToDockerRegistry converts string display name to DockerRegistry.
 func ConvertToDockerRegistry(displayName string) DockerRegistry {
 	switch strings.ToLower(strings.TrimSpace(displayName)) {
 	case "docker hub", "docker.io":

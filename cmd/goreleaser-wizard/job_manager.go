@@ -9,7 +9,7 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-// Job represents a wizard operation job
+// Job represents a wizard operation job.
 type Job interface {
 	ID() string
 	Name() string
@@ -17,7 +17,7 @@ type Job interface {
 	Rollback(ctx context.Context) error
 }
 
-// JobStatus represents the status of a job
+// JobStatus represents the status of a job.
 type JobStatus int
 
 const (
@@ -45,7 +45,7 @@ func (js JobStatus) String() string {
 	}
 }
 
-// JobResult represents the result of a job execution
+// JobResult represents the result of a job execution.
 type JobResult struct {
 	Job      Job
 	Status   JobStatus
@@ -56,7 +56,7 @@ type JobResult struct {
 	Output   string
 }
 
-// JobManager manages the execution of wizard jobs
+// JobManager manages the execution of wizard jobs.
 type JobManager struct {
 	jobs        []Job
 	results     []JobResult
@@ -67,7 +67,7 @@ type JobManager struct {
 	currentJobs int
 }
 
-// NewJobManager creates a new job manager
+// NewJobManager creates a new job manager.
 func NewJobManager(logger *log.Logger) *JobManager {
 	return &JobManager{
 		jobs:        make([]Job, 0),
@@ -79,28 +79,28 @@ func NewJobManager(logger *log.Logger) *JobManager {
 	}
 }
 
-// SetParallel sets whether jobs should run in parallel
+// SetParallel sets whether jobs should run in parallel.
 func (jm *JobManager) SetParallel(parallel bool) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 	jm.parallel = parallel
 }
 
-// SetMaxJobs sets the maximum number of parallel jobs
+// SetMaxJobs sets the maximum number of parallel jobs.
 func (jm *JobManager) SetMaxJobs(maxJobs int) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 	jm.maxJobs = maxJobs
 }
 
-// AddJob adds a job to the manager
+// AddJob adds a job to the manager.
 func (jm *JobManager) AddJob(job Job) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 	jm.jobs = append(jm.jobs, job)
 }
 
-// ExecuteJobs executes all jobs according to the manager settings
+// ExecuteJobs executes all jobs according to the manager settings.
 func (jm *JobManager) ExecuteJobs(ctx context.Context) error {
 	if jm.parallel {
 		return jm.executeParallel(ctx)
@@ -108,7 +108,7 @@ func (jm *JobManager) ExecuteJobs(ctx context.Context) error {
 	return jm.executeSequential(ctx)
 }
 
-// executeSequential executes jobs one by one
+// executeSequential executes jobs one by one.
 func (jm *JobManager) executeSequential(ctx context.Context) error {
 	for _, job := range jm.jobs {
 		if ctx.Err() != nil {
@@ -126,7 +126,7 @@ func (jm *JobManager) executeSequential(ctx context.Context) error {
 	return nil
 }
 
-// executeParallel executes jobs in parallel with concurrency limits
+// executeParallel executes jobs in parallel with concurrency limits.
 func (jm *JobManager) executeParallel(ctx context.Context) error {
 	var wg sync.WaitGroup
 	semaphore := make(chan struct{}, jm.maxJobs)
@@ -169,7 +169,7 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 	return nil
 }
 
-// executeJob executes a single job and records the result
+// executeJob executes a single job and records the result.
 func (jm *JobManager) executeJob(ctx context.Context, job Job) JobResult {
 	start := time.Now()
 
@@ -206,20 +206,20 @@ func (jm *JobManager) executeJob(ctx context.Context, job Job) JobResult {
 	return result
 }
 
-// updateJobStatus updates the status of a job (for UI updates)
+// updateJobStatus updates the status of a job (for UI updates).
 func (jm *JobManager) updateJobStatus(jobID string, status JobStatus) {
 	// This could be extended to update a UI or event system
 	jm.logger.Debugf("Job %s status: %s", jobID, status)
 }
 
-// addResult adds a result to the results list
+// addResult adds a result to the results list.
 func (jm *JobManager) addResult(result JobResult) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 	jm.results = append(jm.results, result)
 }
 
-// GetResults returns all job results
+// GetResults returns all job results.
 func (jm *JobManager) GetResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
@@ -229,7 +229,7 @@ func (jm *JobManager) GetResults() []JobResult {
 	return results
 }
 
-// GetCompletedResults returns only completed job results
+// GetCompletedResults returns only completed job results.
 func (jm *JobManager) GetCompletedResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
@@ -243,7 +243,7 @@ func (jm *JobManager) GetCompletedResults() []JobResult {
 	return completed
 }
 
-// GetFailedResults returns only failed job results
+// GetFailedResults returns only failed job results.
 func (jm *JobManager) GetFailedResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
@@ -257,7 +257,7 @@ func (jm *JobManager) GetFailedResults() []JobResult {
 	return failed
 }
 
-// RollbackFailedJobs rolls back all failed jobs
+// RollbackFailedJobs rolls back all failed jobs.
 func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 	failed := jm.GetFailedResults()
 
@@ -287,7 +287,7 @@ func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 	return nil
 }
 
-// Clear clears all jobs and results
+// Clear clears all jobs and results.
 func (jm *JobManager) Clear() {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
@@ -295,7 +295,7 @@ func (jm *JobManager) Clear() {
 	jm.results = make([]JobResult, 0)
 }
 
-// GetStatistics returns job execution statistics
+// GetStatistics returns job execution statistics.
 func (jm *JobManager) GetStatistics() map[string]any {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()

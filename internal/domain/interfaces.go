@@ -21,7 +21,7 @@ import (
 // Repository interfaces for external dependency management
 // Follows Clean Architecture principles - domain defines contracts
 
-// FileSystemRepository handles all file system operations
+// FileSystemRepository handles all file system operations.
 type FileSystemRepository interface {
 	// File operations
 	ReadFile(ctx context.Context, path string) ([]byte, error)
@@ -48,7 +48,7 @@ type FileSystemRepository interface {
 	TempDir(dir, pattern string) (string, error)
 }
 
-// TemplateRepository handles template rendering and management
+// TemplateRepository handles template rendering and management.
 type TemplateRepository interface {
 	// Template operations
 	LoadTemplate(ctx context.Context, name string) (string, error)
@@ -65,7 +65,7 @@ type TemplateRepository interface {
 	GetTemplateMetadata(ctx context.Context, name string) (TemplateMetadata, error)
 }
 
-// GoReleaserRepository handles GoReleaser integration
+// GoReleaserRepository handles GoReleaser integration.
 type GoReleaserRepository interface {
 	// Configuration management
 	ValidateConfig(ctx context.Context, config *SafeProjectConfig) error
@@ -87,7 +87,7 @@ type GoReleaserRepository interface {
 	CheckInstallation() (bool, error)
 }
 
-// GitHubRepository handles GitHub API operations
+// GitHubRepository handles GitHub API operations.
 type GitHubRepository interface {
 	// Repository operations
 	GetRepo(ctx context.Context, owner, name string) (*GitHubRepo, error)
@@ -114,7 +114,7 @@ type GitHubRepository interface {
 	CheckPermissions(ctx context.Context, owner, name, token string) (*GitHubPermissions, error)
 }
 
-// DockerRepository handles Docker registry operations
+// DockerRepository handles Docker registry operations.
 type DockerRepository interface {
 	// Registry operations
 	ValidateRegistry(ctx context.Context, registry DockerRegistry, url string) error
@@ -135,7 +135,7 @@ type DockerRepository interface {
 	ValidateCredentials(ctx context.Context, registry DockerRegistry, credentials *DockerCredentials) error
 }
 
-// Logger interface for dependency injection
+// Logger interface for dependency injection.
 type Logger interface {
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
@@ -155,7 +155,7 @@ type Logger interface {
 	WithError(err error) Logger
 }
 
-// Validator interface for configuration validation
+// Validator interface for configuration validation.
 type Validator interface {
 	Validate(ctx context.Context, config *SafeProjectConfig) error
 	ValidateField(ctx context.Context, field, value string) error
@@ -164,7 +164,7 @@ type Validator interface {
 
 // Use case interfaces following Clean Architecture
 
-// ConfigUseCase handles configuration management
+// ConfigUseCase handles configuration management.
 type ConfigUseCase interface {
 	CreateConfig(ctx context.Context, projectType ProjectType) (*SafeProjectConfig, error)
 	LoadConfig(ctx context.Context, path string) (*SafeProjectConfig, error)
@@ -173,7 +173,7 @@ type ConfigUseCase interface {
 	UpdateConfig(ctx context.Context, config *SafeProjectConfig, updates *ConfigUpdate) (*SafeProjectConfig, error)
 }
 
-// GenerationUseCase handles template and configuration generation
+// GenerationUseCase handles template and configuration generation.
 type GenerationUseCase interface {
 	GenerateGoReleaserConfig(ctx context.Context, config *SafeProjectConfig) (string, error)
 	GenerateGitHubActions(ctx context.Context, config *SafeProjectConfig) (string, error)
@@ -181,7 +181,7 @@ type GenerationUseCase interface {
 	GenerateAll(ctx context.Context, config *SafeProjectConfig, outputPath string) error
 }
 
-// ProjectUseCase handles project-level operations
+// ProjectUseCase handles project-level operations.
 type ProjectUseCase interface {
 	InitializeProject(ctx context.Context, config *SafeProjectConfig) error
 	ValidateProject(ctx context.Context, projectPath string) (*ProjectValidationResult, error)
@@ -272,7 +272,7 @@ type ConfigUpdate struct {
 	State              *ConfigState    `json:"state,omitempty"`
 }
 
-// Project information and validation types
+// Project information and validation types.
 type ProjectInfo struct {
 	Name         string      `json:"name"`
 	Path         string      `json:"path"`
@@ -413,7 +413,7 @@ type GitHubPermissions struct {
 	Triage   bool `json:"triage"`
 }
 
-// Docker configuration and build types
+// Docker configuration and build types.
 type DockerBuildConfig struct {
 	Context    string            `json:"context"`
 	Dockerfile string            `json:"dockerfile"`
@@ -444,7 +444,7 @@ type DockerImage struct {
 
 // Utility interfaces
 
-// ProgressTracker for long-running operations
+// ProgressTracker for long-running operations.
 type ProgressTracker interface {
 	Start(total int64, message string)
 	Update(current int64, message string)
@@ -453,7 +453,7 @@ type ProgressTracker interface {
 	WithLogger(logger Logger) ProgressTracker
 }
 
-// Configuration store interface
+// Configuration store interface.
 type ConfigurationStore interface {
 	Save(ctx context.Context, key string, value any) error
 	Load(ctx context.Context, key string, value any) (bool, error)

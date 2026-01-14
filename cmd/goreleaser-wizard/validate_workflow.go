@@ -6,14 +6,14 @@ import (
 	"strings"
 )
 
-// validateWorkflowContent validates GitHub Actions workflow content
+// validateWorkflowContent validates GitHub Actions workflow content.
 func validateWorkflowContent(workflowPath string, results *ValidationResults) error {
 	data, err := os.ReadFile(workflowPath)
 	if err != nil {
 		return NewSystemError(
 			"FILE_READ_FAILED",
 			"Failed to read workflow file",
-			fmt.Sprintf("Cannot read %s", workflowPath),
+			"Cannot read "+workflowPath,
 			err,
 		)
 	}
@@ -28,7 +28,7 @@ func validateWorkflowContent(workflowPath string, results *ValidationResults) er
 				NewTemplateError(
 					"TEMPLATE_EXECUTION_FAILED",
 					"Missing workflow element",
-					fmt.Sprintf("Workflow missing required element: %s", element),
+					"Workflow missing required element: "+element,
 				).WithContext(workflowPath))
 		}
 	}

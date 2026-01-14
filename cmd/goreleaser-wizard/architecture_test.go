@@ -25,7 +25,7 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-// TestJobManager tests the job manager functionality
+// TestJobManager tests the job manager functionality.
 func TestJobManager(t *testing.T) {
 	logger := log.New(os.Stderr)
 	jm := NewJobManager(logger)
@@ -82,7 +82,7 @@ func TestJobManager(t *testing.T) {
 	}
 }
 
-// TestJobExecution tests individual job execution
+// TestJobExecution tests individual job execution.
 func TestJobExecution(t *testing.T) {
 	logger := log.New(os.Stderr)
 
@@ -141,7 +141,7 @@ go 1.21
 	}
 }
 
-// TestJobRollback tests job rollback functionality
+// TestJobRollback tests job rollback functionality.
 func TestJobRollback(t *testing.T) {
 	logger := log.New(os.Stderr)
 
@@ -205,7 +205,7 @@ go 1.21
 	}
 }
 
-// TestWorkflow tests workflow functionality
+// TestWorkflow tests workflow functionality.
 func TestWorkflow(t *testing.T) {
 	logger := log.New(os.Stderr)
 
@@ -282,7 +282,7 @@ go 1.21
 	}
 }
 
-// TestWorkflowBuilder tests workflow builder functionality
+// TestWorkflowBuilder tests workflow builder functionality.
 func TestWorkflowBuilder(t *testing.T) {
 	logger := log.New(os.Stderr)
 	wb := NewWorkflowBuilder(logger)
@@ -370,7 +370,7 @@ go 1.21
 	}
 }
 
-// TestConcurrentJobExecution tests concurrent job execution
+// TestConcurrentJobExecution tests concurrent job execution.
 func TestConcurrentJobExecution(t *testing.T) {
 	logger := log.New(os.Stderr)
 	jm := NewJobManager(logger)

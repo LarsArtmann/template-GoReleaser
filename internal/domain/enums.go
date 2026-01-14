@@ -18,19 +18,19 @@ import (
 )
 
 // CGOStatus represents CGO compilation status with compile-time safety
-// Replaces bool CGOEnabled for better type safety and semantic clarity
+// Replaces bool CGOEnabled for better type safety and semantic clarity.
 type CGOStatus string
 
 const (
-	// CGOStatusDisabled disables CGO compilation completely
+	// CGOStatusDisabled disables CGO compilation completely.
 	CGOStatusDisabled CGOStatus = "disabled"
-	// CGOStatusEnabled enables CGO compilation when available
+	// CGOStatusEnabled enables CGO compilation when available.
 	CGOStatusEnabled CGOStatus = "enabled"
-	// CGOStatusRequired requires CGO compilation and will fail if not available
+	// CGOStatusRequired requires CGO compilation and will fail if not available.
 	CGOStatusRequired CGOStatus = "required"
 )
 
-// IsValid returns true if CGOStatus is valid
+// IsValid returns true if CGOStatus is valid.
 func (cs CGOStatus) IsValid() bool {
 	switch cs {
 	case CGOStatusDisabled, CGOStatusEnabled, CGOStatusRequired:
@@ -40,7 +40,7 @@ func (cs CGOStatus) IsValid() bool {
 	}
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (cs CGOStatus) String() string {
 	switch cs {
 	case CGOStatusDisabled:
@@ -54,27 +54,27 @@ func (cs CGOStatus) String() string {
 	}
 }
 
-// IsEnabled returns true if CGO is enabled (enabled or required)
+// IsEnabled returns true if CGO is enabled (enabled or required).
 func (cs CGOStatus) IsEnabled() bool {
 	return cs == CGOStatusEnabled || cs == CGOStatusRequired
 }
 
-// IsDisabled returns true if CGO is disabled
+// IsDisabled returns true if CGO is disabled.
 func (cs CGOStatus) IsDisabled() bool {
 	return cs == CGOStatusDisabled
 }
 
-// IsRequired returns true if CGO is required
+// IsRequired returns true if CGO is required.
 func (cs CGOStatus) IsRequired() bool {
 	return cs == CGOStatusRequired
 }
 
-// ToBool converts to legacy boolean for compatibility
+// ToBool converts to legacy boolean for compatibility.
 func (cs CGOStatus) ToBool() bool {
 	return cs.IsEnabled()
 }
 
-// ValidateCGOStatus validates a CGO status
+// ValidateCGOStatus validates a CGO status.
 func ValidateCGOStatus(status CGOStatus) error {
 	if !status.IsValid() {
 		return NewValidationError(
@@ -87,21 +87,21 @@ func ValidateCGOStatus(status CGOStatus) error {
 }
 
 // SigningLevel represents code signing level with compile-time safety
-// Replaces bool Signing for better type safety and semantic clarity
+// Replaces bool Signing for better type safety and semantic clarity.
 type SigningLevel string
 
 const (
-	// SigningLevelNone disables code signing completely
+	// SigningLevelNone disables code signing completely.
 	SigningLevelNone SigningLevel = "none"
-	// SigningLevelBasic enables basic code signing
+	// SigningLevelBasic enables basic code signing.
 	SigningLevelBasic SigningLevel = "basic"
-	// SigningLevelAdvanced enables advanced code signing with additional verification
+	// SigningLevelAdvanced enables advanced code signing with additional verification.
 	SigningLevelAdvanced SigningLevel = "advanced"
-	// SigningLevelEnterprise enables enterprise-level code signing with full compliance
+	// SigningLevelEnterprise enables enterprise-level code signing with full compliance.
 	SigningLevelEnterprise SigningLevel = "enterprise"
 )
 
-// IsValid returns true if SigningLevel is valid
+// IsValid returns true if SigningLevel is valid.
 func (sl SigningLevel) IsValid() bool {
 	switch sl {
 	case SigningLevelNone, SigningLevelBasic, SigningLevelAdvanced, SigningLevelEnterprise:
@@ -111,7 +111,7 @@ func (sl SigningLevel) IsValid() bool {
 	}
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (sl SigningLevel) String() string {
 	switch sl {
 	case SigningLevelNone:
@@ -127,12 +127,12 @@ func (sl SigningLevel) String() string {
 	}
 }
 
-// IsEnabled returns true if signing is enabled (basic, advanced, or enterprise)
+// IsEnabled returns true if signing is enabled (basic, advanced, or enterprise).
 func (sl SigningLevel) IsEnabled() bool {
 	return sl != SigningLevelNone
 }
 
-// RequiresCosign returns true if level requires cosign
+// RequiresCosign returns true if level requires cosign.
 func (sl SigningLevel) RequiresCosign() bool {
 	switch sl {
 	case SigningLevelAdvanced, SigningLevelEnterprise:
@@ -142,7 +142,7 @@ func (sl SigningLevel) RequiresCosign() bool {
 	}
 }
 
-// RequiresKeyManagement returns true if level requires key management
+// RequiresKeyManagement returns true if level requires key management.
 func (sl SigningLevel) RequiresKeyManagement() bool {
 	switch sl {
 	case SigningLevelBasic, SigningLevelAdvanced, SigningLevelEnterprise:
@@ -152,7 +152,7 @@ func (sl SigningLevel) RequiresKeyManagement() bool {
 	}
 }
 
-// GetRequiredTools returns tools required for this signing level
+// GetRequiredTools returns tools required for this signing level.
 func (sl SigningLevel) GetRequiredTools() []string {
 	switch sl {
 	case SigningLevelNone:
@@ -168,12 +168,12 @@ func (sl SigningLevel) GetRequiredTools() []string {
 	}
 }
 
-// ToBool converts to legacy boolean for compatibility
+// ToBool converts to legacy boolean for compatibility.
 func (sl SigningLevel) ToBool() bool {
 	return sl.IsEnabled()
 }
 
-// ValidateSigningLevel validates a signing level
+// ValidateSigningLevel validates a signing level.
 func ValidateSigningLevel(level SigningLevel) error {
 	if !level.IsValid() {
 		return NewValidationError(
@@ -187,7 +187,7 @@ func ValidateSigningLevel(level SigningLevel) error {
 
 // Enum migration utilities for backward compatibility
 
-// CGOStatusFromBool converts legacy boolean to CGOStatus
+// CGOStatusFromBool converts legacy boolean to CGOStatus.
 func CGOStatusFromBool(enabled bool) CGOStatus {
 	if enabled {
 		return CGOStatusEnabled
@@ -195,7 +195,7 @@ func CGOStatusFromBool(enabled bool) CGOStatus {
 	return CGOStatusDisabled
 }
 
-// DockerSupportFromBool converts legacy boolean to DockerSupport
+// DockerSupportFromBool converts legacy boolean to DockerSupport.
 func DockerSupportFromBool(enabled bool) DockerSupport {
 	if enabled {
 		return DockerSupportBoth
@@ -203,7 +203,7 @@ func DockerSupportFromBool(enabled bool) DockerSupport {
 	return DockerSupportNone
 }
 
-// SigningLevelFromBool converts legacy boolean to SigningLevel
+// SigningLevelFromBool converts legacy boolean to SigningLevel.
 func SigningLevelFromBool(enabled bool) SigningLevel {
 	if enabled {
 		return SigningLevelBasic
@@ -211,7 +211,7 @@ func SigningLevelFromBool(enabled bool) SigningLevel {
 	return SigningLevelNone
 }
 
-// ActionLevelFromBool converts legacy boolean to ActionLevel
+// ActionLevelFromBool converts legacy boolean to ActionLevel.
 func ActionLevelFromBool(enabled bool) ActionLevel {
 	if enabled {
 		return ActionLevelBasic
@@ -219,7 +219,7 @@ func ActionLevelFromBool(enabled bool) ActionLevel {
 	return ActionLevelNone
 }
 
-// FeatureLevelFromBool converts legacy boolean to FeatureLevel
+// FeatureLevelFromBool converts legacy boolean to FeatureLevel.
 func FeatureLevelFromBool(enabled bool) FeatureLevel {
 	if enabled {
 		return FeatureLevelStandard
@@ -229,7 +229,7 @@ func FeatureLevelFromBool(enabled bool) FeatureLevel {
 
 // Smart conversion functions based on project type context
 
-// GetDefaultCGOStatus returns smart CGO status based on project type
+// GetDefaultCGOStatus returns smart CGO status based on project type.
 func GetDefaultCGOStatus(projectType ProjectType) CGOStatus {
 	if projectType.DefaultCGOEnabled() {
 		return CGOStatusEnabled
@@ -237,7 +237,7 @@ func GetDefaultCGOStatus(projectType ProjectType) CGOStatus {
 	return CGOStatusDisabled
 }
 
-// GetDefaultDockerSupport returns smart Docker support based on project type
+// GetDefaultDockerSupport returns smart Docker support based on project type.
 func GetDefaultDockerSupport(projectType ProjectType) DockerSupport {
 	if projectType.DockerSupported() {
 		return DockerSupportBuild
@@ -245,7 +245,7 @@ func GetDefaultDockerSupport(projectType ProjectType) DockerSupport {
 	return DockerSupportNone
 }
 
-// GetRecommendedActionLevel returns recommended action level based on project type
+// GetRecommendedActionLevel returns recommended action level based on project type.
 func GetRecommendedActionLevel(projectType ProjectType) ActionLevel {
 	switch projectType {
 	case ProjectTypeCLI, ProjectTypeWebAPI:
@@ -261,7 +261,7 @@ func GetRecommendedActionLevel(projectType ProjectType) ActionLevel {
 	}
 }
 
-// GetRecommendedSigningLevel returns recommended signing level based on project type
+// GetRecommendedSigningLevel returns recommended signing level based on project type.
 func GetRecommendedSigningLevel(projectType ProjectType) SigningLevel {
 	switch projectType {
 	case ProjectTypeCLI:
@@ -277,7 +277,7 @@ func GetRecommendedSigningLevel(projectType ProjectType) SigningLevel {
 	}
 }
 
-// GetRecommendedFeatureLevel returns recommended feature level based on project type
+// GetRecommendedFeatureLevel returns recommended feature level based on project type.
 func GetRecommendedFeatureLevel(projectType ProjectType) FeatureLevel {
 	switch projectType {
 	case ProjectTypeWebAPI, ProjectTypeGRPCService:

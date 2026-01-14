@@ -10,7 +10,7 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
 
-// GetRecommendedProjectType analyzes current directory and returns recommended project type
+// GetRecommendedProjectType analyzes current directory and returns recommended project type.
 func GetRecommendedProjectType() domain.ProjectType {
 	// Check for common project indicators
 	if hasFile("go.mod") {
@@ -30,7 +30,7 @@ func GetRecommendedProjectType() domain.ProjectType {
 	return domain.ProjectTypeCLI
 }
 
-// GetRecommendedPlatforms returns recommended platforms based on current OS and common patterns
+// GetRecommendedPlatforms returns recommended platforms based on current OS and common patterns.
 func GetRecommendedPlatforms() []domain.Platform {
 	platforms := []domain.Platform{domain.PlatformLinux} // Always include Linux
 
@@ -45,7 +45,7 @@ func GetRecommendedPlatforms() []domain.Platform {
 	return platforms
 }
 
-// GetRecommendedArchitectures returns recommended architectures based on current arch
+// GetRecommendedArchitectures returns recommended architectures based on current arch.
 func GetRecommendedArchitectures() []domain.Architecture {
 	architectures := []domain.Architecture{domain.ArchitectureAMD64} // Always include AMD64
 
@@ -60,7 +60,7 @@ func GetRecommendedArchitectures() []domain.Architecture {
 	return architectures
 }
 
-// GetRecommendedGitProvider returns recommended Git provider based on analysis
+// GetRecommendedGitProvider returns recommended Git provider based on analysis.
 func GetRecommendedGitProvider() domain.GitProvider {
 	// Try to detect from git remote
 	if remote, err := exec.Command("git", "remote", "get-url", "origin").Output(); err == nil {
@@ -80,12 +80,12 @@ func GetRecommendedGitProvider() domain.GitProvider {
 	return domain.GitProviderGitHub
 }
 
-// GetRecommendedDockerRegistry returns recommended Docker registry based on Git provider
+// GetRecommendedDockerRegistry returns recommended Docker registry based on Git provider.
 func GetRecommendedDockerRegistry(gitProvider domain.GitProvider) domain.DockerRegistry {
 	return gitProvider.DefaultRegistry()
 }
 
-// hasFile checks if a file exists in current directory or common subdirectories
+// hasFile checks if a file exists in current directory or common subdirectories.
 func hasFile(filename string) bool {
 	// Check current directory
 	if _, err := os.Stat(filename); err == nil {
@@ -103,7 +103,7 @@ func hasFile(filename string) bool {
 	return false
 }
 
-// GetGitHubOwner tries to extract GitHub owner from git remote
+// GetGitHubOwner tries to extract GitHub owner from git remote.
 func GetGitHubOwner() string {
 	if owner := git.GetGitHubOwner(); owner != "owner" {
 		return owner
@@ -111,7 +111,7 @@ func GetGitHubOwner() string {
 	return "owner"
 }
 
-// GetGitHubRepo tries to extract GitHub repo name from git remote
+// GetGitHubRepo tries to extract GitHub repo name from git remote.
 func GetGitHubRepo() string {
 	if repo := git.GetGitHubRepo(); repo != "repo" {
 		return repo
@@ -119,21 +119,21 @@ func GetGitHubRepo() string {
 	return "repo"
 }
 
-// IsDevelopmentEnvironment returns true if running in development environment
+// IsDevelopmentEnvironment returns true if running in development environment.
 func IsDevelopmentEnvironment() bool {
 	return os.Getenv("GO_ENV") == "development" ||
 		os.Getenv("ENV") == "development" ||
 		os.Getenv("NODE_ENV") == "development"
 }
 
-// IsProductionEnvironment returns true if running in production environment
+// IsProductionEnvironment returns true if running in production environment.
 func IsProductionEnvironment() bool {
 	return os.Getenv("GO_ENV") == "production" ||
 		os.Getenv("ENV") == "production" ||
 		os.Getenv("NODE_ENV") == "production"
 }
 
-// GetEnvironment returns current environment name
+// GetEnvironment returns current environment name.
 func GetEnvironment() string {
 	if env := os.Getenv("GO_ENV"); env != "" {
 		return env

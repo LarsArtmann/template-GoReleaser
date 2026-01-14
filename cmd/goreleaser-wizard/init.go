@@ -13,7 +13,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// runInitWizard runs the init command
+// runInitWizard runs the init command.
 func runInitWizard(cmd *cobra.Command, args []string) {
 	defer recoverFromPanic("init wizard")
 
@@ -61,9 +61,10 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	// Display results
 	results := workflow.GetResults()
 	for _, result := range results {
-		if result.Status == JobStatusCompleted {
+		switch result.Status {
+		case JobStatusCompleted:
 			fmt.Printf("%s %s completed successfully\n", successStyle.Render("✅"), result.Job.Name())
-		} else if result.Status == JobStatusFailed {
+		case JobStatusFailed:
 			fmt.Printf("%s %s failed: %v\n", errorStyle.Render("❌"), result.Job.Name(), result.Error)
 		}
 	}
@@ -77,7 +78,7 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	fmt.Println("  • Commit the configuration to your repository")
 }
 
-// detectProjectInfo detects project information from the current directory
+// detectProjectInfo detects project information from the current directory.
 func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	// Get current working directory
 	wd, err := os.Getwd()
@@ -149,7 +150,7 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	return nil
 }
 
-// detectMainStructure detects the main.go structure and determines project type
+// detectMainStructure detects the main.go structure and determines project type.
 func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 	// Check for main.go in root
 	if _, err := os.Stat(filepath.Join(wd, "main.go")); err == nil {
@@ -163,7 +164,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 			if entry.IsDir() {
 				mainFile := filepath.Join(cmdDir, entry.Name(), "main.go")
 				if _, err := os.Stat(mainFile); err == nil {
-					return fmt.Sprintf("./cmd/%s", entry.Name()), entry.Name(), "cli"
+					return "./cmd/" + entry.Name(), entry.Name(), "cli"
 				}
 			}
 		}
@@ -202,7 +203,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 	return ".", filepath.Base(wd), "cli"
 }
 
-// runInteractiveWizard runs an interactive wizard for configuration
+// runInteractiveWizard runs an interactive wizard for configuration.
 func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 	prompter := NewInteractivePrompter()
 
@@ -269,7 +270,7 @@ func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 	return nil
 }
 
-// initFlags adds flags to the init command
+// initFlags adds flags to the init command.
 func init() {
 	initCmd.Flags().Bool("force", false, "force overwrite existing configuration")
 	initCmd.Flags().Bool("interactive", true, "run in interactive mode (default true)")

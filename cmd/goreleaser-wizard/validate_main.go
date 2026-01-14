@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// validateGoReleaserConfig validates GoReleaser configuration
+// validateGoReleaserConfig validates GoReleaser configuration.
 func validateGoReleaserConfig(results *ValidationResults) error {
 	configPath := ".goreleaser.yaml"
 
@@ -19,7 +19,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 			NewSystemError(
 				"FILE_READ_FAILED",
 				"Failed to check configuration file",
-				fmt.Sprintf("Cannot access %s", configPath),
+				"Cannot access "+configPath,
 				err,
 			).WithContext(configPath))
 		return nil
@@ -31,7 +31,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 			NewSystemError(
 				"FILE_NOT_FOUND",
 				"Configuration file not found",
-				fmt.Sprintf("%s does not exist", configPath),
+				configPath+" does not exist",
 				nil,
 			).WithContext(configPath))
 		results.Recommendations = append(results.Recommendations,
@@ -75,7 +75,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 	return nil
 }
 
-// validateGitHubActions validates GitHub Actions workflow
+// validateGitHubActions validates GitHub Actions workflow.
 func validateGitHubActions(results *ValidationResults) error {
 	workflowPath := filepath.Join(".github", "workflows", "release.yml")
 
@@ -86,7 +86,7 @@ func validateGitHubActions(results *ValidationResults) error {
 			NewSystemError(
 				"FILE_READ_FAILED",
 				"Failed to check workflow file",
-				fmt.Sprintf("Cannot access %s", workflowPath),
+				"Cannot access "+workflowPath,
 				err,
 			).WithContext(workflowPath))
 		return nil
@@ -109,7 +109,7 @@ func validateGitHubActions(results *ValidationResults) error {
 	return nil
 }
 
-// validateProjectStructure validates project structure
+// validateProjectStructure validates project structure.
 func validateProjectStructure(results *ValidationResults) error {
 	// Check for go.mod
 	if exists, err := fileSystemRepo.FileExists(context.Background(), "go.mod"); err != nil {
@@ -139,7 +139,7 @@ func validateProjectStructure(results *ValidationResults) error {
 			NewSystemError(
 				"FILE_READ_FAILED",
 				"Failed to check main directory",
-				fmt.Sprintf("Cannot access %s", mainPath),
+				"Cannot access "+mainPath,
 				err,
 			).WithContext(mainPath))
 		return nil
@@ -173,7 +173,7 @@ func validateProjectStructure(results *ValidationResults) error {
 	return nil
 }
 
-// validateYAML validates YAML file
+// validateYAML validates YAML file.
 func validateYAML(filePath string, results *ValidationResults) error {
 	// Simple YAML validation - try to read file content
 	content, err := fileSystemRepo.ReadFile(context.Background(), filePath)
@@ -188,7 +188,7 @@ func validateYAML(filePath string, results *ValidationResults) error {
 			NewValidationError(
 				"INVALID_FILE_FORMAT",
 				"Empty YAML file",
-				fmt.Sprintf("%s is empty", filePath),
+				filePath+" is empty",
 			).WithContext(filePath))
 		return nil
 	}
@@ -208,7 +208,7 @@ func validateYAML(filePath string, results *ValidationResults) error {
 			NewValidationError(
 				"INVALID_FILE_FORMAT",
 				"Invalid YAML structure",
-				fmt.Sprintf("%s does not appear to be valid YAML", filePath),
+				filePath+" does not appear to be valid YAML",
 			).WithContext(filePath))
 		return nil
 	}

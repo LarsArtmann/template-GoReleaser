@@ -19,13 +19,13 @@ import (
 	"strings"
 )
 
-// Validation use case implementation
+// Validation use case implementation.
 type ValidationUseCase struct {
 	logger Logger
 	repo   FileSystemRepository
 }
 
-// NewValidationUseCase creates a new validation use case
+// NewValidationUseCase creates a new validation use case.
 func NewValidationUseCase(logger Logger, repo FileSystemRepository) *ValidationUseCase {
 	return &ValidationUseCase{
 		logger: logger,
@@ -33,7 +33,7 @@ func NewValidationUseCase(logger Logger, repo FileSystemRepository) *ValidationU
 	}
 }
 
-// ValidateConfiguration performs comprehensive validation of project configuration
+// ValidateConfiguration performs comprehensive validation of project configuration.
 func (vu *ValidationUseCase) ValidateConfiguration(ctx context.Context, config *SafeProjectConfig) (*ValidationResult, error) {
 	vu.logger.DebugContext(ctx, "Starting comprehensive configuration validation")
 
@@ -81,7 +81,7 @@ func (vu *ValidationUseCase) ValidateConfiguration(ctx context.Context, config *
 	return result, nil
 }
 
-// validateBasicFields validates basic required fields
+// validateBasicFields validates basic required fields.
 func (vu *ValidationUseCase) validateBasicFields(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	// Project name validation
 	if err := ValidateProjectName(config.ProjectName); err != nil {
@@ -108,7 +108,7 @@ func (vu *ValidationUseCase) validateBasicFields(ctx context.Context, config *Sa
 	return nil
 }
 
-// validateTypes validates enum types
+// validateTypes validates enum types.
 func (vu *ValidationUseCase) validateTypes(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	// Project type validation
 	if !config.ProjectType.IsValid() {
@@ -155,7 +155,7 @@ func (vu *ValidationUseCase) validateTypes(ctx context.Context, config *SafeProj
 	return nil
 }
 
-// validatePlatformArchCompatibility validates platform-architecture compatibility
+// validatePlatformArchCompatibility validates platform-architecture compatibility.
 func (vu *ValidationUseCase) validatePlatformArchCompatibility(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	if err := ValidatePlatformArchCompatibility(config.Platforms, config.Architectures); err != nil {
 		return NewValidationError(ErrPlatformArchMismatch, "Platform architecture compatibility failed", err.Error()).WithContext("platforms_architectures")
@@ -163,7 +163,7 @@ func (vu *ValidationUseCase) validatePlatformArchCompatibility(ctx context.Conte
 	return nil
 }
 
-// validateBusinessRules validates domain business rules
+// validateBusinessRules validates domain business rules.
 func (vu *ValidationUseCase) validateBusinessRules(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	// Docker support rule
 	if config.GetDockerEnabled() && !config.ProjectType.DockerSupported() {
@@ -190,7 +190,7 @@ func (vu *ValidationUseCase) validateBusinessRules(ctx context.Context, config *
 	return nil
 }
 
-// validateSecurity performs security-focused validation
+// validateSecurity performs security-focused validation.
 func (vu *ValidationUseCase) validateSecurity(ctx context.Context, config *SafeProjectConfig) *DomainError {
 	// Check for potential path traversal in main path
 	if containsPathTraversal(config.MainPath) {
@@ -212,7 +212,7 @@ func (vu *ValidationUseCase) validateSecurity(ctx context.Context, config *SafeP
 	return nil
 }
 
-// generateWarnings generates validation warnings
+// generateWarnings generates validation warnings.
 func (vu *ValidationUseCase) generateWarnings(ctx context.Context, config *SafeProjectConfig, result *ValidationResult) {
 	// Warning for single platform
 	if len(config.Platforms) == 1 {
@@ -237,7 +237,7 @@ func (vu *ValidationUseCase) generateWarnings(ctx context.Context, config *SafeP
 	}
 }
 
-// ValidateProjectStructure validates project directory structure
+// ValidateProjectStructure validates project directory structure.
 func (vu *ValidationUseCase) ValidateProjectStructure(ctx context.Context, projectPath string) (*ProjectValidationResult, error) {
 	vu.logger.DebugContext(ctx, "Validating project structure", "path", projectPath)
 
@@ -277,7 +277,7 @@ func (vu *ValidationUseCase) ValidateProjectStructure(ctx context.Context, proje
 	return result, nil
 }
 
-// analyzeProjectStructure analyzes the project directory structure
+// analyzeProjectStructure analyzes the project directory structure.
 func (vu *ValidationUseCase) analyzeProjectStructure(ctx context.Context, projectPath string) (*ProjectInfo, error) {
 	info := &ProjectInfo{
 		Path: projectPath,
@@ -313,7 +313,7 @@ func (vu *ValidationUseCase) analyzeProjectStructure(ctx context.Context, projec
 	return info, nil
 }
 
-// parseGoMod parses go.mod file for module information
+// parseGoMod parses go.mod file for module information.
 func (vu *ValidationUseCase) parseGoMod(ctx context.Context, goModPath string, info *ProjectInfo) error {
 	data, err := vu.repo.ReadFile(ctx, goModPath)
 	if err != nil {
@@ -336,7 +336,7 @@ func (vu *ValidationUseCase) parseGoMod(ctx context.Context, goModPath string, i
 	return nil
 }
 
-// findMainFile searches for main.go in common locations
+// findMainFile searches for main.go in common locations.
 func (vu *ValidationUseCase) findMainFile(ctx context.Context, projectPath string) (string, error) {
 	commonPaths := []string{
 		"main.go",
@@ -359,7 +359,7 @@ func (vu *ValidationUseCase) findMainFile(ctx context.Context, projectPath strin
 	return "", nil
 }
 
-// inferProjectType infers project type and binary name from structure
+// inferProjectType infers project type and binary name from structure.
 func (vu *ValidationUseCase) inferProjectType(ctx context.Context, info *ProjectInfo) {
 	// Infer binary name from module name
 	if info.Name != "" && info.MainFilePath != "" {
@@ -388,7 +388,7 @@ func (vu *ValidationUseCase) inferProjectType(ctx context.Context, info *Project
 	info.Buildable = info.HasMainFile && info.HasGoMod
 }
 
-// validateProjectRequirements validates project against requirements
+// validateProjectRequirements validates project against requirements.
 func (vu *ValidationUseCase) validateProjectRequirements(ctx context.Context, info *ProjectInfo) *DomainError {
 	if !info.HasGoMod {
 		return NewSystemError(ErrDependencyNotFound, "Go module not found", "Project must have a go.mod file", nil)
@@ -401,7 +401,7 @@ func (vu *ValidationUseCase) validateProjectRequirements(ctx context.Context, in
 	return nil
 }
 
-// generateProjectRecommendations generates recommendations for project improvement
+// generateProjectRecommendations generates recommendations for project improvement.
 func (vu *ValidationUseCase) generateProjectRecommendations(ctx context.Context, info *ProjectInfo, result *ProjectValidationResult) {
 	// Recommendation for missing GitHub Actions
 	if _, err := vu.repo.DirExists(ctx, vu.repo.JoinPath(info.Path, ".github", "workflows")); err != nil {
@@ -424,7 +424,7 @@ func (vu *ValidationUseCase) generateProjectRecommendations(ctx context.Context,
 	}
 }
 
-// Utility functions for security validation
+// Utility functions for security validation.
 func containsPathTraversal(path string) bool {
 	return strings.Contains(path, "..") || strings.Contains(path, `\`)
 }

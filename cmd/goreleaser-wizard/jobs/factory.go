@@ -10,19 +10,19 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// JobFactory creates jobs for common wizard operations
+// JobFactory creates jobs for common wizard operations.
 type JobFactory struct {
 	logger Logger
 }
 
-// NewJobFactory creates a new job factory
+// NewJobFactory creates a new job factory.
 func NewJobFactory(logger Logger) *JobFactory {
 	return &JobFactory{
 		logger: logger,
 	}
 }
 
-// CreateFullWizardJobs creates all jobs for a complete wizard operation
+// CreateFullWizardJobs creates all jobs for a complete wizard operation.
 func (jf *JobFactory) CreateFullWizardJobs(config *domain.SafeProjectConfig, force bool) []Job {
 	var jobs []Job
 
@@ -57,7 +57,7 @@ func (jf *JobFactory) CreateFullWizardJobs(config *domain.SafeProjectConfig, for
 	return jobs
 }
 
-// CreateConfigOnlyJobs creates jobs for config generation only
+// CreateConfigOnlyJobs creates jobs for config generation only.
 func (jf *JobFactory) CreateConfigOnlyJobs(config *domain.SafeProjectConfig, force bool) []Job {
 	return []Job{
 		NewProjectValidationJob(".", jf.logger),
@@ -65,12 +65,12 @@ func (jf *JobFactory) CreateConfigOnlyJobs(config *domain.SafeProjectConfig, for
 	}
 }
 
-// CreateValidationOnlyJob creates a validation-only job
+// CreateValidationOnlyJob creates a validation-only job.
 func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) Job {
 	return NewProjectValidationJob(projectDir, jf.logger)
 }
 
-// CreateCustomJobs creates jobs for custom operations
+// CreateCustomJobs creates jobs for custom operations.
 func (jf *JobFactory) CreateCustomJobs(operation string, config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
 	switch operation {
 	case "preview":
@@ -88,7 +88,7 @@ func (jf *JobFactory) CreateCustomJobs(operation string, config *domain.SafeProj
 	}
 }
 
-// createPreviewJobs creates jobs for preview operations
+// createPreviewJobs creates jobs for preview operations.
 func (jf *JobFactory) createPreviewJobs(config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
 	var jobs []Job
 
@@ -103,7 +103,7 @@ func (jf *JobFactory) createPreviewJobs(config *domain.SafeProjectConfig, option
 	return jobs, nil
 }
 
-// createValidationJobs creates jobs for validation operations
+// createValidationJobs creates jobs for validation operations.
 func (jf *JobFactory) createValidationJobs(config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
 	var jobs []Job
 
@@ -122,7 +122,7 @@ func (jf *JobFactory) createValidationJobs(config *domain.SafeProjectConfig, opt
 	return jobs, nil
 }
 
-// createRollbackJobs creates jobs for rollback operations
+// createRollbackJobs creates jobs for rollback operations.
 func (jf *JobFactory) createRollbackJobs(config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
 	var jobs []Job
 
@@ -136,7 +136,7 @@ func (jf *JobFactory) createRollbackJobs(config *domain.SafeProjectConfig, optio
 	return jobs, nil
 }
 
-// createPreviewJob creates a preview generation job
+// createPreviewJob creates a preview generation job.
 func (jf *JobFactory) createPreviewJob(config *domain.SafeProjectConfig, options map[string]any) (Job, error) {
 	return &PreviewGenerationJob{
 		id:          "preview-generation",
@@ -146,7 +146,7 @@ func (jf *JobFactory) createPreviewJob(config *domain.SafeProjectConfig, options
 	}, nil
 }
 
-// createConfigValidationJob creates a config validation job
+// createConfigValidationJob creates a config validation job.
 func (jf *JobFactory) createConfigValidationJob(config *domain.SafeProjectConfig) Job {
 	return &ConfigValidationJob{
 		id:     "config-validation",
@@ -155,7 +155,7 @@ func (jf *JobFactory) createConfigValidationJob(config *domain.SafeProjectConfig
 	}
 }
 
-// createJobRollback creates a job rollback operation
+// createJobRollback creates a job rollback operation.
 func (jf *JobFactory) createJobRollback(jobID string, config *domain.SafeProjectConfig) Job {
 	return &JobRollbackJob{
 		id:     "job-rollback",
@@ -165,7 +165,7 @@ func (jf *JobFactory) createJobRollback(jobID string, config *domain.SafeProject
 	}
 }
 
-// getRequiredDependencies returns required dependencies based on configuration
+// getRequiredDependencies returns required dependencies based on configuration.
 func (jf *JobFactory) getRequiredDependencies(config *domain.SafeProjectConfig) []string {
 	dependencies := []string{"go"}
 
@@ -181,7 +181,7 @@ func (jf *JobFactory) getRequiredDependencies(config *domain.SafeProjectConfig) 
 	return dependencies
 }
 
-// getStringOption safely extracts string option from options map
+// getStringOption safely extracts string option from options map.
 func getStringOption(options map[string]any, key, defaultValue string) string {
 	if value, ok := options[key].(string); ok {
 		return value
@@ -189,7 +189,7 @@ func getStringOption(options map[string]any, key, defaultValue string) string {
 	return defaultValue
 }
 
-// PreviewGenerationJob generates preview of configurations
+// PreviewGenerationJob generates preview of configurations.
 type PreviewGenerationJob struct {
 	id          string
 	config      *domain.SafeProjectConfig
@@ -272,7 +272,7 @@ func (j *PreviewGenerationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// ConfigValidationJob validates configuration
+// ConfigValidationJob validates configuration.
 type ConfigValidationJob struct {
 	id     string
 	config *domain.SafeProjectConfig
@@ -319,7 +319,7 @@ func (j *ConfigValidationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// JobRollbackJob rolls back a specific job
+// JobRollbackJob rolls back a specific job.
 type JobRollbackJob struct {
 	id     string
 	jobID  string
@@ -332,7 +332,7 @@ func (j *JobRollbackJob) ID() string {
 }
 
 func (j *JobRollbackJob) Name() string {
-	return fmt.Sprintf("Rollback Job: %s", j.jobID)
+	return "Rollback Job: " + j.jobID
 }
 
 func (j *JobRollbackJob) GetMetadata() JobMetadata {

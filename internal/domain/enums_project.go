@@ -1,7 +1,7 @@
 package domain
 
 // ProjectType represents different types of Go projects
-// This enum replaces string-based project types for type safety
+// This enum replaces string-based project types for type safety.
 type ProjectType string
 
 const (
@@ -17,7 +17,7 @@ const (
 	ProjectTypeTool         ProjectType = "tool"
 )
 
-// IsValid returns true if ProjectType is valid
+// IsValid returns true if ProjectType is valid.
 func (pt ProjectType) IsValid() bool {
 	switch pt {
 	case ProjectTypeCLI, ProjectTypeLibrary, ProjectTypeWebAPI,
@@ -29,7 +29,7 @@ func (pt ProjectType) IsValid() bool {
 	}
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (pt ProjectType) String() string {
 	switch pt {
 	case ProjectTypeCLI:
@@ -57,32 +57,32 @@ func (pt ProjectType) String() string {
 	}
 }
 
-// IsWebRelated returns true for web-related project types
+// IsWebRelated returns true for web-related project types.
 func (pt ProjectType) IsWebRelated() bool {
 	return pt == ProjectTypeWebAPI || pt == ProjectTypeGRPCService || pt == ProjectTypeMicroservice
 }
 
-// IsDesktopRelated returns true for desktop-related project types
+// IsDesktopRelated returns true for desktop-related project types.
 func (pt ProjectType) IsDesktopRelated() bool {
 	return pt == ProjectTypeDesktop || pt == ProjectTypeDaemon || pt == ProjectTypeTool
 }
 
-// IsMobileRelated returns true for mobile-related project types
+// IsMobileRelated returns true for mobile-related project types.
 func (pt ProjectType) IsMobileRelated() bool {
 	return pt == ProjectTypeMobile
 }
 
-// IsLibrary returns true for library project type
+// IsLibrary returns true for library project type.
 func (pt ProjectType) IsLibrary() bool {
 	return pt == ProjectTypeLibrary
 }
 
-// IsService returns true for service-oriented project types
+// IsService returns true for service-oriented project types.
 func (pt ProjectType) IsService() bool {
 	return pt == ProjectTypeWebAPI || pt == ProjectTypeGRPCService || pt == ProjectTypeMicroservice || pt == ProjectTypeDaemon
 }
 
-// DefaultCGOEnabled returns true if project type typically requires CGO
+// DefaultCGOEnabled returns true if project type typically requires CGO.
 func (pt ProjectType) DefaultCGOEnabled() bool {
 	switch pt {
 	case ProjectTypeDesktop, ProjectTypeWebAPI, ProjectTypeGRPCService:
@@ -92,12 +92,12 @@ func (pt ProjectType) DefaultCGOEnabled() bool {
 	}
 }
 
-// DockerSupported returns true if project type supports Docker
+// DockerSupported returns true if project type supports Docker.
 func (pt ProjectType) DockerSupported() bool {
 	return !pt.IsMobileRelated() && !pt.IsLibrary()
 }
 
-// RecommendedPlatforms returns recommended platforms for project type
+// RecommendedPlatforms returns recommended platforms for project type.
 func (pt ProjectType) RecommendedPlatforms() []Platform {
 	switch pt {
 	case ProjectTypeCLI, ProjectTypeTool:
@@ -117,7 +117,7 @@ func (pt ProjectType) RecommendedPlatforms() []Platform {
 	}
 }
 
-// RecommendedArchitectures returns recommended architectures for project type
+// RecommendedArchitectures returns recommended architectures for project type.
 func (pt ProjectType) RecommendedArchitectures() []Architecture {
 	switch pt {
 	case ProjectTypeCLI, ProjectTypeTool:
@@ -135,17 +135,17 @@ func (pt ProjectType) RecommendedArchitectures() []Architecture {
 	}
 }
 
-// RequiresGit returns true if project type requires Git
+// RequiresGit returns true if project type requires Git.
 func (pt ProjectType) RequiresGit() bool {
 	return pt != ProjectTypeTool && pt != ProjectTypePlugin
 }
 
-// RequiresCI returns true if project type benefits from CI/CD
+// RequiresCI returns true if project type benefits from CI/CD.
 func (pt ProjectType) RequiresCI() bool {
 	return !pt.IsLibrary() && pt != ProjectTypePlugin
 }
 
-// FeatureLevel represents feature maturity levels
+// FeatureLevel represents feature maturity levels.
 type FeatureLevel string
 
 const (
@@ -156,7 +156,7 @@ const (
 	FeatureLevelEnterprise FeatureLevel = "enterprise"
 )
 
-// IsValid returns true if FeatureLevel is valid
+// IsValid returns true if FeatureLevel is valid.
 func (fl FeatureLevel) IsValid() bool {
 	switch fl {
 	case FeatureLevelNone, FeatureLevelBasic, FeatureLevelStandard,
@@ -167,7 +167,7 @@ func (fl FeatureLevel) IsValid() bool {
 	}
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (fl FeatureLevel) String() string {
 	switch fl {
 	case FeatureLevelNone:
@@ -185,27 +185,27 @@ func (fl FeatureLevel) String() string {
 	}
 }
 
-// IsEnabled returns true if feature level is enabled
+// IsEnabled returns true if feature level is enabled.
 func (fl FeatureLevel) IsEnabled() bool {
 	return fl != FeatureLevelNone
 }
 
-// IncludesBasic returns true if feature level includes basic features
+// IncludesBasic returns true if feature level includes basic features.
 func (fl FeatureLevel) IncludesBasic() bool {
 	return fl == FeatureLevelBasic || fl == FeatureLevelStandard || fl == FeatureLevelAdvanced || fl == FeatureLevelEnterprise
 }
 
-// IncludesAdvanced returns true if feature level includes advanced features
+// IncludesAdvanced returns true if feature level includes advanced features.
 func (fl FeatureLevel) IncludesAdvanced() bool {
 	return fl == FeatureLevelAdvanced || fl == FeatureLevelEnterprise
 }
 
-// IncludesEnterprise returns true if feature level includes enterprise features
+// IncludesEnterprise returns true if feature level includes enterprise features.
 func (fl FeatureLevel) IncludesEnterprise() bool {
 	return fl == FeatureLevelEnterprise
 }
 
-// GetRecommendedDockerSupport returns recommended Docker support for feature level
+// GetRecommendedDockerSupport returns recommended Docker support for feature level.
 func (fl FeatureLevel) GetRecommendedDockerSupport() DockerSupport {
 	switch fl {
 	case FeatureLevelNone:
@@ -223,7 +223,7 @@ func (fl FeatureLevel) GetRecommendedDockerSupport() DockerSupport {
 	}
 }
 
-// GetRecommendedSigningLevel returns recommended signing level for feature level
+// GetRecommendedSigningLevel returns recommended signing level for feature level.
 func (fl FeatureLevel) GetRecommendedSigningLevel() SigningLevel {
 	switch fl {
 	case FeatureLevelNone:
@@ -241,7 +241,7 @@ func (fl FeatureLevel) GetRecommendedSigningLevel() SigningLevel {
 	}
 }
 
-// GetRecommendedActionLevel returns recommended GitHub Actions level for feature level
+// GetRecommendedActionLevel returns recommended GitHub Actions level for feature level.
 func (fl FeatureLevel) GetRecommendedActionLevel() ActionLevel {
 	switch fl {
 	case FeatureLevelNone:

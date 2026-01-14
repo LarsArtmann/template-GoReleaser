@@ -11,13 +11,13 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// DockerfileGenerator handles Dockerfile generation
+// DockerfileGenerator handles Dockerfile generation.
 type DockerfileGenerator struct {
 	templateData *DockerfileTemplateData
 	logger       Logger
 }
 
-// DockerfileTemplateData contains data for Dockerfile template
+// DockerfileTemplateData contains data for Dockerfile template.
 type DockerfileTemplateData struct {
 	ProjectName   string
 	GoVersion     string
@@ -33,13 +33,13 @@ type DockerfileTemplateData struct {
 	HealthCheck   *HealthCheck
 }
 
-// EnvVar represents an environment variable
+// EnvVar represents an environment variable.
 type EnvVar struct {
 	Key   string
 	Value string
 }
 
-// HealthCheck represents container health check configuration
+// HealthCheck represents container health check configuration.
 type HealthCheck struct {
 	Interval    string
 	Timeout     string
@@ -48,7 +48,7 @@ type HealthCheck struct {
 	Commands    []string
 }
 
-// NewDockerfileGenerator creates a new Dockerfile generator
+// NewDockerfileGenerator creates a new Dockerfile generator.
 func NewDockerfileGenerator(config *domain.SafeProjectConfig, logger Logger) *DockerfileGenerator {
 	return &DockerfileGenerator{
 		templateData: createDockerfileTemplateData(config),
@@ -56,7 +56,7 @@ func NewDockerfileGenerator(config *domain.SafeProjectConfig, logger Logger) *Do
 	}
 }
 
-// createDockerfileTemplateData creates template data from project config
+// createDockerfileTemplateData creates template data from project config.
 func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileTemplateData {
 	data := &DockerfileTemplateData{
 		ProjectName:   config.ProjectName,
@@ -98,7 +98,7 @@ func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileT
 	return data
 }
 
-// Generate generates Dockerfile
+// Generate generates Dockerfile.
 func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 	g.logger.Info("Generating Dockerfile")
 
@@ -142,7 +142,7 @@ func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 	return nil
 }
 
-// ValidateTemplate validates Dockerfile template
+// ValidateTemplate validates Dockerfile template.
 func (g *DockerfileGenerator) ValidateTemplate() error {
 	tmpl := template.New("dockerfile")
 
@@ -158,7 +158,7 @@ func (g *DockerfileGenerator) ValidateTemplate() error {
 	return nil
 }
 
-// GeneratePreview generates a preview without writing to file
+// GeneratePreview generates a preview without writing to file.
 func (g *DockerfileGenerator) GeneratePreview(ctx context.Context) (string, error) {
 	g.logger.Debug("Generating Dockerfile preview")
 
@@ -192,7 +192,7 @@ func (g *DockerfileGenerator) GeneratePreview(ctx context.Context) (string, erro
 	return output.String(), nil
 }
 
-// Rollback removes generated Dockerfile
+// Rollback removes generated Dockerfile.
 func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back Dockerfile generation")
 
@@ -217,7 +217,7 @@ func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// UpdateConfig updates generator configuration
+// UpdateConfig updates generator configuration.
 func (g *DockerfileGenerator) UpdateConfig(config *domain.SafeProjectConfig) {
 	g.templateData = createDockerfileTemplateData(config)
 }

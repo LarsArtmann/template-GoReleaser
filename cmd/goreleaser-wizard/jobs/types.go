@@ -2,6 +2,7 @@ package jobs
 
 import (
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -9,7 +10,7 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// JobExecutionStatus represents the status of a job execution
+// JobExecutionStatus represents the status of a job execution.
 type JobExecutionStatus struct {
 	JobID       string                 `json:"job_id"`
 	JobName     string                 `json:"job_name"`
@@ -21,7 +22,7 @@ type JobExecutionStatus struct {
 	Metadata    JobExecutionMetadata   `json:"metadata"`
 }
 
-// JobExecutionStatusType represents job status types
+// JobExecutionStatusType represents job status types.
 type JobExecutionStatusType string
 
 const (
@@ -32,14 +33,14 @@ const (
 	JobExecutionStatusCancelled JobExecutionStatusType = "cancelled"
 )
 
-// JobExecutionMetadata represents metadata for job execution
+// JobExecutionMetadata represents metadata for job execution.
 type JobExecutionMetadata struct {
 	Retries int               `json:"retries"`
 	Tags    map[string]string `json:"tags,omitempty"`
 	Context map[string]any    `json:"context,omitempty"`
 }
 
-// WorkflowExecution represents a workflow execution with multiple jobs
+// WorkflowExecution represents a workflow execution with multiple jobs.
 type WorkflowExecution struct {
 	ID          string                      `json:"id"`
 	Name        string                      `json:"name"`
@@ -59,7 +60,7 @@ type WorkflowExecution struct {
 	mu          sync.Mutex                  `json:"-"`
 }
 
-// WorkflowExecutionStatusType represents workflow status types
+// WorkflowExecutionStatusType represents workflow status types.
 type WorkflowExecutionStatusType string
 
 const (
@@ -70,7 +71,7 @@ const (
 	WorkflowExecutionStatusCancelled WorkflowExecutionStatusType = "cancelled"
 )
 
-// WorkflowExecutionMetadata represents workflow execution metadata
+// WorkflowExecutionMetadata represents workflow execution metadata.
 type WorkflowExecutionMetadata struct {
 	CreatedBy   string            `json:"created_by"`
 	Environment string            `json:"environment"`
@@ -78,7 +79,7 @@ type WorkflowExecutionMetadata struct {
 	Options     map[string]any    `json:"options,omitempty"`
 }
 
-// JobResult represents the result of a job execution
+// JobResult represents the result of a job execution.
 type JobResult struct {
 	Job      Job                    `json:"-"`
 	Status   JobExecutionStatusType `json:"status"`
@@ -88,7 +89,7 @@ type JobResult struct {
 	Metadata JobExecutionMetadata   `json:"metadata"`
 }
 
-// WorkflowOptions represents options for workflow execution
+// WorkflowOptions represents options for workflow execution.
 type WorkflowOptions struct {
 	Parallel        bool              `json:"parallel"`
 	Timeout         time.Duration     `json:"timeout"`
@@ -100,7 +101,7 @@ type WorkflowOptions struct {
 	Context         map[string]any    `json:"context,omitempty"`
 }
 
-// DefaultWorkflowOptions returns default workflow options
+// DefaultWorkflowOptions returns default workflow options.
 func DefaultWorkflowOptions() WorkflowOptions {
 	return WorkflowOptions{
 		Parallel:        false,
@@ -114,7 +115,7 @@ func DefaultWorkflowOptions() WorkflowOptions {
 	}
 }
 
-// JobExecutionOptions represents options for job execution
+// JobExecutionOptions represents options for job execution.
 type JobExecutionOptions struct {
 	Timeout       time.Duration     `json:"timeout"`
 	RetryCount    int               `json:"retry_count"`
@@ -124,7 +125,7 @@ type JobExecutionOptions struct {
 	Metadata      map[string]string `json:"metadata,omitempty"`
 }
 
-// DefaultJobExecutionOptions returns default job execution options
+// DefaultJobExecutionOptions returns default job execution options.
 func DefaultJobExecutionOptions() JobExecutionOptions {
 	return JobExecutionOptions{
 		Timeout:       5 * time.Minute,
@@ -136,7 +137,7 @@ func DefaultJobExecutionOptions() JobExecutionOptions {
 	}
 }
 
-// JobExecutionPlan represents a plan for executing jobs
+// JobExecutionPlan represents a plan for executing jobs.
 type JobExecutionPlan struct {
 	ID           string              `json:"id"`
 	Name         string              `json:"name"`
@@ -148,7 +149,7 @@ type JobExecutionPlan struct {
 	UpdatedAt    time.Time           `json:"updated_at"`
 }
 
-// NewJobExecutionPlan creates a new job execution plan
+// NewJobExecutionPlan creates a new job execution plan.
 func NewJobExecutionPlan(id, name, description string, jobs []Job, options WorkflowOptions) *JobExecutionPlan {
 	return &JobExecutionPlan{
 		ID:           id,
@@ -162,7 +163,7 @@ func NewJobExecutionPlan(id, name, description string, jobs []Job, options Workf
 	}
 }
 
-// AddDependency adds a dependency between jobs
+// AddDependency adds a dependency between jobs.
 func (p *JobExecutionPlan) AddDependency(jobID, dependsOn string) {
 	if p.Dependencies == nil {
 		p.Dependencies = make(map[string][]string)
@@ -171,7 +172,7 @@ func (p *JobExecutionPlan) AddDependency(jobID, dependsOn string) {
 	p.UpdatedAt = time.Now()
 }
 
-// RemoveDependency removes a dependency between jobs
+// RemoveDependency removes a dependency between jobs.
 func (p *JobExecutionPlan) RemoveDependency(jobID, dependsOn string) {
 	if deps, ok := p.Dependencies[jobID]; ok {
 		for i, dep := range deps {
@@ -187,19 +188,17 @@ func (p *JobExecutionPlan) RemoveDependency(jobID, dependsOn string) {
 	}
 }
 
-// HasDependency checks if a job has a dependency
+// HasDependency checks if a job has a dependency.
 func (p *JobExecutionPlan) HasDependency(jobID, dependsOn string) bool {
 	if deps, ok := p.Dependencies[jobID]; ok {
-		for _, dep := range deps {
-			if dep == dependsOn {
-				return true
-			}
+		if slices.Contains(deps, dependsOn) {
+			return true
 		}
 	}
 	return false
 }
 
-// GetDependencies returns all dependencies for a job
+// GetDependencies returns all dependencies for a job.
 func (p *JobExecutionPlan) GetDependencies(jobID string) []string {
 	if deps, ok := p.Dependencies[jobID]; ok {
 		result := make([]string, len(deps))
@@ -209,7 +208,7 @@ func (p *JobExecutionPlan) GetDependencies(jobID string) []string {
 	return nil
 }
 
-// ValidatePlan validates the execution plan
+// ValidatePlan validates the execution plan.
 func (p *JobExecutionPlan) ValidatePlan() error {
 	// Check for circular dependencies
 	if err := p.validateCircularDependencies(); err != nil {
@@ -241,7 +240,7 @@ func (p *JobExecutionPlan) ValidatePlan() error {
 	return nil
 }
 
-// validateCircularDependencies checks for circular dependencies
+// validateCircularDependencies checks for circular dependencies.
 func (p *JobExecutionPlan) validateCircularDependencies() error {
 	visited := make(map[string]bool)
 	recursionStack := make(map[string]bool)
@@ -255,7 +254,7 @@ func (p *JobExecutionPlan) validateCircularDependencies() error {
 	return nil
 }
 
-// checkCircularDependency recursively checks for circular dependencies
+// checkCircularDependency recursively checks for circular dependencies.
 func (p *JobExecutionPlan) checkCircularDependency(jobID string, visited, recursionStack map[string]bool) error {
 	if recursionStack[jobID] {
 		return errors.NewValidationError(
@@ -282,7 +281,7 @@ func (p *JobExecutionPlan) checkCircularDependency(jobID string, visited, recurs
 	return nil
 }
 
-// validateMissingDependencies checks for missing dependencies
+// validateMissingDependencies checks for missing dependencies.
 func (p *JobExecutionPlan) validateMissingDependencies() error {
 	jobIDs := make(map[string]bool)
 	for _, job := range p.Jobs {
@@ -304,24 +303,22 @@ func (p *JobExecutionPlan) validateMissingDependencies() error {
 	return nil
 }
 
-// validateSelfDependencies checks for self-dependencies
+// validateSelfDependencies checks for self-dependencies.
 func (p *JobExecutionPlan) validateSelfDependencies() error {
 	for jobID, deps := range p.Dependencies {
-		for _, depID := range deps {
-			if jobID == depID {
-				return errors.NewValidationError(
-					errors.ErrInvalidConfig,
-					"Self-dependency detected",
-					fmt.Sprintf("Job %s depends on itself", jobID),
-				).WithField("job_id")
-			}
+		if slices.Contains(deps, jobID) {
+			return errors.NewValidationError(
+				errors.ErrInvalidConfig,
+				"Self-dependency detected",
+				fmt.Sprintf("Job %s depends on itself", jobID),
+			).WithField("job_id")
 		}
 	}
 
 	return nil
 }
 
-// Clone creates a copy of the execution plan
+// Clone creates a copy of the execution plan.
 func (p *JobExecutionPlan) Clone() *JobExecutionPlan {
 	clone := &JobExecutionPlan{
 		ID:           p.ID,

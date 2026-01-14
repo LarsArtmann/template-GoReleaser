@@ -5,30 +5,42 @@ import (
 	"runtime"
 )
 
-// ErrorCode represents typed error codes
+// ErrorCode represents typed error codes.
 type ErrorCode string
 
 const (
-	// Validation Errors
+	// Validation Errors.
 	ErrValidationFailed ErrorCode = "VALIDATION_FAILED"
 	ErrInvalidProject   ErrorCode = "INVALID_PROJECT"
+	ErrInvalidBinary    ErrorCode = "INVALID_BINARY"
 	ErrInvalidConfig    ErrorCode = "INVALID_CONFIG"
 	ErrInvalidTemplate  ErrorCode = "INVALID_TEMPLATE"
 	ErrInvalidField     ErrorCode = "INVALID_FIELD"
+	ErrInvalidOperation ErrorCode = "INVALID_OPERATION"
 
-	// Configuration Errors
-	ErrConfigGeneration ErrorCode = "CONFIG_GENERATION"
-	ErrConfigNotFound   ErrorCode = "CONFIG_NOT_FOUND"
-	ErrConfigInvalid    ErrorCode = "CONFIG_INVALID"
-	ErrConfigPermission ErrorCode = "CONFIG_PERMISSION"
+	// Configuration Errors.
+	ErrConfigGeneration          ErrorCode = "CONFIG_GENERATION"
+	ErrConfigFound               ErrorCode = "CONFIG_FOUND"
+	ErrConfigNotFound            ErrorCode = "CONFIG_NOT_FOUND"
+	ErrConfigInvalid             ErrorCode = "CONFIG_INVALID"
+	ErrInvalidMainPath           ErrorCode = "INVALID_MAIN_PATH"
+	ErrInvalidProjectDescription ErrorCode = "INVALID_PROJECT_DESCRIPTION"
+	ErrInvalidDockerImage        ErrorCode = "INVALID_DOCKER_IMAGE"
+	ErrInvalidDockerRegistry     ErrorCode = "INVALID_DOCKER_REGISTRY"
+	ErrInvalidVersion            ErrorCode = "INVALID_VERSION"
+	ErrInvalidGitBranch          ErrorCode = "INVALID_GIT_BRANCH"
+	ErrInvalidGitTag             ErrorCode = "INVALID_GIT_TAG"
+	ErrInvalidBuildTag           ErrorCode = "INVALID_BUILD_TAG"
+	ErrInvalidPort               ErrorCode = "INVALID_PORT"
+	ErrConfigPermission          ErrorCode = "CONFIG_PERMISSION"
 
-	// Template Errors
+	// Template Errors.
 	ErrTemplateNotFound  ErrorCode = "TEMPLATE_NOT_FOUND"
 	ErrTemplateParsing   ErrorCode = "TEMPLATE_PARSING"
 	ErrTemplateRendering ErrorCode = "TEMPLATE_RENDERING"
 	ErrTemplateExecution ErrorCode = "TEMPLATE_EXECUTION"
 
-	// File System Errors
+	// File System Errors.
 	ErrFileOperation  ErrorCode = "FILE_OPERATION"
 	ErrFileNotFound   ErrorCode = "FILE_NOT_FOUND"
 	ErrFilePermission ErrorCode = "FILE_PERMISSION"
@@ -36,50 +48,50 @@ const (
 	ErrDirNotFound    ErrorCode = "DIR_NOT_FOUND"
 	ErrDirPermission  ErrorCode = "DIR_PERMISSION"
 
-	// Git Errors
+	// Git Errors.
 	ErrGitOperation  ErrorCode = "GIT_OPERATION"
 	ErrGitNotFound   ErrorCode = "GIT_NOT_FOUND"
 	ErrGitPermission ErrorCode = "GIT_PERMISSION"
 	ErrGitCommand    ErrorCode = "GIT_COMMAND"
 
-	// Dependency Errors
+	// Dependency Errors.
 	ErrDependencyMissing  ErrorCode = "DEPENDENCY_MISSING"
 	ErrDependencyVersion  ErrorCode = "DEPENDENCY_VERSION"
 	ErrDependencyConflict ErrorCode = "DEPENDENCY_CONFLICT"
 
-	// Job Execution Errors
+	// Job Execution Errors.
 	ErrJobExecution ErrorCode = "JOB_EXECUTION"
 	ErrJobTimeout   ErrorCode = "JOB_TIMEOUT"
 	ErrJobCancelled ErrorCode = "JOB_CANCELLED"
 	ErrJobFailed    ErrorCode = "JOB_FAILED"
 
-	// Workflow Errors
+	// Workflow Errors.
 	ErrWorkflowExecution ErrorCode = "WORKFLOW_EXECUTION"
 	ErrWorkflowTimeout   ErrorCode = "WORKFLOW_TIMEOUT"
 	ErrWorkflowCancelled ErrorCode = "WORKFLOW_CANCELLED"
 	ErrWorkflowFailed    ErrorCode = "WORKFLOW_FAILED"
 
-	// Network Errors
+	// Network Errors.
 	ErrNetworkError       ErrorCode = "NETWORK_ERROR"
 	ErrNetworkTimeout     ErrorCode = "NETWORK_TIMEOUT"
 	ErrNetworkUnavailable ErrorCode = "NETWORK_UNAVAILABLE"
 
-	// Permission Errors
+	// Permission Errors.
 	ErrPermissionDenied ErrorCode = "PERMISSION_DENIED"
 	ErrUnauthorized     ErrorCode = "UNAUTHORIZED"
 	ErrForbidden        ErrorCode = "FORBIDDEN"
 
-	// System Errors
+	// System Errors.
 	ErrSystemError ErrorCode = "SYSTEM_ERROR"
 	ErrMemoryError ErrorCode = "MEMORY_ERROR"
 	ErrDiskError   ErrorCode = "DISK_ERROR"
 	ErrCPUError    ErrorCode = "CPU_ERROR"
 
-	// Unknown Error
+	// Unknown Error.
 	ErrUnknown ErrorCode = "UNKNOWN"
 )
 
-// ErrorLevel represents error severity levels
+// ErrorLevel represents error severity levels.
 type ErrorLevel string
 
 const (
@@ -89,7 +101,7 @@ const (
 	ErrorLevelLow      ErrorLevel = "low"
 )
 
-// DomainError represents a structured domain error
+// DomainError represents a structured domain error.
 type DomainError struct {
 	Code      ErrorCode  `json:"code"`
 	Message   string     `json:"message"`
@@ -104,7 +116,7 @@ type DomainError struct {
 	Function  string     `json:"function,omitempty"`
 }
 
-// Error implements the error interface
+// Error implements the error interface.
 func (de *DomainError) Error() string {
 	if de.Details != "" {
 		return fmt.Sprintf("[%s] %s: %s", de.Code, de.Message, de.Details)
@@ -112,42 +124,42 @@ func (de *DomainError) Error() string {
 	return fmt.Sprintf("[%s] %s", de.Code, de.Message)
 }
 
-// Unwrap returns the underlying cause
+// Unwrap returns the underlying cause.
 func (de *DomainError) Unwrap() error {
 	return de.Cause
 }
 
-// WithContext adds context to the error
+// WithContext adds context to the error.
 func (de *DomainError) WithContext(context string) *DomainError {
 	de.Context = context
 	return de
 }
 
-// WithField adds field information to the error
+// WithField adds field information to the error.
 func (de *DomainError) WithField(field string) *DomainError {
 	de.Field = field
 	return de
 }
 
-// WithLevel sets the error level
+// WithLevel sets the error level.
 func (de *DomainError) WithLevel(level ErrorLevel) *DomainError {
 	de.Level = level
 	return de
 }
 
-// WithRetryable sets if the error is retryable
+// WithRetryable sets if the error is retryable.
 func (de *DomainError) WithRetryable(retryable bool) *DomainError {
 	de.Retryable = retryable
 	return de
 }
 
-// WithCause adds the underlying cause
+// WithCause adds the underlying cause.
 func (de *DomainError) WithCause(cause error) *DomainError {
 	de.Cause = cause
 	return de
 }
 
-// WithCaller adds caller information
+// WithCaller adds caller information.
 func (de *DomainError) WithCaller() *DomainError {
 	if pc, file, line, ok := runtime.Caller(1); ok {
 		de.Function = runtime.FuncForPC(pc).Name()
@@ -157,7 +169,13 @@ func (de *DomainError) WithCaller() *DomainError {
 	return de
 }
 
-// NewValidationError creates a new validation error
+// WithSuggestion adds a suggestion to the error.
+func (de *DomainError) WithSuggestion(suggestion string) *DomainError {
+	de.Context = suggestion
+	return de
+}
+
+// NewValidationError creates a new validation error.
 func NewValidationError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -169,7 +187,7 @@ func NewValidationError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewConfigError creates a new configuration error
+// NewConfigError creates a new configuration error.
 func NewConfigError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -181,7 +199,7 @@ func NewConfigError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewFileError creates a new file system error
+// NewFileError creates a new file system error.
 func NewFileError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -193,7 +211,7 @@ func NewFileError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewGitError creates a new git error
+// NewGitError creates a new git error.
 func NewGitError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -205,7 +223,7 @@ func NewGitError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewJobError creates a new job execution error
+// NewJobError creates a new job execution error.
 func NewJobError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -217,7 +235,7 @@ func NewJobError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewWorkflowError creates a new workflow error
+// NewWorkflowError creates a new workflow error.
 func NewWorkflowError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -229,7 +247,7 @@ func NewWorkflowError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewNetworkError creates a new network error
+// NewNetworkError creates a new network error.
 func NewNetworkError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -241,7 +259,7 @@ func NewNetworkError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewPermissionError creates a new permission error
+// NewPermissionError creates a new permission error.
 func NewPermissionError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -253,7 +271,7 @@ func NewPermissionError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// NewSystemError creates a new system error
+// NewSystemError creates a new system error.
 func NewSystemError(code ErrorCode, message, details string) *DomainError {
 	err := &DomainError{
 		Code:      code,
@@ -265,7 +283,7 @@ func NewSystemError(code ErrorCode, message, details string) *DomainError {
 	return err.WithCaller()
 }
 
-// WrapError wraps an existing error with domain context
+// WrapError wraps an existing error with domain context.
 func WrapError(err error, code ErrorCode, message string) *DomainError {
 	domainErr := &DomainError{
 		Code:      code,
@@ -278,25 +296,28 @@ func WrapError(err error, code ErrorCode, message string) *DomainError {
 	return domainErr.WithCaller()
 }
 
-// IsRetryable checks if an error is retryable
+// IsRetryable checks if an error is retryable.
 func IsRetryable(err error) bool {
-	if domainErr, ok := err.(*DomainError); ok {
+	domainErr := &DomainError{}
+	if errors.As(err, &domainErr) {
 		return domainErr.Retryable
 	}
 	return false
 }
 
-// GetErrorCode extracts the error code from an error
+// GetErrorCode extracts the error code from an error.
 func GetErrorCode(err error) ErrorCode {
-	if domainErr, ok := err.(*DomainError); ok {
+	domainErr := &DomainError{}
+	if errors.As(err, &domainErr) {
 		return domainErr.Code
 	}
 	return ErrUnknown
 }
 
-// GetErrorLevel extracts the error level from an error
+// GetErrorLevel extracts the error level from an error.
 func GetErrorLevel(err error) ErrorLevel {
-	if domainErr, ok := err.(*DomainError); ok {
+	domainErr := &DomainError{}
+	if errors.As(err, &domainErr) {
 		if domainErr.Level != "" {
 			return domainErr.Level
 		}

@@ -12,7 +12,7 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// Job represents a unit of work that can be executed
+// Job represents a unit of work that can be executed.
 type Job interface {
 	ID() string
 	Name() string
@@ -21,7 +21,7 @@ type Job interface {
 	GetMetadata() JobMetadata
 }
 
-// JobMetadata represents job metadata
+// JobMetadata represents job metadata.
 type JobMetadata struct {
 	Description   string        `json:"description"`
 	EstimatedTime time.Duration `json:"estimated_time"`
@@ -31,7 +31,7 @@ type JobMetadata struct {
 	Tags          []string      `json:"tags"`
 }
 
-// Logger interface for jobs
+// Logger interface for jobs.
 type Logger interface {
 	Debug(msg string, args ...any)
 	Info(msg string, args ...any)
@@ -39,7 +39,7 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
-// ConfigGenerationJob generates GoReleaser configuration
+// ConfigGenerationJob generates GoReleaser configuration.
 type ConfigGenerationJob struct {
 	id        string
 	config    *domain.SafeProjectConfig
@@ -48,7 +48,7 @@ type ConfigGenerationJob struct {
 	generator *generators.GoReleaserGenerator
 }
 
-// NewConfigGenerationJob creates a new config generation job
+// NewConfigGenerationJob creates a new config generation job.
 func NewConfigGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *ConfigGenerationJob {
 	return &ConfigGenerationJob{
 		id:        "config-generation",
@@ -169,7 +169,7 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// GitHubActionsGenerationJob generates GitHub Actions workflow
+// GitHubActionsGenerationJob generates GitHub Actions workflow.
 type GitHubActionsGenerationJob struct {
 	id        string
 	config    *domain.SafeProjectConfig
@@ -177,7 +177,7 @@ type GitHubActionsGenerationJob struct {
 	generator *generators.GitHubActionsGenerator
 }
 
-// NewGitHubActionsGenerationJob creates a new GitHub Actions generation job
+// NewGitHubActionsGenerationJob creates a new GitHub Actions generation job.
 func NewGitHubActionsGenerationJob(config *domain.SafeProjectConfig, logger Logger) *GitHubActionsGenerationJob {
 	return &GitHubActionsGenerationJob{
 		id:        "github-actions-generation",
@@ -241,14 +241,14 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// ProjectValidationJob validates project structure
+// ProjectValidationJob validates project structure.
 type ProjectValidationJob struct {
 	id         string
 	projectDir string
 	logger     Logger
 }
 
-// NewProjectValidationJob creates a new project validation job
+// NewProjectValidationJob creates a new project validation job.
 func NewProjectValidationJob(projectDir string, logger Logger) *ProjectValidationJob {
 	return &ProjectValidationJob{
 		id:         "project-validation",
@@ -289,7 +289,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 		return errors.NewValidationError(
 			errors.ErrInvalidProject,
 			"Project directory does not exist",
-			fmt.Sprintf("Directory not found: %s", j.projectDir),
+			"Directory not found: "+j.projectDir,
 		).WithField("project_dir")
 	}
 
@@ -306,14 +306,14 @@ func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// DependencyCheckJob checks for required dependencies
+// DependencyCheckJob checks for required dependencies.
 type DependencyCheckJob struct {
 	id           string
 	dependencies []string
 	logger       Logger
 }
 
-// NewDependencyCheckJob creates a new dependency check job
+// NewDependencyCheckJob creates a new dependency check job.
 func NewDependencyCheckJob(dependencies []string, logger Logger) *DependencyCheckJob {
 	return &DependencyCheckJob{
 		id:           "dependency-check",
@@ -379,7 +379,7 @@ func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// DockerfileGenerationJob generates Dockerfile
+// DockerfileGenerationJob generates Dockerfile.
 type DockerfileGenerationJob struct {
 	id        string
 	config    *domain.SafeProjectConfig
@@ -388,7 +388,7 @@ type DockerfileGenerationJob struct {
 	generator *generators.DockerfileGenerator
 }
 
-// NewDockerfileGenerationJob creates a new Dockerfile generation job
+// NewDockerfileGenerationJob creates a new Dockerfile generation job.
 func NewDockerfileGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *DockerfileGenerationJob {
 	return &DockerfileGenerationJob{
 		id:        "dockerfile-generation",
@@ -459,7 +459,7 @@ func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// HomebrewGenerationJob generates Homebrew formula
+// HomebrewGenerationJob generates Homebrew formula.
 type HomebrewGenerationJob struct {
 	id        string
 	config    *domain.SafeProjectConfig
@@ -468,7 +468,7 @@ type HomebrewGenerationJob struct {
 	generator *generators.HomebrewGenerator
 }
 
-// NewHomebrewGenerationJob creates a new Homebrew generation job
+// NewHomebrewGenerationJob creates a new Homebrew generation job.
 func NewHomebrewGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *HomebrewGenerationJob {
 	return &HomebrewGenerationJob{
 		id:        "homebrew-generation",

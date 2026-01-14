@@ -1,6 +1,6 @@
 package domain
 
-// GetURL returns the registry URL for this DockerRegistry
+// GetURL returns the registry URL for this DockerRegistry.
 func (dr DockerRegistry) GetURL() string {
 	switch dr {
 	case DockerRegistryDockerHub:
@@ -18,7 +18,7 @@ func (dr DockerRegistry) GetURL() string {
 	}
 }
 
-// SupportsDocker returns true if git provider supports Docker
+// SupportsDocker returns true if git provider supports Docker.
 func (gp GitProvider) SupportsDocker() bool {
 	switch gp {
 	case GitProviderGitHub, GitProviderGitLab, GitProviderGitea, GitProviderSelfHosted:
@@ -30,7 +30,7 @@ func (gp GitProvider) SupportsDocker() bool {
 	}
 }
 
-// GetGitHubOwner returns GitHub owner from project config
+// GetGitHubOwner returns GitHub owner from project config.
 func GetGitHubOwner(projectName string) string {
 	// Simple extraction - in real implementation would parse from git remote
 	return projectName

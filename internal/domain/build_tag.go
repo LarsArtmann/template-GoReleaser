@@ -5,13 +5,13 @@ import (
 	"slices"
 )
 
-// BuildTag represents build tags for conditional compilation
+// BuildTag represents build tags for conditional compilation.
 type BuildTag struct {
-	Name        string `json:"name" yaml:"name"`
+	Name        string `json:"name"        yaml:"name"`
 	Description string `json:"description" yaml:"description"`
 }
 
-// IsValid returns true if BuildTag has valid name
+// IsValid returns true if BuildTag has valid name.
 func (bt BuildTag) IsValid() bool {
 	if len(bt.Name) == 0 {
 		return false
@@ -25,12 +25,12 @@ func (bt BuildTag) IsValid() bool {
 	return true
 }
 
-// String returns string representation of BuildTag
+// String returns string representation of BuildTag.
 func (bt BuildTag) String() string {
 	return bt.Name
 }
 
-// isValidBuildTagName validates build tag name format
+// isValidBuildTagName validates build tag name format.
 func isValidBuildTagName(name string) bool {
 	if len(name) == 0 {
 		return false
@@ -46,7 +46,7 @@ func isValidBuildTagName(name string) bool {
 	return true
 }
 
-// ValidateBuildTag validates a single build tag
+// ValidateBuildTag validates a single build tag.
 func ValidateBuildTag(tag BuildTag) error {
 	if !tag.IsValid() {
 		return fmt.Errorf("invalid build tag: %s", tag.Name)
@@ -54,10 +54,10 @@ func ValidateBuildTag(tag BuildTag) error {
 	return nil
 }
 
-// ValidateBuildTags validates a slice of build tags
+// ValidateBuildTags validates a slice of build tags.
 func ValidateBuildTags(tags []BuildTag) error {
 	if len(tags) > 50 {
-		return fmt.Errorf("too many build tags (max 50)")
+		return errors.New("too many build tags (max 50)")
 	}
 
 	for _, tag := range tags {
@@ -78,7 +78,7 @@ func ValidateBuildTags(tags []BuildTag) error {
 	return nil
 }
 
-// GetCommonBuildTags returns commonly used build tags
+// GetCommonBuildTags returns commonly used build tags.
 func GetCommonBuildTags() []BuildTag {
 	return []BuildTag{
 		{
@@ -108,7 +108,7 @@ func GetCommonBuildTags() []BuildTag {
 	}
 }
 
-// FilterBuildTagsByPlatform filters build tags by platform compatibility
+// FilterBuildTagsByPlatform filters build tags by platform compatibility.
 func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 	// Platform-specific build tag filtering
 	platformTags := make(map[Platform][]string)
@@ -146,7 +146,7 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 	return filtered
 }
 
-// CreateBuildTag creates a new build tag
+// CreateBuildTag creates a new build tag.
 func CreateBuildTag(name, description string) BuildTag {
 	return BuildTag{
 		Name:        name,
@@ -154,7 +154,7 @@ func CreateBuildTag(name, description string) BuildTag {
 	}
 }
 
-// contains checks if slice contains string
+// contains checks if slice contains string.
 func contains(slice []string, item string) bool {
 	return slices.Contains(slice, item)
 }

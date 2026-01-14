@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// ApplyDefaults applies smart defaults based on project type and context
+// ApplyDefaults applies smart defaults based on project type and context.
 func (spc *SafeProjectConfig) ApplyDefaults() {
 	// Apply project type-specific defaults
 	spc.applyProjectTypeDefaults()
@@ -18,7 +18,7 @@ func (spc *SafeProjectConfig) ApplyDefaults() {
 	spc.applyGeneralDefaults()
 }
 
-// applyProjectTypeDefaults applies defaults based on project type
+// applyProjectTypeDefaults applies defaults based on project type.
 func (spc *SafeProjectConfig) applyProjectTypeDefaults() {
 	// Set CGO status based on project type
 	if spc.CGOStatus == "" {
@@ -54,7 +54,7 @@ func (spc *SafeProjectConfig) applyProjectTypeDefaults() {
 	}
 }
 
-// applyFeatureLevelDefaults applies defaults based on feature level
+// applyFeatureLevelDefaults applies defaults based on feature level.
 func (spc *SafeProjectConfig) applyFeatureLevelDefaults() {
 	// Set Docker support based on feature level
 	if spc.DockerSupport == "" {
@@ -86,7 +86,7 @@ func (spc *SafeProjectConfig) applyFeatureLevelDefaults() {
 	}
 }
 
-// applyGeneralDefaults applies general defaults
+// applyGeneralDefaults applies general defaults.
 func (spc *SafeProjectConfig) applyGeneralDefaults() {
 	// Set Git provider if not specified
 	if spc.GitProvider == "" {
@@ -124,7 +124,7 @@ func (spc *SafeProjectConfig) applyGeneralDefaults() {
 	}
 }
 
-// GetDockerImageName returns Docker image name based on configuration
+// GetDockerImageName returns Docker image name based on configuration.
 func (spc *SafeProjectConfig) GetDockerImageName() string {
 	if spc.DockerImage != "" {
 		return spc.DockerImage
@@ -141,7 +141,7 @@ func (spc *SafeProjectConfig) GetDockerImageName() string {
 	return "app"
 }
 
-// GetDockerRegistryURL returns full Docker registry URL
+// GetDockerRegistryURL returns full Docker registry URL.
 func (spc *SafeProjectConfig) GetDockerRegistryURL() string {
 	baseURL := spc.DockerRegistry.GetURL()
 
@@ -161,7 +161,7 @@ func (spc *SafeProjectConfig) GetDockerRegistryURL() string {
 	return baseURL
 }
 
-// GetDockerOwner returns Docker image owner
+// GetDockerOwner returns Docker image owner.
 func (spc *SafeProjectConfig) GetDockerOwner() string {
 	// Try to get from git remote
 	if owner := GetGitHubOwner(spc.ProjectName); owner != "owner" {
@@ -176,87 +176,87 @@ func (spc *SafeProjectConfig) GetDockerOwner() string {
 	return "user"
 }
 
-// GetAzureContainerRegistry returns Azure container registry name
+// GetAzureContainerRegistry returns Azure container registry name.
 func (spc *SafeProjectConfig) GetAzureContainerRegistry() string {
 	// This would typically come from configuration or environment
 	// For now, return a default
 	return "myregistry"
 }
 
-// ShouldGenerateActionsFiles returns true if actions files should be generated
+// ShouldGenerateActionsFiles returns true if actions files should be generated.
 func (spc *SafeProjectConfig) ShouldGenerateActionsFiles() bool {
 	return spc.ActionLevel.IsEnabled() &&
 		spc.GitProvider.ActionsSupported() &&
 		len(spc.ActionsOn) > 0
 }
 
-// ShouldGenerateDockerFiles returns true if Docker files should be generated
+// ShouldGenerateDockerFiles returns true if Docker files should be generated.
 func (spc *SafeProjectConfig) ShouldGenerateDockerFiles() bool {
 	return spc.DockerSupport.IsBuildEnabled() &&
 		spc.ProjectType.DockerSupported()
 }
 
-// GetDockerEnabled returns true if Docker is fully enabled
+// GetDockerEnabled returns true if Docker is fully enabled.
 func (spc *SafeProjectConfig) GetDockerEnabled() bool {
 	return spc.DockerSupport.IsEnabled()
 }
 
-// GetSigningEnabled returns true if signing is enabled
+// GetSigningEnabled returns true if signing is enabled.
 func (spc *SafeProjectConfig) GetSigningEnabled() bool {
 	return spc.SigningLevel.IsEnabled()
 }
 
-// GetCGOEnabled returns true if CGO is enabled
+// GetCGOEnabled returns true if CGO is enabled.
 func (spc *SafeProjectConfig) GetCGOEnabled() bool {
 	return spc.CGOStatus.IsEnabled()
 }
 
-// GetPlatformCount returns number of platforms
+// GetPlatformCount returns number of platforms.
 func (spc *SafeProjectConfig) GetPlatformCount() int {
 	return len(spc.Platforms)
 }
 
-// GetArchitectureCount returns number of architectures
+// GetArchitectureCount returns number of architectures.
 func (spc *SafeProjectConfig) GetArchitectureCount() int {
 	return len(spc.Architectures)
 }
 
-// GetBuildTagCount returns number of build tags
+// GetBuildTagCount returns number of build tags.
 func (spc *SafeProjectConfig) GetBuildTagCount() int {
 	return len(spc.BuildTags)
 }
 
-// GetActionTriggerCount returns number of action triggers
+// GetActionTriggerCount returns number of action triggers.
 func (spc *SafeProjectConfig) GetActionTriggerCount() int {
 	return len(spc.ActionsOn)
 }
 
-// IsDesktopApplication returns true for desktop applications
+// IsDesktopApplication returns true for desktop applications.
 func (spc *SafeProjectConfig) IsDesktopApplication() bool {
 	return spc.ProjectType.IsDesktopRelated()
 }
 
-// IsWebApplication returns true for web applications
+// IsWebApplication returns true for web applications.
 func (spc *SafeProjectConfig) IsWebApplication() bool {
 	return spc.ProjectType.IsWebRelated()
 }
 
-// IsMobileApplication returns true for mobile applications
+// IsMobileApplication returns true for mobile applications.
 func (spc *SafeProjectConfig) IsMobileApplication() bool {
 	return spc.ProjectType.IsMobileRelated()
 }
 
-// IsLibrary returns true for libraries
+// IsLibrary returns true for libraries.
 func (spc *SafeProjectConfig) IsLibrary() bool {
 	return spc.ProjectType.IsLibrary()
 }
 
-// IsService returns true for services
+// IsService returns true for services.
 func (spc *SafeProjectConfig) IsService() bool {
 	return spc.ProjectType.IsService()
 }
 
-// IsProductionReady returns true if configuration is production-ready
+// IsProductionReady returns true if configuration is production-ready.
 func (spc *SafeProjectConfig) IsProductionReady() bool {
 	return spc.FeatureLevel.IncludesAdvanced() &&
 		spc.SigningLevel.IsEnabled() &&
@@ -264,13 +264,13 @@ func (spc *SafeProjectConfig) IsProductionReady() bool {
 		spc.ActionLevel.IsProductionReady()
 }
 
-// IsMinimal returns true if configuration is minimal
+// IsMinimal returns true if configuration is minimal.
 func (spc *SafeProjectConfig) IsMinimal() bool {
 	return spc.FeatureLevel == FeatureLevelNone ||
 		spc.FeatureLevel == FeatureLevelBasic
 }
 
-// RequiresCrossCompilation returns true if cross-compilation is required
+// RequiresCrossCompilation returns true if cross-compilation is required.
 func (spc *SafeProjectConfig) RequiresCrossCompilation() bool {
 	if len(spc.Platforms) <= 1 || len(spc.Architectures) <= 1 {
 		return false
@@ -288,7 +288,7 @@ func (spc *SafeProjectConfig) RequiresCrossCompilation() bool {
 	return false
 }
 
-// isNativePlatform returns true if platform/arch is native to current system
+// isNativePlatform returns true if platform/arch is native to current system.
 func isNativePlatform(platform Platform, arch Architecture) bool {
 	// This is a simplified check - in reality would need to detect current platform
 	return (platform == PlatformLinux && arch == ArchitectureAMD64) ||
@@ -296,7 +296,7 @@ func isNativePlatform(platform Platform, arch Architecture) bool {
 		(platform == PlatformWindows && arch == ArchitectureAMD64)
 }
 
-// GetBuildComplexity returns build complexity score
+// GetBuildComplexity returns build complexity score.
 func (spc *SafeProjectConfig) GetBuildComplexity() int {
 	complexity := 0
 
@@ -324,7 +324,7 @@ func (spc *SafeProjectConfig) GetBuildComplexity() int {
 	return complexity
 }
 
-// GetEstimatedBuildTime returns estimated build time in seconds
+// GetEstimatedBuildTime returns estimated build time in seconds.
 func (spc *SafeProjectConfig) GetEstimatedBuildTime() int {
 	baseTime := 30 // Base build time in seconds
 
@@ -350,7 +350,7 @@ func (spc *SafeProjectConfig) GetEstimatedBuildTime() int {
 	return buildTime
 }
 
-// GetDependencyCount returns estimated number of external dependencies
+// GetDependencyCount returns estimated number of external dependencies.
 func (spc *SafeProjectConfig) GetDependencyCount() int {
 	deps := 2 // Base Go dependencies
 

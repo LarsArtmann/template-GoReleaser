@@ -11,19 +11,19 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
-// InteractivePrompter handles user interaction during init
+// InteractivePrompter handles user interaction during init.
 type InteractivePrompter struct {
 	scanner *bufio.Scanner
 }
 
-// NewInteractivePrompter creates a new interactive prompter
+// NewInteractivePrompter creates a new interactive prompter.
 func NewInteractivePrompter() *InteractivePrompter {
 	return &InteractivePrompter{
 		scanner: bufio.NewScanner(os.Stdin),
 	}
 }
 
-// confirmDetectedInfo prompts user to confirm detected project information
+// confirmDetectedInfo prompts user to confirm detected project information.
 func (ip *InteractivePrompter) confirmDetectedInfo(config *domain.SafeProjectConfig) (*domain.SafeProjectConfig, error) {
 	fmt.Println(titleStyle.Render("📋 Project Information Detected:"))
 	fmt.Printf("  Project Name: %s\n", config.ProjectName)
@@ -46,7 +46,7 @@ func (ip *InteractivePrompter) confirmDetectedInfo(config *domain.SafeProjectCon
 	return ip.promptProjectInfo(config)
 }
 
-// promptProjectInfo prompts for project information
+// promptProjectInfo prompts for project information.
 func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfig) (*domain.SafeProjectConfig, error) {
 	// Project name
 	name, err := ip.promptString("Project Name", config.ProjectName)
@@ -86,7 +86,7 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 	return config, nil
 }
 
-// promptProjectType prompts for project type selection
+// promptProjectType prompts for project type selection.
 func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (domain.ProjectType, error) {
 	fmt.Println(infoStyle.Render("\n🎯 Select Project Type:"))
 
@@ -112,7 +112,7 @@ func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (do
 	return types[selection-1], nil
 }
 
-// promptPlatforms prompts for target platforms
+// promptPlatforms prompts for target platforms.
 func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]domain.Platform, error) {
 	fmt.Println(infoStyle.Render("\n🖥️  Select Target Platforms:"))
 
@@ -143,7 +143,7 @@ func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]dom
 	return selected, nil
 }
 
-// promptArchitectures prompts for target architectures
+// promptArchitectures prompts for target architectures.
 func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture) ([]domain.Architecture, error) {
 	fmt.Println(infoStyle.Render("\n🏗️  Select Target Architectures:"))
 
@@ -173,7 +173,7 @@ func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture
 	return selected, nil
 }
 
-// promptCGO prompts for CGO configuration
+// promptCGO prompts for CGO configuration.
 func (ip *InteractivePrompter) promptCGO(current domain.CGOStatus) (domain.CGOStatus, error) {
 	fmt.Println(infoStyle.Render("\n⚙️  CGO Configuration:"))
 
@@ -199,7 +199,7 @@ func (ip *InteractivePrompter) promptCGO(current domain.CGOStatus) (domain.CGOSt
 	return statuses[selection-1], nil
 }
 
-// promptDocker prompts for Docker configuration
+// promptDocker prompts for Docker configuration.
 func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domain.DockerSupport, error) {
 	fmt.Println(infoStyle.Render("\n🐳 Docker Support:"))
 
@@ -226,7 +226,7 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 	return levels[selection-1], nil
 }
 
-// promptGitProvider prompts for Git provider
+// promptGitProvider prompts for Git provider.
 func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (domain.GitProvider, error) {
 	fmt.Println(infoStyle.Render("\n🔗 Git Provider:"))
 
@@ -252,7 +252,7 @@ func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (do
 	return providers[selection-1], nil
 }
 
-// promptAdvancedOptions prompts for advanced configuration options
+// promptAdvancedOptions prompts for advanced configuration options.
 func (ip *InteractivePrompter) promptAdvancedOptions(config *domain.SafeProjectConfig) error {
 	fmt.Println(infoStyle.Render("\n🔧 Advanced Options:"))
 
@@ -309,7 +309,7 @@ func (ip *InteractivePrompter) promptAdvancedOptions(config *domain.SafeProjectC
 	return nil
 }
 
-// promptString prompts for a string value
+// promptString prompts for a string value.
 func (ip *InteractivePrompter) promptString(label, defaultValue string) (string, error) {
 	if defaultValue != "" {
 		fmt.Printf("\n%s [%s]: ", label, defaultValue)
@@ -318,7 +318,7 @@ func (ip *InteractivePrompter) promptString(label, defaultValue string) (string,
 	}
 
 	if !ip.scanner.Scan() {
-		return "", fmt.Errorf("failed to read input")
+		return "", errors.New("failed to read input")
 	}
 
 	value := strings.TrimSpace(ip.scanner.Text())
@@ -328,7 +328,7 @@ func (ip *InteractivePrompter) promptString(label, defaultValue string) (string,
 	return value, nil
 }
 
-// promptYesNo prompts for a yes/no answer
+// promptYesNo prompts for a yes/no answer.
 func (ip *InteractivePrompter) promptYesNo(label string, defaultValue bool) (bool, error) {
 	defaultStr := "y/N"
 	if defaultValue {
@@ -338,7 +338,7 @@ func (ip *InteractivePrompter) promptYesNo(label string, defaultValue bool) (boo
 	fmt.Printf("\n%s [%s]? ", label, defaultStr)
 
 	if !ip.scanner.Scan() {
-		return false, fmt.Errorf("failed to read input")
+		return false, errors.New("failed to read input")
 	}
 
 	response := strings.ToLower(strings.TrimSpace(ip.scanner.Text()))
@@ -349,13 +349,13 @@ func (ip *InteractivePrompter) promptYesNo(label string, defaultValue bool) (boo
 	return response == "y" || response == "yes", nil
 }
 
-// promptInt prompts for an integer within a range
+// promptInt prompts for an integer within a range.
 func (ip *InteractivePrompter) promptInt(label string, min, max int) (int, error) {
 	for {
 		fmt.Printf("\n%s (%d-%d): ", label, min, max)
 
 		if !ip.scanner.Scan() {
-			return 0, fmt.Errorf("failed to read input")
+			return 0, errors.New("failed to read input")
 		}
 
 		value, err := strconv.Atoi(strings.TrimSpace(ip.scanner.Text()))
@@ -373,13 +373,13 @@ func (ip *InteractivePrompter) promptInt(label string, min, max int) (int, error
 	}
 }
 
-// promptMultiInt prompts for multiple integers within a range
+// promptMultiInt prompts for multiple integers within a range.
 func (ip *InteractivePrompter) promptMultiInt(label string, min, max int) ([]int, error) {
 	for {
 		fmt.Printf("\n%s (%d-%d): ", label, min, max)
 
 		if !ip.scanner.Scan() {
-			return nil, fmt.Errorf("failed to read input")
+			return nil, errors.New("failed to read input")
 		}
 
 		input := strings.TrimSpace(ip.scanner.Text())
@@ -413,7 +413,7 @@ func (ip *InteractivePrompter) promptMultiInt(label string, min, max int) ([]int
 	}
 }
 
-// getCGODescription returns description for CGO status
+// getCGODescription returns description for CGO status.
 func (ip *InteractivePrompter) getCGODescription(status domain.CGOStatus) string {
 	switch status {
 	case domain.CGOStatusDisabled:
@@ -427,7 +427,7 @@ func (ip *InteractivePrompter) getCGODescription(status domain.CGOStatus) string
 	}
 }
 
-// getDockerDescription returns description for Docker support level
+// getDockerDescription returns description for Docker support level.
 func (ip *InteractivePrompter) getDockerDescription(level domain.DockerSupport) string {
 	switch level {
 	case domain.DockerSupportNone:
@@ -443,12 +443,12 @@ func (ip *InteractivePrompter) getDockerDescription(level domain.DockerSupport) 
 	}
 }
 
-// containsPlatform checks if platform is in the list
+// containsPlatform checks if platform is in the list.
 func containsPlatform(platforms []domain.Platform, target domain.Platform) bool {
 	return slices.Contains(platforms, target)
 }
 
-// containsArchitecture checks if architecture is in the list
+// containsArchitecture checks if architecture is in the list.
 func containsArchitecture(architectures []domain.Architecture, target domain.Architecture) bool {
 	return slices.Contains(architectures, target)
 }

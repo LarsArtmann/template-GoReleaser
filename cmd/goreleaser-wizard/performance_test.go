@@ -12,7 +12,7 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
-// BenchmarkProjectDetection benchmarks project detection performance
+// BenchmarkProjectDetection benchmarks project detection performance.
 func BenchmarkProjectDetection(b *testing.B) {
 	// Create a temporary project for benchmarking
 	tmpDir, _ := os.MkdirTemp("", "wizard-benchmark")
@@ -42,7 +42,7 @@ require github.com/charmbracelet/lipgloss v1.1.0
 	}
 }
 
-// BenchmarkConfigGeneration benchmarks GoReleaser config generation
+// BenchmarkConfigGeneration benchmarks GoReleaser config generation.
 func BenchmarkConfigGeneration(b *testing.B) {
 	// Create a temporary project for benchmarking
 	tmpDir, _ := os.MkdirTemp("", "wizard-config-benchmark")
@@ -87,7 +87,7 @@ go 1.21
 	}
 }
 
-// BenchmarkGitHubActionsGeneration benchmarks GitHub Actions workflow generation
+// BenchmarkGitHubActionsGeneration benchmarks GitHub Actions workflow generation.
 func BenchmarkGitHubActionsGeneration(b *testing.B) {
 	// Create a temporary project for benchmarking
 	tmpDir, _ := os.MkdirTemp("", "wizard-actions-benchmark")
@@ -123,7 +123,7 @@ go 1.21
 	}
 }
 
-// BenchmarkFileOperations benchmarks file operation performance
+// BenchmarkFileOperations benchmarks file operation performance.
 func BenchmarkFileOperations(b *testing.B) {
 	tmpDir, _ := os.MkdirTemp("", "wizard-fileops-benchmark")
 	defer os.RemoveAll(tmpDir)
@@ -163,7 +163,7 @@ func BenchmarkFileOperations(b *testing.B) {
 	}
 }
 
-// TestPerformanceCharacteristics tests performance characteristics under different conditions
+// TestPerformanceCharacteristics tests performance characteristics under different conditions.
 func TestPerformanceCharacteristics(t *testing.T) {
 	tests := []struct {
 		name          string
@@ -180,7 +180,7 @@ func TestPerformanceCharacteristics(t *testing.T) {
 			start := time.Now()
 
 			// Create project with specified complexity
-			tmpDir, _ := os.MkdirTemp("", fmt.Sprintf("wizard-perf-%s", tt.name))
+			tmpDir, _ := os.MkdirTemp("", "wizard-perf-"+tt.name)
 			defer os.RemoveAll(tmpDir)
 
 			createBenchmarkProject(t, tmpDir, tt.complexity)
@@ -215,7 +215,7 @@ func TestPerformanceCharacteristics(t *testing.T) {
 	}
 }
 
-// TestMemoryUsage tests memory usage patterns
+// TestMemoryUsage tests memory usage patterns.
 func TestMemoryUsage(t *testing.T) {
 	// Get initial memory stats
 	var m1, m2 runtime.MemStats
@@ -261,7 +261,7 @@ func TestMemoryUsage(t *testing.T) {
 	}
 }
 
-// TestConcurrentOperations tests concurrent wizard operations
+// TestConcurrentOperations tests concurrent wizard operations.
 func TestConcurrentOperations(t *testing.T) {
 	// Test that wizard can handle concurrent operations safely
 	concurrency := 5
@@ -292,7 +292,7 @@ func TestConcurrentOperations(t *testing.T) {
 			detectProjectInfo(config)
 			err := generateGoReleaserConfig(config)
 			if err != nil {
-				errors <- fmt.Errorf("project %d: %v", id, err)
+				errors <- fmt.Errorf("project %d: %w", id, err)
 				return
 			}
 		}(i)
@@ -312,7 +312,7 @@ func TestConcurrentOperations(t *testing.T) {
 	t.Logf("Successfully completed %d concurrent operations", concurrency)
 }
 
-// createBenchmarkProject creates a project with specified complexity
+// createBenchmarkProject creates a project with specified complexity.
 func createBenchmarkProject(t *testing.T, dir string, complexity int) {
 	// Create basic structure
 	goMod := `module github.com/user/benchmark-project
@@ -354,7 +354,7 @@ go 1.21
 		for i := range 5 {
 			pkgName := fmt.Sprintf("pkg%02d", i)
 			os.MkdirAll(filepath.Join(dir, pkgName), 0o755)
-			os.WriteFile(filepath.Join(dir, pkgName, fmt.Sprintf("%s.go", pkgName)), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0o644)
+			os.WriteFile(filepath.Join(dir, pkgName, pkgName+".go"), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0o644)
 		}
 	}
 }

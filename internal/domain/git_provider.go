@@ -6,7 +6,7 @@ import (
 )
 
 // GitProvider represents git hosting providers
-// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
+// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type GitProvider string
 
 const (
@@ -17,7 +17,7 @@ const (
 	GitProviderSelfHosted GitProvider = "self-hosted" // Self-hosted
 )
 
-// GitProvider metadata - generated from TypeSpec invariants
+// GitProvider metadata - generated from TypeSpec invariants.
 type gitProviderMeta struct {
 	defaultRegistry             DockerRegistry
 	actionsSupported            bool
@@ -64,13 +64,13 @@ var gitProviderMetaMap = map[GitProvider]gitProviderMeta{
 	},
 }
 
-// IsValid returns true if GitProvider is valid
+// IsValid returns true if GitProvider is valid.
 func (gp GitProvider) IsValid() bool {
 	_, exists := gitProviderMetaMap[gp]
 	return exists
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (gp GitProvider) String() string {
 	switch gp {
 	case GitProviderGitHub:
@@ -88,7 +88,7 @@ func (gp GitProvider) String() string {
 	}
 }
 
-// DefaultRegistry returns the default Docker registry for this provider
+// DefaultRegistry returns the default Docker registry for this provider.
 func (gp GitProvider) DefaultRegistry() DockerRegistry {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.defaultRegistry
@@ -96,7 +96,7 @@ func (gp GitProvider) DefaultRegistry() DockerRegistry {
 	return DockerRegistryCustom
 }
 
-// ActionsSupported returns true if GitHub Actions are supported
+// ActionsSupported returns true if GitHub Actions are supported.
 func (gp GitProvider) ActionsSupported() bool {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.actionsSupported
@@ -104,7 +104,7 @@ func (gp GitProvider) ActionsSupported() bool {
 	return false
 }
 
-// APIURL returns the API URL for this provider
+// APIURL returns the API URL for this provider.
 func (gp GitProvider) APIURL() string {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.apiURL
@@ -112,7 +112,7 @@ func (gp GitProvider) APIURL() string {
 	return ""
 }
 
-// WebURL returns the web URL for this provider
+// WebURL returns the web URL for this provider.
 func (gp GitProvider) WebURL() string {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.webURL
@@ -120,7 +120,7 @@ func (gp GitProvider) WebURL() string {
 	return ""
 }
 
-// RequiresPersonalAccessToken returns true if provider requires personal access token
+// RequiresPersonalAccessToken returns true if provider requires personal access token.
 func (gp GitProvider) RequiresPersonalAccessToken() bool {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.requiresPersonalAccessToken
@@ -128,7 +128,7 @@ func (gp GitProvider) RequiresPersonalAccessToken() bool {
 	return true
 }
 
-// ValidateGitProvider validates a git provider
+// ValidateGitProvider validates a git provider.
 func ValidateGitProvider(provider GitProvider) error {
 	if !provider.IsValid() {
 		return NewValidationError(
@@ -140,7 +140,7 @@ func ValidateGitProvider(provider GitProvider) error {
 	return nil
 }
 
-// GetAllGitProviders returns all available git providers
+// GetAllGitProviders returns all available git providers.
 func GetAllGitProviders() []GitProvider {
 	return []GitProvider{
 		GitProviderGitHub, GitProviderGitLab, GitProviderBitbucket,
@@ -148,12 +148,12 @@ func GetAllGitProviders() []GitProvider {
 	}
 }
 
-// GetRecommendedGitProvider returns recommended git provider (GitHub)
+// GetRecommendedGitProvider returns recommended git provider (GitHub).
 func GetRecommendedGitProvider() GitProvider {
 	return GitProviderGitHub
 }
 
-// ConvertToGitProvider converts string display name to GitProvider
+// ConvertToGitProvider converts string display name to GitProvider.
 func ConvertToGitProvider(displayName string) GitProvider {
 	switch strings.ToLower(strings.TrimSpace(displayName)) {
 	case "github", "🐙  github":

@@ -131,7 +131,7 @@ func TestConfigurationValidation(t *testing.T) {
 				ProjectDescription: "A test web service",
 				BinaryName:         "test-web",
 				MainPath:           ".",
-				ProjectType:        domain.ProjectTypeWeb,
+				ProjectType:        domain.ProjectTypeWebAPI,
 				Platforms:          []domain.Platform{"linux", "darwin"},
 				Architectures:      []domain.Architecture{"amd64"},
 				CGOStatus:          domain.CGOStatusEnabled,
@@ -236,7 +236,7 @@ func TestDifferentProjectTypes(t *testing.T) {
 			name:        "web_service",
 			projectType: "Web Service",
 			expectedConfig: ProjectConfig{
-				ProjectType: domain.ProjectTypeWeb,
+				ProjectType: domain.ProjectTypeWebAPI,
 				CGOStatus:   domain.CGOStatusEnabled,
 			},
 		},
@@ -277,7 +277,7 @@ go 1.21
 			case "CLI Application":
 				config.ProjectType = domain.ProjectTypeCLI
 			case "Web Service":
-				config.ProjectType = domain.ProjectTypeWeb
+				config.ProjectType = domain.ProjectTypeWebAPI
 			case "Library":
 				config.ProjectType = domain.ProjectTypeLibrary
 			}
@@ -286,7 +286,7 @@ go 1.21
 			switch config.ProjectType {
 			case domain.ProjectTypeCLI:
 				config.CGOStatus = domain.CGOStatusDisabled
-			case domain.ProjectTypeWeb:
+			case domain.ProjectTypeWebAPI:
 				config.CGOStatus = domain.CGOStatusEnabled
 			case domain.ProjectTypeLibrary:
 				config.CGOStatus = domain.CGOStatusDisabled

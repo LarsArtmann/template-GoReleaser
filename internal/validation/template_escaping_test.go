@@ -240,7 +240,7 @@ func TestIsValidDockerLabel(t *testing.T) {
 	}
 }
 
-// Fuzzing tests for escaping functions
+// Fuzzing tests for escaping functions.
 func FuzzEscapeYAML(f *testing.F) {
 	seed := []string{"hello", "name: value", "don't", "multiline\nstring"}
 	for _, s := range seed {
@@ -283,7 +283,7 @@ func FuzzEscapeJSON(f *testing.F) {
 	})
 }
 
-// Benchmark tests
+// Benchmark tests.
 func BenchmarkEscapeYAML(b *testing.B) {
 	te := NewTemplateEscaper()
 	input := "my-project-name: value with 'quotes'"

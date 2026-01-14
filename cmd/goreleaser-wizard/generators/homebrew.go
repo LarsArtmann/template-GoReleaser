@@ -13,13 +13,13 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// HomebrewGenerator handles Homebrew formula generation
+// HomebrewGenerator handles Homebrew formula generation.
 type HomebrewGenerator struct {
 	templateData *HomebrewTemplateData
 	logger       Logger
 }
 
-// HomebrewTemplateData contains data for Homebrew formula template
+// HomebrewTemplateData contains data for Homebrew formula template.
 type HomebrewTemplateData struct {
 	FormulaName        string
 	ProjectName        string
@@ -35,7 +35,7 @@ type HomebrewTemplateData struct {
 	Service            bool
 }
 
-// NewHomebrewGenerator creates a new Homebrew generator
+// NewHomebrewGenerator creates a new Homebrew generator.
 func NewHomebrewGenerator(config *domain.SafeProjectConfig, logger Logger) *HomebrewGenerator {
 	return &HomebrewGenerator{
 		templateData: createHomebrewTemplateData(config),
@@ -43,7 +43,7 @@ func NewHomebrewGenerator(config *domain.SafeProjectConfig, logger Logger) *Home
 	}
 }
 
-// createHomebrewTemplateData creates template data from project config
+// createHomebrewTemplateData creates template data from project config.
 func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTemplateData {
 	// Convert project name to formula name (CamelCase)
 	formulaName := toCamelCase(config.ProjectName)
@@ -51,7 +51,7 @@ func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTempl
 	// Default values
 	description := config.ProjectDescription
 	if description == "" {
-		description = fmt.Sprintf("%s is a Go application", config.ProjectName)
+		description = config.ProjectName + " is a Go application"
 	}
 
 	return &HomebrewTemplateData{
@@ -65,12 +65,12 @@ func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTempl
 		MainPath:           config.MainPath,
 		LDFlags:            "-s -w -X main.version={{version}}",
 		BinaryName:         config.BinaryName,
-		TestOutput:         fmt.Sprintf("%s version", config.BinaryName),
+		TestOutput:         config.BinaryName + " version",
 		Service:            config.ProjectType == domain.ProjectTypeWebAPI,
 	}
 }
 
-// toCamelCase converts snake_case or kebab-case to CamelCase
+// toCamelCase converts snake_case or kebab-case to CamelCase.
 func toCamelCase(s string) string {
 	// Handle kebab-case and snake_case
 	words := splitWords(s)
@@ -85,7 +85,7 @@ func toCamelCase(s string) string {
 	return result.String()
 }
 
-// splitWords splits a string into words by common separators
+// splitWords splits a string into words by common separators.
 func splitWords(s string) []string {
 	var words []string
 	current := ""
@@ -108,7 +108,7 @@ func splitWords(s string) []string {
 	return words
 }
 
-// Generate generates Homebrew formula
+// Generate generates Homebrew formula.
 func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 	g.logger.Info("Generating Homebrew formula")
 
@@ -163,7 +163,7 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 	return nil
 }
 
-// ValidateTemplate validates Homebrew template
+// ValidateTemplate validates Homebrew template.
 func (g *HomebrewGenerator) ValidateTemplate() error {
 	tmpl := template.New("homebrew")
 
@@ -179,7 +179,7 @@ func (g *HomebrewGenerator) ValidateTemplate() error {
 	return nil
 }
 
-// GeneratePreview generates a preview without writing to file
+// GeneratePreview generates a preview without writing to file.
 func (g *HomebrewGenerator) GeneratePreview(ctx context.Context) (string, error) {
 	g.logger.Debug("Generating Homebrew formula preview")
 
@@ -213,7 +213,7 @@ func (g *HomebrewGenerator) GeneratePreview(ctx context.Context) (string, error)
 	return output.String(), nil
 }
 
-// Rollback removes generated Homebrew formula
+// Rollback removes generated Homebrew formula.
 func (g *HomebrewGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back Homebrew formula generation")
 
@@ -245,7 +245,7 @@ func (g *HomebrewGenerator) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// UpdateConfig updates generator configuration
+// UpdateConfig updates generator configuration.
 func (g *HomebrewGenerator) UpdateConfig(config *domain.SafeProjectConfig) {
 	g.templateData = createHomebrewTemplateData(config)
 }

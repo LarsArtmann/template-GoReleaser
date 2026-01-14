@@ -1,6 +1,6 @@
 package main
 
-// ValidationResults holds all validation results
+// ValidationResults holds all validation results.
 type ValidationResults struct {
 	ConfigExists    bool
 	ConfigValid     bool
@@ -13,7 +13,7 @@ type ValidationResults struct {
 	Recommendations []string
 }
 
-// GetExitCode returns appropriate exit code
+// GetExitCode returns appropriate exit code.
 func (vr *ValidationResults) GetExitCode() int {
 	if len(vr.Errors) > 0 {
 		return 1

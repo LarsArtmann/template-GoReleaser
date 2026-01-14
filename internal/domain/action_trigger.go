@@ -7,7 +7,7 @@ import (
 )
 
 // ActionTrigger represents GitHub Actions triggers
-// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
+// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type ActionTrigger string
 
 const (
@@ -21,7 +21,7 @@ const (
 	ActionTriggerSchedule    ActionTrigger = "schedule"     // Scheduled Trigger
 )
 
-// ActionTrigger metadata - generated from TypeSpec invariants
+// ActionTrigger metadata - generated from TypeSpec invariants.
 type actionTriggerMeta struct {
 	githubPattern  string
 	description    string
@@ -56,13 +56,13 @@ var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 	},
 }
 
-// IsValid returns true if ActionTrigger is valid
+// IsValid returns true if ActionTrigger is valid.
 func (at ActionTrigger) IsValid() bool {
 	_, exists := actionTriggerMetaMap[at]
 	return exists
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (at ActionTrigger) String() string {
 	switch at {
 	case ActionTriggerVersionTags:
@@ -80,7 +80,7 @@ func (at ActionTrigger) String() string {
 	}
 }
 
-// GitHubPattern returns the GitHub Actions YAML pattern
+// GitHubPattern returns the GitHub Actions YAML pattern.
 func (at ActionTrigger) GitHubPattern() string {
 	if meta, exists := actionTriggerMetaMap[at]; exists {
 		return meta.githubPattern
@@ -88,7 +88,7 @@ func (at ActionTrigger) GitHubPattern() string {
 	return ""
 }
 
-// Description returns the description of this trigger
+// Description returns the description of this trigger.
 func (at ActionTrigger) Description() string {
 	if meta, exists := actionTriggerMetaMap[at]; exists {
 		return meta.description
@@ -96,7 +96,7 @@ func (at ActionTrigger) Description() string {
 	return ""
 }
 
-// RecommendedFor returns the project types this trigger is recommended for
+// RecommendedFor returns the project types this trigger is recommended for.
 func (at ActionTrigger) RecommendedFor() []ProjectType {
 	if meta, exists := actionTriggerMetaMap[at]; exists {
 		return meta.recommendedFor
@@ -104,10 +104,10 @@ func (at ActionTrigger) RecommendedFor() []ProjectType {
 	return []ProjectType{}
 }
 
-// ValidateActionTriggers validates a slice of action triggers
+// ValidateActionTriggers validates a slice of action triggers.
 func ValidateActionTriggers(triggers []ActionTrigger) error {
 	if len(triggers) == 0 {
-		return fmt.Errorf("at least one action trigger is required")
+		return errors.New("at least one action trigger is required")
 	}
 
 	for _, trigger := range triggers {
@@ -119,7 +119,7 @@ func ValidateActionTriggers(triggers []ActionTrigger) error {
 	return nil
 }
 
-// GetRecommendedTriggers returns recommended triggers for a project type
+// GetRecommendedTriggers returns recommended triggers for a project type.
 func GetRecommendedTriggers(projectType ProjectType) []ActionTrigger {
 	recommended := []ActionTrigger{}
 	for _, trigger := range GetAllActionTriggers() {
@@ -131,7 +131,7 @@ func GetRecommendedTriggers(projectType ProjectType) []ActionTrigger {
 	return recommended
 }
 
-// GetAllActionTriggers returns all available action triggers
+// GetAllActionTriggers returns all available action triggers.
 func GetAllActionTriggers() []ActionTrigger {
 	return []ActionTrigger{
 		ActionTriggerVersionTags, ActionTriggerAllTags, ActionTriggerManual,
@@ -139,7 +139,7 @@ func GetAllActionTriggers() []ActionTrigger {
 	}
 }
 
-// GenerateGitHubActionsTriggersYAML generates YAML triggers for multiple triggers
+// GenerateGitHubActionsTriggersYAML generates YAML triggers for multiple triggers.
 func GenerateGitHubActionsTriggersYAML(triggers []ActionTrigger) string {
 	if len(triggers) == 0 {
 		return ""

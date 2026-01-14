@@ -15,10 +15,10 @@ import (
 )
 
 // Type alias for backward compatibility during migration
-// TODO: Remove after migration complete
+// TODO: Remove after migration complete.
 type ProjectConfig = domain.SafeProjectConfig
 
-// LoggerAdapter adapts charmbracelet/log to domain.Logger interface
+// LoggerAdapter adapts charmbracelet/log to domain.Logger interface.
 type LoggerAdapter struct {
 	logger *log.Logger
 }
@@ -72,7 +72,7 @@ func (la *LoggerAdapter) WithError(err error) domain.Logger {
 }
 
 var (
-	// Build-time variables set by GoReleaser
+	// Build-time variables set by GoReleaser.
 	version        = "dev"
 	commit         = "none"
 	date           = "unknown"
@@ -83,10 +83,10 @@ var (
 	cfgFile string
 )
 
-// Domain logger for dependency injection
+// Domain logger for dependency injection.
 var appLogger domain.Logger
 
-// Style definitions
+// Style definitions.
 var titleStyle, successStyle, errorStyle, infoStyle lipgloss.Style
 
 func init() {
@@ -112,7 +112,7 @@ func init() {
 	}
 }
 
-// rootCmd represents the base command when called without any subcommands
+// rootCmd represents the base command when called without any subcommands.
 var rootCmd = &cobra.Command{
 	Use:   "goreleaser-wizard",
 	Short: "Interactive setup wizard for GoReleaser",
@@ -134,7 +134,7 @@ func Execute() {
 	}
 }
 
-// recoverFromPanic provides graceful panic recovery using domain types
+// recoverFromPanic provides graceful panic recovery using domain types.
 func recoverFromPanic(context string) {
 	if r := recover(); r != nil {
 		logger.Error("Panic recovered", "context", context, "panic", r)
@@ -152,7 +152,7 @@ func recoverFromPanic(context string) {
 	}
 }
 
-// displayError displays errors using domain error handling
+// displayError displays errors using domain error handling.
 func displayError(err error) {
 	if err == nil {
 		return
@@ -264,7 +264,7 @@ func initConfig() {
 	}
 }
 
-// validateFileExists validates file existence using domain error types
+// validateFileExists validates file existence using domain error types.
 func validateFileExists(path string, requireDir bool) *domain.DomainError {
 	info, err := os.Stat(path)
 	if err != nil {
@@ -279,7 +279,7 @@ func validateFileExists(path string, requireDir bool) *domain.DomainError {
 		return domain.NewSystemError(
 			domain.ErrFileReadFailed,
 			"File access error",
-			fmt.Sprintf("Cannot access %s", path),
+			"Cannot access "+path,
 			err,
 		).WithContext(path)
 	}
@@ -288,7 +288,7 @@ func validateFileExists(path string, requireDir bool) *domain.DomainError {
 		return domain.NewValidationError(
 			domain.ErrInvalidCharacters,
 			"Expected directory",
-			fmt.Sprintf("%s is not a directory", path),
+			path+" is not a directory",
 		).WithContext(path)
 	}
 
@@ -312,7 +312,7 @@ var versionCmd = &cobra.Command{
 	},
 }
 
-// Placeholder command definitions - TODO: Implement actual functionality
+// Placeholder command definitions - TODO: Implement actual functionality.
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "Initialize GoReleaser configuration",
@@ -325,7 +325,7 @@ var generateCmd = &cobra.Command{
 	Run:   runGenerate,
 }
 
-// HandleError provides a simple error handling function for tests and CLI usage
+// HandleError provides a simple error handling function for tests and CLI usage.
 func HandleError(err error) {
 	if err != nil {
 		displayError(err)

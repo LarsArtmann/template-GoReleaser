@@ -6,15 +6,41 @@ import (
 	"strings"
 )
 
-// TemplateEscaper provides secure escaping for different output formats
+// Precompiled regex patterns for validation.
+var (
+	shellMetacharPattern = regexp.MustCompile(`[;&|<>$\(\)\{\}\[\]\*?]`)
+	pathTraversalPattern = regexp.MustCompile(`\.\.[/\\]`)
+)
+
+// SanitizeInput sanitizes user input by removing dangerous characters.
+func SanitizeInput(input string) string {
+	if input == "" {
+		return ""
+	}
+
+	// Trim whitespace
+	input = strings.TrimSpace(input)
+
+	// Remove null bytes and control characters
+	input = strings.Map(func(r rune) rune {
+		if r < 32 && r != '\n' && r != '\r' && r != '\t' {
+			return -1
+		}
+		return r
+	}, input)
+
+	return input
+}
+
+// TemplateEscaper provides secure escaping for different output formats.
 type TemplateEscaper struct{}
 
-// NewTemplateEscaper creates a new template escaper
+// NewTemplateEscaper creates a new template escaper.
 func NewTemplateEscaper() *TemplateEscaper {
 	return &TemplateEscaper{}
 }
 
-// EscapeYAML escapes values for safe YAML output
+// EscapeYAML escapes values for safe YAML output.
 func (te *TemplateEscaper) EscapeYAML(value string) string {
 	if value == "" {
 		return ""
@@ -29,9 +55,9 @@ func (te *TemplateEscaper) EscapeYAML(value string) string {
 	if strings.Contains(value, "\n") {
 		// Check if it needs literal block style
 		if strings.ContainsAny(value, ":{}[],&*#?|-<>'\"%@`") {
-			return fmt.Sprintf("|-\n%s", te.indentYAMLLines(value))
+			return "|-\n" + te.indentYAMLLines(value)
 		}
-		return fmt.Sprintf("|-\n%s", te.indentYAMLLines(value))
+		return "|-\n" + te.indentYAMLLines(value)
 	}
 
 	// For single line, check if it needs quoting
@@ -45,7 +71,7 @@ func (te *TemplateEscaper) EscapeYAML(value string) string {
 	return value
 }
 
-// EscapeShell escapes values for safe shell command usage
+// EscapeShell escapes values for safe shell command usage.
 func (te *TemplateEscaper) EscapeShell(value string) string {
 	if value == "" {
 		return ""
@@ -66,7 +92,7 @@ func (te *TemplateEscaper) EscapeShell(value string) string {
 	return fmt.Sprintf("'%s'", value)
 }
 
-// EscapeGitHubActions escapes values for GitHub Actions workflow files
+// EscapeGitHubActions escapes values for GitHub Actions workflow files.
 func (te *TemplateEscaper) EscapeGitHubActions(value string) string {
 	if value == "" {
 		return ""
@@ -87,7 +113,7 @@ func (te *TemplateEscaper) EscapeGitHubActions(value string) string {
 	return value
 }
 
-// EscapeJSON escapes values for JSON output
+// EscapeJSON escapes values for JSON output.
 func (te *TemplateEscaper) EscapeJSON(value string) string {
 	if value == "" {
 		return `""`
@@ -106,7 +132,7 @@ func (te *TemplateEscaper) EscapeJSON(value string) string {
 	return fmt.Sprintf(`"%s"`, value)
 }
 
-// EscapeDockerLabel escapes values for Docker labels
+// EscapeDockerLabel escapes values for Docker labels.
 func (te *TemplateEscaper) EscapeDockerLabel(value string) string {
 	if value == "" {
 		return ""
@@ -140,7 +166,7 @@ func (te *TemplateEscaper) EscapeDockerLabel(value string) string {
 	return value
 }
 
-// ValidateTemplateContent validates generated content for security
+// ValidateTemplateContent validates generated content for security.
 func (te *TemplateEscaper) ValidateTemplateContent(content, templateType string) error {
 	// Check for injection patterns
 	dangerousPatterns := []string{
@@ -173,15 +199,15 @@ func (te *TemplateEscaper) ValidateTemplateContent(content, templateType string)
 	switch templateType {
 	case "yaml":
 		if te.containsYAMLInjection(content) {
-			return fmt.Errorf("YAML template contains potential injection")
+			return errors.New("YAML template contains potential injection")
 		}
 	case "shell":
 		if containsShellInjection(content) {
-			return fmt.Errorf("shell script contains potential injection")
+			return errors.New("shell script contains potential injection")
 		}
 	case "github-actions":
 		if te.containsGitHubActionsInjection(content) {
-			return fmt.Errorf("GitHub Actions workflow contains potential injection")
+			return errors.New("GitHub Actions workflow contains potential injection")
 		}
 	}
 

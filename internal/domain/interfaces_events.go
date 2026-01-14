@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// ProgressReporter represents progress reporting interface
+// ProgressReporter represents progress reporting interface.
 type ProgressReporter interface {
 	Start(total int64, message string) error
 	Update(current int64) error
@@ -15,7 +15,7 @@ type ProgressReporter interface {
 	Increment() error
 }
 
-// Progress represents progress information
+// Progress represents progress information.
 type Progress struct {
 	Current int64         `json:"current"`
 	Total   int64         `json:"total"`
@@ -25,7 +25,7 @@ type Progress struct {
 	ETA     time.Duration `json:"eta,omitempty"`
 }
 
-// Event represents a domain event
+// Event represents a domain event.
 type Event interface {
 	ID() string
 	Type() EventType
@@ -35,17 +35,17 @@ type Event interface {
 	Version() int
 }
 
-// EventType represents the type of domain event
+// EventType represents the type of domain event.
 type EventType string
 
 const (
-	// Configuration events
+	// Configuration events.
 	EventTypeConfigCreated   EventType = "CONFIG_CREATED"
 	EventTypeConfigUpdated   EventType = "CONFIG_UPDATED"
 	EventTypeConfigValidated EventType = "CONFIG_VALIDATED"
 	EventTypeConfigGenerated EventType = "CONFIG_GENERATED"
 
-	// Job execution events
+	// Job execution events.
 	EventTypeJobCreated   EventType = "JOB_CREATED"
 	EventTypeJobStarted   EventType = "JOB_STARTED"
 	EventTypeJobCompleted EventType = "JOB_COMPLETED"
@@ -53,51 +53,51 @@ const (
 	EventTypeJobCancelled EventType = "JOB_CANCELLED"
 	EventTypeJobRetried   EventType = "JOB_RETRIED"
 
-	// Workflow execution events
+	// Workflow execution events.
 	EventTypeWorkflowCreated   EventType = "WORKFLOW_CREATED"
 	EventTypeWorkflowStarted   EventType = "WORKFLOW_STARTED"
 	EventTypeWorkflowCompleted EventType = "WORKFLOW_COMPLETED"
 	EventTypeWorkflowFailed    EventType = "WORKFLOW_FAILED"
 	EventTypeWorkflowCancelled EventType = "WORKFLOW_CANCELLED"
 
-	// Template generation events
+	// Template generation events.
 	EventTypeTemplateGenerated EventType = "TEMPLATE_GENERATED"
 	EventTypeTemplateRendered  EventType = "TEMPLATE_RENDERED"
 	EventTypeTemplateValidated EventType = "TEMPLATE_VALIDATED"
 
-	// File system events
+	// File system events.
 	EventTypeFileCreated EventType = "FILE_CREATED"
 	EventTypeFileUpdated EventType = "FILE_UPDATED"
 	EventTypeFileDeleted EventType = "FILE_DELETED"
 	EventTypeDirCreated  EventType = "DIR_CREATED"
 	EventTypeDirDeleted  EventType = "DIR_DELETED"
 
-	// Git operations events
+	// Git operations events.
 	EventTypeGitOperation EventType = "GIT_OPERATION"
 	EventTypeGitPush      EventType = "GIT_PUSH"
 	EventTypeGitCommit    EventType = "GIT_COMMIT"
 	EventTypeGitTag       EventType = "GIT_TAG"
 
-	// External integration events
+	// External integration events.
 	EventTypeGitHubAPI           EventType = "GITHUB_API"
 	EventTypeDockerOperation     EventType = "DOCKER_OPERATION"
 	EventTypeGoReleaserOperation EventType = "GORELEASER_OPERATION"
 )
 
-// EventPublisher represents event publishing interface
+// EventPublisher represents event publishing interface.
 type EventPublisher interface {
 	Publish(ctx context.Context, event Event) error
 	PublishAsync(ctx context.Context, event Event)
 	PublishBatch(ctx context.Context, events []Event) error
 }
 
-// EventHandler represents event handling interface
+// EventHandler represents event handling interface.
 type EventHandler interface {
 	Handle(ctx context.Context, event Event) error
 	CanHandle(eventType EventType) bool
 }
 
-// EventBus represents event bus interface
+// EventBus represents event bus interface.
 type EventBus interface {
 	Subscribe(eventType EventType, handler EventHandler) error
 	Unsubscribe(eventType EventType, handler EventHandler) error
@@ -105,7 +105,7 @@ type EventBus interface {
 	Close() error
 }
 
-// BaseEvent provides a base implementation for domain events
+// BaseEvent provides a base implementation for domain events.
 type BaseEvent struct {
 	id          string
 	eventType   EventType
@@ -115,7 +115,7 @@ type BaseEvent struct {
 	version     int
 }
 
-// NewBaseEvent creates a new base event
+// NewBaseEvent creates a new base event.
 func NewBaseEvent(eventType EventType, data any, aggregateID string) *BaseEvent {
 	return &BaseEvent{
 		id:          generateEventID(),
@@ -151,33 +151,34 @@ func (e *BaseEvent) Version() int {
 	return e.version
 }
 
-// WithData updates event data
+// WithData updates event data.
 func (e *BaseEvent) WithData(data any) *BaseEvent {
 	e.data = data
 	return e
 }
 
-// WithVersion updates event version
+// WithVersion updates event version.
 func (e *BaseEvent) WithVersion(version int) *BaseEvent {
 	e.version = version
 	return e
 }
 
-// generateEventID generates a unique event ID
+// generateEventID generates a unique event ID.
 func generateEventID() string {
 	return fmt.Sprintf("evt_%d", time.Now().UnixNano())
 }
 
-// ConfigCreatedEvent represents a configuration creation event
+// ConfigCreatedEvent represents a configuration creation event.
 type ConfigCreatedEvent struct {
 	*BaseEvent
+
 	ConfigID    string `json:"config_id"`
 	ConfigType  string `json:"config_type"`
 	CreatedBy   string `json:"created_by"`
 	ProjectName string `json:"project_name"`
 }
 
-// NewConfigCreatedEvent creates a new config created event
+// NewConfigCreatedEvent creates a new config created event.
 func NewConfigCreatedEvent(configID, configType, createdBy, projectName string) *ConfigCreatedEvent {
 	return &ConfigCreatedEvent{
 		BaseEvent: NewBaseEvent(EventTypeConfigCreated, map[string]any{
@@ -193,16 +194,17 @@ func NewConfigCreatedEvent(configID, configType, createdBy, projectName string) 
 	}
 }
 
-// JobStartedEvent represents a job started event
+// JobStartedEvent represents a job started event.
 type JobStartedEvent struct {
 	*BaseEvent
+
 	JobID     string    `json:"job_id"`
 	JobName   string    `json:"job_name"`
 	StartedBy string    `json:"started_by"`
 	StartTime time.Time `json:"start_time"`
 }
 
-// NewJobStartedEvent creates a new job started event
+// NewJobStartedEvent creates a new job started event.
 func NewJobStartedEvent(jobID, jobName, startedBy string) *JobStartedEvent {
 	startTime := time.Now()
 	return &JobStartedEvent{
@@ -219,9 +221,10 @@ func NewJobStartedEvent(jobID, jobName, startedBy string) *JobStartedEvent {
 	}
 }
 
-// WorkflowCompletedEvent represents a workflow completed event
+// WorkflowCompletedEvent represents a workflow completed event.
 type WorkflowCompletedEvent struct {
 	*BaseEvent
+
 	WorkflowID     string        `json:"workflow_id"`
 	WorkflowName   string        `json:"workflow_name"`
 	StartTime      time.Time     `json:"start_time"`
@@ -232,7 +235,7 @@ type WorkflowCompletedEvent struct {
 	FailedJobs     int           `json:"failed_jobs"`
 }
 
-// NewWorkflowCompletedEvent creates a new workflow completed event
+// NewWorkflowCompletedEvent creates a new workflow completed event.
 func NewWorkflowCompletedEvent(workflowID, workflowName string, startTime, endTime time.Time, totalJobs, successfulJobs, failedJobs int) *WorkflowCompletedEvent {
 	duration := endTime.Sub(startTime)
 	return &WorkflowCompletedEvent{

@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// FileSystemRepository interface for file system operations
+// FileSystemRepository interface for file system operations.
 type FileSystemRepository interface {
 	ReadFile(ctx context.Context, path string) ([]byte, error)
 	WriteFile(ctx context.Context, path string, data []byte, perm os.FileMode) error

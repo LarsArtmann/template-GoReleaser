@@ -2,10 +2,10 @@ package domain
 
 import "fmt"
 
-// ValidatePlatforms validates slice of platforms
+// ValidatePlatforms validates slice of platforms.
 func ValidatePlatforms(platforms []Platform) error {
 	if len(platforms) == 0 {
-		return fmt.Errorf("at least one platform is required")
+		return errors.New("at least one platform is required")
 	}
 
 	for _, platform := range platforms {
@@ -17,7 +17,7 @@ func ValidatePlatforms(platforms []Platform) error {
 	return nil
 }
 
-// ValidatePlatformArchCompatibility validates platform-architecture compatibility
+// ValidatePlatformArchCompatibility validates platform-architecture compatibility.
 func ValidatePlatformArchCompatibility(platforms []Platform, architectures []Architecture) error {
 	for _, platform := range platforms {
 		for _, arch := range architectures {

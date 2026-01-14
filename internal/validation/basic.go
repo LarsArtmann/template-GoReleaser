@@ -3,33 +3,34 @@ package validation
 import (
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// Validation patterns
+// Validation patterns.
 var (
-	// Project name validation: alphanumeric, hyphens, underscores, 1-50 chars
+	// Project name validation: alphanumeric, hyphens, underscores, 1-50 chars.
 	projectNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$`)
 
-	// Binary name validation: alphanumeric, hyphens, 1-30 chars
+	// Binary name validation: alphanumeric, hyphens, 1-30 chars.
 	binaryNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,29}$`)
 
-	// Main path validation: relative path, no invalid characters
+	// Main path validation: relative path, no invalid characters.
 	mainPathPattern = regexp.MustCompile(`^(\.|\./|\.\./)?[^\\:*?"<>|]+$`)
 
-	// Project description validation: 1-500 chars, printable
-	projectDescriptionPattern = regexp.MustCompile(`^[\p{Print}]{1,500}$`)
+	// Project description validation: 1-500 chars, printable.
+	projectDescriptionPattern = regexp.MustCompile(`^[[:print:]]{1,500}$`)
 
-	// Docker image name validation: lowercase, alphanum, separators, max 255
+	// Docker image name validation: lowercase, alphanum, separators, max 255.
 	dockerImagePattern = regexp.MustCompile(`^[a-z0-9]+(?:[._-][a-z0-9]+)*$`)
 
-	// Docker registry URL validation
+	// Docker registry URL validation.
 	dockerRegistryPattern = regexp.MustCompile(`^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
 )
 
-// ValidateProjectName validates project name
+// ValidateProjectName validates project name.
 func ValidateProjectName(name string) error {
 	if name == "" {
 		return errors.NewValidationError(
@@ -62,20 +63,18 @@ func ValidateProjectName(name string) error {
 	}
 
 	lowerName := strings.ToLower(name)
-	for _, reserved := range reservedNames {
-		if lowerName == reserved {
-			return errors.NewValidationError(
-				errors.ErrInvalidProject,
-				"Reserved project name",
-				fmt.Sprintf("'%s' is a reserved name", name),
-			).WithField("project_name").WithSuggestion("Choose a different project name")
-		}
+	if slices.Contains(reservedNames, lowerName) {
+		return errors.NewValidationError(
+			errors.ErrInvalidProject,
+			"Reserved project name",
+			fmt.Sprintf("'%s' is a reserved name", name),
+		).WithField("project_name").WithSuggestion("Choose a different project name")
 	}
 
 	return nil
 }
 
-// ValidateBinaryName validates binary name
+// ValidateBinaryName validates binary name.
 func ValidateBinaryName(name string) error {
 	if name == "" {
 		return errors.NewValidationError(
@@ -108,20 +107,18 @@ func ValidateBinaryName(name string) error {
 	}
 
 	lowerName := strings.ToLower(name)
-	for _, reserved := range reservedNames {
-		if lowerName == reserved {
-			return errors.NewValidationError(
-				errors.ErrInvalidBinary,
-				"Reserved binary name",
-				fmt.Sprintf("'%s' is a reserved binary name", name),
-			).WithField("binary_name").WithSuggestion("Choose a different binary name")
-		}
+	if slices.Contains(reservedNames, lowerName) {
+		return errors.NewValidationError(
+			errors.ErrInvalidBinary,
+			"Reserved binary name",
+			fmt.Sprintf("'%s' is a reserved binary name", name),
+		).WithField("binary_name").WithSuggestion("Choose a different binary name")
 	}
 
 	return nil
 }
 
-// ValidateMainPath validates main path
+// ValidateMainPath validates main path.
 func ValidateMainPath(path string) error {
 	if path == "" {
 		return errors.NewValidationError(
@@ -157,24 +154,22 @@ func ValidateMainPath(path string) error {
 		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
 	}
 
-	components := strings.Split(normalizedPath, "/")
-	for _, component := range components {
+	components := strings.SplitSeq(normalizedPath, "/")
+	for component := range components {
 		lowerComponent := strings.ToLower(component)
-		for _, invalid := range invalidComponents {
-			if lowerComponent == invalid {
-				return errors.NewValidationError(
-					errors.ErrInvalidMainPath,
-					"Invalid path component",
-					fmt.Sprintf("'%s' is not allowed in path", component),
-				).WithField("main_path").WithSuggestion("Remove invalid components from path")
-			}
+		if slices.Contains(invalidComponents, lowerComponent) {
+			return errors.NewValidationError(
+				errors.ErrInvalidMainPath,
+				"Invalid path component",
+				fmt.Sprintf("'%s' is not allowed in path", component),
+			).WithField("main_path").WithSuggestion("Remove invalid components from path")
 		}
 	}
 
 	return nil
 }
 
-// ValidateProjectDescription validates project description
+// ValidateProjectDescription validates project description.
 func ValidateProjectDescription(description string) error {
 	if description == "" {
 		return nil // Description is optional
@@ -218,7 +213,7 @@ func ValidateProjectDescription(description string) error {
 	return nil
 }
 
-// ValidateDockerImageName validates Docker image name
+// ValidateDockerImageName validates Docker image name.
 func ValidateDockerImageName(name string) error {
 	if name == "" {
 		return errors.NewValidationError(
@@ -291,7 +286,7 @@ func ValidateDockerImageName(name string) error {
 	return nil
 }
 
-// ValidateDockerRegistry validates Docker registry URL
+// ValidateDockerRegistry validates Docker registry URL.
 func ValidateDockerRegistry(registry string) error {
 	if registry == "" {
 		return nil // Registry can be empty (use default)
@@ -330,7 +325,7 @@ func ValidateDockerRegistry(registry string) error {
 	return nil
 }
 
-// ValidateVersion validates version string
+// ValidateVersion validates version string.
 func ValidateVersion(version string) error {
 	if version == "" {
 		return errors.NewValidationError(
@@ -355,7 +350,7 @@ func ValidateVersion(version string) error {
 	return nil
 }
 
-// ValidateGitBranch validates Git branch name
+// ValidateGitBranch validates Git branch name.
 func ValidateGitBranch(branch string) error {
 	if branch == "" {
 		return errors.NewValidationError(
@@ -381,20 +376,18 @@ func ValidateGitBranch(branch string) error {
 	}
 
 	lowerBranch := strings.ToLower(branch)
-	for _, invalid := range invalidNames {
-		if lowerBranch == invalid {
-			return errors.NewValidationError(
-				errors.ErrInvalidGitBranch,
-				"Reserved Git branch name",
-				fmt.Sprintf("'%s' is a reserved branch name", branch),
-			).WithField("git_branch").WithSuggestion("Use a descriptive branch name")
-		}
+	if slices.Contains(invalidNames, lowerBranch) {
+		return errors.NewValidationError(
+			errors.ErrInvalidGitBranch,
+			"Reserved Git branch name",
+			fmt.Sprintf("'%s' is a reserved branch name", branch),
+		).WithField("git_branch").WithSuggestion("Use a descriptive branch name")
 	}
 
 	return nil
 }
 
-// ValidateGitTag validates Git tag name
+// ValidateGitTag validates Git tag name.
 func ValidateGitTag(tag string) error {
 	if tag == "" {
 		return errors.NewValidationError(
@@ -416,7 +409,7 @@ func ValidateGitTag(tag string) error {
 	return nil
 }
 
-// ValidateBuildTags validates build tags
+// ValidateBuildTags validates build tags.
 func ValidateBuildTags(tags []string) error {
 	if len(tags) == 0 {
 		return nil // No build tags is valid
@@ -466,7 +459,7 @@ func ValidateBuildTags(tags []string) error {
 	return nil
 }
 
-// ValidatePort validates port number
+// ValidatePort validates port number.
 func ValidatePort(port int) error {
 	if port < 1 || port > 65535 {
 		return errors.NewValidationError(
@@ -497,14 +490,12 @@ func ValidatePort(port int) error {
 		649, 650, 651, 652, 653, 654, 655,
 	}
 
-	for _, restricted := range restrictedPorts {
-		if port == restricted {
-			return errors.NewValidationError(
-				errors.ErrInvalidPort,
-				"Restricted port number",
-				fmt.Sprintf("Port %d is restricted and shouldn't be used by applications", port),
-			).WithField("port").WithSuggestion("Use a non-privileged port (1024-65535)")
-		}
+	if slices.Contains(restrictedPorts, port) {
+		return errors.NewValidationError(
+			errors.ErrInvalidPort,
+			"Restricted port number",
+			fmt.Sprintf("Port %d is restricted and shouldn't be used by applications", port),
+		).WithField("port").WithSuggestion("Use a non-privileged port (1024-65535)")
 	}
 
 	return nil

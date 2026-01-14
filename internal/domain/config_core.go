@@ -9,35 +9,35 @@ import (
 )
 
 // SafeProjectConfig represents single source of truth for project configuration
-// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY
+// Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type SafeProjectConfig struct {
 	// Basic Information
-	ProjectName        string      `json:"project_name" yaml:"project_name"`
+	ProjectName        string      `json:"project_name"                  yaml:"project_name"`
 	ProjectDescription string      `json:"project_description,omitempty" yaml:"project_description,omitempty"`
-	ProjectType        ProjectType `json:"project_type" yaml:"project_type"`
-	BinaryName         string      `json:"binary_name" yaml:"binary_name"`
-	MainPath           string      `json:"main_path" yaml:"main_path"`
+	ProjectType        ProjectType `json:"project_type"                  yaml:"project_type"`
+	BinaryName         string      `json:"binary_name"                   yaml:"binary_name"`
+	MainPath           string      `json:"main_path"                     yaml:"main_path"`
 
 	// Build Configuration
-	Platforms     []Platform     `json:"platforms" yaml:"platforms"`
-	Architectures []Architecture `json:"architectures" yaml:"architectures"`
-	CGOStatus     CGOStatus      `json:"cgo_status" yaml:"cgo_status"`
+	Platforms     []Platform     `json:"platforms"            yaml:"platforms"`
+	Architectures []Architecture `json:"architectures"        yaml:"architectures"`
+	CGOStatus     CGOStatus      `json:"cgo_status"           yaml:"cgo_status"`
 	BuildTags     []BuildTag     `json:"build_tags,omitempty" yaml:"build_tags,omitempty"`
-	LDFlags       bool           `json:"ldflags" yaml:"ldflags"`
+	LDFlags       bool           `json:"ldflags"              yaml:"ldflags"`
 
 	// Release Configuration
-	GitProvider    GitProvider    `json:"git_provider" yaml:"git_provider"`
-	DockerSupport  DockerSupport  `json:"docker_support" yaml:"docker_support"`
-	DockerRegistry DockerRegistry `json:"docker_registry" yaml:"docker_registry"`
+	GitProvider    GitProvider    `json:"git_provider"           yaml:"git_provider"`
+	DockerSupport  DockerSupport  `json:"docker_support"         yaml:"docker_support"`
+	DockerRegistry DockerRegistry `json:"docker_registry"        yaml:"docker_registry"`
 	DockerImage    string         `json:"docker_image,omitempty" yaml:"docker_image,omitempty"`
-	SigningLevel   SigningLevel   `json:"signing_level" yaml:"signing_level"`
-	Homebrew       bool           `json:"homebrew" yaml:"homebrew"`
-	Snap           bool           `json:"snap" yaml:"snap"`
-	SBOM           bool           `json:"sbom" yaml:"sbom"`
+	SigningLevel   SigningLevel   `json:"signing_level"          yaml:"signing_level"`
+	Homebrew       bool           `json:"homebrew"               yaml:"homebrew"`
+	Snap           bool           `json:"snap"                   yaml:"snap"`
+	SBOM           bool           `json:"sbom"                   yaml:"sbom"`
 
 	// CI/CD Configuration
 	ActionLevel ActionLevel     `json:"action_level" yaml:"action_level"`
-	ActionsOn   []ActionTrigger `json:"actions_on" yaml:"actions_on"`
+	ActionsOn   []ActionTrigger `json:"actions_on"   yaml:"actions_on"`
 
 	// Advanced Features
 	FeatureLevel FeatureLevel `json:"feature_level" yaml:"feature_level"`
@@ -46,7 +46,7 @@ type SafeProjectConfig struct {
 	State ConfigState `json:"state" yaml:"state"`
 }
 
-// NewSafeProjectConfig creates a new safe configuration with smart defaults
+// NewSafeProjectConfig creates a new safe configuration with smart defaults.
 func NewSafeProjectConfig() *SafeProjectConfig {
 	return &SafeProjectConfig{
 		// Smart defaults based on project analysis
@@ -67,7 +67,7 @@ func NewSafeProjectConfig() *SafeProjectConfig {
 	}
 }
 
-// Validate validates the configuration
+// Validate validates the configuration.
 func (spc *SafeProjectConfig) Validate() error {
 	// Validate basic fields
 	if err := ValidateProjectName(spc.ProjectName); err != nil {
@@ -209,7 +209,7 @@ func (spc *SafeProjectConfig) Validate() error {
 	return spc.validateBusinessRules()
 }
 
-// validateBusinessRules validates business logic rules
+// validateBusinessRules validates business logic rules.
 func (spc *SafeProjectConfig) validateBusinessRules() error {
 	// Validate platform/architecture compatibility
 	if err := spc.validatePlatformArchCompatibility(); err != nil {
@@ -234,7 +234,7 @@ func (spc *SafeProjectConfig) validateBusinessRules() error {
 	return nil
 }
 
-// validatePlatformArchCompatibility validates platform/architecture compatibility
+// validatePlatformArchCompatibility validates platform/architecture compatibility.
 func (spc *SafeProjectConfig) validatePlatformArchCompatibility() error {
 	for _, platform := range spc.Platforms {
 		for _, arch := range spc.Architectures {
@@ -251,7 +251,7 @@ func (spc *SafeProjectConfig) validatePlatformArchCompatibility() error {
 	return nil
 }
 
-// validateDockerConfiguration validates Docker configuration
+// validateDockerConfiguration validates Docker configuration.
 func (spc *SafeProjectConfig) validateDockerConfiguration() error {
 	if spc.DockerSupport.IsEnabled() {
 		// Check if Docker is supported by project type
@@ -276,7 +276,7 @@ func (spc *SafeProjectConfig) validateDockerConfiguration() error {
 	return nil
 }
 
-// validateSigningConfiguration validates signing configuration
+// validateSigningConfiguration validates signing configuration.
 func (spc *SafeProjectConfig) validateSigningConfiguration() error {
 	if spc.SigningLevel.IsEnabled() {
 		// Check if required tools are available
@@ -295,7 +295,7 @@ func (spc *SafeProjectConfig) validateSigningConfiguration() error {
 	return nil
 }
 
-// validateActionsConfiguration validates Actions configuration
+// validateActionsConfiguration validates Actions configuration.
 func (spc *SafeProjectConfig) validateActionsConfiguration() error {
 	if spc.ActionLevel.IsEnabled() {
 		// Check if Git provider supports actions
@@ -320,7 +320,7 @@ func (spc *SafeProjectConfig) validateActionsConfiguration() error {
 	return nil
 }
 
-// Clone creates a deep copy of the configuration
+// Clone creates a deep copy of the configuration.
 func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 	clone := *spc
 
@@ -348,7 +348,7 @@ func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 	return &clone
 }
 
-// ToJSON converts configuration to JSON string
+// ToJSON converts configuration to JSON string.
 func (spc *SafeProjectConfig) ToJSON() (string, error) {
 	data, err := json.MarshalIndent(spc, "", "  ")
 	if err != nil {
@@ -361,7 +361,7 @@ func (spc *SafeProjectConfig) ToJSON() (string, error) {
 	return string(data), nil
 }
 
-// ToYAML converts configuration to YAML string
+// ToYAML converts configuration to YAML string.
 func (spc *SafeProjectConfig) ToYAML() (string, error) {
 	data, err := yaml.Marshal(spc)
 	if err != nil {
@@ -374,17 +374,17 @@ func (spc *SafeProjectConfig) ToYAML() (string, error) {
 	return string(data), nil
 }
 
-// FromJSON loads configuration from JSON string
+// FromJSON loads configuration from JSON string.
 func (spc *SafeProjectConfig) FromJSON(jsonStr string) error {
 	return json.Unmarshal([]byte(jsonStr), spc)
 }
 
-// FromYAML loads configuration from YAML string
+// FromYAML loads configuration from YAML string.
 func (spc *SafeProjectConfig) FromYAML(yamlStr string) error {
 	return yaml.Unmarshal([]byte(yamlStr), spc)
 }
 
-// GetSummary returns a summary of the configuration
+// GetSummary returns a summary of the configuration.
 func (spc *SafeProjectConfig) GetSummary() ConfigSummary {
 	return ConfigSummary{
 		ProjectName:    spc.ProjectName,
@@ -401,7 +401,7 @@ func (spc *SafeProjectConfig) GetSummary() ConfigSummary {
 	}
 }
 
-// ConfigSummary represents a summary of configuration
+// ConfigSummary represents a summary of configuration.
 type ConfigSummary struct {
 	ProjectName    string `json:"project_name"`
 	ProjectType    string `json:"project_type"`

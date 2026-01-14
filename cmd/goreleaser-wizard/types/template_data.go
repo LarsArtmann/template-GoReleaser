@@ -8,7 +8,7 @@ import (
 )
 
 // GoReleaserTemplateData represents strongly typed template data for GoReleaser configuration
-// Eliminates map[string]any usage for type safety
+// Eliminates map[string]any usage for type safety.
 type GoReleaserTemplateData struct {
 	// Project Information
 	ProjectName string `json:"project_name"`
@@ -39,7 +39,7 @@ type GoReleaserTemplateData struct {
 	Env map[string]string `json:"env"`
 }
 
-// GitHubActionsTemplateData represents strongly typed template data for GitHub Actions
+// GitHubActionsTemplateData represents strongly typed template data for GitHub Actions.
 type GitHubActionsTemplateData struct {
 	ProjectName    string   `json:"project_name"`
 	Triggers       []string `json:"triggers"`
@@ -49,13 +49,13 @@ type GitHubActionsTemplateData struct {
 	DockerImage    string   `json:"docker_image,omitempty"`
 }
 
-// PlatformIgnored represents platform/architecture combinations to ignore
+// PlatformIgnored represents platform/architecture combinations to ignore.
 type PlatformIgnored struct {
 	GoOS   string `json:"goos"`
 	GoArch string `json:"goarch"`
 }
 
-// DockerConfig represents Docker-specific configuration
+// DockerConfig represents Docker-specific configuration.
 type DockerConfig struct {
 	Enabled  bool   `json:"enabled"`
 	Registry string `json:"registry"`
@@ -64,7 +64,7 @@ type DockerConfig struct {
 	Password string `json:"password,omitempty"`
 }
 
-// SigningConfig represents code signing configuration
+// SigningConfig represents code signing configuration.
 type SigningConfig struct {
 	Enabled     bool   `json:"enabled"`
 	Level       string `json:"level"`
@@ -72,7 +72,7 @@ type SigningConfig struct {
 	Certificate string `json:"certificate,omitempty"`
 }
 
-// ValidationResult represents structured validation results
+// ValidationResult represents structured validation results.
 type ValidationResult struct {
 	IsValid  bool                 `json:"is_valid"`
 	Errors   []*ValidationError   `json:"errors"`
@@ -80,7 +80,7 @@ type ValidationResult struct {
 	Summary  ValidationSummary    `json:"summary"`
 }
 
-// ValidationError represents a structured validation error
+// ValidationError represents a structured validation error.
 type ValidationError struct {
 	Code       string `json:"code"`
 	Field      string `json:"field"`
@@ -90,7 +90,7 @@ type ValidationError struct {
 	Suggestion string `json:"suggestion,omitempty"`
 }
 
-// ValidationWarning represents a structured validation warning
+// ValidationWarning represents a structured validation warning.
 type ValidationWarning struct {
 	Code       string `json:"code"`
 	Field      string `json:"field"`
@@ -100,7 +100,7 @@ type ValidationWarning struct {
 	Suggestion string `json:"suggestion,omitempty"`
 }
 
-// ValidationSummary provides a summary of validation results
+// ValidationSummary provides a summary of validation results.
 type ValidationSummary struct {
 	TotalErrors   int `json:"total_errors"`
 	TotalWarnings int `json:"total_warnings"`
@@ -110,7 +110,7 @@ type ValidationSummary struct {
 	Low           int `json:"low"`
 }
 
-// JobExecutionResult represents the result of a job execution
+// JobExecutionResult represents the result of a job execution.
 type JobExecutionResult struct {
 	JobID    string      `json:"job_id"`
 	JobName  string      `json:"job_name"`
@@ -121,7 +121,7 @@ type JobExecutionResult struct {
 	Metadata JobMetadata `json:"metadata"`
 }
 
-// JobStatus represents the status of a job
+// JobStatus represents the status of a job.
 type JobStatus string
 
 const (
@@ -132,7 +132,7 @@ const (
 	JobStatusCancelled JobStatus = "cancelled"
 )
 
-// JobError represents a job execution error
+// JobError represents a job execution error.
 type JobError struct {
 	Code      string `json:"code"`
 	Message   string `json:"message"`
@@ -141,7 +141,7 @@ type JobError struct {
 	Retryable bool   `json:"retryable"`
 }
 
-// JobMetadata represents job execution metadata
+// JobMetadata represents job execution metadata.
 type JobMetadata struct {
 	StartedAt   string            `json:"started_at"`
 	CompletedAt string            `json:"completed_at,omitempty"`
@@ -149,7 +149,7 @@ type JobMetadata struct {
 	Tags        map[string]string `json:"tags,omitempty"`
 }
 
-// WorkflowState represents the state of a workflow
+// WorkflowState represents the state of a workflow.
 type WorkflowState struct {
 	WorkflowID   string                `json:"workflow_id"`
 	WorkflowName string                `json:"workflow_name"`
@@ -162,7 +162,7 @@ type WorkflowState struct {
 	Metadata     WorkflowMetadata      `json:"metadata"`
 }
 
-// WorkflowStatus represents the status of a workflow
+// WorkflowStatus represents the status of a workflow.
 type WorkflowStatus string
 
 const (
@@ -173,7 +173,7 @@ const (
 	WorkflowStatusCancelled WorkflowStatus = "cancelled"
 )
 
-// WorkflowMetadata represents workflow metadata
+// WorkflowMetadata represents workflow metadata.
 type WorkflowMetadata struct {
 	CreatedBy   string            `json:"created_by"`
 	Timeout     string            `json:"timeout"`
@@ -182,7 +182,7 @@ type WorkflowMetadata struct {
 	Tags        map[string]string `json:"tags,omitempty"`
 }
 
-// NewGoReleaserTemplateData creates typed template data from SafeProjectConfig
+// NewGoReleaserTemplateData creates typed template data from SafeProjectConfig.
 func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemplateData {
 	data := &GoReleaserTemplateData{
 		ProjectName: config.ProjectName,
@@ -238,7 +238,7 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 	return data
 }
 
-// NewGitHubActionsTemplateData creates typed template data from SafeProjectConfig
+// NewGitHubActionsTemplateData creates typed template data from SafeProjectConfig.
 func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActionsTemplateData {
 	data := &GitHubActionsTemplateData{
 		ProjectName:    config.ProjectName,
@@ -264,7 +264,7 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 	return data
 }
 
-// GetGitHubOwner tries to get GitHub owner from git remote
+// GetGitHubOwner tries to get GitHub owner from git remote.
 func GetGitHubOwner() string {
 	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
@@ -287,7 +287,7 @@ func GetGitHubOwner() string {
 	return "owner" // fallback
 }
 
-// GetGitHubRepo tries to get GitHub repo from git remote
+// GetGitHubRepo tries to get GitHub repo from git remote.
 func GetGitHubRepo() string {
 	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {

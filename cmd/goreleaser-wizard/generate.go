@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// runGenerate runs the generate command
+// runGenerate runs the generate command.
 func runGenerate(cmd *cobra.Command, args []string) {
 	defer recoverFromPanic("generate command")
 
@@ -68,9 +68,10 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	// Display results
 	results := workflow.GetResults()
 	for _, result := range results {
-		if result.Status == JobStatusCompleted {
+		switch result.Status {
+		case JobStatusCompleted:
 			fmt.Printf("%s %s completed successfully\n", successStyle.Render("✅"), result.Job.Name())
-		} else if result.Status == JobStatusFailed {
+		case JobStatusFailed:
 			fmt.Printf("%s %s failed: %v\n", errorStyle.Render("❌"), result.Job.Name(), result.Error)
 		}
 	}
@@ -91,7 +92,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	fmt.Println("  • Test configuration with 'goreleaser check'")
 }
 
-// generateFlags adds flags to the generate command
+// generateFlags adds flags to the generate command.
 func init() {
 	generateCmd.Flags().Bool("force", false, "force overwrite existing configuration")
 	generateCmd.Flags().Bool("config-only", false, "generate only GoReleaser configuration (no GitHub Actions)")

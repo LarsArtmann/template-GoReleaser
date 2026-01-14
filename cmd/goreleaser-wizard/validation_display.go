@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// displayValidationResults displays validation results to the user
+// displayValidationResults displays validation results to the user.
 func displayValidationResults(results *ValidationResults, verbose bool) {
 	fmt.Println("📋 Validation Summary:")
 	fmt.Println()

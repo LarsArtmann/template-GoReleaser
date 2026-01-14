@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Validation repository (would be injected in real implementation)
+// Validation repository (would be injected in real implementation).
 var fileSystemRepo FileSystemRepository
 
 var validateCmd = &cobra.Command{

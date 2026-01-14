@@ -291,7 +291,7 @@ func TestFormValidatorSetFieldError(t *testing.T) {
 	}
 }
 
-// Helper function to check if string contains substring
+// Helper function to check if string contains substring.
 func contains(s, substr string) bool {
 	return len(s) >= len(substr) &&
 		(s == substr ||

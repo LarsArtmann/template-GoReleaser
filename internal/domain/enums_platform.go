@@ -3,29 +3,29 @@ package domain
 import "fmt"
 
 // Platform represents supported operating systems
-// This enum replaces string-based platform types for type safety
+// This enum replaces string-based platform types for type safety.
 type Platform string
 
 const (
-	// PlatformLinux represents Linux distributions
+	// PlatformLinux represents Linux distributions.
 	PlatformLinux Platform = "linux"
-	// PlatformDarwin represents macOS (Apple)
+	// PlatformDarwin represents macOS (Apple).
 	PlatformDarwin Platform = "darwin"
-	// PlatformWindows represents Microsoft Windows
+	// PlatformWindows represents Microsoft Windows.
 	PlatformWindows Platform = "windows"
-	// PlatformFreeBSD represents FreeBSD
+	// PlatformFreeBSD represents FreeBSD.
 	PlatformFreeBSD Platform = "freebsd"
-	// PlatformOpenBSD represents OpenBSD
+	// PlatformOpenBSD represents OpenBSD.
 	PlatformOpenBSD Platform = "openbsd"
-	// PlatformNetBSD represents NetBSD
+	// PlatformNetBSD represents NetBSD.
 	PlatformNetBSD Platform = "netbsd"
-	// PlatformAndroid represents Android OS
+	// PlatformAndroid represents Android OS.
 	PlatformAndroid Platform = "android"
-	// PlatformIOS represents iOS (Apple mobile)
+	// PlatformIOS represents iOS (Apple mobile).
 	PlatformIOS Platform = "ios"
 )
 
-// IsValid returns true if Platform is valid
+// IsValid returns true if Platform is valid.
 func (p Platform) IsValid() bool {
 	switch p {
 	case PlatformLinux, PlatformDarwin, PlatformWindows,
@@ -37,7 +37,7 @@ func (p Platform) IsValid() bool {
 	}
 }
 
-// String returns human-readable display name
+// String returns human-readable display name.
 func (p Platform) String() string {
 	switch p {
 	case PlatformLinux:
@@ -61,7 +61,7 @@ func (p Platform) String() string {
 	}
 }
 
-// IsUnix returns true for Unix-like platforms
+// IsUnix returns true for Unix-like platforms.
 func (p Platform) IsUnix() bool {
 	switch p {
 	case PlatformLinux, PlatformDarwin, PlatformFreeBSD,
@@ -72,7 +72,7 @@ func (p Platform) IsUnix() bool {
 	}
 }
 
-// IsMobile returns true for mobile platforms
+// IsMobile returns true for mobile platforms.
 func (p Platform) IsMobile() bool {
 	switch p {
 	case PlatformAndroid, PlatformIOS:
@@ -82,17 +82,17 @@ func (p Platform) IsMobile() bool {
 	}
 }
 
-// IsDesktop returns true for desktop platforms
+// IsDesktop returns true for desktop platforms.
 func (p Platform) IsDesktop() bool {
 	return !p.IsMobile()
 }
 
-// IsWindows returns true for Windows platform
+// IsWindows returns true for Windows platform.
 func (p Platform) IsWindows() bool {
 	return p == PlatformWindows
 }
 
-// IsApple returns true for Apple platforms
+// IsApple returns true for Apple platforms.
 func (p Platform) IsApple() bool {
 	switch p {
 	case PlatformDarwin, PlatformIOS:
@@ -102,7 +102,7 @@ func (p Platform) IsApple() bool {
 	}
 }
 
-// SupportsCGO returns true if platform supports CGO
+// SupportsCGO returns true if platform supports CGO.
 func (p Platform) SupportsCGO() bool {
 	switch p {
 	case PlatformLinux, PlatformDarwin, PlatformWindows, PlatformFreeBSD:
@@ -116,7 +116,7 @@ func (p Platform) SupportsCGO() bool {
 	}
 }
 
-// GetDefaultArchitectures returns default architectures for platform
+// GetDefaultArchitectures returns default architectures for platform.
 func (p Platform) GetDefaultArchitectures() []Architecture {
 	switch p {
 	case PlatformLinux:
@@ -136,7 +136,7 @@ func (p Platform) GetDefaultArchitectures() []Architecture {
 	}
 }
 
-// GetPackageFormat returns preferred package format for platform
+// GetPackageFormat returns preferred package format for platform.
 func (p Platform) GetPackageFormat() string {
 	switch p {
 	case PlatformLinux:
@@ -152,7 +152,7 @@ func (p Platform) GetPackageFormat() string {
 	}
 }
 
-// GetBinaryExtension returns binary extension for platform
+// GetBinaryExtension returns binary extension for platform.
 func (p Platform) GetBinaryExtension() string {
 	switch p {
 	case PlatformWindows:
@@ -162,7 +162,7 @@ func (p Platform) GetBinaryExtension() string {
 	}
 }
 
-// IsProductionReady returns true if platform is production-ready
+// IsProductionReady returns true if platform is production-ready.
 func (p Platform) IsProductionReady() bool {
 	switch p {
 	case PlatformLinux, PlatformDarwin, PlatformWindows:
@@ -178,7 +178,7 @@ func (p Platform) IsProductionReady() bool {
 	}
 }
 
-// ValidatePlatform validates a platform
+// ValidatePlatform validates a platform.
 func ValidatePlatform(platform Platform) error {
 	if !platform.IsValid() {
 		return NewValidationError(
@@ -190,7 +190,7 @@ func ValidatePlatform(platform Platform) error {
 	return nil
 }
 
-// GetRecommendedPlatforms returns recommended platforms for projects
+// GetRecommendedPlatforms returns recommended platforms for projects.
 func GetRecommendedPlatforms() []Platform {
 	return []Platform{
 		PlatformLinux,   // Primary server platform

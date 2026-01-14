@@ -7,21 +7,21 @@ import (
 	"strings"
 )
 
-// Security validation patterns
+// Security validation patterns.
 var (
-	// Project name pattern: alphanumeric, hyphens, underscores, dots, starts and ends with alphanumeric
+	// Project name pattern: alphanumeric, hyphens, underscores, dots, starts and ends with alphanumeric.
 	projectNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9\-._]*[a-zA-Z0-9]$`)
 
-	// Binary name pattern: more restrictive, no special characters that could cause issues
+	// Binary name pattern: more restrictive, no special characters that could cause issues.
 	binaryNamePattern = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9\-_]*[a-zA-Z0-9]$`)
 
-	// Path traversal detection
+	// Path traversal detection.
 	pathTraversalPattern = regexp.MustCompile(`\.\.[/\\]`)
 
-	// Shell metacharacters that could be dangerous
+	// Shell metacharacters that could be dangerous.
 	shellMetacharPattern = regexp.MustCompile(`[;&|<>"'$` + "`" + `\\]`)
 
-	// Reserved names (OS-specific and Go-specific)
+	// Reserved names (OS-specific and Go-specific).
 	reservedNames = map[string]bool{
 		// Windows reserved
 		"con": true, "prn": true, "aux": true, "nul": true,
@@ -42,7 +42,7 @@ var (
 		"mnt": true, "media": true, "run": true,
 	}
 
-	// Dangerous file extensions
+	// Dangerous file extensions.
 	dangerousExtensions = map[string]bool{
 		".exe": true, ".bat": true, ".cmd": true, ".com": true, ".pif": true,
 		".scr": true, ".vbs": true, ".js": true, ".jar": true, ".sh": true,
@@ -50,25 +50,25 @@ var (
 	}
 )
 
-// ValidateProjectName validates project name according to security rules
+// ValidateProjectName validates project name according to security rules.
 func ValidateProjectName(name string) error {
 	if name == "" {
-		return fmt.Errorf("project name cannot be empty")
+		return errors.New("project name cannot be empty")
 	}
 
 	if len(name) < 1 || len(name) > 63 {
-		return fmt.Errorf("project name must be 1-63 characters long")
+		return errors.New("project name must be 1-63 characters long")
 	}
 
 	// Check for consecutive special characters
 	if strings.Contains(name, "--") || strings.Contains(name, "__") ||
 		strings.Contains(name, "..") || strings.Contains(name, "__") {
-		return fmt.Errorf("project name cannot contain consecutive special characters")
+		return errors.New("project name cannot contain consecutive special characters")
 	}
 
 	// Validate pattern
 	if !projectNamePattern.MatchString(name) {
-		return fmt.Errorf("project name contains invalid characters. Use letters, numbers, hyphens, underscores, and dots")
+		return errors.New("project name contains invalid characters. Use letters, numbers, hyphens, underscores, and dots")
 	}
 
 	// Check for reserved names (case-insensitive)
@@ -79,39 +79,39 @@ func ValidateProjectName(name string) error {
 
 	// Check for dangerous patterns
 	if strings.HasPrefix(name, ".") || strings.HasPrefix(name, "-") {
-		return fmt.Errorf("project name cannot start with special characters")
+		return errors.New("project name cannot start with special characters")
 	}
 
 	if strings.HasSuffix(name, ".") || strings.HasSuffix(name, "-") {
-		return fmt.Errorf("project name cannot end with special characters")
+		return errors.New("project name cannot end with special characters")
 	}
 
 	return nil
 }
 
-// ValidateBinaryName validates binary name with strict security rules
+// ValidateBinaryName validates binary name with strict security rules.
 func ValidateBinaryName(name string) error {
 	if name == "" {
-		return fmt.Errorf("binary name cannot be empty")
+		return errors.New("binary name cannot be empty")
 	}
 
 	if len(name) < 1 || len(name) > 255 {
-		return fmt.Errorf("binary name must be 1-255 characters long")
+		return errors.New("binary name must be 1-255 characters long")
 	}
 
 	// No spaces or shell metacharacters
 	if shellMetacharPattern.MatchString(name) {
-		return fmt.Errorf("binary name contains dangerous characters")
+		return errors.New("binary name contains dangerous characters")
 	}
 
 	// Must be valid filename on all platforms
 	if strings.ContainsAny(name, `<>:"/\|?*`) {
-		return fmt.Errorf("binary name contains invalid filename characters")
+		return errors.New("binary name contains invalid filename characters")
 	}
 
 	// Validate pattern
 	if !binaryNamePattern.MatchString(name) {
-		return fmt.Errorf("binary name must start with a letter and contain only letters, numbers, hyphens, and underscores")
+		return errors.New("binary name must start with a letter and contain only letters, numbers, hyphens, and underscores")
 	}
 
 	// Check for reserved names (case-insensitive)
@@ -129,20 +129,20 @@ func ValidateBinaryName(name string) error {
 	return nil
 }
 
-// ValidateMainPath validates the main package path with security checks
+// ValidateMainPath validates the main package path with security checks.
 func ValidateMainPath(path string) error {
 	if path == "" {
-		return fmt.Errorf("main path cannot be empty")
+		return errors.New("main path cannot be empty")
 	}
 
 	// No path traversal attacks
 	if pathTraversalPattern.MatchString(path) {
-		return fmt.Errorf("path traversal not allowed")
+		return errors.New("path traversal not allowed")
 	}
 
 	// No absolute paths
 	if filepath.IsAbs(path) {
-		return fmt.Errorf("absolute paths not allowed")
+		return errors.New("absolute paths not allowed")
 	}
 
 	// Clean the path
@@ -150,12 +150,12 @@ func ValidateMainPath(path string) error {
 
 	// Check for dangerous patterns
 	if strings.Contains(cleanPath, "..") {
-		return fmt.Errorf("path traversal not allowed")
+		return errors.New("path traversal not allowed")
 	}
 
 	// Check for shell metacharacters
 	if shellMetacharPattern.MatchString(cleanPath) {
-		return fmt.Errorf("path contains dangerous characters")
+		return errors.New("path contains dangerous characters")
 	}
 
 	// Validate path doesn't point to system directories
@@ -172,20 +172,20 @@ func ValidateMainPath(path string) error {
 	return nil
 }
 
-// ValidateProjectDescription validates project description
+// ValidateProjectDescription validates project description.
 func ValidateProjectDescription(desc string) error {
 	if len(desc) > 255 {
-		return fmt.Errorf("project description must be 255 characters or less")
+		return errors.New("project description must be 255 characters or less")
 	}
 
 	// Check for HTML/markdown injection attempts
 	if strings.Contains(desc, "<script") || strings.Contains(desc, "javascript:") {
-		return fmt.Errorf("description contains potentially dangerous content")
+		return errors.New("description contains potentially dangerous content")
 	}
 
 	// Check for excessive length that might indicate injection
 	if len(strings.TrimSpace(desc)) == 0 && len(desc) > 100 {
-		return fmt.Errorf("description contains suspicious content")
+		return errors.New("description contains suspicious content")
 	}
 
 	return nil

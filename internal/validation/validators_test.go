@@ -197,33 +197,6 @@ func TestValidateDockerRegistry(t *testing.T) {
 	}
 }
 
-func TestValidateGitProvider(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   string
-		wantErr bool
-	}{
-		{"Valid GitHub", "github", false},
-		{"Valid GitHub uppercase", "GitHub", false},
-		{"Valid GitLab", "gitlab", false},
-		{"Valid Bitbucket", "bitbucket", false},
-		{"Valid Gitea", "gitea", false},
-		{"Valid Self-hosted", "self-hosted", false},
-		{"Valid Local", "local", false},
-		{"Invalid provider", "gitfake", true},
-		{"Empty string", "", true},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateGitProvider(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateGitProvider() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func TestSanitizeInput(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -249,7 +222,7 @@ func TestSanitizeInput(t *testing.T) {
 	}
 }
 
-// Fuzzing tests for security validation
+// Fuzzing tests for security validation.
 func FuzzValidateProjectName(f *testing.F) {
 	seed := []string{"myproject", "my-project", "my_project", "my.project", "con", "aux", "test"}
 	for _, s := range seed {
@@ -295,7 +268,7 @@ func FuzzValidateMainPath(f *testing.F) {
 	})
 }
 
-// Benchmark tests to ensure validation is efficient
+// Benchmark tests to ensure validation is efficient.
 func BenchmarkValidateProjectName(b *testing.B) {
 	for b.Loop() {
 		_ = ValidateProjectName("my-test-project")

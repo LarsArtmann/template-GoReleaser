@@ -171,7 +171,7 @@ func TestCheckFileExists(t *testing.T) {
 			requireDir: false,
 			wantErr:    false,
 			setupFunc: func() string {
-				file, _ := os.CreateTemp("", "wizard-test-file")
+				file, _ := os.CreateTemp(t.TempDir(), "wizard-test-file")
 				file.Close()
 				return file.Name()
 			},
@@ -198,7 +198,7 @@ func TestCheckFileExists(t *testing.T) {
 			wantErr:     true,
 			errContains: "Expected directory",
 			setupFunc: func() string {
-				file, _ := os.CreateTemp("", "wizard-test-file")
+				file, _ := os.CreateTemp(t.TempDir(), "wizard-test-file")
 				file.Close()
 				return file.Name()
 			},

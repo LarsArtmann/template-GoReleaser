@@ -1,6 +1,6 @@
 package domain
 
-// IsCompatibleWith returns true if architecture is compatible with platform
+// IsCompatibleWith returns true if architecture is compatible with platform.
 func (a Architecture) IsCompatibleWith(platform Platform) bool {
 	// Basic compatibility checks
 	switch platform {

@@ -5,19 +5,19 @@ import (
 	"strings"
 )
 
-// FormValidator provides validation functions for huh forms
+// FormValidator provides validation functions for huh forms.
 type FormValidator struct {
 	errors map[string]string
 }
 
-// NewFormValidator creates a new form validator
+// NewFormValidator creates a new form validator.
 func NewFormValidator() *FormValidator {
 	return &FormValidator{
 		errors: make(map[string]string),
 	}
 }
 
-// ValidateProjectName creates a huh-compatible validator for project names
+// ValidateProjectName creates a huh-compatible validator for project names.
 func (fv *FormValidator) ValidateProjectName() func(string) error {
 	return func(value string) error {
 		if err := ValidateProjectName(value); err != nil {
@@ -29,7 +29,7 @@ func (fv *FormValidator) ValidateProjectName() func(string) error {
 	}
 }
 
-// ValidateBinaryName creates a huh-compatible validator for binary names
+// ValidateBinaryName creates a huh-compatible validator for binary names.
 func (fv *FormValidator) ValidateBinaryName() func(string) error {
 	return func(value string) error {
 		if err := ValidateBinaryName(value); err != nil {
@@ -41,7 +41,7 @@ func (fv *FormValidator) ValidateBinaryName() func(string) error {
 	}
 }
 
-// ValidateMainPath creates a huh-compatible validator for main path
+// ValidateMainPath creates a huh-compatible validator for main path.
 func (fv *FormValidator) ValidateMainPath() func(string) error {
 	return func(value string) error {
 		if err := ValidateMainPath(value); err != nil {
@@ -53,7 +53,7 @@ func (fv *FormValidator) ValidateMainPath() func(string) error {
 	}
 }
 
-// ValidateProjectDescription creates a huh-compatible validator for project description
+// ValidateProjectDescription creates a huh-compatible validator for project description.
 func (fv *FormValidator) ValidateProjectDescription() func(string) error {
 	return func(value string) error {
 		if err := ValidateProjectDescription(value); err != nil {
@@ -65,7 +65,7 @@ func (fv *FormValidator) ValidateProjectDescription() func(string) error {
 	}
 }
 
-// ValidateDockerRegistry creates a huh-compatible validator for Docker registry
+// ValidateDockerRegistry creates a huh-compatible validator for Docker registry.
 func (fv *FormValidator) ValidateDockerRegistry() func(string) error {
 	return func(value string) error {
 		if err := ValidateDockerRegistry(value); err != nil {
@@ -77,7 +77,7 @@ func (fv *FormValidator) ValidateDockerRegistry() func(string) error {
 	}
 }
 
-// ValidateBuildTags creates a huh-compatible validator for build tags
+// ValidateBuildTags creates a huh-compatible validator for build tags.
 func (fv *FormValidator) ValidateBuildTags(tags []string) error {
 	if err := ValidateBuildTags(tags); err != nil {
 		fv.errors["build_tags"] = err.Error()
@@ -87,17 +87,17 @@ func (fv *FormValidator) ValidateBuildTags(tags []string) error {
 	return nil
 }
 
-// GetErrors returns all current validation errors
+// GetErrors returns all current validation errors.
 func (fv *FormValidator) GetErrors() map[string]string {
 	return fv.errors
 }
 
-// HasErrors returns true if there are validation errors
+// HasErrors returns true if there are validation errors.
 func (fv *FormValidator) HasErrors() bool {
 	return len(fv.errors) > 0
 }
 
-// GetErrorSummary returns a formatted summary of all errors
+// GetErrorSummary returns a formatted summary of all errors.
 func (fv *FormValidator) GetErrorSummary() string {
 	if !fv.HasErrors() {
 		return ""
@@ -111,12 +111,12 @@ func (fv *FormValidator) GetErrorSummary() string {
 	return "Validation errors:\n" + strings.Join(errors, "\n")
 }
 
-// ClearErrors clears all current validation errors
+// ClearErrors clears all current validation errors.
 func (fv *FormValidator) ClearErrors() {
 	fv.errors = make(map[string]string)
 }
 
-// SanitizeAndValidate sanitizes input and validates it
+// SanitizeAndValidate sanitizes input and validates it.
 func (fv *FormValidator) SanitizeAndValidate(input string, validator func(string) error) (string, error) {
 	// First sanitize the input
 	sanitized := SanitizeInput(input)
@@ -129,17 +129,17 @@ func (fv *FormValidator) SanitizeAndValidate(input string, validator func(string
 	return sanitized, nil
 }
 
-// GetFieldError gets a specific field error
+// GetFieldError gets a specific field error.
 func (fv *FormValidator) GetFieldError(field string) string {
 	return fv.errors[field]
 }
 
-// SetFieldError manually sets a field error
+// SetFieldError manually sets a field error.
 func (fv *FormValidator) SetFieldError(field, message string) {
 	fv.errors[field] = message
 }
 
-// ValidateRequired validates that a field is not empty
+// ValidateRequired validates that a field is not empty.
 func (fv *FormValidator) ValidateRequired(fieldName string) func(string) error {
 	return func(value string) error {
 		if strings.TrimSpace(value) == "" {
@@ -152,7 +152,7 @@ func (fv *FormValidator) ValidateRequired(fieldName string) func(string) error {
 	}
 }
 
-// ValidateLength validates string length within bounds
+// ValidateLength validates string length within bounds.
 func (fv *FormValidator) ValidateLength(min, max int, fieldName string) func(string) error {
 	return func(value string) error {
 		length := len(strings.TrimSpace(value))
@@ -166,7 +166,7 @@ func (fv *FormValidator) ValidateLength(min, max int, fieldName string) func(str
 	}
 }
 
-// ValidateNoShellMetacharacters validates that input doesn't contain shell metacharacters
+// ValidateNoShellMetacharacters validates that input doesn't contain shell metacharacters.
 func (fv *FormValidator) ValidateNoShellMetacharacters(fieldName string) func(string) error {
 	return func(value string) error {
 		if shellMetacharPattern.MatchString(value) {
@@ -179,7 +179,7 @@ func (fv *FormValidator) ValidateNoShellMetacharacters(fieldName string) func(st
 	}
 }
 
-// ValidateNoPathTraversal validates that input doesn't contain path traversal
+// ValidateNoPathTraversal validates that input doesn't contain path traversal.
 func (fv *FormValidator) ValidateNoPathTraversal(fieldName string) func(string) error {
 	return func(value string) error {
 		if pathTraversalPattern.MatchString(value) {

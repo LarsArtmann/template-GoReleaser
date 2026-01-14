@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// SimpleFileSystemRepository is a basic implementation for demonstration
+// SimpleFileSystemRepository is a basic implementation for demonstration.
 type SimpleFileSystemRepository struct{}
 
 func (r *SimpleFileSystemRepository) ReadFile(ctx context.Context, path string) ([]byte, error) {

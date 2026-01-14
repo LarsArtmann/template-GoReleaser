@@ -9,7 +9,7 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// ValidationResult represents structured validation results
+// ValidationResult represents structured validation results.
 type ValidationResult struct {
 	IsValid  bool                 `json:"is_valid"`
 	Errors   []*ValidationError   `json:"errors"`
@@ -17,38 +17,38 @@ type ValidationResult struct {
 	Summary  ValidationSummary    `json:"summary"`
 }
 
-// AddError adds an error to the validation result
+// AddError adds an error to the validation result.
 func (vr *ValidationResult) AddError(err *ValidationError) {
 	vr.Errors = append(vr.Errors, err)
 	vr.IsValid = false
 }
 
-// AddWarning adds a warning to the validation result
+// AddWarning adds a warning to the validation result.
 func (vr *ValidationResult) AddWarning(warn *ValidationWarning) {
 	vr.Warnings = append(vr.Warnings, warn)
 }
 
-// HasErrors returns true if there are errors
+// HasErrors returns true if there are errors.
 func (vr *ValidationResult) HasErrors() bool {
 	return len(vr.Errors) > 0
 }
 
-// HasWarnings returns true if there are warnings
+// HasWarnings returns true if there are warnings.
 func (vr *ValidationResult) HasWarnings() bool {
 	return len(vr.Warnings) > 0
 }
 
-// GetErrorCount returns the number of errors
+// GetErrorCount returns the number of errors.
 func (vr *ValidationResult) GetErrorCount() int {
 	return len(vr.Errors)
 }
 
-// GetWarningCount returns the number of warnings
+// GetWarningCount returns the number of warnings.
 func (vr *ValidationResult) GetWarningCount() int {
 	return len(vr.Warnings)
 }
 
-// GetCriticalErrors returns critical errors
+// GetCriticalErrors returns critical errors.
 func (vr *ValidationResult) GetCriticalErrors() []*ValidationError {
 	var critical []*ValidationError
 	for _, err := range vr.Errors {
@@ -59,7 +59,7 @@ func (vr *ValidationResult) GetCriticalErrors() []*ValidationError {
 	return critical
 }
 
-// GetHighErrors returns high-severity errors
+// GetHighErrors returns high-severity errors.
 func (vr *ValidationResult) GetHighErrors() []*ValidationError {
 	var high []*ValidationError
 	for _, err := range vr.Errors {
@@ -70,7 +70,7 @@ func (vr *ValidationResult) GetHighErrors() []*ValidationError {
 	return high
 }
 
-// GetMediumErrors returns medium-severity errors
+// GetMediumErrors returns medium-severity errors.
 func (vr *ValidationResult) GetMediumErrors() []*ValidationError {
 	var medium []*ValidationError
 	for _, err := range vr.Errors {
@@ -81,7 +81,7 @@ func (vr *ValidationResult) GetMediumErrors() []*ValidationError {
 	return medium
 }
 
-// GetLowErrors returns low-severity errors
+// GetLowErrors returns low-severity errors.
 func (vr *ValidationResult) GetLowErrors() []*ValidationError {
 	var low []*ValidationError
 	for _, err := range vr.Errors {
@@ -92,7 +92,7 @@ func (vr *ValidationResult) GetLowErrors() []*ValidationError {
 	return low
 }
 
-// GetHighWarnings returns high-severity warnings
+// GetHighWarnings returns high-severity warnings.
 func (vr *ValidationResult) GetHighWarnings() []*ValidationWarning {
 	var high []*ValidationWarning
 	for _, warn := range vr.Warnings {
@@ -103,7 +103,7 @@ func (vr *ValidationResult) GetHighWarnings() []*ValidationWarning {
 	return high
 }
 
-// GetMediumWarnings returns medium-severity warnings
+// GetMediumWarnings returns medium-severity warnings.
 func (vr *ValidationResult) GetMediumWarnings() []*ValidationWarning {
 	var medium []*ValidationWarning
 	for _, warn := range vr.Warnings {
@@ -114,7 +114,7 @@ func (vr *ValidationResult) GetMediumWarnings() []*ValidationWarning {
 	return medium
 }
 
-// GetLowWarnings returns low-severity warnings
+// GetLowWarnings returns low-severity warnings.
 func (vr *ValidationResult) GetLowWarnings() []*ValidationWarning {
 	var low []*ValidationWarning
 	for _, warn := range vr.Warnings {
@@ -125,7 +125,7 @@ func (vr *ValidationResult) GetLowWarnings() []*ValidationWarning {
 	return low
 }
 
-// GetErrorsByField returns errors grouped by field
+// GetErrorsByField returns errors grouped by field.
 func (vr *ValidationResult) GetErrorsByField() map[string][]*ValidationError {
 	fieldErrors := make(map[string][]*ValidationError)
 	for _, err := range vr.Errors {
@@ -138,7 +138,7 @@ func (vr *ValidationResult) GetErrorsByField() map[string][]*ValidationError {
 	return fieldErrors
 }
 
-// GetWarningsByField returns warnings grouped by field
+// GetWarningsByField returns warnings grouped by field.
 func (vr *ValidationResult) GetWarningsByField() map[string][]*ValidationWarning {
 	fieldWarnings := make(map[string][]*ValidationWarning)
 	for _, warn := range vr.Warnings {
@@ -151,7 +151,7 @@ func (vr *ValidationResult) GetWarningsByField() map[string][]*ValidationWarning
 	return fieldWarnings
 }
 
-// GetErrorsByCode returns errors grouped by error code
+// GetErrorsByCode returns errors grouped by error code.
 func (vr *ValidationResult) GetErrorsByCode() map[errors.ErrorCode][]*ValidationError {
 	codeErrors := make(map[errors.ErrorCode][]*ValidationError)
 	for _, err := range vr.Errors {
@@ -160,7 +160,7 @@ func (vr *ValidationResult) GetErrorsByCode() map[errors.ErrorCode][]*Validation
 	return codeErrors
 }
 
-// GetWarningsByCode returns warnings grouped by warning code
+// GetWarningsByCode returns warnings grouped by warning code.
 func (vr *ValidationResult) GetWarningsByCode() map[string][]*ValidationWarning {
 	codeWarnings := make(map[string][]*ValidationWarning)
 	for _, warn := range vr.Warnings {
@@ -169,7 +169,7 @@ func (vr *ValidationResult) GetWarningsByCode() map[string][]*ValidationWarning 
 	return codeWarnings
 }
 
-// UpdateSummary updates the validation summary
+// UpdateSummary updates the validation summary.
 func (vr *ValidationResult) UpdateSummary() {
 	vr.Summary = ValidationSummary{
 		TotalErrors:    len(vr.Errors),
@@ -184,7 +184,7 @@ func (vr *ValidationResult) UpdateSummary() {
 	}
 }
 
-// String returns a human-readable string representation
+// String returns a human-readable string representation.
 func (vr *ValidationResult) String() string {
 	var result strings.Builder
 
@@ -199,7 +199,7 @@ func (vr *ValidationResult) String() string {
 		for _, err := range vr.Errors {
 			result.WriteString(fmt.Sprintf("\n  • [%s] %s: %s", err.Level, err.Field, err.Message))
 			if err.Suggestion != "" {
-				result.WriteString(fmt.Sprintf("\n    💡 %s", err.Suggestion))
+				result.WriteString("\n    💡 " + err.Suggestion)
 			}
 		}
 	}
@@ -209,7 +209,7 @@ func (vr *ValidationResult) String() string {
 		for _, warn := range vr.Warnings {
 			result.WriteString(fmt.Sprintf("\n  • [%s] %s: %s", warn.Level, warn.Field, warn.Message))
 			if warn.Suggestion != "" {
-				result.WriteString(fmt.Sprintf("\n    💡 %s", warn.Suggestion))
+				result.WriteString("\n    💡 " + warn.Suggestion)
 			}
 		}
 	}
@@ -217,12 +217,12 @@ func (vr *ValidationResult) String() string {
 	return result.String()
 }
 
-// ToJSON converts validation result to JSON
+// ToJSON converts validation result to JSON.
 func (vr *ValidationResult) ToJSON() ([]byte, error) {
 	return json.MarshalIndent(vr, "", "  ")
 }
 
-// Merge merges another validation result into this one
+// Merge merges another validation result into this one.
 func (vr *ValidationResult) Merge(other *ValidationResult) {
 	vr.Errors = append(vr.Errors, other.Errors...)
 	vr.Warnings = append(vr.Warnings, other.Warnings...)
@@ -234,7 +234,7 @@ func (vr *ValidationResult) Merge(other *ValidationResult) {
 	vr.UpdateSummary()
 }
 
-// Clone creates a deep copy of the validation result
+// Clone creates a deep copy of the validation result.
 func (vr *ValidationResult) Clone() *ValidationResult {
 	clone := &ValidationResult{
 		IsValid:  vr.IsValid,
@@ -272,7 +272,7 @@ func (vr *ValidationResult) Clone() *ValidationResult {
 	return clone
 }
 
-// ValidationError represents a structured validation error
+// ValidationError represents a structured validation error.
 type ValidationError struct {
 	Code       errors.ErrorCode `json:"code"`
 	Field      string           `json:"field"`
@@ -283,7 +283,7 @@ type ValidationError struct {
 	Suggestion string           `json:"suggestion,omitempty"`
 }
 
-// Error implements the error interface
+// Error implements the error interface.
 func (ve *ValidationError) Error() string {
 	if ve.Context != "" {
 		return fmt.Sprintf("[%s] %s: %s (%s)", ve.Code, ve.Field, ve.Message, ve.Context)
@@ -291,25 +291,25 @@ func (ve *ValidationError) Error() string {
 	return fmt.Sprintf("[%s] %s: %s", ve.Code, ve.Field, ve.Message)
 }
 
-// WithContext adds context to the validation error
+// WithContext adds context to the validation error.
 func (ve *ValidationError) WithContext(context string) *ValidationError {
 	ve.Context = context
 	return ve
 }
 
-// WithDetails adds details to the validation error
+// WithDetails adds details to the validation error.
 func (ve *ValidationError) WithDetails(details string) *ValidationError {
 	ve.Details = details
 	return ve
 }
 
-// WithSuggestion adds suggestion to the validation error
+// WithSuggestion adds suggestion to the validation error.
 func (ve *ValidationError) WithSuggestion(suggestion string) *ValidationError {
 	ve.Suggestion = suggestion
 	return ve
 }
 
-// ValidationWarning represents a structured validation warning
+// ValidationWarning represents a structured validation warning.
 type ValidationWarning struct {
 	Code       string       `json:"code"`
 	Field      string       `json:"field"`
@@ -320,7 +320,7 @@ type ValidationWarning struct {
 	Suggestion string       `json:"suggestion,omitempty"`
 }
 
-// String returns a string representation of the warning
+// String returns a string representation of the warning.
 func (vw *ValidationWarning) String() string {
 	if vw.Context != "" {
 		return fmt.Sprintf("[%s] %s: %s (%s)", vw.Code, vw.Field, vw.Message, vw.Context)
@@ -328,25 +328,25 @@ func (vw *ValidationWarning) String() string {
 	return fmt.Sprintf("[%s] %s: %s", vw.Code, vw.Field, vw.Message)
 }
 
-// WithContext adds context to the validation warning
+// WithContext adds context to the validation warning.
 func (vw *ValidationWarning) WithContext(context string) *ValidationWarning {
 	vw.Context = context
 	return vw
 }
 
-// WithDetails adds details to the validation warning
+// WithDetails adds details to the validation warning.
 func (vw *ValidationWarning) WithDetails(details string) *ValidationWarning {
 	vw.Details = details
 	return vw
 }
 
-// WithSuggestion adds suggestion to the validation warning
+// WithSuggestion adds suggestion to the validation warning.
 func (vw *ValidationWarning) WithSuggestion(suggestion string) *ValidationWarning {
 	vw.Suggestion = suggestion
 	return vw
 }
 
-// ValidationSummary provides a summary of validation results
+// ValidationSummary provides a summary of validation results.
 type ValidationSummary struct {
 	TotalErrors    int `json:"total_errors"`
 	TotalWarnings  int `json:"total_warnings"`
@@ -359,7 +359,7 @@ type ValidationSummary struct {
 	LowWarnings    int `json:"low_warnings"`
 }
 
-// GetScore returns a validation score (0-100)
+// GetScore returns a validation score (0-100).
 func (vs *ValidationSummary) GetScore() int {
 	if vs.TotalErrors > 0 {
 		return 0
@@ -382,7 +382,7 @@ func (vs *ValidationSummary) GetScore() int {
 	return score
 }
 
-// GetGrade returns a validation grade
+// GetGrade returns a validation grade.
 func (vs *ValidationSummary) GetGrade() string {
 	score := vs.GetScore()
 
@@ -411,7 +411,7 @@ func (vs *ValidationSummary) GetGrade() string {
 	}
 }
 
-// GetStatus returns a validation status
+// GetStatus returns a validation status.
 func (vs *ValidationSummary) GetStatus() ValidationStatus {
 	if vs.TotalErrors > 0 {
 		return ValidationStatusFailed
@@ -432,7 +432,7 @@ func (vs *ValidationSummary) GetStatus() ValidationStatus {
 	return ValidationStatusPassed
 }
 
-// ValidationStatus represents validation status
+// ValidationStatus represents validation status.
 type ValidationStatus string
 
 const (
@@ -443,12 +443,12 @@ const (
 	ValidationStatusFailed   ValidationStatus = "failed"
 )
 
-// String returns string representation
+// String returns string representation.
 func (vs ValidationStatus) String() string {
 	return string(vs)
 }
 
-// GetIcon returns an icon for the status
+// GetIcon returns an icon for the status.
 func (vs ValidationStatus) GetIcon() string {
 	switch vs {
 	case ValidationStatusPassed:
@@ -466,7 +466,7 @@ func (vs ValidationStatus) GetIcon() string {
 	}
 }
 
-// GetColor returns a color for the status
+// GetColor returns a color for the status.
 func (vs ValidationStatus) GetColor() string {
 	switch vs {
 	case ValidationStatusPassed:
@@ -484,7 +484,7 @@ func (vs ValidationStatus) GetColor() string {
 	}
 }
 
-// ErrorLevel represents error severity levels
+// ErrorLevel represents error severity levels.
 type ErrorLevel string
 
 const (
@@ -494,12 +494,12 @@ const (
 	ErrorLevelLow      ErrorLevel = "low"
 )
 
-// String returns string representation
+// String returns string representation.
 func (el ErrorLevel) String() string {
 	return string(el)
 }
 
-// GetPriority returns numeric priority for sorting
+// GetPriority returns numeric priority for sorting.
 func (el ErrorLevel) GetPriority() int {
 	switch el {
 	case ErrorLevelCritical:
@@ -515,7 +515,7 @@ func (el ErrorLevel) GetPriority() int {
 	}
 }
 
-// WarningLevel represents warning severity levels
+// WarningLevel represents warning severity levels.
 type WarningLevel string
 
 const (
@@ -524,12 +524,12 @@ const (
 	WarningLevelLow    WarningLevel = "low"
 )
 
-// String returns string representation
+// String returns string representation.
 func (wl WarningLevel) String() string {
 	return string(wl)
 }
 
-// GetPriority returns numeric priority for sorting
+// GetPriority returns numeric priority for sorting.
 func (wl WarningLevel) GetPriority() int {
 	switch wl {
 	case WarningLevelHigh:
@@ -543,7 +543,7 @@ func (wl WarningLevel) GetPriority() int {
 	}
 }
 
-// ValidationFilter represents filters for validation results
+// ValidationFilter represents filters for validation results.
 type ValidationFilter struct {
 	Fields        []string           `json:"fields,omitempty"`
 	Levels        []ErrorLevel       `json:"error_levels,omitempty"`
@@ -554,7 +554,7 @@ type ValidationFilter struct {
 	MinScore      int                `json:"min_score,omitempty"`
 }
 
-// Filter applies the filter to a validation result
+// Filter applies the filter to a validation result.
 func (f *ValidationFilter) Filter(result *ValidationResult) *ValidationResult {
 	filtered := &ValidationResult{
 		IsValid:  result.IsValid,
@@ -580,7 +580,7 @@ func (f *ValidationFilter) Filter(result *ValidationResult) *ValidationResult {
 	return filtered
 }
 
-// matchesError checks if an error matches the filter criteria
+// matchesError checks if an error matches the filter criteria.
 func (f *ValidationFilter) matchesError(err *ValidationError) bool {
 	// Check fields
 	if len(f.Fields) > 0 && !contains(f.Fields, err.Field) {
@@ -605,7 +605,7 @@ func (f *ValidationFilter) matchesError(err *ValidationError) bool {
 	return true
 }
 
-// matchesWarning checks if a warning matches the filter criteria
+// matchesWarning checks if a warning matches the filter criteria.
 func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
 	// Check fields
 	if len(f.Fields) > 0 && !contains(f.Fields, warn.Field) {
@@ -630,7 +630,7 @@ func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
 	return true
 }
 
-// Helper functions
+// Helper functions.
 func contains(slice []string, item string) bool {
 	return slices.Contains(slice, item)
 }

@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// DomainError represents domain error for validation results
+// DomainError represents domain error for validation results.
 type DomainError struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
@@ -13,7 +13,7 @@ type DomainError struct {
 	Cause   error  `json:"cause,omitempty"`
 }
 
-// Error implements error interface
+// Error implements error interface.
 func (de *DomainError) Error() string {
 	if de.Context != "" {
 		return fmt.Sprintf("[%s] %s (context: %s)", de.Code, de.Message, de.Context)
@@ -21,12 +21,12 @@ func (de *DomainError) Error() string {
 	return fmt.Sprintf("[%s] %s", de.Code, de.Message)
 }
 
-// Unwrap returns the underlying cause
+// Unwrap returns the underlying cause.
 func (de *DomainError) Unwrap() error {
 	return de.Cause
 }
 
-// NewValidationError creates a validation domain error
+// NewValidationError creates a validation domain error.
 func NewValidationError(code, message, details string) *DomainError {
 	return &DomainError{
 		Code:    code,
@@ -35,7 +35,7 @@ func NewValidationError(code, message, details string) *DomainError {
 	}
 }
 
-// NewSystemError creates a system domain error
+// NewSystemError creates a system domain error.
 func NewSystemError(code, message, details string, cause error) *DomainError {
 	return &DomainError{
 		Code:    code,
@@ -45,7 +45,7 @@ func NewSystemError(code, message, details string, cause error) *DomainError {
 	}
 }
 
-// NewTemplateError creates a template domain error
+// NewTemplateError creates a template domain error.
 func NewTemplateError(code, message, details string) *DomainError {
 	return &DomainError{
 		Code:    code,
@@ -54,7 +54,7 @@ func NewTemplateError(code, message, details string) *DomainError {
 	}
 }
 
-// WithContext adds context to the error
+// WithContext adds context to the error.
 func (de *DomainError) WithContext(context string) *DomainError {
 	return &DomainError{
 		Code:    de.Code,

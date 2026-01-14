@@ -13,13 +13,13 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// GitHubActionsGenerator handles GitHub Actions workflow generation
+// GitHubActionsGenerator handles GitHub Actions workflow generation.
 type GitHubActionsGenerator struct {
 	templateData *types.GitHubActionsTemplateData
 	logger       Logger
 }
 
-// NewGitHubActionsGenerator creates a new GitHub Actions generator
+// NewGitHubActionsGenerator creates a new GitHub Actions generator.
 func NewGitHubActionsGenerator(config *domain.SafeProjectConfig, logger Logger) *GitHubActionsGenerator {
 	return &GitHubActionsGenerator{
 		templateData: types.NewGitHubActionsTemplateData(config),
@@ -27,7 +27,7 @@ func NewGitHubActionsGenerator(config *domain.SafeProjectConfig, logger Logger) 
 	}
 }
 
-// Generate generates GitHub Actions workflow
+// Generate generates GitHub Actions workflow.
 func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	g.logger.Info("Generating GitHub Actions workflow")
 
@@ -88,13 +88,13 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	return nil
 }
 
-// shouldGenerate checks if GitHub Actions should be generated
+// shouldGenerate checks if GitHub Actions should be generated.
 func (g *GitHubActionsGenerator) shouldGenerate() bool {
 	// Check if we have triggers defined
 	return len(g.templateData.Triggers) > 0
 }
 
-// ValidateTemplate validates GitHub Actions template
+// ValidateTemplate validates GitHub Actions template.
 func (g *GitHubActionsGenerator) ValidateTemplate() error {
 	tmpl := template.New("github-actions").Delims("[[", "]]")
 
@@ -110,7 +110,7 @@ func (g *GitHubActionsGenerator) ValidateTemplate() error {
 	return nil
 }
 
-// GeneratePreview generates a preview without writing to file
+// GeneratePreview generates a preview without writing to file.
 func (g *GitHubActionsGenerator) GeneratePreview(ctx context.Context) (string, error) {
 	g.logger.Debug("Generating GitHub Actions workflow preview")
 
@@ -149,7 +149,7 @@ func (g *GitHubActionsGenerator) GeneratePreview(ctx context.Context) (string, e
 	return output.String(), nil
 }
 
-// Rollback removes generated GitHub Actions workflow
+// Rollback removes generated GitHub Actions workflow.
 func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back GitHub Actions workflow generation")
 
@@ -184,12 +184,12 @@ func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// UpdateConfig updates the generator configuration
+// UpdateConfig updates the generator configuration.
 func (g *GitHubActionsGenerator) UpdateConfig(config *domain.SafeProjectConfig) {
 	g.templateData = types.NewGitHubActionsTemplateData(config)
 }
 
-// GetWorkflowPath returns the path where workflow will be generated
+// GetWorkflowPath returns the path where workflow will be generated.
 func (g *GitHubActionsGenerator) GetWorkflowPath() string {
 	return filepath.Join(".github", "workflows", "release.yml")
 }

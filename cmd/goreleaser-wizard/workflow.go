@@ -23,7 +23,7 @@ import (
 	"github.com/charmbracelet/log"
 )
 
-// Workflow represents a sequence of jobs
+// Workflow represents a sequence of jobs.
 type Workflow struct {
 	Name        string
 	Description string
@@ -32,7 +32,7 @@ type Workflow struct {
 	Timeout     time.Duration
 }
 
-// NewWorkflow creates a new workflow
+// NewWorkflow creates a new workflow.
 func NewWorkflow(name, description string, logger *log.Logger) *Workflow {
 	return &Workflow{
 		Name:        name,
@@ -43,18 +43,18 @@ func NewWorkflow(name, description string, logger *log.Logger) *Workflow {
 	}
 }
 
-// SetTimeout sets workflow timeout
+// SetTimeout sets workflow timeout.
 func (w *Workflow) SetTimeout(timeout time.Duration) {
 	w.Timeout = timeout
 }
 
-// SetParallel sets whether jobs should run in parallel
+// SetParallel sets whether jobs should run in parallel.
 func (w *Workflow) SetParallel(parallel bool, maxJobs int) {
 	w.JobManager.SetParallel(parallel)
 	w.JobManager.SetMaxJobs(maxJobs)
 }
 
-// Execute executes the workflow
+// Execute executes the workflow.
 func (w *Workflow) Execute(ctx context.Context) error {
 	// Create timeout context
 	timeoutCtx, cancel := context.WithTimeout(ctx, w.Timeout)
@@ -83,12 +83,12 @@ func (w *Workflow) Execute(ctx context.Context) error {
 	return nil
 }
 
-// GetResults returns workflow execution results
+// GetResults returns workflow execution results.
 func (w *Workflow) GetResults() []JobResult {
 	return w.JobManager.GetResults()
 }
 
-// GetStatistics returns workflow statistics
+// GetStatistics returns workflow statistics.
 func (w *Workflow) GetStatistics() map[string]any {
 	stats := w.JobManager.GetStatistics()
 	stats["workflow_name"] = w.Name
@@ -97,7 +97,7 @@ func (w *Workflow) GetStatistics() map[string]any {
 	return stats
 }
 
-// WorkflowType represents different types of workflows
+// WorkflowType represents different types of workflows.
 type WorkflowType string
 
 const (
@@ -109,13 +109,13 @@ const (
 	WorkflowTypeRollback       WorkflowType = "rollback"
 )
 
-// WorkflowBuilder builds workflows for different scenarios
+// WorkflowBuilder builds workflows for different scenarios.
 type WorkflowBuilder struct {
 	logger  *log.Logger
 	factory *JobFactory
 }
 
-// NewWorkflowBuilder creates a new workflow builder
+// NewWorkflowBuilder creates a new workflow builder.
 func NewWorkflowBuilder(logger *log.Logger) *WorkflowBuilder {
 	return &WorkflowBuilder{
 		logger:  logger,
@@ -123,7 +123,7 @@ func NewWorkflowBuilder(logger *log.Logger) *WorkflowBuilder {
 	}
 }
 
-// BuildWorkflow builds a workflow based on type and configuration
+// BuildWorkflow builds a workflow based on type and configuration.
 func (wb *WorkflowBuilder) BuildWorkflow(wfType WorkflowType, config *ProjectConfig, force bool) (*Workflow, error) {
 	var workflow *Workflow
 	var jobs []Job
@@ -166,7 +166,7 @@ func (wb *WorkflowBuilder) BuildWorkflow(wfType WorkflowType, config *ProjectCon
 	return workflow, nil
 }
 
-// BuildMigrateWorkflow builds a migration workflow
+// BuildMigrateWorkflow builds a migration workflow.
 func (wb *WorkflowBuilder) BuildMigrateWorkflow(fromVersion, toVersion string, config *ProjectConfig) (*Workflow, error) {
 	workflow := NewWorkflow(
 		fmt.Sprintf("Migration %s -> %s", fromVersion, toVersion),
@@ -187,7 +187,7 @@ func (wb *WorkflowBuilder) BuildMigrateWorkflow(fromVersion, toVersion string, c
 	return workflow, nil
 }
 
-// BuildUpdateWorkflow builds an update workflow
+// BuildUpdateWorkflow builds an update workflow.
 func (wb *WorkflowBuilder) BuildUpdateWorkflow(config *ProjectConfig, dryRun bool) (*Workflow, error) {
 	workflow := NewWorkflow(
 		"Update Configuration",
@@ -208,7 +208,7 @@ func (wb *WorkflowBuilder) BuildUpdateWorkflow(config *ProjectConfig, dryRun boo
 	return workflow, nil
 }
 
-// createMigrationJobs creates jobs for migration workflow
+// createMigrationJobs creates jobs for migration workflow.
 func (wb *WorkflowBuilder) createMigrationJobs(fromVersion, toVersion string, config *ProjectConfig) []Job {
 	var jobs []Job
 
@@ -241,7 +241,7 @@ func (wb *WorkflowBuilder) createMigrationJobs(fromVersion, toVersion string, co
 	return jobs
 }
 
-// createUpdateJobs creates jobs for update workflow
+// createUpdateJobs creates jobs for update workflow.
 func (wb *WorkflowBuilder) createUpdateJobs(config *ProjectConfig, dryRun bool) []Job {
 	var jobs []Job
 
@@ -261,7 +261,7 @@ func (wb *WorkflowBuilder) createUpdateJobs(config *ProjectConfig, dryRun bool) 
 	return jobs
 }
 
-// ConfigBackupJob backs up existing configuration
+// ConfigBackupJob backs up existing configuration.
 type ConfigBackupJob struct {
 	id     string
 	logger *log.Logger
@@ -286,7 +286,7 @@ func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 
 	// Create backup with timestamp
 	timestamp := time.Now().Format("20060102-150405")
-	backupFile := fmt.Sprintf(".goreleaser.yaml.backup.%s", timestamp)
+	backupFile := ".goreleaser.yaml.backup." + timestamp
 
 	err := os.Rename(".goreleaser.yaml", backupFile)
 	if err != nil {
@@ -302,7 +302,7 @@ func (j *ConfigBackupJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// MigrationValidationJob validates migration compatibility
+// MigrationValidationJob validates migration compatibility.
 type MigrationValidationJob struct {
 	id          string
 	fromVersion string
@@ -324,7 +324,7 @@ func (j *MigrationValidationJob) Execute(ctx context.Context) error {
 	// This is a simplified validation - in real implementation,
 	// this would check compatibility between versions
 	if j.fromVersion == j.toVersion {
-		return fmt.Errorf("source and target versions are the same")
+		return errors.New("source and target versions are the same")
 	}
 
 	j.logger.Info("Migration compatibility validated")
@@ -336,7 +336,7 @@ func (j *MigrationValidationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// ConfigMigrationJob migrates configuration
+// ConfigMigrationJob migrates configuration.
 type ConfigMigrationJob struct {
 	id          string
 	fromVersion string
@@ -373,7 +373,7 @@ func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 	// Restore from backup (simplified)
 	backupFiles, err := filepath.Glob(".goreleaser.yaml.backup.*")
 	if err != nil || len(backupFiles) == 0 {
-		return fmt.Errorf("no backup found for rollback")
+		return errors.New("no backup found for rollback")
 	}
 
 	// Get the most recent backup
@@ -388,7 +388,7 @@ func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
-// ConfigUpdateJob updates configuration
+// ConfigUpdateJob updates configuration.
 type ConfigUpdateJob struct {
 	id     string
 	config *ProjectConfig
