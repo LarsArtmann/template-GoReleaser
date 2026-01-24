@@ -142,9 +142,9 @@ Workflow uses minimal required permissions:
 
 ```yaml
 permissions:
-  contents: write    # For creating releases
-  packages: write    # For Docker registry
-  id-token: write    # For cosign signing
+  contents: write # For creating releases
+  packages: write # For Docker registry
+  id-token: write # For cosign signing
 ```
 
 ### Security Best Practices Applied

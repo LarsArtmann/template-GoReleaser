@@ -40,18 +40,21 @@
 
 ```markdown
 # Getting Started Guide
+
 - Quick installation and setup
 - Basic configuration generation
 - First project setup tutorial
 - Common usage examples
 
 # Configuration Guide
+
 - Complete configuration reference
 - All enum types and values
 - Business rules and validation
 - Best practices and recommendations
 
 # Tutorials
+
 - CLI project setup
 - Web API project setup
 - Library project setup
@@ -60,12 +63,14 @@
 - Advanced configuration
 
 # Examples
+
 - Real-world configuration examples
 - Platform-specific configurations
 - Industry-specific setups
 - Migration examples
 
 # Troubleshooting
+
 - Common issues and solutions
 - Error code reference
 - Performance optimization
@@ -80,12 +85,14 @@
 
 ```markdown
 # Architecture Overview
+
 - Clean Architecture layers
 - Domain-driven design principles
 - Type safety approach
 - Design patterns used
 
 # Decision Records (ADRs)
+
 - ADR-001: Type Safety Implementation
 - ADR-002: Clean Architecture Adoption
 - ADR-003: Enum System Design
@@ -95,6 +102,7 @@
 - ADR-007: Error Type System
 
 # Design Patterns
+
 - Repository pattern implementation
 - Factory pattern usage
 - Builder pattern for configuration
@@ -102,6 +110,7 @@
 - Strategy pattern for validation
 
 # Component Interactions
+
 - How layers communicate
 - Dependency injection strategy
 - Event flow and handling
@@ -117,30 +126,35 @@
 
 ```markdown
 # Public API Reference
+
 - All exported interfaces
 - All exported types and structs
 - All exported functions
 - Usage examples for each API
 
 # Configuration API
+
 - SafeProjectConfig reference
 - All configuration fields
 - Validation methods
 - Business logic methods
 
 # Job Execution API
+
 - Job interface and implementations
 - Workflow management
 - Execution options
 - Result handling
 
 # Validation API
+
 - Validation pipeline reference
 - All validation rules
 - Error types and codes
 - Result types and methods
 
 # Event API
+
 - Event types and interfaces
 - Event bus usage
 - Event handling patterns
@@ -155,30 +169,35 @@
 
 ```markdown
 # Development Setup
+
 - Getting the code
 - Setting up development environment
 - Running tests
 - Building the project
 
 # Contributing Guidelines
+
 - Code style and conventions
 - Pull request process
 - Testing requirements
 - Documentation requirements
 
 # Code Organization
+
 - Package structure
 - File naming conventions
 - Import organization
 - Layer separation rules
 
 # Development Workflow
+
 - Feature development process
 - Bug fixing process
 - Release process
 - Maintenance guidelines
 
 # Testing Guidelines
+
 - Test organization
 - Test writing standards
 - Mock usage guidelines
@@ -193,18 +212,21 @@
 
 ```markdown
 # Migration Guide
+
 - Breaking changes overview
 - Step-by-step migration process
 - Configuration mapping table
 - Automated migration tools
 
 # Compatibility Guide
+
 - What is still supported
 - Deprecated features
 - Migration timeline
 - Required actions
 
 # Migration Examples
+
 - CLI project migration
 - Web API project migration
 - Library project migration

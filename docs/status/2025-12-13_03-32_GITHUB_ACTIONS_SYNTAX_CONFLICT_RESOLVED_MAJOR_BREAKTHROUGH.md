@@ -228,7 +228,7 @@ triggers[i] = trigger.GitHubPattern()  // "push:\n  tags:\n    - 'v*'"
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
   release:
     types: [published]
