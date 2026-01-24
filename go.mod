@@ -5,7 +5,7 @@ go 1.25.6
 require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/charmbracelet/log v0.4.2
-	github.com/kaptinlin/messageformat-go v0.4.8
+	github.com/kaptinlin/messageformat-go v0.4.9
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/viper v1.21.0
 	gopkg.in/yaml.v3 v3.0.1
