@@ -341,29 +341,42 @@ go 1.21
 
 // addCmdStructure adds cmd directory structure.
 func addCmdStructure(dir string) {
-	os.MkdirAll(filepath.Join(dir, "cmd", "benchmark-project"), 0o755)
-	os.WriteFile(filepath.Join(dir, "cmd", "benchmark-project", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+	createDirAndFiles(dir, "cmd/benchmark-project", map[string]string{
+		"main.go": "package main\n\nfunc main() {}",
+	})
 }
 
 // addInternalStructure adds internal/app directory structure.
 func addInternalStructure(dir string) {
-	os.MkdirAll(filepath.Join(dir, "internal", "app"), 0o755)
-	os.WriteFile(filepath.Join(dir, "internal", "app", "app.go"), []byte("package app\n\nfunc Run() {}"), 0o644)
-	os.WriteFile(filepath.Join(dir, "internal", "app", "config.go"), []byte("package app\n\ntype Config struct {}"), 0o644)
+	createDirAndFiles(dir, "internal/app", map[string]string{
+		"app.go":    "package app\n\nfunc Run() {}",
+		"config.go": "package app\n\ntype Config struct {}",
+	})
 }
 
 // addAPIStructure adds api/v1 directory structure.
 func addAPIStructure(dir string) {
-	os.MkdirAll(filepath.Join(dir, "api", "v1"), 0o755)
-	os.WriteFile(filepath.Join(dir, "api", "v1", "handler.go"), []byte("package v1\n\nfunc Handle() {}"), 0o644)
-	os.WriteFile(filepath.Join(dir, "api", "v1", "middleware.go"), []byte("package v1\n\nfunc Middleware() {}"), 0o644)
+	createDirAndFiles(dir, "api/v1", map[string]string{
+		"handler.go":     "package v1\n\nfunc Handle() {}",
+		"middleware.go":  "package v1\n\nfunc Middleware() {}",
+	})
 }
 
 // addPkgStructure adds pkg/utils directory structure.
 func addPkgStructure(dir string) {
-	os.MkdirAll(filepath.Join(dir, "pkg", "utils"), 0o755)
-	os.WriteFile(filepath.Join(dir, "pkg", "utils", "helper.go"), []byte("package utils\n\nfunc Helper() {}"), 0o644)
-	os.WriteFile(filepath.Join(dir, "pkg", "utils", "validator.go"), []byte("package utils\n\nfunc Validate() {}"), 0o644)
+	createDirAndFiles(dir, "pkg/utils", map[string]string{
+		"helper.go":    "package utils\n\nfunc Helper() {}",
+		"validator.go": "package utils\n\nfunc Validate() {}",
+	})
+}
+
+// createDirAndFiles creates a directory and writes multiple files.
+func createDirAndFiles(baseDir, dirPath string, files map[string]string) {
+	fullDir := filepath.Join(baseDir, filepath.FromSlash(dirPath))
+	os.MkdirAll(fullDir, 0o755)
+	for filename, content := range files {
+		os.WriteFile(filepath.Join(fullDir, filename), []byte(content), 0o644)
+	}
 }
 
 // addExtensiveStructure adds multiple package directories.
