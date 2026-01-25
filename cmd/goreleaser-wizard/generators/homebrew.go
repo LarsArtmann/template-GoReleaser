@@ -165,52 +165,12 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 
 // ValidateTemplate validates Homebrew template.
 func (g *HomebrewGenerator) ValidateTemplate() error {
-	tmpl := template.New("homebrew")
-
-	_, err := tmpl.Parse(templates.HomebrewTemplate)
-	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrInvalidTemplate,
-			"Homebrew template validation failed",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return nil
+	return ValidateTemplate("homebrew", templates.HomebrewTemplate)
 }
 
 // GeneratePreview generates a preview without writing to file.
 func (g *HomebrewGenerator) GeneratePreview(ctx context.Context) (string, error) {
-	g.logger.Debug("Generating Homebrew formula preview")
-
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return "", ctx.Err()
-	}
-
-	// Create template
-	tmpl := template.New("homebrew")
-
-	tmpl, err := tmpl.Parse(templates.HomebrewTemplate)
-	if err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse Homebrew template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, g.templateData); err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute Homebrew template preview",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return output.String(), nil
+	return GeneratePreview(ctx, g.logger, "homebrew", templates.HomebrewTemplate, "Generating Homebrew formula preview", g.templateData)
 }
 
 // Rollback removes generated Homebrew formula.

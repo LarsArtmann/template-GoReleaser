@@ -144,52 +144,12 @@ func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 
 // ValidateTemplate validates Dockerfile template.
 func (g *DockerfileGenerator) ValidateTemplate() error {
-	tmpl := template.New("dockerfile")
-
-	_, err := tmpl.Parse(templates.DockerfileTemplate)
-	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrInvalidTemplate,
-			"Dockerfile template validation failed",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return nil
+	return ValidateTemplate("dockerfile", templates.DockerfileTemplate)
 }
 
 // GeneratePreview generates a preview without writing to file.
 func (g *DockerfileGenerator) GeneratePreview(ctx context.Context) (string, error) {
-	g.logger.Debug("Generating Dockerfile preview")
-
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return "", ctx.Err()
-	}
-
-	// Create template
-	tmpl := template.New("dockerfile")
-
-	tmpl, err := tmpl.Parse(templates.DockerfileTemplate)
-	if err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse Dockerfile template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, g.templateData); err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute Dockerfile template preview",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return output.String(), nil
+	return GeneratePreview(ctx, g.logger, "dockerfile", templates.DockerfileTemplate, "Generating Dockerfile preview", g.templateData)
 }
 
 // Rollback removes generated Dockerfile.
