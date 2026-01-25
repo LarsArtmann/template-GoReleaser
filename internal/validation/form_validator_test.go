@@ -4,6 +4,28 @@ import (
 	"testing"
 )
 
+// runValidationTest is a helper function that tests a validator with valid and invalid inputs
+func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) error, field string, validInput string, invalidInput string) {
+	// Test valid input
+	err := validator(validInput)
+	if err != nil {
+		t.Errorf("%s valid input error = %v", field, err)
+	}
+
+	// Clear errors before testing invalid input
+	fv.ClearErrors()
+
+	// Test invalid input
+	err = validator(invalidInput)
+	if err == nil {
+		t.Errorf("%s should error for invalid input", field)
+	}
+
+	if fv.GetFieldError(field) == "" {
+		t.Errorf("%s should set %s error", field, field)
+	}
+}
+
 func TestFormValidator(t *testing.T) {
 	fv := NewFormValidator()
 
@@ -54,82 +76,22 @@ func TestFormValidatorValidateProjectName(t *testing.T) {
 
 func TestFormValidatorValidateBinaryName(t *testing.T) {
 	fv := NewFormValidator()
-
-	// Test valid binary name
-	err := fv.ValidateBinaryName()("myapp")
-	if err != nil {
-		t.Errorf("ValidateBinaryName() valid input error = %v", err)
-	}
-
-	// Test invalid binary name with dangerous chars
-	err = fv.ValidateBinaryName()("my;app")
-	if err == nil {
-		t.Errorf("ValidateBinaryName() should error for dangerous characters")
-	}
-
-	if fv.GetFieldError("binary_name") == "" {
-		t.Errorf("ValidateBinaryName() should set binary_name error")
-	}
+	runValidationTest(t, fv, fv.ValidateBinaryName(), "binary_name", "myapp", "my;app")
 }
 
 func TestFormValidatorValidateMainPath(t *testing.T) {
 	fv := NewFormValidator()
-
-	// Test valid path
-	err := fv.ValidateMainPath()("./cmd/app")
-	if err != nil {
-		t.Errorf("ValidateMainPath() valid input error = %v", err)
-	}
-
-	// Test path traversal
-	err = fv.ValidateMainPath()("../../../etc/passwd")
-	if err == nil {
-		t.Errorf("ValidateMainPath() should error for path traversal")
-	}
-
-	if fv.GetFieldError("main_path") == "" {
-		t.Errorf("ValidateMainPath() should set main_path error")
-	}
+	runValidationTest(t, fv, fv.ValidateMainPath(), "main_path", "./cmd/app", "../../../etc/passwd")
 }
 
 func TestFormValidatorValidateProjectDescription(t *testing.T) {
 	fv := NewFormValidator()
-
-	// Test valid description
-	err := fv.ValidateProjectDescription()("A great app")
-	if err != nil {
-		t.Errorf("ValidateProjectDescription() valid input error = %v", err)
-	}
-
-	// Test script injection
-	err = fv.ValidateProjectDescription()("<script>alert('xss')</script>")
-	if err == nil {
-		t.Errorf("ValidateProjectDescription() should error for script injection")
-	}
-
-	if fv.GetFieldError("project_description") == "" {
-		t.Errorf("ValidateProjectDescription() should set project_description error")
-	}
+	runValidationTest(t, fv, fv.ValidateProjectDescription(), "project_description", "A great app", "<script>alert('xss')</script>")
 }
 
 func TestFormValidatorValidateDockerRegistry(t *testing.T) {
 	fv := NewFormValidator()
-
-	// Test valid registry
-	err := fv.ValidateDockerRegistry()("ghcr.io/username/app")
-	if err != nil {
-		t.Errorf("ValidateDockerRegistry() valid input error = %v", err)
-	}
-
-	// Test insecure HTTP (non-localhost)
-	err = fv.ValidateDockerRegistry()("http://registry.example.com/app")
-	if err == nil {
-		t.Errorf("ValidateDockerRegistry() should error for insecure HTTP")
-	}
-
-	if fv.GetFieldError("docker_registry") == "" {
-		t.Errorf("ValidateDockerRegistry() should set docker_registry error")
-	}
+	runValidationTest(t, fv, fv.ValidateDockerRegistry(), "docker_registry", "ghcr.io/username/app", "http://registry.example.com/app")
 }
 
 func TestFormValidatorValidateBuildTags(t *testing.T) {
