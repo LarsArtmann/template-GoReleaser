@@ -3,6 +3,7 @@ package generators
 import (
 	"bytes"
 	"context"
+	"os"
 	"text/template"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
@@ -88,4 +89,19 @@ func GenerateTemplate(ctx context.Context, logger Logger, templateName, template
 	}
 
 	return output.Bytes(), nil
+}
+
+// removeGeneratedFile removes a generated file if it exists.
+func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) error {
+	if _, err := os.Stat(filePath); err == nil {
+		if err := os.Remove(filePath); err != nil {
+			return errors.NewFileError(
+				errors.ErrFileOperation,
+				errorMsg,
+				err.Error(),
+			).WithCause(err)
+		}
+		logger.Info(successMsg, "path", filePath)
+	}
+	return nil
 }

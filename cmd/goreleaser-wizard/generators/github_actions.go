@@ -160,16 +160,8 @@ func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 
 	// Remove generated workflow
 	workflowPath := filepath.Join(".github", "workflows", "release.yml")
-	if _, err := os.Stat(workflowPath); err == nil {
-		err := os.Remove(workflowPath)
-		if err != nil {
-			return errors.NewFileError(
-				errors.ErrFileOperation,
-				"Failed to remove generated workflow",
-				err.Error(),
-			).WithCause(err)
-		}
-		g.logger.Info("Removed generated workflow", "path", workflowPath)
+	if err := removeGeneratedFile(g.logger, workflowPath, "Failed to remove generated workflow", "Removed generated workflow"); err != nil {
+		return err
 	}
 
 	// Try to remove .github directory if empty

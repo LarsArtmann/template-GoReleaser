@@ -158,16 +158,8 @@ func (g *HomebrewGenerator) Rollback(ctx context.Context) error {
 
 	// Remove generated formula
 	formulaPath := fmt.Sprintf("homebrew/%s.rb", g.templateData.FormulaName)
-	if _, err := os.Stat(formulaPath); err == nil {
-		err := os.Remove(formulaPath)
-		if err != nil {
-			return errors.NewFileError(
-				errors.ErrFileOperation,
-				"Failed to remove generated formula",
-				err.Error(),
-			).WithCause(err)
-		}
-		g.logger.Info("Removed generated formula", "path", formulaPath)
+	if err := removeGeneratedFile(g.logger, formulaPath, "Failed to remove generated formula", "Removed generated formula"); err != nil {
+		return err
 	}
 
 	// Try to remove homebrew directory if empty
