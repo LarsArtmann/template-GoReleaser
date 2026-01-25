@@ -13,9 +13,9 @@ before:
     - go test ./...
 
 builds:
-  - id: wizard-concurrent-32395724583
+  - id: wizard-concurrent-33260731306
     main: .
-    binary: wizard-concurrent-32395724583
+    binary: wizard-concurrent-33260731306
     
     env:
       - CGO_ENABLED=

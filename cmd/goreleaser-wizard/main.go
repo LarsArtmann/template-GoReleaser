@@ -332,6 +332,15 @@ func HandleError(err error) {
 	}
 }
 
+// addCommonFlags adds common flags used by both init and generate commands.
+func addCommonFlags(cmd *cobra.Command) {
+	cmd.Flags().Bool("force", false, "force overwrite existing configuration")
+	cmd.Flags().String("project-name", "", "override project name")
+	cmd.Flags().String("main-path", "", "override main.go path")
+	cmd.Flags().String("binary-name", "", "override binary name")
+	cmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
+}
+
 func main() {
 	// Set up global panic recovery
 	defer recoverFromPanic("main")

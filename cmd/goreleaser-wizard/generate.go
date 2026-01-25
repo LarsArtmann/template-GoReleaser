@@ -94,10 +94,6 @@ func runGenerate(cmd *cobra.Command, args []string) {
 
 // generateFlags adds flags to the generate command.
 func init() {
-	generateCmd.Flags().Bool("force", false, "force overwrite existing configuration")
+	addCommonFlags(generateCmd)
 	generateCmd.Flags().Bool("config-only", false, "generate only GoReleaser configuration (no GitHub Actions)")
-	generateCmd.Flags().String("project-name", "", "override project name")
-	generateCmd.Flags().String("main-path", "", "override main.go path")
-	generateCmd.Flags().String("binary-name", "", "override binary name")
-	generateCmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
 }

@@ -272,10 +272,6 @@ func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 
 // initFlags adds flags to the init command.
 func init() {
-	initCmd.Flags().Bool("force", false, "force overwrite existing configuration")
+	addCommonFlags(initCmd)
 	initCmd.Flags().Bool("interactive", true, "run in interactive mode (default true)")
-	initCmd.Flags().String("project-name", "", "override project name")
-	initCmd.Flags().String("main-path", "", "override main.go path")
-	initCmd.Flags().String("binary-name", "", "override binary name")
-	initCmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
 }
