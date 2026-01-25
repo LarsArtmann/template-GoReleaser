@@ -1,12 +1,10 @@
 package generators
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"os"
 	"strings"
-	"text/template"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
@@ -110,33 +108,9 @@ func splitWords(s string) []string {
 
 // Generate generates Homebrew formula.
 func (g *HomebrewGenerator) Generate(ctx context.Context) error {
-	g.logger.Info("Generating Homebrew formula")
-
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-
-	// Create template
-	tmpl := template.New("homebrew")
-
-	tmpl, err := tmpl.Parse(templates.HomebrewTemplate)
+	output, err := GenerateTemplate(ctx, g.logger, "homebrew", templates.HomebrewTemplate, "Generating Homebrew formula", g.templateData)
 	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse Homebrew template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, g.templateData); err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute Homebrew template",
-			err.Error(),
-		).WithCause(err)
+		return err
 	}
 
 	// Ensure homebrew directory exists
@@ -151,7 +125,7 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 
 	// Write formula file
 	formulaPath := fmt.Sprintf("%s/%s.rb", formulaDir, g.templateData.FormulaName)
-	if err := os.WriteFile(formulaPath, output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(formulaPath, output, 0o644); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write Homebrew formula",

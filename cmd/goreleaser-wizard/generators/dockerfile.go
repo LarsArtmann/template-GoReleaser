@@ -1,10 +1,8 @@
 package generators
 
 import (
-	"bytes"
 	"context"
 	"os"
-	"text/template"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
@@ -100,37 +98,13 @@ func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileT
 
 // Generate generates Dockerfile.
 func (g *DockerfileGenerator) Generate(ctx context.Context) error {
-	g.logger.Info("Generating Dockerfile")
-
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-
-	// Create template
-	tmpl := template.New("dockerfile")
-
-	tmpl, err := tmpl.Parse(templates.DockerfileTemplate)
+	output, err := GenerateTemplate(ctx, g.logger, "dockerfile", templates.DockerfileTemplate, "Generating Dockerfile", g.templateData)
 	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse Dockerfile template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, g.templateData); err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute Dockerfile template",
-			err.Error(),
-		).WithCause(err)
+		return err
 	}
 
 	// Write Dockerfile
-	if err := os.WriteFile("Dockerfile", output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile("Dockerfile", output, 0o644); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write Dockerfile",

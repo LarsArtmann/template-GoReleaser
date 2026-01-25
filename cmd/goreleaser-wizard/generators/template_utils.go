@@ -56,3 +56,36 @@ func GeneratePreview(ctx context.Context, logger Logger, templateName, templateC
 
 	return output.String(), nil
 }
+
+// GenerateTemplate generates and executes a template, returning the output.
+func GenerateTemplate(ctx context.Context, logger Logger, templateName, templateContent, logPrefix string, templateData any) ([]byte, error) {
+	logger.Info(logPrefix)
+
+	// Check context cancellation
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
+	}
+
+	// Create and parse template
+	tmpl := template.New(templateName)
+	tmpl, err := tmpl.Parse(templateContent)
+	if err != nil {
+		return nil, errors.NewConfigError(
+			errors.ErrTemplateParsing,
+			"Failed to parse "+templateName+" template",
+			err.Error(),
+		).WithCause(err)
+	}
+
+	// Execute template
+	var output bytes.Buffer
+	if err := tmpl.Execute(&output, templateData); err != nil {
+		return nil, errors.NewConfigError(
+			errors.ErrTemplateRendering,
+			"Failed to execute "+templateName+" template",
+			err.Error(),
+		).WithCause(err)
+	}
+
+	return output.Bytes(), nil
+}
