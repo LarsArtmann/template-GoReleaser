@@ -26,6 +26,28 @@ func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) e
 	}
 }
 
+// runSliceValidationTest is a helper function that tests a validator with valid and invalid slice inputs
+func runSliceValidationTest[T any](t *testing.T, fv *FormValidator, validator func([]T) error, field string, validInput []T, invalidInput []T) {
+	// Test valid input
+	err := validator(validInput)
+	if err != nil {
+		t.Errorf("%s valid input error = %v", field, err)
+	}
+
+	// Clear errors before testing invalid input
+	fv.ClearErrors()
+
+	// Test invalid input
+	err = validator(invalidInput)
+	if err == nil {
+		t.Errorf("%s should error for invalid input", field)
+	}
+
+	if fv.GetFieldError(field) == "" {
+		t.Errorf("%s should set %s error", field, field)
+	}
+}
+
 func TestFormValidator(t *testing.T) {
 	fv := NewFormValidator()
 
@@ -96,22 +118,7 @@ func TestFormValidatorValidateDockerRegistry(t *testing.T) {
 
 func TestFormValidatorValidateBuildTags(t *testing.T) {
 	fv := NewFormValidator()
-
-	// Test valid tags
-	err := fv.ValidateBuildTags([]string{"prod", "linux"})
-	if err != nil {
-		t.Errorf("ValidateBuildTags() valid input error = %v", err)
-	}
-
-	// Test invalid tags
-	err = fv.ValidateBuildTags([]string{"prod;rm"})
-	if err == nil {
-		t.Errorf("ValidateBuildTags() should error for dangerous tags")
-	}
-
-	if fv.GetFieldError("build_tags") == "" {
-		t.Errorf("ValidateBuildTags() should set build_tags error")
-	}
+	runSliceValidationTest(t, fv, fv.ValidateBuildTags, "build_tags", []string{"prod", "linux"}, []string{"prod;rm"})
 }
 
 func TestFormValidatorErrorSummary(t *testing.T) {
