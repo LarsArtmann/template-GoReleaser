@@ -360,15 +360,15 @@ func (ve *ValidationError) WithSuggestion(suggestion string) *ValidationError {
 	return ve
 }
 
-// cloneValidationItem creates a deep copy of a validation item.
-func cloneValidationItem[T any](item T) T {
-	return item
+// cloneStruct creates a deep copy of a struct by value.
+func cloneStruct[T any](item T) *T {
+	clone := item
+	return &clone
 }
 
 // Clone creates a deep copy of the validation error.
 func (ve *ValidationError) Clone() *ValidationError {
-	clone := *ve
-	return &clone
+	return cloneStruct(*ve)
 }
 
 // ValidationWarning represents a structured validation warning.
@@ -407,8 +407,7 @@ func (vw *ValidationWarning) WithSuggestion(suggestion string) *ValidationWarnin
 
 // Clone creates a deep copy of the validation warning.
 func (vw *ValidationWarning) Clone() *ValidationWarning {
-	clone := *vw
-	return &clone
+	return cloneStruct(*vw)
 }
 
 // ValidationSummary provides a summary of validation results.
