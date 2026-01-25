@@ -307,31 +307,41 @@ func (vr *ValidationResult) Clone() *ValidationResult {
 
 	// Deep copy errors
 	for i, err := range vr.Errors {
-		clone.Errors[i] = &ValidationError{
-			Code:       err.Code,
-			Field:      err.Field,
-			Message:    err.Message,
-			Details:    err.Details,
-			Context:    err.Context,
-			Level:      err.Level,
-			Suggestion: err.Suggestion,
-		}
+		clone.Errors[i] = cloneValidationError(err)
 	}
 
 	// Deep copy warnings
 	for i, warn := range vr.Warnings {
-		clone.Warnings[i] = &ValidationWarning{
-			Code:       warn.Code,
-			Field:      warn.Field,
-			Message:    warn.Message,
-			Details:    warn.Details,
-			Context:    warn.Context,
-			Level:      warn.Level,
-			Suggestion: warn.Suggestion,
-		}
+		clone.Warnings[i] = cloneValidationWarning(warn)
 	}
 
 	return clone
+}
+
+// cloneValidationError creates a deep copy of a validation error.
+func cloneValidationError(err *ValidationError) *ValidationError {
+	return &ValidationError{
+		Code:       err.Code,
+		Field:      err.Field,
+		Message:    err.Message,
+		Details:    err.Details,
+		Context:    err.Context,
+		Level:      err.Level,
+		Suggestion: err.Suggestion,
+	}
+}
+
+// cloneValidationWarning creates a deep copy of a validation warning.
+func cloneValidationWarning(warn *ValidationWarning) *ValidationWarning {
+	return &ValidationWarning{
+		Code:       warn.Code,
+		Field:      warn.Field,
+		Message:    warn.Message,
+		Details:    warn.Details,
+		Context:    warn.Context,
+		Level:      warn.Level,
+		Suggestion: warn.Suggestion,
+	}
 }
 
 // ValidationError represents a structured validation error.
