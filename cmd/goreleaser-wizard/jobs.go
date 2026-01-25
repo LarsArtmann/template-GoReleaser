@@ -21,7 +21,6 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
-	"time"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
@@ -652,8 +651,8 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		"MainPath":    config.MainPath,
 		"Version":     version,
 		"Tag":         version,
-		"Major":       getMajorVersion(version),
-		"Date":        getCurrentDate(),
+		"Major":       git.GetMajorVersion(version),
+		"Date":        git.GetCurrentDate(),
 		"FullCommit":  getCommitHash(),
 		"CGOEnabled": map[domain.CGOStatus]string{
 			domain.CGOStatusDisabled: "0",
@@ -781,23 +780,6 @@ func getVersion() string {
 
 	// Final fallback
 	return "v0.1.0"
-}
-
-// getMajorVersion extracts major version from version string.
-func getMajorVersion(version string) string {
-	if strings.HasPrefix(version, "v") {
-		version = version[1:]
-	}
-	parts := strings.Split(version, ".")
-	if len(parts) > 0 {
-		return parts[0]
-	}
-	return "0"
-}
-
-// getCurrentDate returns current date in YYYY-MM-DD format.
-func getCurrentDate() string {
-	return time.Now().Format("2006-01-02")
 }
 
 // getCommitHash gets the current git commit hash.
