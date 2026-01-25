@@ -96,6 +96,19 @@ func promptSingleOption[T comparable](
 	promptLabel string,
 	toString func(T) string,
 ) (T, error) {
+	return promptSingleOptionWithDescription(ip, header, options, current, promptLabel, toString, nil)
+}
+
+// promptSingleOptionWithDescription is a generic helper for single-option selection with optional descriptions.
+func promptSingleOptionWithDescription[T comparable](
+	ip *InteractivePrompter,
+	header string,
+	options []T,
+	current T,
+	promptLabel string,
+	toString func(T) string,
+	getDescription func(T) string,
+) (T, error) {
 	fmt.Println(infoStyle.Render(header))
 
 	for i, opt := range options {
@@ -103,7 +116,11 @@ func promptSingleOption[T comparable](
 		if opt == current {
 			marker = "•"
 		}
-		fmt.Printf("  %s %d. %s\n", marker, i+1, toString(opt))
+		if getDescription != nil {
+			fmt.Printf("  %s %d. %s - %s\n", marker, i+1, toString(opt), getDescription(opt))
+		} else {
+			fmt.Printf("  %s %d. %s\n", marker, i+1, toString(opt))
+		}
 	}
 
 	selection, err := ip.promptInt(promptLabel, 1, len(options))
@@ -191,34 +208,19 @@ func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture
 
 // promptCGO prompts for CGO configuration.
 func (ip *InteractivePrompter) promptCGO(current domain.CGOStatus) (domain.CGOStatus, error) {
-	fmt.Println(infoStyle.Render("\n⚙️  CGO Configuration:"))
-
 	statuses := []domain.CGOStatus{
 		domain.CGOStatusDisabled,
 		domain.CGOStatusEnabled,
 		domain.CGOStatusRequired,
 	}
 
-	for i, status := range statuses {
-		marker := " "
-		if status == current {
-			marker = "•"
-		}
-		fmt.Printf("  %s %d. %s - %s\n", marker, i+1, status, ip.getCGODescription(status))
-	}
-
-	selection, err := ip.promptInt("Select CGO status (number)", 1, len(statuses))
-	if err != nil {
-		return "", err
-	}
-
-	return statuses[selection-1], nil
+	return promptSingleOptionWithDescription(ip, "\n⚙️  CGO Configuration:", statuses, current, "Select CGO status (number)", func(s domain.CGOStatus) string {
+		return s.String()
+	}, ip.getCGODescription)
 }
 
 // promptDocker prompts for Docker configuration.
 func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domain.DockerSupport, error) {
-	fmt.Println(infoStyle.Render("\n🐳 Docker Support:"))
-
 	levels := []domain.DockerSupport{
 		domain.DockerSupportNone,
 		domain.DockerSupportBuild,
@@ -226,20 +228,9 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 		domain.DockerSupportBoth,
 	}
 
-	for i, level := range levels {
-		marker := " "
-		if level == current {
-			marker = "•"
-		}
-		fmt.Printf("  %s %d. %s - %s\n", marker, i+1, level, ip.getDockerDescription(level))
-	}
-
-	selection, err := ip.promptInt("Select Docker support level (number)", 1, len(levels))
-	if err != nil {
-		return "", err
-	}
-
-	return levels[selection-1], nil
+	return promptSingleOptionWithDescription(ip, "\n🐳 Docker Support:", levels, current, "Select Docker support level (number)", func(d domain.DockerSupport) string {
+		return d.String()
+	}, ip.getDockerDescription)
 }
 
 // promptGitProvider prompts for Git provider.
