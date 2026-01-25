@@ -345,12 +345,17 @@ type ValidationError struct {
 	Suggestion string           `json:"suggestion,omitempty"`
 }
 
+// formatValidationItem formats a validation item with optional context.
+func formatValidationItem(code string, field, message, context string) string {
+	if context != "" {
+		return fmt.Sprintf("[%s] %s: %s (%s)", code, field, message, context)
+	}
+	return fmt.Sprintf("[%s] %s: %s", code, field, message)
+}
+
 // Error implements the error interface.
 func (ve *ValidationError) Error() string {
-	if ve.Context != "" {
-		return fmt.Sprintf("[%s] %s: %s (%s)", ve.Code, ve.Field, ve.Message, ve.Context)
-	}
-	return fmt.Sprintf("[%s] %s: %s", ve.Code, ve.Field, ve.Message)
+	return formatValidationItem(string(ve.Code), ve.Field, ve.Message, ve.Context)
 }
 
 // WithContext adds context to the validation error.
@@ -384,10 +389,7 @@ type ValidationWarning struct {
 
 // String returns a string representation of the warning.
 func (vw *ValidationWarning) String() string {
-	if vw.Context != "" {
-		return fmt.Sprintf("[%s] %s: %s (%s)", vw.Code, vw.Field, vw.Message, vw.Context)
-	}
-	return fmt.Sprintf("[%s] %s: %s", vw.Code, vw.Field, vw.Message)
+	return formatValidationItem(vw.Code, vw.Field, vw.Message, vw.Context)
 }
 
 // WithContext adds context to the validation warning.
