@@ -270,8 +270,6 @@ func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 	return nil
 }
 
-// initFlags adds flags to the init command.
 func init() {
-	addCommonFlags(initCmd)
-	initCmd.Flags().Bool("interactive", true, "run in interactive mode (default true)")
+	configureInitCommand(initCmd)
 }

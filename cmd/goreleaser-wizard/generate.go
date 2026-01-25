@@ -92,8 +92,6 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	fmt.Println("  • Test configuration with 'goreleaser check'")
 }
 
-// generateFlags adds flags to the generate command.
 func init() {
-	addCommonFlags(generateCmd)
-	generateCmd.Flags().Bool("config-only", false, "generate only GoReleaser configuration (no GitHub Actions)")
+	configureGenerateCommand(generateCmd)
 }

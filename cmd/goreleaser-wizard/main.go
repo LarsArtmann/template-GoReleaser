@@ -341,6 +341,18 @@ func addCommonFlags(cmd *cobra.Command) {
 	cmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
 }
 
+// configureInitCommand adds flags specific to the init command.
+func configureInitCommand(cmd *cobra.Command) {
+	addCommonFlags(cmd)
+	cmd.Flags().Bool("interactive", true, "run in interactive mode (default true)")
+}
+
+// configureGenerateCommand adds flags specific to the generate command.
+func configureGenerateCommand(cmd *cobra.Command) {
+	addCommonFlags(cmd)
+	cmd.Flags().Bool("config-only", false, "generate only GoReleaser configuration (no GitHub Actions)")
+}
+
 func main() {
 	// Set up global panic recovery
 	defer recoverFromPanic("main")
