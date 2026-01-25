@@ -39,6 +39,13 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	})
 }
 
+// runBenchmark is a helper function to run benchmark tests for escape functions
+func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
+	for b.Loop() {
+		_ = escaper(input)
+	}
+}
+
 func TestTemplateEscaper_EscapeYAML(t *testing.T) {
 	te := NewTemplateEscaper()
 
@@ -243,26 +250,17 @@ func FuzzEscapeJSON(f *testing.F) {
 func BenchmarkEscapeYAML(b *testing.B) {
 	te := NewTemplateEscaper()
 	input := "my-project-name: value with 'quotes'"
-
-	for b.Loop() {
-		_ = te.EscapeYAML(input)
-	}
+	runBenchmark(b, input, te.EscapeYAML)
 }
 
 func BenchmarkEscapeShell(b *testing.B) {
 	te := NewTemplateEscaper()
 	input := "my-app with single 'quotes'"
-
-	for b.Loop() {
-		_ = te.EscapeShell(input)
-	}
+	runBenchmark(b, input, te.EscapeShell)
 }
 
 func BenchmarkEscapeJSON(b *testing.B) {
 	te := NewTemplateEscaper()
 	input := `string with "quotes" and \backslashes`
-
-	for b.Loop() {
-		_ = te.EscapeJSON(input)
-	}
+	runBenchmark(b, input, te.EscapeJSON)
 }
