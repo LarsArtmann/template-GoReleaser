@@ -5,12 +5,46 @@ import (
 	"testing"
 )
 
+// testCase represents a generic test case for validation functions.
+type testCase[T any] struct {
+	name    string
+	input   T
+	wantErr bool
+}
+
+// runValidatorTests executes test cases for validation functions.
+func runValidatorTests[T any](t *testing.T, tests []testCase[T], validatorName string, validator func(T) error) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := validator(tt.input)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("%s() error = %v, wantErr %v", validatorName, err, tt.wantErr)
+			}
+		})
+	}
+}
+
+// transformationTestCase represents a test case for string transformation functions.
+type transformationTestCase struct {
+	name     string
+	input    string
+	expected string
+}
+
+// runTransformationTests executes test cases for string transformation functions.
+func runTransformationTests(t *testing.T, tests []transformationTestCase, funcName string, transform func(string) string) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := transform(tt.input)
+			if result != tt.expected {
+				t.Errorf("%s() = %v, want %v", funcName, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestValidateProjectName(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   string
-		wantErr bool
-	}{
+	tests := []testCase[string]{
 		{"Valid simple name", "myproject", false},
 		{"Valid with hyphens", "my-project", false},
 		{"Valid with underscores", "my_project", false},
@@ -32,22 +66,11 @@ func TestValidateProjectName(t *testing.T) {
 		{"Spaces", "project name", true},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateProjectName(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateProjectName() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	runValidatorTests(t, tests, "ValidateProjectName", ValidateProjectName)
 }
 
 func TestValidateBinaryName(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   string
-		wantErr bool
-	}{
+	tests := []testCase[string]{
 		{"Valid simple name", "myapp", false},
 		{"Valid with hyphens", "my-app", false},
 		{"Valid with underscores", "my_app", false},
@@ -68,22 +91,11 @@ func TestValidateBinaryName(t *testing.T) {
 		{"Valid number at end", "myapp2", false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateBinaryName(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateBinaryName() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	runValidatorTests(t, tests, "ValidateBinaryName", ValidateBinaryName)
 }
 
 func TestValidateMainPath(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   string
-		wantErr bool
-	}{
+	tests := []testCase[string]{
 		{"Valid current dir", ".", false},
 		{"Valid relative path", "./cmd/app", false},
 		{"Valid deeper path", "cmd/myapp", false},
@@ -101,22 +113,11 @@ func TestValidateMainPath(t *testing.T) {
 		{"Clean path should be valid", "./cmd", false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateMainPath(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateMainPath() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	runValidatorTests(t, tests, "ValidateMainPath", ValidateMainPath)
 }
 
 func TestValidateProjectDescription(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   string
-		wantErr bool
-	}{
+	tests := []testCase[string]{
 		{"Valid description", "A great Go application", false},
 		{"Empty description", "", false},
 		{"Max length description", strings.Repeat("a", 255), false},
@@ -128,22 +129,11 @@ func TestValidateProjectDescription(t *testing.T) {
 		{"Suspicious long whitespace", strings.Repeat(" ", 200), true},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateProjectDescription(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateProjectDescription() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	runValidatorTests(t, tests, "ValidateProjectDescription", ValidateProjectDescription)
 }
 
 func TestValidateBuildTags(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   []string
-		wantErr bool
-	}{
+	tests := []testCase[[]string]{
 		{"Valid single tag", []string{"prod"}, false},
 		{"Valid multiple tags", []string{"prod", "linux", "amd64"}, false},
 		{"Valid complex tag", []string{"my_custom_tag_123"}, false},
@@ -157,22 +147,11 @@ func TestValidateBuildTags(t *testing.T) {
 		{"Valid with numbers", []string{"v2"}, false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateBuildTags(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateBuildTags() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	runValidatorTests(t, tests, "ValidateBuildTags", ValidateBuildTags)
 }
 
 func TestValidateDockerRegistry(t *testing.T) {
-	tests := []struct {
-		name    string
-		input   string
-		wantErr bool
-	}{
+	tests := []testCase[string]{
 		{"Valid Docker Hub", "docker.io/username", false},
 		{"Valid GitHub Registry", "ghcr.io/username/app", false},
 		{"Valid GitLab Registry", "registry.gitlab.com/username/app", false},
@@ -187,22 +166,11 @@ func TestValidateDockerRegistry(t *testing.T) {
 		{"With fragment", "registry.com/app#tag", true},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateDockerRegistry(tt.input)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateDockerRegistry() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
+	runValidatorTests(t, tests, "ValidateDockerRegistry", ValidateDockerRegistry)
 }
 
 func TestSanitizeInput(t *testing.T) {
-	tests := []struct {
-		name     string
-		input    string
-		expected string
-	}{
+	tests := []transformationTestCase{
 		{"Normal text", "hello world", "hello world"},
 		{"With null bytes", "hello\x00world", "helloworld"},
 		{"With control chars", "hello\x01world", "helloworld"},
@@ -212,14 +180,7 @@ func TestSanitizeInput(t *testing.T) {
 		{"Mixed", "  hello\x00\tworld\n  ", "hello\tworld\n"},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := SanitizeInput(tt.input)
-			if result != tt.expected {
-				t.Errorf("SanitizeInput() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runTransformationTests(t, tests, "SanitizeInput", SanitizeInput)
 }
 
 // Fuzzing tests for security validation.
