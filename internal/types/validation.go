@@ -580,54 +580,91 @@ func (f *ValidationFilter) Filter(result *ValidationResult) *ValidationResult {
 	return filtered
 }
 
-// matchesError checks if an error matches the filter criteria.
-func (f *ValidationFilter) matchesError(err *ValidationError) bool {
+// filterItem represents a filterable validation item with common fields.
+type filterItem interface {
+	getField() string
+	getContext() string
+}
+
+// matchesFilter checks if an item matches the filter criteria using the provided checkers.
+func matchesFilter[T filterItem](
+	item T,
+	fields []string,
+	context string,
+	levelMatches func() bool,
+	codeMatches func() bool,
+) bool {
 	// Check fields
-	if len(f.Fields) > 0 && !contains(f.Fields, err.Field) {
+	if len(fields) > 0 && !contains(fields, item.getField()) {
 		return false
 	}
 
 	// Check levels
-	if len(f.Levels) > 0 && !containsErrorLevels(f.Levels, err.Level) {
+	if !levelMatches() {
 		return false
 	}
 
 	// Check codes
-	if len(f.Codes) > 0 && !containsErrorCodes(f.Codes, err.Code) {
+	if !codeMatches() {
 		return false
 	}
 
 	// Check context
-	if f.Context != "" && err.Context != f.Context {
+	if context != "" && item.getContext() != context {
 		return false
 	}
 
 	return true
 }
 
+// matchesError checks if an error matches the filter criteria.
+func (f *ValidationFilter) matchesError(err *ValidationError) bool {
+	return matchesFilter(
+		err,
+		f.Fields,
+		f.Context,
+		func() bool {
+			return len(f.Levels) == 0 || containsErrorLevels(f.Levels, err.Level)
+		},
+		func() bool {
+			return len(f.Codes) == 0 || containsErrorCodes(f.Codes, err.Code)
+		},
+	)
+}
+
 // matchesWarning checks if a warning matches the filter criteria.
 func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
-	// Check fields
-	if len(f.Fields) > 0 && !contains(f.Fields, warn.Field) {
-		return false
-	}
+	return matchesFilter(
+		warn,
+		f.Fields,
+		f.Context,
+		func() bool {
+			return len(f.WarningLevels) == 0 || containsWarningLevels(f.WarningLevels, warn.Level)
+		},
+		func() bool {
+			return len(f.WarningCodes) == 0 || contains(f.WarningCodes, warn.Code)
+		},
+	)
+}
 
-	// Check warning levels
-	if len(f.WarningLevels) > 0 && !containsWarningLevels(f.WarningLevels, warn.Level) {
-		return false
-	}
+// getField implements filterItem for ValidationError.
+func (e *ValidationError) getField() string {
+	return e.Field
+}
 
-	// Check warning codes
-	if len(f.WarningCodes) > 0 && !contains(f.WarningCodes, warn.Code) {
-		return false
-	}
+// getContext implements filterItem for ValidationError.
+func (e *ValidationError) getContext() string {
+	return e.Context
+}
 
-	// Check context
-	if f.Context != "" && warn.Context != f.Context {
-		return false
-	}
+// getField implements filterItem for ValidationWarning.
+func (w *ValidationWarning) getField() string {
+	return w.Field
+}
 
-	return true
+// getContext implements filterItem for ValidationWarning.
+func (w *ValidationWarning) getContext() string {
+	return w.Context
 }
 
 // Helper functions.
