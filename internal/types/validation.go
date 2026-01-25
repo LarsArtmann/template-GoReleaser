@@ -307,41 +307,15 @@ func (vr *ValidationResult) Clone() *ValidationResult {
 
 	// Deep copy errors
 	for i, err := range vr.Errors {
-		clone.Errors[i] = cloneValidationError(err)
+		clone.Errors[i] = err.Clone()
 	}
 
 	// Deep copy warnings
 	for i, warn := range vr.Warnings {
-		clone.Warnings[i] = cloneValidationWarning(warn)
+		clone.Warnings[i] = warn.Clone()
 	}
 
 	return clone
-}
-
-// cloneValidationError creates a deep copy of a validation error.
-func cloneValidationError(err *ValidationError) *ValidationError {
-	return &ValidationError{
-		Code:       err.Code,
-		Field:      err.Field,
-		Message:    err.Message,
-		Details:    err.Details,
-		Context:    err.Context,
-		Level:      err.Level,
-		Suggestion: err.Suggestion,
-	}
-}
-
-// cloneValidationWarning creates a deep copy of a validation warning.
-func cloneValidationWarning(warn *ValidationWarning) *ValidationWarning {
-	return &ValidationWarning{
-		Code:       warn.Code,
-		Field:      warn.Field,
-		Message:    warn.Message,
-		Details:    warn.Details,
-		Context:    warn.Context,
-		Level:      warn.Level,
-		Suggestion: warn.Suggestion,
-	}
 }
 
 // ValidationError represents a structured validation error.
@@ -386,6 +360,19 @@ func (ve *ValidationError) WithSuggestion(suggestion string) *ValidationError {
 	return ve
 }
 
+// Clone creates a deep copy of the validation error.
+func (ve *ValidationError) Clone() *ValidationError {
+	return &ValidationError{
+		Code:       ve.Code,
+		Field:      ve.Field,
+		Message:    ve.Message,
+		Details:    ve.Details,
+		Context:    ve.Context,
+		Level:      ve.Level,
+		Suggestion: ve.Suggestion,
+	}
+}
+
 // ValidationWarning represents a structured validation warning.
 type ValidationWarning struct {
 	Code       string       `json:"code"`
@@ -418,6 +405,19 @@ func (vw *ValidationWarning) WithDetails(details string) *ValidationWarning {
 func (vw *ValidationWarning) WithSuggestion(suggestion string) *ValidationWarning {
 	vw.Suggestion = suggestion
 	return vw
+}
+
+// Clone creates a deep copy of the validation warning.
+func (vw *ValidationWarning) Clone() *ValidationWarning {
+	return &ValidationWarning{
+		Code:       vw.Code,
+		Field:      vw.Field,
+		Message:    vw.Message,
+		Details:    vw.Details,
+		Context:    vw.Context,
+		Level:      vw.Level,
+		Suggestion: vw.Suggestion,
+	}
 }
 
 // ValidationSummary provides a summary of validation results.
