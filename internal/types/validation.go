@@ -194,6 +194,15 @@ type validationItem interface {
 	GetSuggestion() string
 }
 
+// toValidationItems converts a slice of validation items to validationItem interface.
+func toValidationItems[T validationItem](items []T) []validationItem {
+	result := make([]validationItem, len(items))
+	for i, item := range items {
+		result[i] = item
+	}
+	return result
+}
+
 // GetLevel returns the level for ValidationError.
 func (ve *ValidationError) GetLevel() string {
 	return string(ve.Level)
@@ -264,17 +273,8 @@ func (vr *ValidationResult) String() string {
 		result.WriteString("❌ Validation failed")
 	}
 
-	var errorsAsItems []validationItem = make([]validationItem, len(vr.Errors))
-	for i, err := range vr.Errors {
-		errorsAsItems[i] = err
-	}
-	appendValidationItems(&result, "🚨", "Errors", errorsAsItems)
-
-	var warningsAsItems []validationItem = make([]validationItem, len(vr.Warnings))
-	for i, warn := range vr.Warnings {
-		warningsAsItems[i] = warn
-	}
-	appendValidationItems(&result, "⚠️ ", "Warnings", warningsAsItems)
+	appendValidationItems(&result, "🚨", "Errors", toValidationItems(vr.Errors))
+	appendValidationItems(&result, "⚠️ ", "Warnings", toValidationItems(vr.Warnings))
 
 	return result.String()
 }
