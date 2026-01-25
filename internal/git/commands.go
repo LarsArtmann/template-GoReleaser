@@ -192,8 +192,9 @@ type RepositoryInfo struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-// extractGitHubURL extracts both owner and repo from a git URL.
-func extractGitHubURL(url string) (owner, repo string) {
+// ParseGitHubURL parses a GitHub URL and extracts owner and repo.
+// Supports formats: git@github.com:owner/repo.git or https://github.com/owner/repo.git
+func ParseGitHubURL(url string) (owner, repo string) {
 	if strings.Contains(url, "github.com") {
 		parts := strings.Split(url, "github.com")
 		if len(parts) > 1 {
@@ -211,13 +212,13 @@ func extractGitHubURL(url string) (owner, repo string) {
 
 // extractOwner extracts the owner from a git URL.
 func extractOwner(url string) string {
-	owner, _ := extractGitHubURL(url)
+	owner, _ := ParseGitHubURL(url)
 	return owner
 }
 
 // extractRepo extracts the repository name from a git URL.
 func extractRepo(url string) string {
-	_, repo := extractGitHubURL(url)
+	_, repo := ParseGitHubURL(url)
 	return repo
 }
 

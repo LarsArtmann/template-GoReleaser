@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
 
 // GoReleaserTemplateData represents strongly typed template data for GoReleaser configuration
@@ -269,19 +270,7 @@ func parseGitHubRemote() (owner, repo string) {
 	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			remote := strings.TrimSpace(string(output))
-			// Parse GitHub URL: git@github.com:owner/repo.git or https://github.com/owner/repo.git
-			if strings.Contains(remote, "github.com") {
-				parts := strings.Split(remote, "github.com")
-				if len(parts) > 1 {
-					repoPath := strings.TrimPrefix(parts[1], ":")
-					repoPath = strings.TrimPrefix(repoPath, "/")
-					repoPath = strings.TrimSuffix(repoPath, ".git")
-					pathParts := strings.Split(repoPath, "/")
-					if len(pathParts) > 1 {
-						return pathParts[0], pathParts[1]
-					}
-				}
-			}
+			return git.ParseGitHubURL(remote)
 		}
 	}
 	return "owner", "repo" // fallbacks
