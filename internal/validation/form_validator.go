@@ -18,64 +18,41 @@ func NewFormValidator() *FormValidator {
 	}
 }
 
-// ValidateProjectName creates a huh-compatible validator for project names.
-func (fv *FormValidator) ValidateProjectName() func(string) error {
+// validateWithFunction is a generic helper for validation functions.
+func (fv *FormValidator) validateWithFunction(fieldName string, validateFunc func(string) error) func(string) error {
 	return func(value string) error {
-		if err := ValidateProjectName(value); err != nil {
-			fv.errors["project_name"] = err.Error()
+		if err := validateFunc(value); err != nil {
+			fv.errors[fieldName] = err.Error()
 			return err
 		}
-		delete(fv.errors, "project_name")
+		delete(fv.errors, fieldName)
 		return nil
 	}
+}
+
+// ValidateProjectName creates a huh-compatible validator for project names.
+func (fv *FormValidator) ValidateProjectName() func(string) error {
+	return fv.validateWithFunction("project_name", ValidateProjectName)
 }
 
 // ValidateBinaryName creates a huh-compatible validator for binary names.
 func (fv *FormValidator) ValidateBinaryName() func(string) error {
-	return func(value string) error {
-		if err := ValidateBinaryName(value); err != nil {
-			fv.errors["binary_name"] = err.Error()
-			return err
-		}
-		delete(fv.errors, "binary_name")
-		return nil
-	}
+	return fv.validateWithFunction("binary_name", ValidateBinaryName)
 }
 
 // ValidateMainPath creates a huh-compatible validator for main path.
 func (fv *FormValidator) ValidateMainPath() func(string) error {
-	return func(value string) error {
-		if err := ValidateMainPath(value); err != nil {
-			fv.errors["main_path"] = err.Error()
-			return err
-		}
-		delete(fv.errors, "main_path")
-		return nil
-	}
+	return fv.validateWithFunction("main_path", ValidateMainPath)
 }
 
 // ValidateProjectDescription creates a huh-compatible validator for project description.
 func (fv *FormValidator) ValidateProjectDescription() func(string) error {
-	return func(value string) error {
-		if err := ValidateProjectDescription(value); err != nil {
-			fv.errors["project_description"] = err.Error()
-			return err
-		}
-		delete(fv.errors, "project_description")
-		return nil
-	}
+	return fv.validateWithFunction("project_description", ValidateProjectDescription)
 }
 
 // ValidateDockerRegistry creates a huh-compatible validator for Docker registry.
 func (fv *FormValidator) ValidateDockerRegistry() func(string) error {
-	return func(value string) error {
-		if err := ValidateDockerRegistry(value); err != nil {
-			fv.errors["docker_registry"] = err.Error()
-			return err
-		}
-		delete(fv.errors, "docker_registry")
-		return nil
-	}
+	return fv.validateWithFunction("docker_registry", ValidateDockerRegistry)
 }
 
 // ValidateBuildTags creates a huh-compatible validator for build tags.
