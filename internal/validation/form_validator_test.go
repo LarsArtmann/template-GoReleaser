@@ -64,30 +64,8 @@ func TestFormValidator(t *testing.T) {
 func TestFormValidatorValidateProjectName(t *testing.T) {
 	fv := NewFormValidator()
 
-	// Test valid name
-	err := fv.ValidateProjectName()("myproject")
-	if err != nil {
-		t.Errorf("ValidateProjectName() valid input error = %v", err)
-	}
-
-	if fv.HasErrors() {
-		t.Errorf("ValidateProjectName() should not have errors for valid input")
-	}
-
-	// Test invalid name
-	err = fv.ValidateProjectName()("con")
-	if err == nil {
-		t.Errorf("ValidateProjectName() should error for reserved name")
-	}
-
-	if !fv.HasErrors() {
-		t.Errorf("ValidateProjectName() should have errors for invalid input")
-	}
-
-	// Check specific error
-	if fv.GetFieldError("project_name") == "" {
-		t.Errorf("ValidateProjectName() should set project_name error")
-	}
+	// Test valid name and invalid name with dots
+	runValidationTest(t, fv, fv.ValidateProjectName(), "project_name", "myproject", "invalid..name")
 
 	// Clear errors and test
 	fv.ClearErrors()
