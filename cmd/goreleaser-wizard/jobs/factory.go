@@ -244,26 +244,30 @@ func (j *PreviewGenerationJob) Execute(ctx context.Context) error {
 	}
 }
 
-func (j *PreviewGenerationJob) generateGoReleaserPreview(ctx context.Context) error {
-	generator := generators.NewGoReleaserGenerator(j.config, j.logger)
+// PreviewGenerator is an interface for generators that can create previews.
+type PreviewGenerator interface {
+	GeneratePreview(ctx context.Context) (string, error)
+}
+
+// generatePreview is a helper function that generates a preview using any PreviewGenerator.
+func (j *PreviewGenerationJob) generatePreview(ctx context.Context, generator PreviewGenerator, label string) error {
 	preview, err := generator.GeneratePreview(ctx)
 	if err != nil {
-		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate GoReleaser preview")
+		return errors.WrapError(err, errors.ErrConfigGeneration, fmt.Sprintf("Failed to generate %s preview", label))
 	}
 
-	j.logger.Info("GoReleaser preview generated", "preview", preview)
+	j.logger.Info(fmt.Sprintf("%s preview generated", label), "preview", preview)
 	return nil
+}
+
+func (j *PreviewGenerationJob) generateGoReleaserPreview(ctx context.Context) error {
+	generator := generators.NewGoReleaserGenerator(j.config, j.logger)
+	return j.generatePreview(ctx, generator, "GoReleaser")
 }
 
 func (j *PreviewGenerationJob) generateGitHubActionsPreview(ctx context.Context) error {
 	generator := generators.NewGitHubActionsGenerator(j.config, j.logger)
-	preview, err := generator.GeneratePreview(ctx)
-	if err != nil {
-		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate GitHub Actions preview")
-	}
-
-	j.logger.Info("GitHub Actions preview generated", "preview", preview)
-	return nil
+	return j.generatePreview(ctx, generator, "GitHub Actions")
 }
 
 func (j *PreviewGenerationJob) Rollback(ctx context.Context) error {
