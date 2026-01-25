@@ -4,8 +4,8 @@ import (
 	"testing"
 )
 
-// runValidationTest is a helper function that tests a validator with valid and invalid inputs
-func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) error, field, validInput, invalidInput string) {
+// runValidationTest is a generic helper function that tests a validator with valid and invalid inputs
+func runValidationTest[T any](t *testing.T, fv *FormValidator, validator func(T) error, field string, validInput, invalidInput T, checkFieldError bool) {
 	// Test valid input
 	err := validator(validInput)
 	if err != nil {
@@ -21,49 +21,14 @@ func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) e
 		t.Errorf("%s should error for invalid input", field)
 	}
 
-	if fv.GetFieldError(field) == "" {
-		t.Errorf("%s should set %s error", field, field)
-	}
-}
-
-// runSliceValidationTest is a helper function that tests a validator with valid and invalid slice inputs
-func runSliceValidationTest[T any](t *testing.T, fv *FormValidator, validator func([]T) error, field string, validInput, invalidInput []T) {
-	// Test valid input
-	err := validator(validInput)
-	if err != nil {
-		t.Errorf("%s valid input error = %v", field, err)
-	}
-
-	// Clear errors before testing invalid input
-	fv.ClearErrors()
-
-	// Test invalid input
-	err = validator(invalidInput)
-	if err == nil {
-		t.Errorf("%s should error for invalid input", field)
-	}
-
-	if fv.GetFieldError(field) == "" {
+	if checkFieldError && fv.GetFieldError(field) == "" {
 		t.Errorf("%s should set %s error", field, field)
 	}
 }
 
 // runValidatorWithParamsTest is a helper function that tests a validator created with parameters
 func runValidatorWithParamsTest(t *testing.T, fv *FormValidator, validator func(string) error, testName string, validInput, invalidInput string) {
-	// Test valid input
-	err := validator(validInput)
-	if err != nil {
-		t.Errorf("%s should not error for valid input, got: %v", testName, err)
-	}
-
-	// Clear errors before testing invalid input
-	fv.ClearErrors()
-
-	// Test invalid input
-	err = validator(invalidInput)
-	if err == nil {
-		t.Errorf("%s should error for invalid input", testName)
-	}
+	runValidationTest(t, fv, validator, testName, validInput, invalidInput, false)
 }
 
 func TestFormValidator(t *testing.T) {
@@ -83,7 +48,7 @@ func TestFormValidatorValidateProjectName(t *testing.T) {
 	fv := NewFormValidator()
 
 	// Test valid name and invalid name with dots
-	runValidationTest(t, fv, fv.ValidateProjectName(), "project_name", "myproject", "invalid..name")
+	runValidationTest(t, fv, fv.ValidateProjectName(), "project_name", "myproject", "invalid..name", true)
 
 	// Clear errors and test
 	fv.ClearErrors()
@@ -94,27 +59,27 @@ func TestFormValidatorValidateProjectName(t *testing.T) {
 
 func TestFormValidatorValidateBinaryName(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateBinaryName(), "binary_name", "myapp", "my;app")
+	runValidationTest(t, fv, fv.ValidateBinaryName(), "binary_name", "myapp", "my;app", true)
 }
 
 func TestFormValidatorValidateMainPath(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateMainPath(), "main_path", "./cmd/app", "../../../etc/passwd")
+	runValidationTest(t, fv, fv.ValidateMainPath(), "main_path", "./cmd/app", "../../../etc/passwd", true)
 }
 
 func TestFormValidatorValidateProjectDescription(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateProjectDescription(), "project_description", "A great app", "<script>alert('xss')</script>")
+	runValidationTest(t, fv, fv.ValidateProjectDescription(), "project_description", "A great app", "<script>alert('xss')</script>", true)
 }
 
 func TestFormValidatorValidateDockerRegistry(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateDockerRegistry(), "docker_registry", "ghcr.io/username/app", "http://registry.example.com/app")
+	runValidationTest(t, fv, fv.ValidateDockerRegistry(), "docker_registry", "ghcr.io/username/app", "http://registry.example.com/app", true)
 }
 
 func TestFormValidatorValidateBuildTags(t *testing.T) {
 	fv := NewFormValidator()
-	runSliceValidationTest(t, fv, fv.ValidateBuildTags, "build_tags", []string{"prod", "linux"}, []string{"prod;rm"})
+	runValidationTest(t, fv, fv.ValidateBuildTags, "build_tags", []string{"prod", "linux"}, []string{"prod;rm"}, true)
 }
 
 func TestFormValidatorErrorSummary(t *testing.T) {
