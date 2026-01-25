@@ -330,7 +330,7 @@ type ValidationError struct {
 }
 
 // formatValidationItem formats a validation item with optional context.
-func formatValidationItem(code string, field, message, context string) string {
+func formatValidationItem(code, field, message, context string) string {
 	if context != "" {
 		return fmt.Sprintf("[%s] %s: %s (%s)", code, field, message, context)
 	}

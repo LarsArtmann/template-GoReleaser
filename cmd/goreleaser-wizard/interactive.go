@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	headerProjectType  = "\n🎯 Select Project Type:"
+	headerProjectType = "\n🎯 Select Project Type:"
 	headerGitProvider = "\n🔗 Git Provider:"
 )
 
