@@ -125,30 +125,27 @@ func (vr *ValidationResult) GetLowWarnings() []*ValidationWarning {
 	return low
 }
 
-// GetErrorsByField returns errors grouped by field.
-func (vr *ValidationResult) GetErrorsByField() map[string][]*ValidationError {
-	fieldErrors := make(map[string][]*ValidationError)
-	for _, err := range vr.Errors {
-		field := err.Field
+// groupByField groups validation items by field name.
+func groupByField[T validationItem](items []T) map[string][]T {
+	fieldGroups := make(map[string][]T)
+	for _, item := range items {
+		field := item.GetField()
 		if field == "" {
 			field = "general"
 		}
-		fieldErrors[field] = append(fieldErrors[field], err)
+		fieldGroups[field] = append(fieldGroups[field], item)
 	}
-	return fieldErrors
+	return fieldGroups
+}
+
+// GetErrorsByField returns errors grouped by field.
+func (vr *ValidationResult) GetErrorsByField() map[string][]*ValidationError {
+	return groupByField(vr.Errors)
 }
 
 // GetWarningsByField returns warnings grouped by field.
 func (vr *ValidationResult) GetWarningsByField() map[string][]*ValidationWarning {
-	fieldWarnings := make(map[string][]*ValidationWarning)
-	for _, warn := range vr.Warnings {
-		field := warn.Field
-		if field == "" {
-			field = "general"
-		}
-		fieldWarnings[field] = append(fieldWarnings[field], warn)
-	}
-	return fieldWarnings
+	return groupByField(vr.Warnings)
 }
 
 // GetErrorsByCode returns errors grouped by error code.
