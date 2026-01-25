@@ -61,6 +61,29 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	})
 }
 
+// Test case constants for validation functions
+var (
+	shellInjectionTestCases = []validationTestCase{
+		{"echo hello", "echo hello", false},
+		{"rm -rf /", "rm -rf /", true},
+		{"cat file | grep pattern", "cat file | grep pattern", true},
+		{"command && rm file", "command && rm file", true},
+		{"script.sh", "script.sh", false},
+		{"$(rm file)", "$(rm file)", true},
+		{"`rm file`", "`rm file`", true},
+	}
+
+	dockerLabelTestCases = []validationTestCase{
+		{"label", "label", true},
+		{"my-label.v1", "my-label.v1", true},
+		{"my_label", "my_label", true},
+		{"empty", "", false},
+		{"invalid@label", "invalid@label", false},
+		{"label with spaces", "label with spaces", false},
+		{"label/with/slashes", "label/with/slashes", false},
+	}
+)
+
 // runBenchmark is a helper function to run benchmark tests for escape functions
 func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
 	for b.Loop() {
@@ -192,31 +215,11 @@ func TestLooksLikeNumber(t *testing.T) {
 }
 
 func TestContainsShellInjection(t *testing.T) {
-	tests := []validationTestCase{
-		{"echo hello", "echo hello", false},
-		{"rm -rf /", "rm -rf /", true},
-		{"cat file | grep pattern", "cat file | grep pattern", true},
-		{"command && rm file", "command && rm file", true},
-		{"script.sh", "script.sh", false},
-		{"$(rm file)", "$(rm file)", true},
-		{"`rm file`", "`rm file`", true},
-	}
-
-	runValidationTests(t, "containsShellInjection", containsShellInjection, tests)
+	runValidationTests(t, "containsShellInjection", containsShellInjection, shellInjectionTestCases)
 }
 
 func TestIsValidDockerLabel(t *testing.T) {
-	tests := []validationTestCase{
-		{"label", "label", true},
-		{"my-label.v1", "my-label.v1", true},
-		{"my_label", "my_label", true},
-		{"empty", "", false},
-		{"invalid@label", "invalid@label", false},
-		{"label with spaces", "label with spaces", false},
-		{"label/with/slashes", "label/with/slashes", false},
-	}
-
-	runValidationTests(t, "isValidDockerLabel", isValidDockerLabel, tests)
+	runValidationTests(t, "isValidDockerLabel", isValidDockerLabel, dockerLabelTestCases)
 }
 
 // Fuzzing tests for escaping functions.
