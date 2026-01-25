@@ -12,6 +12,25 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
+const (
+	headerProjectType  = "\n🎯 Select Project Type:"
+	headerGitProvider = "\n🔗 Git Provider:"
+)
+
+var (
+	projectTypeOptions = []domain.ProjectType{
+		domain.ProjectTypeCLI,
+		domain.ProjectTypeWebAPI,
+		domain.ProjectTypeLibrary,
+	}
+
+	gitProviderOptions = []domain.GitProvider{
+		domain.GitProviderGitHub,
+		domain.GitProviderGitLab,
+		domain.GitProviderBitbucket,
+	}
+)
+
 // InteractivePrompter handles user interaction during init.
 type InteractivePrompter struct {
 	scanner *bufio.Scanner
@@ -134,11 +153,7 @@ func promptSingleOptionWithDescription[T comparable](
 
 // promptProjectType prompts for project type selection.
 func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (domain.ProjectType, error) {
-	return promptSingleOption(ip, "\n🎯 Select Project Type:", []domain.ProjectType{
-		domain.ProjectTypeCLI,
-		domain.ProjectTypeWebAPI,
-		domain.ProjectTypeLibrary,
-	}, current, "Select project type (number)", func(t domain.ProjectType) string {
+	return promptSingleOption(ip, headerProjectType, projectTypeOptions, current, "Select project type (number)", func(t domain.ProjectType) string {
 		return t.String()
 	})
 }
@@ -233,11 +248,7 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 
 // promptGitProvider prompts for Git provider.
 func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (domain.GitProvider, error) {
-	return promptSingleOption(ip, "\n🔗 Git Provider:", []domain.GitProvider{
-		domain.GitProviderGitHub,
-		domain.GitProviderGitLab,
-		domain.GitProviderBitbucket,
-	}, current, "Select Git provider (number)", func(p domain.GitProvider) string {
+	return promptSingleOption(ip, headerGitProvider, gitProviderOptions, current, "Select Git provider (number)", func(p domain.GitProvider) string {
 		return p.String()
 	})
 }
