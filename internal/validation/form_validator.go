@@ -2,6 +2,7 @@ package validation
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -166,11 +167,11 @@ func (fv *FormValidator) ValidateLength(min, max int, fieldName string) func(str
 	}
 }
 
-// ValidateNoShellMetacharacters validates that input doesn't contain shell metacharacters.
-func (fv *FormValidator) ValidateNoShellMetacharacters(fieldName string) func(string) error {
+// validatePattern is a generic helper for pattern-based validation.
+func (fv *FormValidator) validatePattern(fieldName string, pattern *regexp.Regexp, errorMessage string) func(string) error {
 	return func(value string) error {
-		if shellMetacharPattern.MatchString(value) {
-			err := fmt.Errorf("%s contains dangerous characters", fieldName)
+		if pattern.MatchString(value) {
+			err := fmt.Errorf("%s %s", fieldName, errorMessage)
 			fv.errors[fieldName] = err.Error()
 			return err
 		}
@@ -179,15 +180,12 @@ func (fv *FormValidator) ValidateNoShellMetacharacters(fieldName string) func(st
 	}
 }
 
+// ValidateNoShellMetacharacters validates that input doesn't contain shell metacharacters.
+func (fv *FormValidator) ValidateNoShellMetacharacters(fieldName string) func(string) error {
+	return fv.validatePattern(fieldName, shellMetacharPattern, "contains dangerous characters")
+}
+
 // ValidateNoPathTraversal validates that input doesn't contain path traversal.
 func (fv *FormValidator) ValidateNoPathTraversal(fieldName string) func(string) error {
-	return func(value string) error {
-		if pathTraversalPattern.MatchString(value) {
-			err := fmt.Errorf("%s contains path traversal attempts", fieldName)
-			fv.errors[fieldName] = err.Error()
-			return err
-		}
-		delete(fv.errors, fieldName)
-		return nil
-	}
+	return fv.validatePattern(fieldName, pathTraversalPattern, "contains path traversal attempts")
 }
