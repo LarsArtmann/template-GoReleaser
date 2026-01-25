@@ -91,9 +91,16 @@ func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
 	}
 }
 
-func TestTemplateEscaper_EscapeYAML(t *testing.T) {
+// runEscapeTest is a helper function to run a complete escape test with a fresh escaper
+func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []escapeTestCase) {
 	te := NewTemplateEscaper()
+	escaper := func(input string) string {
+		return escaperMethod(te, input)
+	}
+	runEscapeTests(t, funcName, escaper, tests)
+}
 
+func TestTemplateEscaper_EscapeYAML(t *testing.T) {
 	tests := []escapeTestCase{
 		{"Simple text", "hello", "hello"},
 		{"Empty string", "", ""},
@@ -106,12 +113,10 @@ func TestTemplateEscaper_EscapeYAML(t *testing.T) {
 		{"Complex multi-line", "line1: value\nline2: value", "|-\nline1: value\n  line2: value"},
 	}
 
-	runEscapeTests(t, "EscapeYAML", te.EscapeYAML, tests)
+	runEscapeTest(t, "EscapeYAML", (*TemplateEscaper).EscapeYAML, tests)
 }
 
 func TestTemplateEscaper_EscapeShell(t *testing.T) {
-	te := NewTemplateEscaper()
-
 	tests := []escapeTestCase{
 		{"Simple text", "hello", "'hello'"},
 		{"Empty string", "", ""},
@@ -121,12 +126,10 @@ func TestTemplateEscaper_EscapeShell(t *testing.T) {
 		{"Script injection", "; echo hacked", ""}, // Should be filtered
 	}
 
-	runEscapeTests(t, "EscapeShell", te.EscapeShell, tests)
+	runEscapeTest(t, "EscapeShell", (*TemplateEscaper).EscapeShell, tests)
 }
 
 func TestTemplateEscaper_EscapeGitHubActions(t *testing.T) {
-	te := NewTemplateEscaper()
-
 	tests := []escapeTestCase{
 		{"Simple text", "hello", "hello"},
 		{"Expression syntax", "${{ github.repository }}", "'${{ '' }}${{ github.repository }}'"},
@@ -134,12 +137,10 @@ func TestTemplateEscaper_EscapeGitHubActions(t *testing.T) {
 		{"Complex YAML", "name: value", "'name: value'"},
 	}
 
-	runEscapeTests(t, "EscapeGitHubActions", te.EscapeGitHubActions, tests)
+	runEscapeTest(t, "EscapeGitHubActions", (*TemplateEscaper).EscapeGitHubActions, tests)
 }
 
 func TestTemplateEscaper_EscapeJSON(t *testing.T) {
-	te := NewTemplateEscaper()
-
 	tests := []escapeTestCase{
 		{"Simple text", "hello", `"hello"`},
 		{"Empty string", "", `""`},
@@ -149,12 +150,10 @@ func TestTemplateEscaper_EscapeJSON(t *testing.T) {
 		{"Tab", "col1\tcol2", `"col1\tcol2"`},
 	}
 
-	runEscapeTests(t, "EscapeJSON", te.EscapeJSON, tests)
+	runEscapeTest(t, "EscapeJSON", (*TemplateEscaper).EscapeJSON, tests)
 }
 
 func TestTemplateEscaper_EscapeDockerLabel(t *testing.T) {
-	te := NewTemplateEscaper()
-
 	tests := []escapeTestCase{
 		{"Simple text", "hello", "hello"},
 		{"Empty string", "", ""},
@@ -165,7 +164,7 @@ func TestTemplateEscaper_EscapeDockerLabel(t *testing.T) {
 		{"Starts with dash", "-dash", "label--dash"},
 	}
 
-	runEscapeTests(t, "EscapeDockerLabel", te.EscapeDockerLabel, tests)
+	runEscapeTest(t, "EscapeDockerLabel", (*TemplateEscaper).EscapeDockerLabel, tests)
 }
 
 func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
