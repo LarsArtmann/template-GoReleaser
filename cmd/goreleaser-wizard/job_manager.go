@@ -229,32 +229,28 @@ func (jm *JobManager) GetResults() []JobResult {
 	return results
 }
 
-// GetCompletedResults returns only completed job results.
-func (jm *JobManager) GetCompletedResults() []JobResult {
+// getResultsByStatus returns job results filtered by status.
+func (jm *JobManager) getResultsByStatus(status JobStatus) []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 
-	completed := make([]JobResult, 0)
+	filtered := make([]JobResult, 0)
 	for _, result := range jm.results {
-		if result.Status == JobStatusCompleted {
-			completed = append(completed, result)
+		if result.Status == status {
+			filtered = append(filtered, result)
 		}
 	}
-	return completed
+	return filtered
+}
+
+// GetCompletedResults returns only completed job results.
+func (jm *JobManager) GetCompletedResults() []JobResult {
+	return jm.getResultsByStatus(JobStatusCompleted)
 }
 
 // GetFailedResults returns only failed job results.
 func (jm *JobManager) GetFailedResults() []JobResult {
-	jm.mu.Lock()
-	defer jm.mu.Unlock()
-
-	failed := make([]JobResult, 0)
-	for _, result := range jm.results {
-		if result.Status == JobStatusFailed {
-			failed = append(failed, result)
-		}
-	}
-	return failed
+	return jm.getResultsByStatus(JobStatusFailed)
 }
 
 // RollbackFailedJobs rolls back all failed jobs.
