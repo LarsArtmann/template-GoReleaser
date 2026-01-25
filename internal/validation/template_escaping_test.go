@@ -26,6 +26,28 @@ func runEscapeTests(t *testing.T, funcName string, escaper escapeFunc, tests []e
 	}
 }
 
+// Helper type for validation function tests
+type validationTestCase struct {
+	name     string
+	input    string
+	expected bool
+}
+
+// validationFunc represents a function that takes a string and returns a bool
+type validationFunc func(string) bool
+
+// runValidationTests is a helper function to run table-driven tests for validation functions
+func runValidationTests(t *testing.T, funcName string, validator validationFunc, tests []validationTestCase) {
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := validator(tt.input)
+			if result != tt.expected {
+				t.Errorf("%s() = %v, want %v", funcName, result, tt.expected)
+			}
+		})
+	}
+}
+
 // runFuzzTest is a helper function to run fuzz tests for escape functions
 func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	for _, s := range seed {
@@ -153,78 +175,48 @@ func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
 }
 
 func TestLooksLikeNumber(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected bool
-	}{
-		{"123", true},
-		{"123.45", true},
-		{"-123", true},
-		{"+123", true},
-		{"1e10", true},
-		{"123abc", false},
-		{"abc123", false},
-		{"", false},
-		{"-", false},
-		{".", false},
+	tests := []validationTestCase{
+		{"123", "123", true},
+		{"123.45", "123.45", true},
+		{"-123", "-123", true},
+		{"+123", "+123", true},
+		{"1e10", "1e10", true},
+		{"123abc", "123abc", false},
+		{"abc123", "abc123", false},
+		{"empty", "", false},
+		{"-", "-", false},
+		{".", ".", false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := looksLikeNumber(tt.input)
-			if result != tt.expected {
-				t.Errorf("looksLikeNumber() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runValidationTests(t, "looksLikeNumber", looksLikeNumber, tests)
 }
 
 func TestContainsShellInjection(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected bool
-	}{
-		{"echo hello", false},
-		{"rm -rf /", true},
-		{"cat file | grep pattern", true},
-		{"command && rm file", true},
-		{"script.sh", false},
-		{"$(rm file)", true},
-		{"`rm file`", true},
+	tests := []validationTestCase{
+		{"echo hello", "echo hello", false},
+		{"rm -rf /", "rm -rf /", true},
+		{"cat file | grep pattern", "cat file | grep pattern", true},
+		{"command && rm file", "command && rm file", true},
+		{"script.sh", "script.sh", false},
+		{"$(rm file)", "$(rm file)", true},
+		{"`rm file`", "`rm file`", true},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := containsShellInjection(tt.input)
-			if result != tt.expected {
-				t.Errorf("containsShellInjection() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runValidationTests(t, "containsShellInjection", containsShellInjection, tests)
 }
 
 func TestIsValidDockerLabel(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected bool
-	}{
-		{"label", true},
-		{"my-label.v1", true},
-		{"my_label", true},
-		{"", false},
-		{"invalid@label", false},
-		{"label with spaces", false},
-		{"label/with/slashes", false},
+	tests := []validationTestCase{
+		{"label", "label", true},
+		{"my-label.v1", "my-label.v1", true},
+		{"my_label", "my_label", true},
+		{"empty", "", false},
+		{"invalid@label", "invalid@label", false},
+		{"label with spaces", "label with spaces", false},
+		{"label/with/slashes", "label/with/slashes", false},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.input, func(t *testing.T) {
-			result := isValidDockerLabel(tt.input)
-			if result != tt.expected {
-				t.Errorf("isValidDockerLabel() = %v, want %v", result, tt.expected)
-			}
-		})
-	}
+	runValidationTests(t, "isValidDockerLabel", isValidDockerLabel, tests)
 }
 
 // Fuzzing tests for escaping functions.
