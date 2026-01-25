@@ -11,21 +11,6 @@ type escapeTestCase struct {
 	expected string
 }
 
-// escapeFunc represents a function that takes a string and returns an escaped string
-type escapeFunc func(string) string
-
-// runEscapeTests is a helper function to run table-driven tests for escape functions
-func runEscapeTests(t *testing.T, funcName string, escaper escapeFunc, tests []escapeTestCase) {
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := escaper(tt.input)
-			if result != tt.expected {
-				t.Errorf("%s() = %v, want %v", funcName, result, tt.expected)
-			}
-		})
-	}
-}
-
 // Helper type for validation function tests
 type validationTestCase struct {
 	name     string
@@ -33,14 +18,27 @@ type validationTestCase struct {
 	expected bool
 }
 
+// escapeFunc represents a function that takes a string and returns an escaped string
+type escapeFunc func(string) string
+
 // validationFunc represents a function that takes a string and returns a bool
 type validationFunc func(string) bool
 
-// runValidationTests is a helper function to run table-driven tests for validation functions
-func runValidationTests(t *testing.T, funcName string, validator validationFunc, tests []validationTestCase) {
+// testFunc represents a generic test function
+type testFunc[T any] func(string) T
+
+// valueTestCase represents a generic test case for value-returning functions
+type valueTestCase[T any] struct {
+	name     string
+	input    string
+	expected T
+}
+
+// runTests is a generic helper function to run table-driven tests
+func runTests[T comparable](t *testing.T, funcName string, fn testFunc[T], tests []valueTestCase[T]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := validator(tt.input)
+			result := fn(tt.input)
 			if result != tt.expected {
 				t.Errorf("%s() = %v, want %v", funcName, result, tt.expected)
 			}
@@ -63,7 +61,7 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 
 // Test case constants for validation functions
 var (
-	shellInjectionTestCases = []validationTestCase{
+	shellInjectionTestCases = []testCase[bool]{
 		{"echo hello", "echo hello", false},
 		{"rm -rf /", "rm -rf /", true},
 		{"cat file | grep pattern", "cat file | grep pattern", true},
@@ -73,7 +71,7 @@ var (
 		{"`rm file`", "`rm file`", true},
 	}
 
-	dockerLabelTestCases = []validationTestCase{
+	dockerLabelTestCases = []testCase[bool]{
 		{"label", "label", true},
 		{"my-label.v1", "my-label.v1", true},
 		{"my_label", "my_label", true},
@@ -92,16 +90,16 @@ func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
 }
 
 // runEscapeTest is a helper function to run a complete escape test with a fresh escaper
-func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []escapeTestCase) {
+func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []testCase[string]) {
 	te := NewTemplateEscaper()
 	escaper := func(input string) string {
 		return escaperMethod(te, input)
 	}
-	runEscapeTests(t, funcName, escaper, tests)
+	runTests(t, funcName, escaper, tests)
 }
 
 func TestTemplateEscaper_EscapeYAML(t *testing.T) {
-	tests := []escapeTestCase{
+	tests := []testCase[string]{
 		{"Simple text", "hello", "hello"},
 		{"Empty string", "", ""},
 		{"String with colon", "name: value", "'name: value'"},
@@ -117,7 +115,7 @@ func TestTemplateEscaper_EscapeYAML(t *testing.T) {
 }
 
 func TestTemplateEscaper_EscapeShell(t *testing.T) {
-	tests := []escapeTestCase{
+	tests := []testCase[string]{
 		{"Simple text", "hello", "'hello'"},
 		{"Empty string", "", ""},
 		{"Single quotes", "don't panic", "'don''t panic'"},
@@ -130,7 +128,7 @@ func TestTemplateEscaper_EscapeShell(t *testing.T) {
 }
 
 func TestTemplateEscaper_EscapeGitHubActions(t *testing.T) {
-	tests := []escapeTestCase{
+	tests := []testCase[string]{
 		{"Simple text", "hello", "hello"},
 		{"Expression syntax", "${{ github.repository }}", "'${{ '' }}${{ github.repository }}'"},
 		{"Empty string", "", ""},
@@ -141,7 +139,7 @@ func TestTemplateEscaper_EscapeGitHubActions(t *testing.T) {
 }
 
 func TestTemplateEscaper_EscapeJSON(t *testing.T) {
-	tests := []escapeTestCase{
+	tests := []testCase[string]{
 		{"Simple text", "hello", `"hello"`},
 		{"Empty string", "", `""`},
 		{"Quotes", "say \"hello\"", `"say \"hello\""`},
@@ -154,7 +152,7 @@ func TestTemplateEscaper_EscapeJSON(t *testing.T) {
 }
 
 func TestTemplateEscaper_EscapeDockerLabel(t *testing.T) {
-	tests := []escapeTestCase{
+	tests := []testCase[string]{
 		{"Simple text", "hello", "hello"},
 		{"Empty string", "", ""},
 		{"Valid characters", "my-app_v1.0", "my-app_v1.0"},
@@ -197,7 +195,7 @@ func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
 }
 
 func TestLooksLikeNumber(t *testing.T) {
-	tests := []validationTestCase{
+	tests := []testCase[bool]{
 		{"123", "123", true},
 		{"123.45", "123.45", true},
 		{"-123", "-123", true},
@@ -210,15 +208,15 @@ func TestLooksLikeNumber(t *testing.T) {
 		{".", ".", false},
 	}
 
-	runValidationTests(t, "looksLikeNumber", looksLikeNumber, tests)
+	runTests(t, "looksLikeNumber", looksLikeNumber, tests)
 }
 
 func TestContainsShellInjection(t *testing.T) {
-	runValidationTests(t, "containsShellInjection", containsShellInjection, shellInjectionTestCases)
+	runTests(t, "containsShellInjection", containsShellInjection, shellInjectionTestCases)
 }
 
 func TestIsValidDockerLabel(t *testing.T) {
-	runValidationTests(t, "isValidDockerLabel", isValidDockerLabel, dockerLabelTestCases)
+	runTests(t, "isValidDockerLabel", isValidDockerLabel, dockerLabelTestCases)
 }
 
 // Fuzzing tests for escaping functions.
