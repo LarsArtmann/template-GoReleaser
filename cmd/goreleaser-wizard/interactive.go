@@ -87,30 +87,45 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 	return config, nil
 }
 
+// promptSingleOption is a generic helper for single-option selection.
+func promptSingleOption[T comparable](
+	ip *InteractivePrompter,
+	header string,
+	options []T,
+	current T,
+	promptLabel string,
+	toString func(T) string,
+) (T, error) {
+	fmt.Println(infoStyle.Render(header))
+
+	for i, opt := range options {
+		marker := " "
+		if opt == current {
+			marker = "•"
+		}
+		fmt.Printf("  %s %d. %s\n", marker, i+1, toString(opt))
+	}
+
+	selection, err := ip.promptInt(promptLabel, 1, len(options))
+	if err != nil {
+		var zero T
+		return zero, err
+	}
+
+	return options[selection-1], nil
+}
+
 // promptProjectType prompts for project type selection.
 func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (domain.ProjectType, error) {
-	fmt.Println(infoStyle.Render("\n🎯 Select Project Type:"))
-
 	types := []domain.ProjectType{
 		domain.ProjectTypeCLI,
 		domain.ProjectTypeWebAPI,
 		domain.ProjectTypeLibrary,
 	}
 
-	for i, pt := range types {
-		marker := " "
-		if pt == current {
-			marker = "•"
-		}
-		fmt.Printf("  %s %d. %s\n", marker, i+1, pt)
-	}
-
-	selection, err := ip.promptInt("Select project type (number)", 1, len(types))
-	if err != nil {
-		return "", err
-	}
-
-	return types[selection-1], nil
+	return promptSingleOption(ip, "\n🎯 Select Project Type:", types, current, "Select project type (number)", func(t domain.ProjectType) string {
+		return t.String()
+	})
 }
 
 // promptPlatforms prompts for target platforms.
@@ -229,28 +244,15 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 
 // promptGitProvider prompts for Git provider.
 func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (domain.GitProvider, error) {
-	fmt.Println(infoStyle.Render("\n🔗 Git Provider:"))
-
 	providers := []domain.GitProvider{
 		domain.GitProviderGitHub,
 		domain.GitProviderGitLab,
 		domain.GitProviderBitbucket,
 	}
 
-	for i, provider := range providers {
-		marker := " "
-		if provider == current {
-			marker = "•"
-		}
-		fmt.Printf("  %s %d. %s\n", marker, i+1, provider)
-	}
-
-	selection, err := ip.promptInt("Select Git provider (number)", 1, len(providers))
-	if err != nil {
-		return "", err
-	}
-
-	return providers[selection-1], nil
+	return promptSingleOption(ip, "\n🔗 Git Provider:", providers, current, "Select Git provider (number)", func(p domain.GitProvider) string {
+		return p.String()
+	})
 }
 
 // promptAdvancedOptions prompts for advanced configuration options.
