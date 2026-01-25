@@ -66,15 +66,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	}
 
 	// Display results
-	results := workflow.GetResults()
-	for _, result := range results {
-		switch result.Status {
-		case JobStatusCompleted:
-			fmt.Printf("%s %s completed successfully\n", successStyle.Render("✅"), result.Job.Name())
-		case JobStatusFailed:
-			fmt.Printf("%s %s failed: %v\n", errorStyle.Render("❌"), result.Job.Name(), result.Error)
-		}
-	}
+	displayJobResults(workflow.GetResults())
 
 	fmt.Println()
 	if configOnly {

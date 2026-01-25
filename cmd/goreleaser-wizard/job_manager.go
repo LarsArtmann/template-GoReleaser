@@ -327,3 +327,15 @@ func (jm *JobManager) GetStatistics() map[string]any {
 
 	return stats
 }
+
+// displayJobResults displays job execution results to the user.
+func displayJobResults(results []JobResult) {
+	for _, result := range results {
+		switch result.Status {
+		case JobStatusCompleted:
+			fmt.Printf("%s %s completed successfully\n", successStyle.Render("✅"), result.Job.Name())
+		case JobStatusFailed:
+			fmt.Printf("%s %s failed: %v\n", errorStyle.Render("❌"), result.Job.Name(), result.Error)
+		}
+	}
+}
