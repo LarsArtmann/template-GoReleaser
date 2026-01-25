@@ -39,6 +39,11 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
+// Rollbacker interface for types that can be rolled back.
+type Rollbacker interface {
+	Rollback(ctx context.Context) error
+}
+
 // ConfigGenerationJob generates GoReleaser configuration.
 type ConfigGenerationJob struct {
 	id        string
@@ -225,20 +230,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 }
 
 func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
-	j.logger.Info("Rolling back GitHub Actions workflow generation")
-
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-
-	// Rollback generator
-	err := j.generator.Rollback(ctx)
-	if err != nil {
-		return errors.WrapError(err, errors.ErrWorkflowExecution, "Failed to rollback GitHub Actions workflow")
-	}
-
-	return nil
+	return rollbackGeneration(j.logger, j.generator, ctx, "GitHub Actions workflow generation")
 }
 
 // ProjectValidationJob validates project structure.
@@ -443,20 +435,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 }
 
 func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
-	j.logger.Info("Rolling back Dockerfile generation")
-
-	// Check context
-	if ctx.Err() != nil {
-		return ctx.Err()
-	}
-
-	// Rollback generation
-	err := j.generator.Rollback(ctx)
-	if err != nil {
-		return errors.WrapError(err, errors.ErrWorkflowExecution, "Failed to rollback Dockerfile generation")
-	}
-
-	return nil
+	return rollbackGeneration(j.logger, j.generator, ctx, "Dockerfile generation")
 }
 
 // HomebrewGenerationJob generates Homebrew formula.
@@ -523,17 +502,22 @@ func (j *HomebrewGenerationJob) Execute(ctx context.Context) error {
 }
 
 func (j *HomebrewGenerationJob) Rollback(ctx context.Context) error {
-	j.logger.Info("Rolling back Homebrew formula generation")
+	return rollbackGeneration(j.logger, j.generator, ctx, "Homebrew formula generation")
+}
 
-	// Check context
+// rollbackGeneration is a helper function that handles the common rollback pattern for generators.
+func rollbackGeneration(logger Logger, rollbacker Rollbacker, ctx context.Context, actionName string) error {
+	logger.Info(fmt.Sprintf("Rolling back %s", actionName))
+
+	// Check context cancellation
 	if ctx.Err() != nil {
 		return ctx.Err()
 	}
 
-	// Rollback generation
-	err := j.generator.Rollback(ctx)
+	// Rollback generator
+	err := rollbacker.Rollback(ctx)
 	if err != nil {
-		return errors.WrapError(err, errors.ErrWorkflowExecution, "Failed to rollback Homebrew formula generation")
+		return errors.WrapError(err, errors.ErrWorkflowExecution, fmt.Sprintf("Failed to rollback %s", actionName))
 	}
 
 	return nil
