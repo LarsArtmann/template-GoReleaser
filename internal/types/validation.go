@@ -691,34 +691,104 @@ func matchesFilter[T filterItem](
 	return true
 }
 
-// matchesError checks if an error matches the filter criteria.
-func (f *ValidationFilter) matchesError(err *ValidationError) bool {
+// filterableItem represents an item that can be filtered with level and code.
+type filterableItem interface {
+	filterItem
+	getLevel() any
+	getCode() any
+}
+
+// matchesGeneric checks if an item matches the filter criteria.
+func matchesGeneric[T filterableItem](
+	f *ValidationFilter,
+	item T,
+	levels any,
+	codes any,
+	levelContains func(any, any) bool,
+	codeContains func(any, any) bool,
+) bool {
 	return matchesFilter(
-		err,
+		item,
 		f.Fields,
 		f.Context,
 		func() bool {
-			return len(f.Levels) == 0 || containsErrorLevels(f.Levels, err.Level)
+			return isZero(levels) || levelContains(levels, item.getLevel())
 		},
 		func() bool {
-			return len(f.Codes) == 0 || containsErrorCodes(f.Codes, err.Code)
+			return isZero(codes) || codeContains(codes, item.getCode())
+		},
+	)
+}
+
+// isZero checks if a value is zero/empty.
+func isZero(v any) bool {
+	if v == nil {
+		return true
+	}
+	switch val := v.(type) {
+	case []ErrorLevel:
+		return len(val) == 0
+	case []errors.ErrorCode:
+		return len(val) == 0
+	case []WarningLevel:
+		return len(val) == 0
+	case []string:
+		return len(val) == 0
+	default:
+		return false
+	}
+}
+
+// matchesError checks if an error matches the filter criteria.
+func (f *ValidationFilter) matchesError(err *ValidationError) bool {
+	return matchesGeneric(
+		f,
+		err,
+		f.Levels,
+		f.Codes,
+		func(levels, level any) bool {
+			return containsErrorLevels(levels.([]ErrorLevel), level.(ErrorLevel))
+		},
+		func(codes, code any) bool {
+			return containsErrorCodes(codes.([]errors.ErrorCode), code.(errors.ErrorCode))
 		},
 	)
 }
 
 // matchesWarning checks if a warning matches the filter criteria.
 func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
-	return matchesFilter(
+	return matchesGeneric(
+		f,
 		warn,
-		f.Fields,
-		f.Context,
-		func() bool {
-			return len(f.WarningLevels) == 0 || containsWarningLevels(f.WarningLevels, warn.Level)
+		f.WarningLevels,
+		f.WarningCodes,
+		func(levels, level any) bool {
+			return containsWarningLevels(levels.([]WarningLevel), level.(WarningLevel))
 		},
-		func() bool {
-			return len(f.WarningCodes) == 0 || contains(f.WarningCodes, warn.Code)
+		func(codes, code any) bool {
+			return contains(codes.([]string), code.(string))
 		},
 	)
+}
+
+// getLevel implements filterableItem for ValidationError.
+func (e *ValidationError) getLevel() any {
+	return e.Level
+}
+
+// getCode implements filterableItem for ValidationError.
+func (e *ValidationError) getCode() any {
+	return e.Code
+}
+
+// getLevel implements filterableItem for ValidationWarning.
+func (w *ValidationWarning) getLevel() any {
+	return w.Level
+}
+
+// getCode implements filterableItem for ValidationWarning.
+func (w *ValidationWarning) getCode() any {
+	return w.Code
 }
 
 // getField implements filterItem for ValidationError.
