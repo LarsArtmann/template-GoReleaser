@@ -3,9 +3,7 @@ package generators
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"os"
-	"strings"
 	"text/template"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
@@ -48,9 +46,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 
 	// Create template with custom functions
 	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
-		"incpatch": func(v string) string {
-			return incpatchVersion(v)
-		},
+		"incpatch": git.IncPatchVersion,
 	})
 
 	tmpl, err := tmpl.Parse(templates.GoReleaserTemplate)
@@ -142,27 +138,10 @@ func (g *GoReleaserGenerator) prepareTemplateData(ctx context.Context) (*types.G
 	return &data, nil
 }
 
-// incpatchVersion increments the patch version for snapshots.
-func incpatchVersion(v string) string {
-	if strings.HasPrefix(v, "v") {
-		v = v[1:]
-	}
-	parts := strings.Split(v, ".")
-	if len(parts) == 3 {
-		patch := 0
-		if len(parts) > 2 {
-			if p, err := fmt.Sscanf(parts[2], "%d", &patch); err == nil && p == 1 {
-				return fmt.Sprintf("v%s.%s.%d-next", parts[0], parts[1], patch+1)
-			}
-		}
-	}
-	return v + "-next"
-}
-
 // ValidateTemplate validates the GoReleaser template.
 func (g *GoReleaserGenerator) ValidateTemplate() error {
 	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
-		"incpatch": incpatchVersion,
+		"incpatch": git.IncPatchVersion,
 	})
 
 	_, err := tmpl.Parse(templates.GoReleaserTemplate)
@@ -188,7 +167,7 @@ func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, erro
 
 	// Create template
 	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
-		"incpatch": incpatchVersion,
+		"incpatch": git.IncPatchVersion,
 	})
 
 	tmpl, err := tmpl.Parse(templates.GoReleaserTemplate)

@@ -2,6 +2,7 @@ package git
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/exec"
 	"strings"
@@ -293,4 +294,23 @@ func GetGitHubRepo() string {
 		return "repo"
 	}
 	return info.Repo
+}
+
+// IncPatchVersion increments the patch version for snapshots.
+// It removes the 'v' prefix if present, splits the version string,
+// and returns the version with the patch number incremented and "-next" suffix.
+func IncPatchVersion(v string) string {
+	if strings.HasPrefix(v, "v") {
+		v = v[1:]
+	}
+	parts := strings.Split(v, ".")
+	if len(parts) == 3 {
+		patch := 0
+		if len(parts) > 2 {
+			if p, err := fmt.Sscanf(parts[2], "%d", &patch); err == nil && p == 1 {
+				return fmt.Sprintf("v%s.%s.%d-next", parts[0], parts[1], patch+1)
+			}
+		}
+	}
+	return v + "-next"
 }

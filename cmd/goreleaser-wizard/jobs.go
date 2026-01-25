@@ -25,6 +25,7 @@ import (
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 	"github.com/charmbracelet/log"
 )
 
@@ -191,23 +192,7 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 
 	// Create template with custom functions
 	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
-		"incpatch": func(v string) string {
-			// Simple version increment - remove 'v' prefix and increment patch
-			if strings.HasPrefix(v, "v") {
-				v = v[1:]
-			}
-			parts := strings.Split(v, ".")
-			if len(parts) == 3 {
-				// Convert patch to int and increment
-				patch := 0
-				if len(parts) > 2 {
-					if p, err := fmt.Sscanf(parts[2], "%d", &patch); err == nil && p == 1 {
-						return fmt.Sprintf("v%s.%s.%d-next", parts[0], parts[1], patch+1)
-					}
-				}
-			}
-			return v + "-next"
-		},
+		"incpatch": git.IncPatchVersion,
 	})
 
 	tmpl, err := tmpl.Parse(templateContent)
