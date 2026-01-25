@@ -163,8 +163,7 @@ func (c *Command) GetRepositoryInfo() (*RepositoryInfo, error) {
 	if c.HasRemote("origin") {
 		if remoteURL, err := c.GetRemoteURL("origin"); err == nil {
 			info.RemoteURL = remoteURL
-			info.Owner = extractOwner(remoteURL)
-			info.Repo = extractRepo(remoteURL)
+			info.Owner, info.Repo = ParseGitHubURL(remoteURL)
 		}
 	}
 
@@ -208,18 +207,6 @@ func ParseGitHubURL(url string) (owner, repo string) {
 		}
 	}
 	return "owner", "repo"
-}
-
-// extractOwner extracts the owner from a git URL.
-func extractOwner(url string) string {
-	owner, _ := ParseGitHubURL(url)
-	return owner
-}
-
-// extractRepo extracts the repository name from a git URL.
-func extractRepo(url string) string {
-	_, repo := ParseGitHubURL(url)
-	return repo
 }
 
 // GetVersionInfo gets version information from git.
