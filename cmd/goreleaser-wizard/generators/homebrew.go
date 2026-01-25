@@ -162,11 +162,7 @@ func (g *HomebrewGenerator) Rollback(ctx context.Context) error {
 		return err
 	}
 
-	// Try to remove homebrew directory if empty
-	if files, err := os.ReadDir("homebrew"); err == nil && len(files) == 0 {
-		os.Remove("homebrew")
-		g.logger.Info("Removed empty homebrew directory")
-	}
+	removeEmptyDirectories(g.logger, []string{"homebrew"})
 
 	return nil
 }

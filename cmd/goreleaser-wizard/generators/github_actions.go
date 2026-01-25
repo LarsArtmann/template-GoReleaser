@@ -164,14 +164,10 @@ func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 		return err
 	}
 
-	// Try to remove .github directory if empty
-	workflowDir := filepath.Join(".github", "workflows")
-	workflowFiles, err := filepath.Glob(filepath.Join(workflowDir, "*.yml"))
-	if err == nil && len(workflowFiles) == 0 {
-		os.Remove(workflowDir)
-		os.Remove(".github")
-		g.logger.Info("Removed empty .github directory")
-	}
+	removeEmptyDirectories(g.logger, []string{
+		filepath.Join(".github", "workflows"),
+		".github",
+	})
 
 	return nil
 }

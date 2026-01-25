@@ -105,3 +105,21 @@ func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) e
 	}
 	return nil
 }
+
+// removeEmptyDirectory removes a directory if it's empty.
+func removeEmptyDirectory(logger Logger, dirPath string) error {
+	files, err := os.ReadDir(dirPath)
+	if err == nil && len(files) == 0 {
+		if err := os.Remove(dirPath); err == nil {
+			logger.Info("Removed empty directory", "path", dirPath)
+		}
+	}
+	return nil
+}
+
+// removeEmptyDirectories removes empty directories in a parent chain.
+func removeEmptyDirectories(logger Logger, parentDirs []string) {
+	for _, dir := range parentDirs {
+		removeEmptyDirectory(logger, dir)
+	}
+}
