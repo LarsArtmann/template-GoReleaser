@@ -134,13 +134,11 @@ func promptSingleOptionWithDescription[T comparable](
 
 // promptProjectType prompts for project type selection.
 func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (domain.ProjectType, error) {
-	types := []domain.ProjectType{
+	return promptSingleOption(ip, "\n🎯 Select Project Type:", []domain.ProjectType{
 		domain.ProjectTypeCLI,
 		domain.ProjectTypeWebAPI,
 		domain.ProjectTypeLibrary,
-	}
-
-	return promptSingleOption(ip, "\n🎯 Select Project Type:", types, current, "Select project type (number)", func(t domain.ProjectType) string {
+	}, current, "Select project type (number)", func(t domain.ProjectType) string {
 		return t.String()
 	})
 }
@@ -235,13 +233,11 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 
 // promptGitProvider prompts for Git provider.
 func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (domain.GitProvider, error) {
-	providers := []domain.GitProvider{
+	return promptSingleOption(ip, "\n🔗 Git Provider:", []domain.GitProvider{
 		domain.GitProviderGitHub,
 		domain.GitProviderGitLab,
 		domain.GitProviderBitbucket,
-	}
-
-	return promptSingleOption(ip, "\n🔗 Git Provider:", providers, current, "Select Git provider (number)", func(p domain.GitProvider) string {
+	}, current, "Select Git provider (number)", func(p domain.GitProvider) string {
 		return p.String()
 	})
 }

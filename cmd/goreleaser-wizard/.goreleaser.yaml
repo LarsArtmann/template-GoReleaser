@@ -4,7 +4,7 @@
 
 version: 2
 
-project_name: concurrent-test-2
+project_name: concurrent-test-0
 
 before:
   hooks:
@@ -13,9 +13,9 @@ before:
     - go test ./...
 
 builds:
-  - id: wizard-concurrent-21016688543
+  - id: wizard-concurrent-02526359473
     main: .
-    binary: wizard-concurrent-21016688543
+    binary: wizard-concurrent-02526359473
     
     env:
       - CGO_ENABLED=
@@ -36,7 +36,7 @@ builds:
 
 archives:
   - id: default
-    name_template: "concurrent-test-2_v0.1.0_{{.Os}}_{{.Arch}}"
+    name_template: "concurrent-test-0_v0.1.0_{{.Os}}_{{.Arch}}"
     
     format_overrides:
       - goos: windows
@@ -81,16 +81,16 @@ release:
 
 dockers:
   - image_templates:
-      - "/concurrent-test-2:v0.1.0"
-      - "/concurrent-test-2:v0"
-      - "/concurrent-test-2:latest"
+      - "/concurrent-test-0:v0.1.0"
+      - "/concurrent-test-0:v0"
+      - "/concurrent-test-0:latest"
     
     dockerfile: Dockerfile
     
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created=2026-01-25"
-      - "--label=org.opencontainers.image.title=concurrent-test-2"
+      - "--label=org.opencontainers.image.title=concurrent-test-0"
       - "--label=org.opencontainers.image.revision=unknown"
       - "--label=org.opencontainers.image.version=v0.1.0"
       - "--platform=linux/amd64"
