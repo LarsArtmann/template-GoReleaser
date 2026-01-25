@@ -59,9 +59,57 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	})
 }
 
-// Test case constants for validation functions
+// Test case constants for escape functions
 var (
-	shellInjectionTestCases = []testCase[bool]{
+	shellEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", "'hello'"},
+		{"Empty string", "", ""},
+		{"Single quotes", "don't panic", "'don''t panic'"},
+		{"Safe characters", "my-app_v1.0", "'my-app_v1.0'"},
+		{"Dangerous content", "rm -rf /", ""},     // Should be filtered
+		{"Script injection", "; echo hacked", ""}, // Should be filtered
+	}
+
+	jsonEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", `"hello"`},
+		{"Empty string", "", `""`},
+		{"Quotes", "say \"hello\"", `"say \"hello\""`},
+		{"Backslash", "path\\to\\file", `"path\\to\\file"`},
+		{"Newline", "line1\nline2", `"line1\nline2"`},
+		{"Tab", "col1\tcol2", `"col1\tcol2"`},
+	}
+
+	yamlEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", "hello"},
+		{"Empty string", "", ""},
+		{"String with colon", "name: value", "'name: value'"},
+		{"String with space", " leading space", "leading space"},
+		{"Number", "123", "'123'"},
+		{"Boolean-like", "true", "true"},
+		{"String starting with special", "!important", "'!important'"},
+		{"Multi-line", "line1\nline2", "|-\nline1\n  line2"},
+		{"Complex multi-line", "line1: value\nline2: value", "|-\nline1: value\n  line2: value"},
+	}
+
+	githubActionsEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", "hello"},
+		{"Expression syntax", "${{ github.repository }}", "'${{ '' }}${{ github.repository }}'"},
+		{"Empty string", "", ""},
+		{"Complex YAML", "name: value", "'name: value'"},
+	}
+
+	dockerLabelEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", "hello"},
+		{"Empty string", "", ""},
+		{"Valid characters", "my-app_v1.0", "my-app_v1.0"},
+		{"Invalid characters", "my@app$", "my-app-"},
+		{"Starts with number", "123label", "label-123label"},
+		{"Starts with dot", ".hidden", "label-.hidden"},
+		{"Starts with dash", "-dash", "label--dash"},
+	}
+
+	// Test case constants for validation functions
+	shellInjectionTestCases = []valueTestCase[bool]{
 		{"echo hello", "echo hello", false},
 		{"rm -rf /", "rm -rf /", true},
 		{"cat file | grep pattern", "cat file | grep pattern", true},
@@ -71,7 +119,7 @@ var (
 		{"`rm file`", "`rm file`", true},
 	}
 
-	dockerLabelTestCases = []testCase[bool]{
+	dockerLabelTestCases = []valueTestCase[bool]{
 		{"label", "label", true},
 		{"my-label.v1", "my-label.v1", true},
 		{"my_label", "my_label", true},
@@ -90,7 +138,7 @@ func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
 }
 
 // runEscapeTest is a helper function to run a complete escape test with a fresh escaper
-func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []testCase[string]) {
+func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []valueTestCase[string]) {
 	te := NewTemplateEscaper()
 	escaper := func(input string) string {
 		return escaperMethod(te, input)
@@ -99,70 +147,23 @@ func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *Templat
 }
 
 func TestTemplateEscaper_EscapeYAML(t *testing.T) {
-	tests := []testCase[string]{
-		{"Simple text", "hello", "hello"},
-		{"Empty string", "", ""},
-		{"String with colon", "name: value", "'name: value'"},
-		{"String with space", " leading space", "leading space"},
-		{"Number", "123", "'123'"},
-		{"Boolean-like", "true", "true"},
-		{"String starting with special", "!important", "'!important'"},
-		{"Multi-line", "line1\nline2", "|-\nline1\n  line2"},
-		{"Complex multi-line", "line1: value\nline2: value", "|-\nline1: value\n  line2: value"},
-	}
-
-	runEscapeTest(t, "EscapeYAML", (*TemplateEscaper).EscapeYAML, tests)
+	runEscapeTest(t, "EscapeYAML", (*TemplateEscaper).EscapeYAML, yamlEscapeTestCases)
 }
 
 func TestTemplateEscaper_EscapeShell(t *testing.T) {
-	tests := []testCase[string]{
-		{"Simple text", "hello", "'hello'"},
-		{"Empty string", "", ""},
-		{"Single quotes", "don't panic", "'don''t panic'"},
-		{"Safe characters", "my-app_v1.0", "'my-app_v1.0'"},
-		{"Dangerous content", "rm -rf /", ""},     // Should be filtered
-		{"Script injection", "; echo hacked", ""}, // Should be filtered
-	}
-
-	runEscapeTest(t, "EscapeShell", (*TemplateEscaper).EscapeShell, tests)
+	runEscapeTest(t, "EscapeShell", (*TemplateEscaper).EscapeShell, shellEscapeTestCases)
 }
 
 func TestTemplateEscaper_EscapeGitHubActions(t *testing.T) {
-	tests := []testCase[string]{
-		{"Simple text", "hello", "hello"},
-		{"Expression syntax", "${{ github.repository }}", "'${{ '' }}${{ github.repository }}'"},
-		{"Empty string", "", ""},
-		{"Complex YAML", "name: value", "'name: value'"},
-	}
-
-	runEscapeTest(t, "EscapeGitHubActions", (*TemplateEscaper).EscapeGitHubActions, tests)
+	runEscapeTest(t, "EscapeGitHubActions", (*TemplateEscaper).EscapeGitHubActions, githubActionsEscapeTestCases)
 }
 
 func TestTemplateEscaper_EscapeJSON(t *testing.T) {
-	tests := []testCase[string]{
-		{"Simple text", "hello", `"hello"`},
-		{"Empty string", "", `""`},
-		{"Quotes", "say \"hello\"", `"say \"hello\""`},
-		{"Backslash", "path\\to\\file", `"path\\to\\file"`},
-		{"Newline", "line1\nline2", `"line1\nline2"`},
-		{"Tab", "col1\tcol2", `"col1\tcol2"`},
-	}
-
-	runEscapeTest(t, "EscapeJSON", (*TemplateEscaper).EscapeJSON, tests)
+	runEscapeTest(t, "EscapeJSON", (*TemplateEscaper).EscapeJSON, jsonEscapeTestCases)
 }
 
 func TestTemplateEscaper_EscapeDockerLabel(t *testing.T) {
-	tests := []testCase[string]{
-		{"Simple text", "hello", "hello"},
-		{"Empty string", "", ""},
-		{"Valid characters", "my-app_v1.0", "my-app_v1.0"},
-		{"Invalid characters", "my@app$", "my-app-"},
-		{"Starts with number", "123label", "label-123label"},
-		{"Starts with dot", ".hidden", "label-.hidden"},
-		{"Starts with dash", "-dash", "label--dash"},
-	}
-
-	runEscapeTest(t, "EscapeDockerLabel", (*TemplateEscaper).EscapeDockerLabel, tests)
+	runEscapeTest(t, "EscapeDockerLabel", (*TemplateEscaper).EscapeDockerLabel, dockerLabelEscapeTestCases)
 }
 
 func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
@@ -195,7 +196,7 @@ func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
 }
 
 func TestLooksLikeNumber(t *testing.T) {
-	tests := []testCase[bool]{
+	tests := []valueTestCase[bool]{
 		{"123", "123", true},
 		{"123.45", "123.45", true},
 		{"-123", "-123", true},
