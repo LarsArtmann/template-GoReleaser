@@ -360,17 +360,15 @@ func (ve *ValidationError) WithSuggestion(suggestion string) *ValidationError {
 	return ve
 }
 
+// cloneValidationItem creates a deep copy of a validation item.
+func cloneValidationItem[T any](item T) T {
+	return item
+}
+
 // Clone creates a deep copy of the validation error.
 func (ve *ValidationError) Clone() *ValidationError {
-	return &ValidationError{
-		Code:       ve.Code,
-		Field:      ve.Field,
-		Message:    ve.Message,
-		Details:    ve.Details,
-		Context:    ve.Context,
-		Level:      ve.Level,
-		Suggestion: ve.Suggestion,
-	}
+	clone := *ve
+	return &clone
 }
 
 // ValidationWarning represents a structured validation warning.
@@ -409,15 +407,8 @@ func (vw *ValidationWarning) WithSuggestion(suggestion string) *ValidationWarnin
 
 // Clone creates a deep copy of the validation warning.
 func (vw *ValidationWarning) Clone() *ValidationWarning {
-	return &ValidationWarning{
-		Code:       vw.Code,
-		Field:      vw.Field,
-		Message:    vw.Message,
-		Details:    vw.Details,
-		Context:    vw.Context,
-		Level:      vw.Level,
-		Suggestion: vw.Suggestion,
-	}
+	clone := *vw
+	return &clone
 }
 
 // ValidationSummary provides a summary of validation results.
