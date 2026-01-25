@@ -323,38 +323,54 @@ go 1.21
 
 	// Add complexity based on level
 	if complexity >= 1 {
-		// Add cmd structure
-		os.MkdirAll(filepath.Join(dir, "cmd", "benchmark-project"), 0o755)
-		os.WriteFile(filepath.Join(dir, "cmd", "benchmark-project", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+		addCmdStructure(dir)
 	}
-
 	if complexity >= 3 {
-		// Add internal structure
-		os.MkdirAll(filepath.Join(dir, "internal", "app"), 0o755)
-		os.WriteFile(filepath.Join(dir, "internal", "app", "app.go"), []byte("package app\n\nfunc Run() {}"), 0o644)
-		os.WriteFile(filepath.Join(dir, "internal", "app", "config.go"), []byte("package app\n\ntype Config struct {}"), 0o644)
+		addInternalStructure(dir)
 	}
-
 	if complexity >= 5 {
-		// Add API structure
-		os.MkdirAll(filepath.Join(dir, "api", "v1"), 0o755)
-		os.WriteFile(filepath.Join(dir, "api", "v1", "handler.go"), []byte("package v1\n\nfunc Handle() {}"), 0o644)
-		os.WriteFile(filepath.Join(dir, "api", "v1", "middleware.go"), []byte("package v1\n\nfunc Middleware() {}"), 0o644)
+		addAPIStructure(dir)
 	}
-
 	if complexity >= 7 {
-		// Add pkg structure
-		os.MkdirAll(filepath.Join(dir, "pkg", "utils"), 0o755)
-		os.WriteFile(filepath.Join(dir, "pkg", "utils", "helper.go"), []byte("package utils\n\nfunc Helper() {}"), 0o644)
-		os.WriteFile(filepath.Join(dir, "pkg", "utils", "validator.go"), []byte("package utils\n\nfunc Validate() {}"), 0o644)
+		addPkgStructure(dir)
 	}
-
 	if complexity >= 10 {
-		// Add extensive structure
-		for i := range 5 {
-			pkgName := fmt.Sprintf("pkg%02d", i)
-			os.MkdirAll(filepath.Join(dir, pkgName), 0o755)
-			os.WriteFile(filepath.Join(dir, pkgName, pkgName+".go"), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0o644)
-		}
+		addExtensiveStructure(dir, 5)
+	}
+}
+
+// addCmdStructure adds cmd directory structure.
+func addCmdStructure(dir string) {
+	os.MkdirAll(filepath.Join(dir, "cmd", "benchmark-project"), 0o755)
+	os.WriteFile(filepath.Join(dir, "cmd", "benchmark-project", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+}
+
+// addInternalStructure adds internal/app directory structure.
+func addInternalStructure(dir string) {
+	os.MkdirAll(filepath.Join(dir, "internal", "app"), 0o755)
+	os.WriteFile(filepath.Join(dir, "internal", "app", "app.go"), []byte("package app\n\nfunc Run() {}"), 0o644)
+	os.WriteFile(filepath.Join(dir, "internal", "app", "config.go"), []byte("package app\n\ntype Config struct {}"), 0o644)
+}
+
+// addAPIStructure adds api/v1 directory structure.
+func addAPIStructure(dir string) {
+	os.MkdirAll(filepath.Join(dir, "api", "v1"), 0o755)
+	os.WriteFile(filepath.Join(dir, "api", "v1", "handler.go"), []byte("package v1\n\nfunc Handle() {}"), 0o644)
+	os.WriteFile(filepath.Join(dir, "api", "v1", "middleware.go"), []byte("package v1\n\nfunc Middleware() {}"), 0o644)
+}
+
+// addPkgStructure adds pkg/utils directory structure.
+func addPkgStructure(dir string) {
+	os.MkdirAll(filepath.Join(dir, "pkg", "utils"), 0o755)
+	os.WriteFile(filepath.Join(dir, "pkg", "utils", "helper.go"), []byte("package utils\n\nfunc Helper() {}"), 0o644)
+	os.WriteFile(filepath.Join(dir, "pkg", "utils", "validator.go"), []byte("package utils\n\nfunc Validate() {}"), 0o644)
+}
+
+// addExtensiveStructure adds multiple package directories.
+func addExtensiveStructure(dir string, count int) {
+	for i := range count {
+		pkgName := fmt.Sprintf("pkg%02d", i)
+		os.MkdirAll(filepath.Join(dir, pkgName), 0o755)
+		os.WriteFile(filepath.Join(dir, pkgName, pkgName+".go"), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0o644)
 	}
 }
