@@ -184,6 +184,79 @@ func (vr *ValidationResult) UpdateSummary() {
 	}
 }
 
+// LevelGetter is an interface for types that have a Level field.
+type LevelGetter interface {
+	GetLevel() string
+}
+
+// validationItem represents the common fields of ValidationError and ValidationWarning.
+type validationItem interface {
+	LevelGetter
+	GetField() string
+	GetMessage() string
+	GetSuggestion() string
+}
+
+// GetLevel returns the level for ValidationError.
+func (ve *ValidationError) GetLevel() string {
+	return string(ve.Level)
+}
+
+// GetField returns the field for ValidationError.
+func (ve *ValidationError) GetField() string {
+	return ve.Field
+}
+
+// GetMessage returns the message for ValidationError.
+func (ve *ValidationError) GetMessage() string {
+	return ve.Message
+}
+
+// GetSuggestion returns the suggestion for ValidationError.
+func (ve *ValidationError) GetSuggestion() string {
+	return ve.Suggestion
+}
+
+// GetLevel returns the level for ValidationWarning.
+func (vw *ValidationWarning) GetLevel() string {
+	return string(vw.Level)
+}
+
+// GetField returns the field for ValidationWarning.
+func (vw *ValidationWarning) GetField() string {
+	return vw.Field
+}
+
+// GetMessage returns the message for ValidationWarning.
+func (vw *ValidationWarning) GetMessage() string {
+	return vw.Message
+}
+
+// GetSuggestion returns the suggestion for ValidationWarning.
+func (vw *ValidationWarning) GetSuggestion() string {
+	return vw.Suggestion
+}
+
+// appendValidationItems appends validation items (errors or warnings) to the result builder.
+func appendValidationItems[T validationItem](
+	result *strings.Builder,
+	emoji string,
+	label string,
+	items []T,
+) {
+	if len(items) == 0 {
+		return
+	}
+
+	result.WriteString(fmt.Sprintf("\n\n%s %s (%d):", emoji, label, len(items)))
+	for _, item := range items {
+		result.WriteString(fmt.Sprintf("\n  • [%s] %s: %s", item.GetLevel(), item.GetField(), item.GetMessage()))
+		if item.GetSuggestion() != "" {
+			result.WriteString("\n    💡 " + item.GetSuggestion())
+		}
+	}
+}
+
 // String returns a human-readable string representation.
 func (vr *ValidationResult) String() string {
 	var result strings.Builder
@@ -194,25 +267,17 @@ func (vr *ValidationResult) String() string {
 		result.WriteString("❌ Validation failed")
 	}
 
-	if len(vr.Errors) > 0 {
-		result.WriteString(fmt.Sprintf("\n\n🚨 Errors (%d):", len(vr.Errors)))
-		for _, err := range vr.Errors {
-			result.WriteString(fmt.Sprintf("\n  • [%s] %s: %s", err.Level, err.Field, err.Message))
-			if err.Suggestion != "" {
-				result.WriteString("\n    💡 " + err.Suggestion)
-			}
-		}
+	var errorsAsItems []validationItem = make([]validationItem, len(vr.Errors))
+	for i, err := range vr.Errors {
+		errorsAsItems[i] = err
 	}
+	appendValidationItems(&result, "🚨", "Errors", errorsAsItems)
 
-	if len(vr.Warnings) > 0 {
-		result.WriteString(fmt.Sprintf("\n\n⚠️  Warnings (%d):", len(vr.Warnings)))
-		for _, warn := range vr.Warnings {
-			result.WriteString(fmt.Sprintf("\n  • [%s] %s: %s", warn.Level, warn.Field, warn.Message))
-			if warn.Suggestion != "" {
-				result.WriteString("\n    💡 " + warn.Suggestion)
-			}
-		}
+	var warningsAsItems []validationItem = make([]validationItem, len(vr.Warnings))
+	for i, warn := range vr.Warnings {
+		warningsAsItems[i] = warn
 	}
+	appendValidationItems(&result, "⚠️ ", "Warnings", warningsAsItems)
 
 	return result.String()
 }
