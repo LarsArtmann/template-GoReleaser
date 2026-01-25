@@ -5,7 +5,7 @@ import (
 )
 
 // runValidationTest is a helper function that tests a validator with valid and invalid inputs
-func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) error, field string, validInput string, invalidInput string) {
+func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) error, field, validInput, invalidInput string) {
 	// Test valid input
 	err := validator(validInput)
 	if err != nil {
@@ -27,7 +27,7 @@ func runValidationTest(t *testing.T, fv *FormValidator, validator func(string) e
 }
 
 // runSliceValidationTest is a helper function that tests a validator with valid and invalid slice inputs
-func runSliceValidationTest[T any](t *testing.T, fv *FormValidator, validator func([]T) error, field string, validInput []T, invalidInput []T) {
+func runSliceValidationTest[T any](t *testing.T, fv *FormValidator, validator func([]T) error, field string, validInput, invalidInput []T) {
 	// Test valid input
 	err := validator(validInput)
 	if err != nil {
@@ -45,6 +45,24 @@ func runSliceValidationTest[T any](t *testing.T, fv *FormValidator, validator fu
 
 	if fv.GetFieldError(field) == "" {
 		t.Errorf("%s should set %s error", field, field)
+	}
+}
+
+// runValidatorWithParamsTest is a helper function that tests a validator created with parameters
+func runValidatorWithParamsTest(t *testing.T, fv *FormValidator, validator func(string) error, testName string, validInput, invalidInput string) {
+	// Test valid input
+	err := validator(validInput)
+	if err != nil {
+		t.Errorf("%s should not error for valid input, got: %v", testName, err)
+	}
+
+	// Clear errors before testing invalid input
+	fv.ClearErrors()
+
+	// Test invalid input
+	err = validator(invalidInput)
+	if err == nil {
+		t.Errorf("%s should error for invalid input", testName)
 	}
 }
 
@@ -148,20 +166,8 @@ func TestFormValidatorSanitizeAndValidate(t *testing.T) {
 
 func TestFormValidatorValidateRequired(t *testing.T) {
 	fv := NewFormValidator()
-
 	validator := fv.ValidateRequired("Test Field")
-
-	// Test empty input
-	err := validator("")
-	if err == nil {
-		t.Errorf("ValidateRequired() should error for empty input")
-	}
-
-	// Test valid input
-	err = validator("test")
-	if err != nil {
-		t.Errorf("ValidateRequired() should not error for valid input")
-	}
+	runValidatorWithParamsTest(t, fv, validator, "ValidateRequired", "test", "")
 }
 
 func TestFormValidatorValidateLength(t *testing.T) {
@@ -190,38 +196,14 @@ func TestFormValidatorValidateLength(t *testing.T) {
 
 func TestFormValidatorValidateNoShellMetacharacters(t *testing.T) {
 	fv := NewFormValidator()
-
 	validator := fv.ValidateNoShellMetacharacters("Test Field")
-
-	// Test dangerous characters
-	err := validator("test;rm")
-	if err == nil {
-		t.Errorf("ValidateNoShellMetacharacters() should error for dangerous characters")
-	}
-
-	// Test safe input
-	err = validator("test-safe")
-	if err != nil {
-		t.Errorf("ValidateNoShellMetacharacters() should not error for safe input")
-	}
+	runValidatorWithParamsTest(t, fv, validator, "ValidateNoShellMetacharacters", "test-safe", "test;rm")
 }
 
 func TestFormValidatorValidateNoPathTraversal(t *testing.T) {
 	fv := NewFormValidator()
-
 	validator := fv.ValidateNoPathTraversal("Test Field")
-
-	// Test path traversal
-	err := validator("../../../etc")
-	if err == nil {
-		t.Errorf("ValidateNoPathTraversal() should error for path traversal")
-	}
-
-	// Test safe path
-	err = validator("./cmd/app")
-	if err != nil {
-		t.Errorf("ValidateNoPathTraversal() should not error for safe path")
-	}
+	runValidatorWithParamsTest(t, fv, validator, "ValidateNoPathTraversal", "./cmd/app", "../../../etc")
 }
 
 func TestFormValidatorSetFieldError(t *testing.T) {
