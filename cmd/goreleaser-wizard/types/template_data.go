@@ -264,31 +264,8 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 	return data
 }
 
-// GetGitHubOwner tries to get GitHub owner from git remote.
-func GetGitHubOwner() string {
-	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
-		if output, err := cmd.Output(); err == nil {
-			remote := strings.TrimSpace(string(output))
-			// Parse GitHub URL: git@github.com:owner/repo.git or https://github.com/owner/repo.git
-			if strings.Contains(remote, "github.com") {
-				parts := strings.Split(remote, "github.com")
-				if len(parts) > 1 {
-					repoPath := strings.TrimPrefix(parts[1], ":")
-					repoPath = strings.TrimPrefix(repoPath, "/")
-					repoPath = strings.TrimSuffix(repoPath, ".git")
-					pathParts := strings.Split(repoPath, "/")
-					if len(pathParts) > 0 {
-						return pathParts[0]
-					}
-				}
-			}
-		}
-	}
-	return "owner" // fallback
-}
-
-// GetGitHubRepo tries to get GitHub repo from git remote.
-func GetGitHubRepo() string {
+// parseGitHubRemote tries to get GitHub owner and repo from git remote.
+func parseGitHubRemote() (owner, repo string) {
 	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			remote := strings.TrimSpace(string(output))
@@ -301,11 +278,23 @@ func GetGitHubRepo() string {
 					repoPath = strings.TrimSuffix(repoPath, ".git")
 					pathParts := strings.Split(repoPath, "/")
 					if len(pathParts) > 1 {
-						return pathParts[1]
+						return pathParts[0], pathParts[1]
 					}
 				}
 			}
 		}
 	}
-	return "repo" // fallback
+	return "owner", "repo" // fallbacks
+}
+
+// GetGitHubOwner tries to get GitHub owner from git remote.
+func GetGitHubOwner() string {
+	owner, _ := parseGitHubRemote()
+	return owner
+}
+
+// GetGitHubRepo tries to get GitHub repo from git remote.
+func GetGitHubRepo() string {
+	_, repo := parseGitHubRemote()
+	return repo
 }

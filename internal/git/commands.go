@@ -191,25 +191,8 @@ type RepositoryInfo struct {
 	Tags        []string `json:"tags,omitempty"`
 }
 
-// extractOwner extracts the owner from a git URL.
-func extractOwner(url string) string {
-	if strings.Contains(url, "github.com") {
-		parts := strings.Split(url, "github.com")
-		if len(parts) > 1 {
-			repoPath := strings.TrimPrefix(parts[1], ":")
-			repoPath = strings.TrimPrefix(repoPath, "/")
-			repoPath = strings.TrimSuffix(repoPath, ".git")
-			pathParts := strings.Split(repoPath, "/")
-			if len(pathParts) > 0 {
-				return pathParts[0]
-			}
-		}
-	}
-	return "owner"
-}
-
-// extractRepo extracts the repository name from a git URL.
-func extractRepo(url string) string {
+// extractGitHubURL extracts both owner and repo from a git URL.
+func extractGitHubURL(url string) (owner, repo string) {
 	if strings.Contains(url, "github.com") {
 		parts := strings.Split(url, "github.com")
 		if len(parts) > 1 {
@@ -218,11 +201,23 @@ func extractRepo(url string) string {
 			repoPath = strings.TrimSuffix(repoPath, ".git")
 			pathParts := strings.Split(repoPath, "/")
 			if len(pathParts) > 1 {
-				return pathParts[1]
+				return pathParts[0], pathParts[1]
 			}
 		}
 	}
-	return "repo"
+	return "owner", "repo"
+}
+
+// extractOwner extracts the owner from a git URL.
+func extractOwner(url string) string {
+	owner, _ := extractGitHubURL(url)
+	return owner
+}
+
+// extractRepo extracts the repository name from a git URL.
+func extractRepo(url string) string {
+	_, repo := extractGitHubURL(url)
+	return repo
 }
 
 // GetVersionInfo gets version information from git.
