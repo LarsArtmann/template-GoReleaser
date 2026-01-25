@@ -18,9 +18,21 @@ func NewFormValidator() *FormValidator {
 	}
 }
 
-// validateWithFunction is a generic helper for validation functions.
+// validateWithFunction is a generic helper for string validation functions.
 func (fv *FormValidator) validateWithFunction(fieldName string, validateFunc func(string) error) func(string) error {
 	return func(value string) error {
+		if err := validateFunc(value); err != nil {
+			fv.errors[fieldName] = err.Error()
+			return err
+		}
+		delete(fv.errors, fieldName)
+		return nil
+	}
+}
+
+// validateStringSliceWithFunction is a helper for string slice validation functions.
+func validateStringSliceWithFunction(fv *FormValidator, fieldName string, validateFunc func([]string) error) func([]string) error {
+	return func(value []string) error {
 		if err := validateFunc(value); err != nil {
 			fv.errors[fieldName] = err.Error()
 			return err
@@ -57,12 +69,7 @@ func (fv *FormValidator) ValidateDockerRegistry() func(string) error {
 
 // ValidateBuildTags creates a huh-compatible validator for build tags.
 func (fv *FormValidator) ValidateBuildTags(tags []string) error {
-	if err := ValidateBuildTags(tags); err != nil {
-		fv.errors["build_tags"] = err.Error()
-		return err
-	}
-	delete(fv.errors, "build_tags")
-	return nil
+	return validateStringSliceWithFunction(fv, "build_tags", ValidateBuildTags)(tags)
 }
 
 // GetErrors returns all current validation errors.

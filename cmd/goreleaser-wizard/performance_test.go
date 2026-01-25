@@ -357,8 +357,8 @@ func addInternalStructure(dir string) {
 // addAPIStructure adds api/v1 directory structure.
 func addAPIStructure(dir string) {
 	createDirAndFiles(dir, "api/v1", map[string]string{
-		"handler.go":     "package v1\n\nfunc Handle() {}",
-		"middleware.go":  "package v1\n\nfunc Middleware() {}",
+		"handler.go":    "package v1\n\nfunc Handle() {}",
+		"middleware.go": "package v1\n\nfunc Middleware() {}",
 	})
 }
 
