@@ -306,15 +306,15 @@ func validateBusinessRules(config *domain.SafeProjectConfig, result *types.Valid
 // validateDockerBusinessRules validates Docker business rules.
 func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Docker support must be compatible with project type
-	if config.DockerSupport.IsEnabled() && !config.ProjectType.DockerSupported() {
-		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
-			Field:      "docker_support",
-			Message:    "Docker not supported for project type: " + config.ProjectType.String(),
-			Level:      types.ErrorLevelHigh,
-			Suggestion: "Disable Docker support or choose a Docker-compatible project type",
-		})
-	}
+	validateFeatureSupport(
+		result,
+		config.DockerSupport.IsEnabled(),
+		config.ProjectType.DockerSupported(),
+		"docker_support",
+		"Docker",
+		"for project type: "+config.ProjectType.String(),
+		"Disable Docker support or choose a Docker-compatible project type",
+	)
 
 	// Docker registry must be compatible with Git provider
 	if config.DockerSupport.IsDeployEnabled() {
@@ -396,15 +396,15 @@ func validateSigningBusinessRules(config *domain.SafeProjectConfig, result *type
 // validateActionsBusinessRules validates Actions business rules.
 func validateActionsBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Actions must be compatible with Git provider
-	if config.ActionLevel.IsEnabled() && !config.GitProvider.ActionsSupported() {
-		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
-			Field:      "action_level",
-			Message:    "Actions not supported by Git provider: " + config.GitProvider.String(),
-			Level:      types.ErrorLevelHigh,
-			Suggestion: "Choose an Actions-compatible Git provider or disable Actions",
-		})
-	}
+	validateFeatureSupport(
+		result,
+		config.ActionLevel.IsEnabled(),
+		config.GitProvider.ActionsSupported(),
+		"action_level",
+		"Actions",
+		"by Git provider: "+config.GitProvider.String(),
+		"Choose an Actions-compatible Git provider or disable Actions",
+	)
 
 	// Action triggers are required when Actions are enabled
 	if config.ActionLevel.IsEnabled() && len(config.ActionsOn) == 0 {
@@ -554,6 +554,20 @@ func generateWarnings(config *domain.SafeProjectConfig, result *types.Validation
 }
 
 // Helper functions.
+
+// validateFeatureSupport validates that a feature is compatible with its target.
+func validateFeatureSupport(result *types.ValidationResult, featureEnabled, targetSupported bool, field, featureName, unsupportedTarget, suggestion string) {
+	if featureEnabled && !targetSupported {
+		result.AddError(&types.ValidationError{
+			Code:       errors.ErrInvalidConfig,
+			Field:      field,
+			Message:    fmt.Sprintf("%s not supported %s", featureName, unsupportedTarget),
+			Level:      types.ErrorLevelHigh,
+			Suggestion: suggestion,
+		})
+	}
+}
+
 func containsPlatform(platforms []domain.Platform, target domain.Platform) bool {
 	return slices.Contains(platforms, target)
 }
