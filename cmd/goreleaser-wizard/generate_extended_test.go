@@ -1,16 +1,3 @@
-// CRITICAL ARCHITECTURE TODO: This file is 511 lines - SPLIT IMMEDIATELY into:
-// 1. generate_template_test.go - Template generation tests
-// 2. generate_actions_test.go - GitHub Actions generation tests
-// 3. generate_validation_test.go - Config validation tests
-// 4. generate_integration_test.go - Integration tests
-// 5. test_helpers.go - Common test utilities
-//
-// TODO: Create proper test suite architecture
-// TODO: Extract test data to separate files
-// TODO: Implement test factories for config objects
-// TODO: Add property-based testing with gopter
-// TODO: Create table-driven test helpers
-// TODO: Implement proper test isolation and cleanup
 package main
 
 import (
@@ -247,21 +234,8 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			}
 
 			if !tt.expectError {
-				// Read generated file
 				workflowPath := filepath.Join(".github", "workflows", "release.yml")
-				content, err := os.ReadFile(workflowPath)
-				if err != nil {
-					t.Fatalf("Failed to read generated workflow: %v", err)
-				}
-
-				contentStr := string(content)
-
-				// Check for expected strings
-				for _, check := range tt.checks {
-					if !strings.Contains(contentStr, check) {
-						t.Errorf("Generated workflow missing expected string: %q", check)
-					}
-				}
+				verifyFileContents(t, workflowPath, tt.checks)
 			}
 		})
 	}

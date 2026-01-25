@@ -9,6 +9,21 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
+func verifyFileContents(t *testing.T, filePath string, checks []string) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		t.Fatalf("Failed to read generated file: %v", err)
+	}
+
+	contentStr := string(content)
+
+	for _, check := range checks {
+		if !strings.Contains(contentStr, check) {
+			t.Errorf("Generated file missing expected string: %q", check)
+		}
+	}
+}
+
 func TestGenerateGoReleaserConfig(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -270,21 +285,8 @@ func TestGenerateGitHubActions(t *testing.T) {
 			}
 
 			if !tt.wantErr {
-				// Read generated file
 				workflowPath := filepath.Join(".github", "workflows", "release.yml")
-				content, err := os.ReadFile(workflowPath)
-				if err != nil {
-					t.Fatalf("Failed to read generated file: %v", err)
-				}
-
-				contentStr := string(content)
-
-				// Check for expected strings
-				for _, check := range tt.checks {
-					if !strings.Contains(contentStr, check) {
-						t.Errorf("Generated workflow missing expected string: %q", check)
-					}
-				}
+				verifyFileContents(t, workflowPath, tt.checks)
 			}
 		})
 	}
