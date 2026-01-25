@@ -26,6 +26,19 @@ func runEscapeTests(t *testing.T, funcName string, escaper escapeFunc, tests []e
 	}
 }
 
+// runFuzzTest is a helper function to run fuzz tests for escape functions
+func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
+	for _, s := range seed {
+		f.Add(s)
+	}
+
+	f.Fuzz(func(t *testing.T, input string) {
+		result := escaper(input)
+		// Should not panic
+		_ = result
+	})
+}
+
 func TestTemplateEscaper_EscapeYAML(t *testing.T) {
 	te := NewTemplateEscaper()
 
@@ -210,44 +223,20 @@ func TestIsValidDockerLabel(t *testing.T) {
 // Fuzzing tests for escaping functions.
 func FuzzEscapeYAML(f *testing.F) {
 	seed := []string{"hello", "name: value", "don't", "multiline\nstring"}
-	for _, s := range seed {
-		f.Add(s)
-	}
-
 	te := NewTemplateEscaper()
-	f.Fuzz(func(t *testing.T, input string) {
-		result := te.EscapeYAML(input)
-		// Should not panic
-		_ = result
-	})
+	runFuzzTest(f, seed, te.EscapeYAML)
 }
 
 func FuzzEscapeShell(f *testing.F) {
 	seed := []string{"hello", "rm -rf", "; echo", "command$(rm)"}
-	for _, s := range seed {
-		f.Add(s)
-	}
-
 	te := NewTemplateEscaper()
-	f.Fuzz(func(t *testing.T, input string) {
-		result := te.EscapeShell(input)
-		// Should not panic
-		_ = result
-	})
+	runFuzzTest(f, seed, te.EscapeShell)
 }
 
 func FuzzEscapeJSON(f *testing.F) {
 	seed := []string{"hello", "quote's", `back\slash`, "newline\n"}
-	for _, s := range seed {
-		f.Add(s)
-	}
-
 	te := NewTemplateEscaper()
-	f.Fuzz(func(t *testing.T, input string) {
-		result := te.EscapeJSON(input)
-		// Should not panic
-		_ = result
-	})
+	runFuzzTest(f, seed, te.EscapeJSON)
 }
 
 // Benchmark tests.
