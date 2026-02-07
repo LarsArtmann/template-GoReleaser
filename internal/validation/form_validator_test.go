@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-// runValidationTest is a generic helper function that tests a validator with valid and invalid inputs
+// runValidationTest is a generic helper function that tests a validator with valid and invalid inputs.
 func runValidationTest[T any](t *testing.T, fv *FormValidator, validator func(T) error, field string, validInput, invalidInput T, checkFieldError bool) {
 	// Test valid input
 	err := validator(validInput)
@@ -26,7 +26,7 @@ func runValidationTest[T any](t *testing.T, fv *FormValidator, validator func(T)
 	}
 }
 
-// runValidatorWithParamsTest is a helper function that tests a validator created with parameters
+// runValidatorWithParamsTest is a helper function that tests a validator created with parameters.
 func runValidatorWithParamsTest(t *testing.T, fv *FormValidator, validator func(string) error, testName, validInput, invalidInput string) {
 	runValidationTest(t, fv, validator, testName, validInput, invalidInput, false)
 }

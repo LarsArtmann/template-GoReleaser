@@ -507,7 +507,7 @@ func (j *HomebrewGenerationJob) Rollback(ctx context.Context) error {
 
 // rollbackGeneration is a helper function that handles the common rollback pattern for generators.
 func rollbackGeneration(logger Logger, rollbacker Rollbacker, ctx context.Context, actionName string) error {
-	logger.Info(fmt.Sprintf("Rolling back %s", actionName))
+	logger.Info("Rolling back " + actionName)
 
 	// Check context cancellation
 	if ctx.Err() != nil {
@@ -517,7 +517,7 @@ func rollbackGeneration(logger Logger, rollbacker Rollbacker, ctx context.Contex
 	// Rollback generator
 	err := rollbacker.Rollback(ctx)
 	if err != nil {
-		return errors.WrapError(err, errors.ErrWorkflowExecution, fmt.Sprintf("Failed to rollback %s", actionName))
+		return errors.WrapError(err, errors.ErrWorkflowExecution, "Failed to rollback "+actionName)
 	}
 
 	return nil

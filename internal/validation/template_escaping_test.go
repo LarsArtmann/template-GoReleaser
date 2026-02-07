@@ -4,37 +4,37 @@ import (
 	"testing"
 )
 
-// Helper type for escape function tests
+// Helper type for escape function tests.
 type escapeTestCase struct {
 	name     string
 	input    string
 	expected string
 }
 
-// Helper type for validation function tests
+// Helper type for validation function tests.
 type validationTestCase struct {
 	name     string
 	input    string
 	expected bool
 }
 
-// escapeFunc represents a function that takes a string and returns an escaped string
+// escapeFunc represents a function that takes a string and returns an escaped string.
 type escapeFunc func(string) string
 
-// validationFunc represents a function that takes a string and returns a bool
+// validationFunc represents a function that takes a string and returns a bool.
 type validationFunc func(string) bool
 
-// testFunc represents a generic test function
+// testFunc represents a generic test function.
 type testFunc[T any] func(string) T
 
-// valueTestCase represents a generic test case for value-returning functions
+// valueTestCase represents a generic test case for value-returning functions.
 type valueTestCase[T any] struct {
 	name     string
 	input    string
 	expected T
 }
 
-// runTests is a generic helper function to run table-driven tests
+// runTests is a generic helper function to run table-driven tests.
 func runTests[T comparable](t *testing.T, funcName string, fn testFunc[T], tests []valueTestCase[T]) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -46,7 +46,7 @@ func runTests[T comparable](t *testing.T, funcName string, fn testFunc[T], tests
 	}
 }
 
-// runFuzzTest is a helper function to run fuzz tests for escape functions
+// runFuzzTest is a helper function to run fuzz tests for escape functions.
 func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	for _, s := range seed {
 		f.Add(s)
@@ -59,7 +59,7 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	})
 }
 
-// Test case constants for escape functions
+// Test case constants for escape functions.
 var (
 	shellEscapeTestCases = []valueTestCase[string]{
 		{"Simple text", "hello", "'hello'"},
@@ -108,7 +108,7 @@ var (
 		{"Starts with dash", "-dash", "label--dash"},
 	}
 
-	// Test case constants for validation functions
+	// Test case constants for validation functions.
 	shellInjectionTestCases = []valueTestCase[bool]{
 		{"echo hello", "echo hello", false},
 		{"rm -rf /", "rm -rf /", true},
@@ -130,14 +130,14 @@ var (
 	}
 )
 
-// runBenchmark is a helper function to run benchmark tests for escape functions
+// runBenchmark is a helper function to run benchmark tests for escape functions.
 func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
 	for b.Loop() {
 		_ = escaper(input)
 	}
 }
 
-// runEscapeTest is a helper function to run a complete escape test with a fresh escaper
+// runEscapeTest is a helper function to run a complete escape test with a fresh escaper.
 func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []valueTestCase[string]) {
 	te := NewTemplateEscaper()
 	escaper := func(input string) string {

@@ -256,7 +256,7 @@ func (j *PreviewGenerationJob) generatePreview(ctx context.Context, generator Pr
 		return errors.WrapError(err, errors.ErrConfigGeneration, fmt.Sprintf("Failed to generate %s preview", label))
 	}
 
-	j.logger.Info(fmt.Sprintf("%s preview generated", label), "preview", preview)
+	j.logger.Info(label+" preview generated", "preview", preview)
 	return nil
 }
 

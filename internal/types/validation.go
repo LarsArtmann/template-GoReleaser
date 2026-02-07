@@ -254,9 +254,9 @@ func appendValidationItems[T validationItem](
 		return
 	}
 
-	result.WriteString(fmt.Sprintf("\n\n%s %s (%d):", emoji, label, len(items)))
+	fmt.Fprintf(result, "\n\n%s %s (%d):", emoji, label, len(items))
 	for _, item := range items {
-		result.WriteString(fmt.Sprintf("\n  • [%s] %s: %s", item.GetLevel(), item.GetField(), item.GetMessage()))
+		fmt.Fprintf(result, "\n  • [%s] %s: %s", item.GetLevel(), item.GetField(), item.GetMessage())
 		if item.GetSuggestion() != "" {
 			result.WriteString("\n    💡 " + item.GetSuggestion())
 		}
