@@ -11,6 +11,7 @@
 GoReleaser-Wizard is an interactive CLI tool that generates production-ready GoReleaser configurations. It follows Domain-Driven Design (DDD) principles with Clean Architecture, using a workflow-based job execution system for configuration generation and validation.
 
 **Key Technologies**:
+
 - Go 1.25.6
 - Cobra CLI framework
 - Viper for configuration
@@ -184,6 +185,7 @@ The project uses **go-arch-lint** to enforce architectural boundaries:
 - **Vendor support**: Can validate with or without vendor dependencies
 
 **Key rules** (from `.go-arch-lint.yml`):
+
 - Domain components can only depend on other domain components
 - Application layer can depend on domain but not infrastructure
 - Infrastructure implements domain interfaces
@@ -196,6 +198,7 @@ The project uses **go-arch-lint** to enforce architectural boundaries:
 ### Domain-Driven Design Patterns
 
 **1. Safe Configuration Types**
+
 ```go
 // Single source of truth for configuration
 type SafeProjectConfig struct {
@@ -209,6 +212,7 @@ func (spc *SafeProjectConfig) ApplyDefaults() { }
 ```
 
 **2. Typed Enumerations**
+
 ```go
 type ProjectType string
 
@@ -222,6 +226,7 @@ func (pt ProjectType) IsValid() bool { }
 ```
 
 **3. Smart Defaults**
+
 ```go
 func NewSafeProjectConfig() *SafeProjectConfig {
     return &SafeProjectConfig{
@@ -274,6 +279,7 @@ func (de *DomainError) WithCause(err error) *DomainError { }
 ```
 
 **Error Usage Pattern**:
+
 ```go
 // Validation errors
 if name == "" {
@@ -296,6 +302,7 @@ if err := os.ReadFile(path); err != nil {
 ```
 
 **Recovery from Panics**:
+
 ```go
 func recoverFromPanic(context string) {
     if r := recover(); r != nil {
@@ -319,6 +326,7 @@ func recoverFromPanic(context string) {
 The project uses a sophisticated workflow-based execution system:
 
 **Workflow Pattern**:
+
 ```go
 // Workflow orchestrates multiple jobs
 type Workflow struct {
@@ -342,6 +350,7 @@ func (w *Workflow) Execute(ctx context.Context) error {
 ```
 
 **Job Factory Pattern**:
+
 ```go
 // JobFactory creates jobs based on configuration
 type JobFactory struct {
@@ -357,6 +366,7 @@ func (jf *JobFactory) CreateConfigJob(config *domain.SafeProjectConfig) Job {
 ```
 
 **Job Implementation**:
+
 ```go
 type ConfigGenerationJob struct {
     Config *domain.SafeProjectConfig
@@ -379,6 +389,7 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 ### Validation Patterns
 
 **Multi-Level Validation**:
+
 ```go
 // 1. Field-level validation (internal/validation/basic.go)
 func ValidateProjectName(name string) error {
@@ -470,6 +481,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 ### Testing Patterns
 
 **Table-Driven Tests**:
+
 ```go
 func TestValidateProjectName(t *testing.T) {
     tests := []struct {
@@ -516,6 +528,7 @@ func TestValidateProjectName(t *testing.T) {
 ```
 
 **Test Setup Pattern**:
+
 ```go
 func TestInitCommand(t *testing.T) {
     tests := []struct {
@@ -595,24 +608,31 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 ### Naming Conventions
 
 **Packages**: Lowercase, single word when possible
+
 - `domain`, `validation`, `errors`, `generators`, `jobs`
 
 **Types**: PascalCase
+
 - `SafeProjectConfig`, `Workflow`, `JobFactory`, `DomainError`
 
 **Interfaces**: PascalCase, usually end with "er"
+
 - `Logger`, `Job`, `FileSystem`
 
 **Functions**: PascalCase (exported), camelCase (unexported)
+
 - `ValidateProjectName()`, `prepareTemplateData()`, `createBackup()`
 
 **Constants**: PascalCase
+
 - `ErrValidationFailed`, `ProjectTypeCLI`, `JobExecutionStatusRunning`
 
 **Variables**: camelCase
+
 - `projectName`, `templateData`, `jobManager`
 
 **Acronyms**: Capitalized in PascalCase, lowercase in camelCase
+
 - `HTTPResponse` (not HttpResponse)
 - `httpClient` (not HTTPClient)
 - `CGOStatus`, `SBOM`, `LDFlags` (well-known acronyms all caps)
@@ -622,6 +642,7 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 **Keep files under 300 lines** - Split immediately when exceeded
 
 Example file splitting pattern (from workflow.go):
+
 ```
 workflow_core.go         - Core Workflow struct and basic methods
 workflow_execution.go    - Execution logic and state management
@@ -658,6 +679,7 @@ import (
 ### Function Patterns
 
 **Early returns preferred** over nested conditionals:
+
 ```go
 // Good
 func validateConfig(config *Config) error {
@@ -705,6 +727,7 @@ func validateConfig(config *Config) error {
 ### Test Utilities
 
 **Use testify/assert**:
+
 ```go
 import "github.com/stretchr/testify/assert"
 
@@ -716,6 +739,7 @@ assert.Contains(t, str, substr)
 ```
 
 **Setup/Teardown**:
+
 ```go
 func TestMain(m *testing.M) {
     // Setup
@@ -738,16 +762,19 @@ func TestMain(m *testing.M) {
 ### Architecture Constraints
 
 **1. Domain Layer Purity**
+
 - Domain layer MUST NOT import application or infrastructure
 - Domain cannot use external dependencies (except through interfaces)
 - Test domain layer in isolation - no external services
 
 **2. Test File Exclusions**
+
 - `*_test.go` files are excluded from architecture validation
 - This allows testing patterns like package imports
 - Don't rely on this for production code
 
 **3. Circular Dependencies**
+
 - go-arch-lint will catch circular dependencies
 - Import cycles prevent compilation
 - Use dependency injection to break cycles
@@ -755,11 +782,13 @@ func TestMain(m *testing.M) {
 ### Error Handling
 
 **4. Always Use Domain Errors**
+
 - Never use `errors.New()` or `fmt.Errorf()` directly
 - Always create errors with `errors.New*Error()`
 - Provides structured error context and recovery suggestions
 
 **5. Context Propagation**
+
 - All async operations should accept `context.Context`
 - Check `ctx.Err()` for cancellation
 - Pass context through to downstream operations
@@ -767,11 +796,13 @@ func TestMain(m *testing.M) {
 ### Template System
 
 **6. Template Escaping**
+
 - Go templates use `{{` and `}}` delimiters
 - Must escape literal braces with `{{"{{"}}` and `{{"}}"}}`
 - Use `internal/validation/template_escaping.go` utilities
 
 **7. Template Functions**
+
 - Custom template functions registered in `template.FuncMap`
 - Example: `"incpatch": git.IncPatchVersion`
 - Functions must be exported and error-safe
@@ -779,6 +810,7 @@ func TestMain(m *testing.M) {
 ### File Operations
 
 **8. Use `os.WriteFile` with Explicit Permissions**
+
 ```go
 // Good
 os.WriteFile("config.yaml", data, 0o644)
@@ -788,22 +820,26 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
 ```
 
 **9. Backup Before Overwrite**
+
 - Always create backups before overwriting existing files
 - Pattern used in generators: `createBackup()` method
 
 ### Build and Dependencies
 
 **10. Justfile Priority**
+
 - Prefer `just` commands over manual commands
 - `just test` instead of `go test ./...`
 - `just build` instead of `go build ./...`
 
 **11. Go Module Management**
+
 - Use `go mod tidy` to clean dependencies
 - Verify with `go mod verify`
 - Check for vulnerabilities with `just lint-vulns`
 
 **12. Tool Versions**
+
 - Go 1.25.6 specified in go.mod
 - golangci-lint v2.6.0
 - go-arch-lint v1.14.0
@@ -812,16 +848,19 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
 ### Linting and Quality
 
 **13. Pre-commit Hooks**
+
 - Install with `just install-hooks` (fast) or `just install-hooks-full` (comprehensive)
 - Fast version: formatting only
 - Full version: includes architecture graph validation
 
 **14. Linting is Strict**
+
 - All linters in `.golangci.yml` are enabled
 - Fix issues before committing
 - Use `just fix` for automatic fixes
 
 **15. Unused Code Detection**
+
 - `unusedparams` linter catches unused parameters
 - `unusedfunc` linter catches unused functions
 - Remove unused code or use `_` prefix
@@ -829,11 +868,13 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
 ### Git Workflow
 
 **16. Never Use `git reset --hard`**
+
 - Use `git mv` for file moves (preserves history)
 - Never use plain `mv` in git repos
 - Check with memory files before destructive operations
 
 **17. Commit Message Format**
+
 - Follow Conventional Commits spec
 - Types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
 - Example: `feat: add Docker multi-stage build support`
@@ -845,6 +886,7 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
 ### Setup New Feature
 
 1. **Create feature branch**
+
    ```bash
    git checkout -b feature/my-feature
    ```
@@ -856,12 +898,14 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
    - Add tests alongside implementation
 
 3. **Run tests and linting**
+
    ```bash
    just test
    just lint
    ```
 
 4. **Commit with proper message**
+
    ```bash
    git add cmd/goreleaser-wizard/my_feature.go internal/domain/types.go
    git commit -m "feat: add my feature"
@@ -875,6 +919,7 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
 ### Debugging
 
 **Enable debug logging**:
+
 ```bash
 # Global flag
 goreleaser-wizard --debug init
@@ -884,12 +929,14 @@ GORELEASER_WIZARD_DEBUG=true goreleaser-wizard init
 ```
 
 **Check architecture violations**:
+
 ```bash
 just lint-arch  # Detailed architecture output
 just graph      # Visualize dependencies
 ```
 
 **Profile performance**:
+
 ```bash
 just profile-cpu      # CPU profiling
 just profile-heap     # Memory profiling
@@ -899,21 +946,25 @@ just profile-trace    # Execution trace
 ### Common Issues
 
 **Import cycle detected**:
+
 - Check architecture with `just lint-arch -v`
 - Use dependency injection to break cycle
 - Move shared code to domain layer
 
 **Template rendering fails**:
+
 - Check template escaping with `internal/validation/template_escaping.go`
 - Verify template functions are registered
 - Ensure template data matches expected structure
 
 **Validation errors**:
+
 - Check error code in `internal/errors/domain_errors.go`
 - Verify validation logic in `internal/validation/`
 - Check business rules in `internal/validation/business_rules.go`
 
 **Tests failing in CI**:
+
 - Run locally with `just ci`
 - Check test coverage with `just coverage`
 - Verify architecture with `just lint-arch`
@@ -941,6 +992,7 @@ The wizard generates four main configuration files:
 ### Smart Defaults
 
 The wizard analyzes the project to provide intelligent defaults:
+
 - Detects project structure from `go.mod`
 - Recommends platforms (Linux, macOS, Windows)
 - Suggests architectures (amd64, arm64)
@@ -959,23 +1011,27 @@ The wizard analyzes the project to provide intelligent defaults:
 ## Configuration Files
 
 ### `.go-arch-lint.yml`
+
 - Defines architectural components and rules
 - Enforces Clean Architecture boundaries
 - Enables deep scanning for AST analysis
 - Excludes test files from validation
 
 ### `.golangci.yml`
+
 - Comprehensive linter configuration
 - 100+ linters enabled
 - Strict error/warning thresholds
 - Custom rules for code quality
 
 ### `justfile`
+
 - Primary task runner
 - Core commands: build, test, fmt, clean, ci
 - Integration with go-arch-lint commands
 
 ### `dev/arch-lint.just`
+
 - Enterprise-grade linting commands
 - Advanced features: profiling, benchmarks, reporting
 - Security scanning: capslock, gosec, govulncheck
@@ -1005,17 +1061,20 @@ The wizard analyzes the project to provide intelligent defaults:
 ## Documentation Resources
 
 ### Project Documentation
+
 - **README.md** - Project overview and usage
 - **CONTRIBUTING.md** - Contribution guidelines
 - **CHANGELOG.md** - Version history
 - **SECURITY.md** - Security policy
 
 ### Internal Documentation
+
 - **docs/status/** - Status reports and analysis
 - **docs/planning/** - Architecture and planning documents
 - **docs/github/** - GitHub issue analysis
 
 ### External Resources
+
 - **GoReleaser Documentation** - https://goreleaser.com
 - **Cobra Documentation** - https://github.com/spf13/cobra
 - **Charm Libraries** - https://charm.sh
@@ -1092,20 +1151,24 @@ just lint-capslock
 ### Common Errors
 
 **"go-arch-lint not found"**
+
 - Run `just install` to install tools
 - Or install manually: `go install github.com/fe3dback/go-arch-lint@v1.14.0`
 
 **"architecture violations found"**
+
 - Check `just lint-arch -v` for details
 - Verify imports follow dependency rules
 - Use `just graph` to visualize dependencies
 
 **"template parsing failed"**
+
 - Check template escaping (`{{` vs `{{"{{"}}`)
 - Verify template syntax
 - Ensure all variables are defined
 
 **"validation failed"**
+
 - Check error code and message
 - Review validation logic in `internal/validation/`
 - Verify business rules in `internal/validation/business_rules.go`
@@ -1122,6 +1185,7 @@ just lint-capslock
 ## Summary Checklist
 
 Before committing changes:
+
 - [ ] All tests pass (`just test`)
 - [ ] Code formatted (`just fmt`)
 - [ ] Linting passes (`just lint`)
@@ -1133,6 +1197,7 @@ Before committing changes:
 - [ ] Commit message follows Conventional Commits
 
 Before pushing changes:
+
 - [ ] Full CI passes (`just ci`)
 - [ ] No architecture violations
 - [ ] Code coverage >= 80%
