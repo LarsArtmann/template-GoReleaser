@@ -254,7 +254,8 @@ func ValidateDockerImageName(name string) error {
 			).WithField("docker_image").WithSuggestion("Use a shorter tag")
 		}
 
-		if !strings.HasPrefix(tag, "v") && !regexp.MustCompile(`^[a-zA-Z0-9._-]+$`).MatchString(tag) {
+		if !strings.HasPrefix(tag, "v") &&
+			!regexp.MustCompile(`^[a-zA-Z0-9._-]+$`).MatchString(tag) {
 			return errors.NewValidationError(
 				errors.ErrInvalidDockerImage,
 				"Invalid Docker image tag format",
@@ -274,6 +275,7 @@ func ValidateDockerImageName(name string) error {
 		if strings.Contains(imageNameLower, reserved) && imageNameLower != reserved {
 			continue // Allow containing but not equal to reserved names
 		}
+
 		if imageNameLower == reserved {
 			return errors.NewValidationError(
 				errors.ErrInvalidDockerImage,
@@ -453,6 +455,7 @@ func ValidateBuildTags(tags []string) error {
 				fmt.Sprintf("Build tag '%s' is specified multiple times", tag),
 			).WithField("build_tags").WithSuggestion("Remove duplicate build tags")
 		}
+
 		seen[tag] = true
 	}
 

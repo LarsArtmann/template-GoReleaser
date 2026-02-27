@@ -35,7 +35,12 @@ type valueTestCase[T any] struct {
 }
 
 // runTests is a generic helper function to run table-driven tests.
-func runTests[T comparable](t *testing.T, funcName string, fn testFunc[T], tests []valueTestCase[T]) {
+func runTests[T comparable](
+	t *testing.T,
+	funcName string,
+	fn testFunc[T],
+	tests []valueTestCase[T],
+) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := fn(tt.input)
@@ -138,7 +143,12 @@ func runBenchmark(b *testing.B, input string, escaper escapeFunc) {
 }
 
 // runEscapeTest is a helper function to run a complete escape test with a fresh escaper.
-func runEscapeTest(t *testing.T, funcName string, escaperMethod func(te *TemplateEscaper, input string) string, tests []valueTestCase[string]) {
+func runEscapeTest(
+	t *testing.T,
+	funcName string,
+	escaperMethod func(te *TemplateEscaper, input string) string,
+	tests []valueTestCase[string],
+) {
 	te := NewTemplateEscaper()
 	escaper := func(input string) string {
 		return escaperMethod(te, input)
@@ -155,7 +165,12 @@ func TestTemplateEscaper_EscapeShell(t *testing.T) {
 }
 
 func TestTemplateEscaper_EscapeGitHubActions(t *testing.T) {
-	runEscapeTest(t, "EscapeGitHubActions", (*TemplateEscaper).EscapeGitHubActions, githubActionsEscapeTestCases)
+	runEscapeTest(
+		t,
+		"EscapeGitHubActions",
+		(*TemplateEscaper).EscapeGitHubActions,
+		githubActionsEscapeTestCases,
+	)
 }
 
 func TestTemplateEscaper_EscapeJSON(t *testing.T) {
@@ -163,7 +178,12 @@ func TestTemplateEscaper_EscapeJSON(t *testing.T) {
 }
 
 func TestTemplateEscaper_EscapeDockerLabel(t *testing.T) {
-	runEscapeTest(t, "EscapeDockerLabel", (*TemplateEscaper).EscapeDockerLabel, dockerLabelEscapeTestCases)
+	runEscapeTest(
+		t,
+		"EscapeDockerLabel",
+		(*TemplateEscaper).EscapeDockerLabel,
+		dockerLabelEscapeTestCases,
+	)
 }
 
 func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
@@ -176,7 +196,12 @@ func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
 		wantErr      bool
 	}{
 		{"Safe YAML", "name: myapp", "yaml", false},
-		{"YAML injection", "name: ${SCRIPT}", "yaml", false}, // Pattern doesn't include full variable
+		{
+			"YAML injection",
+			"name: ${SCRIPT}",
+			"yaml",
+			false,
+		}, // Pattern doesn't include full variable
 		{"Safe shell", "echo 'hello'", "shell", false},
 		{"Shell injection", "rm -rf /", "shell", true},
 		{"Safe GitHub Actions", "name: build", "github-actions", false},

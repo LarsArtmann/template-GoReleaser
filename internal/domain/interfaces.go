@@ -92,7 +92,11 @@ type GitHubRepository interface {
 	// Repository operations
 	GetRepo(ctx context.Context, owner, name string) (*GitHubRepo, error)
 	CreateRepo(ctx context.Context, repo *GitHubRepoRequest) (*GitHubRepo, error)
-	UpdateRepo(ctx context.Context, owner, name string, updates *GitHubRepoUpdate) (*GitHubRepo, error)
+	UpdateRepo(
+		ctx context.Context,
+		owner, name string,
+		updates *GitHubRepoUpdate,
+	) (*GitHubRepo, error)
 
 	// Branch and tag operations
 	GetBranches(ctx context.Context, owner, name string) ([]*GitHubBranch, error)
@@ -101,12 +105,24 @@ type GitHubRepository interface {
 
 	// Release operations
 	GetReleases(ctx context.Context, owner, name string) ([]*GitHubRelease, error)
-	CreateRelease(ctx context.Context, owner, name string, release *GitHubReleaseRequest) (*GitHubRelease, error)
-	UploadReleaseAsset(ctx context.Context, owner, name, releaseID string, asset *GitHubAsset) (*GitHubAsset, error)
+	CreateRelease(
+		ctx context.Context,
+		owner, name string,
+		release *GitHubReleaseRequest,
+	) (*GitHubRelease, error)
+	UploadReleaseAsset(
+		ctx context.Context,
+		owner, name, releaseID string,
+		asset *GitHubAsset,
+	) (*GitHubAsset, error)
 
 	// Workflow operations
 	GetWorkflows(ctx context.Context, owner, name string) ([]*GitHubWorkflow, error)
-	TriggerWorkflow(ctx context.Context, owner, name, workflowID string, inputs map[string]any) error
+	TriggerWorkflow(
+		ctx context.Context,
+		owner, name, workflowID string,
+		inputs map[string]any,
+	) error
 
 	// Authentication and permissions
 	ValidateToken(ctx context.Context, token string) error
@@ -122,7 +138,11 @@ type DockerRepository interface {
 
 	// Image operations
 	BuildImage(ctx context.Context, dockerfile, tag string, config *DockerBuildConfig) error
-	PushImage(ctx context.Context, image, registry DockerRegistry, credentials *DockerCredentials) error
+	PushImage(
+		ctx context.Context,
+		image, registry DockerRegistry,
+		credentials *DockerCredentials,
+	) error
 	PullImage(ctx context.Context, image string) error
 
 	// Image metadata
@@ -132,7 +152,11 @@ type DockerRepository interface {
 	// Authentication and security
 	Login(ctx context.Context, registry DockerRegistry, credentials *DockerCredentials) error
 	Logout(ctx context.Context, registry DockerRegistry) error
-	ValidateCredentials(ctx context.Context, registry DockerRegistry, credentials *DockerCredentials) error
+	ValidateCredentials(
+		ctx context.Context,
+		registry DockerRegistry,
+		credentials *DockerCredentials,
+	) error
 }
 
 // Logger interface for dependency injection.
@@ -170,7 +194,11 @@ type ConfigUseCase interface {
 	LoadConfig(ctx context.Context, path string) (*SafeProjectConfig, error)
 	SaveConfig(ctx context.Context, config *SafeProjectConfig, path string) error
 	ValidateConfig(ctx context.Context, config *SafeProjectConfig) (*ValidationResult, error)
-	UpdateConfig(ctx context.Context, config *SafeProjectConfig, updates *ConfigUpdate) (*SafeProjectConfig, error)
+	UpdateConfig(
+		ctx context.Context,
+		config *SafeProjectConfig,
+		updates *ConfigUpdate,
+	) (*SafeProjectConfig, error)
 }
 
 // GenerationUseCase handles template and configuration generation.

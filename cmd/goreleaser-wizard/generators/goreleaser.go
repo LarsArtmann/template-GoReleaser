@@ -89,6 +89,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	g.logger.Info("GoReleaser configuration generated successfully")
+
 	return nil
 }
 
@@ -96,24 +97,30 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 func (g *GoReleaserGenerator) createBackup(filename string) error {
 	if _, err := os.Stat(filename); err == nil {
 		backupPath := filename + ".backup"
-		if err := os.Rename(filename, backupPath); err != nil {
+		err := os.Rename(filename, backupPath)
+		if err != nil {
 			return errors.NewFileError(
 				errors.ErrFileOperation,
 				"Failed to create backup",
 				err.Error(),
 			).WithCause(err)
 		}
+
 		g.logger.Info("Created backup file", "backup", backupPath)
 	}
+
 	return nil
 }
 
 // prepareTemplateData prepares complete template data including git information.
-func (g *GoReleaserGenerator) prepareTemplateData(ctx context.Context) (*types.GoReleaserTemplateData, error) {
+func (g *GoReleaserGenerator) prepareTemplateData(
+	ctx context.Context,
+) (*types.GoReleaserTemplateData, error) {
 	// Get version information from git
 	versionInfo, err := git.GetVersionInfo(ctx)
 	if err != nil {
 		g.logger.Warn("Failed to get git version info, using defaults", "error", err)
+
 		versionInfo = &git.VersionInfo{
 			Version:    "v0.1.0",
 			CommitHash: "unknown",
@@ -132,6 +139,7 @@ func (g *GoReleaserGenerator) prepareTemplateData(ctx context.Context) (*types.G
 	if data.Env == nil {
 		data.Env = make(map[string]string)
 	}
+
 	data.Env["GITHUB_OWNER"] = versionInfo.Owner
 	data.Env["GITHUB_REPO"] = versionInfo.Repo
 

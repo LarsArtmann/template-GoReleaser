@@ -14,11 +14,19 @@ func (r *SimpleFileSystemRepository) ReadFile(ctx context.Context, path string) 
 	return os.ReadFile(path)
 }
 
-func (r *SimpleFileSystemRepository) WriteFile(ctx context.Context, path string, data []byte, perm os.FileMode) error {
+func (r *SimpleFileSystemRepository) WriteFile(
+	ctx context.Context,
+	path string,
+	data []byte,
+	perm os.FileMode,
+) error {
 	return os.WriteFile(path, data, perm)
 }
 
-func (r *SimpleFileSystemRepository) CreateFile(ctx context.Context, path string) (io.WriteCloser, error) {
+func (r *SimpleFileSystemRepository) CreateFile(
+	ctx context.Context,
+	path string,
+) (io.WriteCloser, error) {
 	return os.Create(path)
 }
 
@@ -31,17 +39,27 @@ func (r *SimpleFileSystemRepository) FileExists(ctx context.Context, path string
 	if err == nil {
 		return true, nil
 	}
+
 	if os.IsNotExist(err) {
 		return false, nil
 	}
+
 	return false, err
 }
 
-func (r *SimpleFileSystemRepository) CreateDir(ctx context.Context, path string, perm os.FileMode) error {
+func (r *SimpleFileSystemRepository) CreateDir(
+	ctx context.Context,
+	path string,
+	perm os.FileMode,
+) error {
 	return os.Mkdir(path, perm)
 }
 
-func (r *SimpleFileSystemRepository) CreateDirAll(ctx context.Context, path string, perm os.FileMode) error {
+func (r *SimpleFileSystemRepository) CreateDirAll(
+	ctx context.Context,
+	path string,
+	perm os.FileMode,
+) error {
 	return os.MkdirAll(path, perm)
 }
 
@@ -50,25 +68,37 @@ func (r *SimpleFileSystemRepository) DirExists(ctx context.Context, path string)
 	if err == nil {
 		return info.IsDir(), nil
 	}
+
 	if os.IsNotExist(err) {
 		return false, nil
 	}
+
 	return false, err
 }
 
-func (r *SimpleFileSystemRepository) ReadDir(ctx context.Context, path string) ([]os.DirEntry, error) {
+func (r *SimpleFileSystemRepository) ReadDir(
+	ctx context.Context,
+	path string,
+) ([]os.DirEntry, error) {
 	return os.ReadDir(path)
 }
 
-func (r *SimpleFileSystemRepository) GetFileInfo(ctx context.Context, path string) (os.FileInfo, error) {
+func (r *SimpleFileSystemRepository) GetFileInfo(
+	ctx context.Context,
+	path string,
+) (os.FileInfo, error) {
 	return os.Stat(path)
 }
 
-func (r *SimpleFileSystemRepository) CheckPermissions(ctx context.Context, path string) (bool, error) {
+func (r *SimpleFileSystemRepository) CheckPermissions(
+	ctx context.Context,
+	path string,
+) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false, err
 	}
+
 	return info.Mode().Perm()&0o777 != 0, nil
 }
 

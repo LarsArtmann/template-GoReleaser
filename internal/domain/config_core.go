@@ -70,20 +70,24 @@ func NewSafeProjectConfig() *SafeProjectConfig {
 // Validate validates the configuration.
 func (spc *SafeProjectConfig) Validate() error {
 	// Validate basic fields
-	if err := ValidateProjectName(spc.ProjectName); err != nil {
+	err := ValidateProjectName(spc.ProjectName)
+	if err != nil {
 		return err
 	}
 
-	if err := ValidateBinaryName(spc.BinaryName); err != nil {
+	err := ValidateBinaryName(spc.BinaryName)
+	if err != nil {
 		return err
 	}
 
-	if err := ValidateMainPath(spc.MainPath); err != nil {
+	err := ValidateMainPath(spc.MainPath)
+	if err != nil {
 		return err
 	}
 
 	if spc.ProjectDescription != "" {
-		if err := ValidateProjectDescription(spc.ProjectDescription); err != nil {
+		err := ValidateProjectDescription(spc.ProjectDescription)
+		if err != nil {
 			return err
 		}
 	}
@@ -212,22 +216,26 @@ func (spc *SafeProjectConfig) Validate() error {
 // validateBusinessRules validates business logic rules.
 func (spc *SafeProjectConfig) validateBusinessRules() error {
 	// Validate platform/architecture compatibility
-	if err := spc.validatePlatformArchCompatibility(); err != nil {
+	err := spc.validatePlatformArchCompatibility()
+	if err != nil {
 		return err
 	}
 
 	// Validate Docker configuration
-	if err := spc.validateDockerConfiguration(); err != nil {
+	err := spc.validateDockerConfiguration()
+	if err != nil {
 		return err
 	}
 
 	// Validate signing configuration
-	if err := spc.validateSigningConfiguration(); err != nil {
+	err := spc.validateSigningConfiguration()
+	if err != nil {
 		return err
 	}
 
 	// Validate Actions configuration
-	if err := spc.validateActionsConfiguration(); err != nil {
+	err := spc.validateActionsConfiguration()
+	if err != nil {
 		return err
 	}
 
@@ -358,6 +366,7 @@ func (spc *SafeProjectConfig) ToJSON() (string, error) {
 			err.Error(),
 		)
 	}
+
 	return string(data), nil
 }
 
@@ -371,6 +380,7 @@ func (spc *SafeProjectConfig) ToYAML() (string, error) {
 			err.Error(),
 		)
 	}
+
 	return string(data), nil
 }
 

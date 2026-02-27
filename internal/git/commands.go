@@ -30,18 +30,21 @@ func NewCommand(ctx context.Context) *Command {
 // WithDir sets the working directory for git commands.
 func (c *Command) WithDir(dir string) *Command {
 	c.dir = dir
+
 	return c
 }
 
 // WithEnv sets environment variables for git commands.
 func (c *Command) WithEnv(env []string) *Command {
 	c.env = append(c.env, env...)
+
 	return c
 }
 
 // WithTimeout sets the timeout for git commands.
 func (c *Command) WithTimeout(timeout time.Duration) *Command {
 	c.timeout = timeout
+
 	return c
 }
 
@@ -51,6 +54,7 @@ func (c *Command) execute(args ...string) (string, error) {
 	if c.dir != "" {
 		cmd.Dir = c.dir
 	}
+
 	if len(c.env) > 0 {
 		cmd.Env = append(os.Environ(), c.env...)
 	}
@@ -95,7 +99,9 @@ func (c *Command) GetBranches() ([]string, error) {
 	}
 
 	branches := strings.Split(output, "\n")
+
 	var result []string
+
 	for _, branch := range branches {
 		branch = strings.TrimSpace(branch)
 		if branch != "" && !strings.HasPrefix(branch, "remotes/origin/HEAD") {
@@ -114,7 +120,9 @@ func (c *Command) GetTags() ([]string, error) {
 	}
 
 	tags := strings.Split(output, "\n")
+
 	var result []string
+
 	for _, tag := range tags {
 		tag = strings.TrimSpace(tag)
 		if tag != "" {
@@ -128,12 +136,14 @@ func (c *Command) GetTags() ([]string, error) {
 // IsRepository checks if the current directory is a git repository.
 func (c *Command) IsRepository() bool {
 	_, err := c.execute("rev-parse", "--git-dir")
+
 	return err == nil
 }
 
 // HasRemote checks if the repository has a remote.
 func (c *Command) HasRemote(remote string) bool {
 	_, err := c.execute("remote", "get-url", remote)
+
 	return err == nil
 }
 
@@ -200,12 +210,14 @@ func ParseGitHubURL(url string) (owner, repo string) {
 			repoPath := strings.TrimPrefix(parts[1], ":")
 			repoPath = strings.TrimPrefix(repoPath, "/")
 			repoPath = strings.TrimSuffix(repoPath, ".git")
+
 			pathParts := strings.Split(repoPath, "/")
 			if len(pathParts) > 1 {
 				return pathParts[0], pathParts[1]
 			}
 		}
 	}
+
 	return "owner", "repo"
 }
 
@@ -250,10 +262,12 @@ func GetMajorVersion(version string) string {
 	if strings.HasPrefix(version, "v") {
 		version = version[1:]
 	}
+
 	parts := strings.Split(version, ".")
 	if len(parts) > 0 {
 		return parts[0]
 	}
+
 	return "0"
 }
 
@@ -266,10 +280,12 @@ func GetCurrentDate() string {
 func GetGitHubOwner() string {
 	ctx := context.Background()
 	cmd := NewCommand(ctx)
+
 	info, err := cmd.GetRepositoryInfo()
 	if err != nil {
 		return "owner"
 	}
+
 	return info.Owner
 }
 
@@ -277,10 +293,12 @@ func GetGitHubOwner() string {
 func GetGitHubRepo() string {
 	ctx := context.Background()
 	cmd := NewCommand(ctx)
+
 	info, err := cmd.GetRepositoryInfo()
 	if err != nil {
 		return "repo"
 	}
+
 	return info.Repo
 }
 
@@ -291,6 +309,7 @@ func IncPatchVersion(v string) string {
 	if strings.HasPrefix(v, "v") {
 		v = v[1:]
 	}
+
 	parts := strings.Split(v, ".")
 	if len(parts) == 3 {
 		patch := 0
@@ -300,5 +319,6 @@ func IncPatchVersion(v string) string {
 			}
 		}
 	}
+
 	return v + "-next"
 }

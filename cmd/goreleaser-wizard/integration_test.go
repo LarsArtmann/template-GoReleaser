@@ -26,11 +26,19 @@ go 1.21
 require github.com/charmbracelet/bubbletea v0.25.0
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					filepath.Join(dir, "main.go"),
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
 
 				// Create cmd directory structure
 				os.MkdirAll(filepath.Join(dir, "cmd", "e2e-test"), 0o755)
-				os.WriteFile(filepath.Join(dir, "cmd", "e2e-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					filepath.Join(dir, "cmd", "e2e-test", "main.go"),
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
 
 				return dir
 			},
@@ -45,6 +53,7 @@ require github.com/charmbracelet/bubbletea v0.25.0
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
@@ -79,6 +88,7 @@ require github.com/charmbracelet/bubbletea v0.25.0
 			// Test GitHub Actions generation
 			config.ActionLevel = domain.ActionLevelBasic
 			config.ActionsOn = []domain.ActionTrigger{domain.ActionTriggerVersionTags}
+
 			err = generateGitHubActions(config)
 			if err != nil {
 				t.Errorf("generateGitHubActions() error = %v", err)
@@ -170,6 +180,7 @@ func TestConfigurationValidation(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -179,6 +190,7 @@ func TestConfigurationValidation(t *testing.T) {
 			// Check error
 			if (err != nil) != tt.expectError {
 				t.Errorf("generateGoReleaserConfig() error = %v, wantErr %v", err, tt.expectError)
+
 				return
 			}
 
@@ -196,6 +208,7 @@ func TestConfigurationValidation(t *testing.T) {
 				content, err := os.ReadFile(".goreleaser.yaml")
 				if err != nil {
 					t.Errorf("Failed to read generated config: %v", err)
+
 					return
 				}
 
@@ -258,6 +271,7 @@ func TestDifferentProjectTypes(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -294,7 +308,11 @@ go 1.21
 
 			// Verify project type
 			if config.ProjectType != tt.expectedConfig.ProjectType {
-				t.Errorf("ProjectType = %q, want %q", config.ProjectType, tt.expectedConfig.ProjectType)
+				t.Errorf(
+					"ProjectType = %q, want %q",
+					config.ProjectType,
+					tt.expectedConfig.ProjectType,
+				)
 			}
 
 			// Verify CGO setting
@@ -327,6 +345,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 			name: "empty_project_directory",
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-empty-test")
+
 				return dir
 			},
 			expectError: true,
@@ -337,6 +356,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-malformed-test")
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte("invalid go.mod content"), 0o644)
+
 				return dir
 			},
 			expectError: true,
@@ -348,6 +368,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 				dir, _ := os.MkdirTemp("", "wizard-readonly-test")
 				// Make directory read-only (this might not work on all systems)
 				os.Chmod(dir, 0o444)
+
 				return dir
 			},
 			expectError: true,
@@ -369,18 +390,25 @@ func TestEdgeCaseScenarios(t *testing.T) {
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
 			// Test project detection
 			config := &ProjectConfig{}
-			detectProjectInfo(config) // This function doesn't return an error, it modifies config directly
+			detectProjectInfo(
+				config,
+			) // This function doesn't return an error, it modifies config directly
 
 			// Check error expectation (for tests that expect errors, we check config state)
 			if tt.expectError {
 				if tt.errorMsg != "" && config.ProjectName != "" {
 					// If we expected an error but got a valid project, that's an issue
-					t.Errorf("Expected error containing %q, but got valid project %q", tt.errorMsg, config.ProjectName)
+					t.Errorf(
+						"Expected error containing %q, but got valid project %q",
+						tt.errorMsg,
+						config.ProjectName,
+					)
 				}
 			} else {
 				if config.ProjectName == "" {

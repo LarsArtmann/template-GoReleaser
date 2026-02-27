@@ -69,7 +69,9 @@ func ValidateProjectName(name string) error {
 
 	// Validate pattern
 	if !projectNamePattern.MatchString(name) {
-		return errors.New("project name contains invalid characters. Use letters, numbers, hyphens, underscores, and dots")
+		return errors.New(
+			"project name contains invalid characters. Use letters, numbers, hyphens, underscores, and dots",
+		)
 	}
 
 	// Check for reserved names (case-insensitive)
@@ -112,7 +114,9 @@ func ValidateBinaryName(name string) error {
 
 	// Validate pattern
 	if !binaryNamePattern.MatchString(name) {
-		return errors.New("binary name must start with a letter and contain only letters, numbers, hyphens, and underscores")
+		return errors.New(
+			"binary name must start with a letter and contain only letters, numbers, hyphens, and underscores",
+		)
 	}
 
 	// Check for reserved names (case-insensitive)

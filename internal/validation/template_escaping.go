@@ -27,6 +27,7 @@ func SanitizeInput(input string) string {
 		if r < 32 && r != '\n' && r != '\r' && r != '\t' {
 			return -1
 		}
+
 		return r
 	}, input)
 
@@ -58,6 +59,7 @@ func (te *TemplateEscaper) EscapeYAML(value string) string {
 		if strings.ContainsAny(value, ":{}[],&*#?|-<>'\"%@`") {
 			return "|-\n" + te.indentYAMLLines(value)
 		}
+
 		return "|-\n" + te.indentYAMLLines(value)
 	}
 
@@ -147,6 +149,7 @@ func (te *TemplateEscaper) EscapeDockerLabel(value string) string {
 	if !isValidDockerLabel(value) {
 		// Sanitize to valid characters only
 		var result strings.Builder
+
 		for _, r := range value {
 			if (r >= 'a' && r <= 'z') || (r >= 'A' && r <= 'Z') ||
 				(r >= '0' && r <= '9') || r == '.' || r == '_' || r == '-' {
@@ -155,6 +158,7 @@ func (te *TemplateEscaper) EscapeDockerLabel(value string) string {
 				result.WriteRune('-') // Replace invalid chars with dash
 			}
 		}
+
 		value = result.String()
 	}
 
@@ -219,13 +223,16 @@ func (te *TemplateEscaper) ValidateTemplateContent(content, templateType string)
 
 func (te *TemplateEscaper) indentYAMLLines(value string) string {
 	lines := strings.Split(value, "\n")
+
 	var result strings.Builder
 
 	for i, line := range lines {
 		if i > 0 {
 			result.WriteString("  ") // 2 spaces for YAML continuation
 		}
+
 		result.WriteString(line)
+
 		if i < len(lines)-1 {
 			result.WriteString("\n")
 		}
@@ -241,6 +248,7 @@ func looksLikeNumber(value string) bool {
 
 	// Check if it's a number (which would need quoting in YAML)
 	hasDigits := false
+
 	for _, r := range value {
 		if r >= '0' && r <= '9' {
 			hasDigits = true
@@ -276,6 +284,7 @@ func isValidDockerLabel(value string) bool {
 
 	// Docker label validation regex pattern
 	dockerLabelPattern := regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
+
 	return dockerLabelPattern.MatchString(value)
 }
 

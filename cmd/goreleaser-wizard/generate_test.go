@@ -140,6 +140,7 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+
 			if err := os.Chdir(tmpDir); err != nil {
 				t.Fatal(err)
 			}
@@ -155,6 +156,7 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 			// Check error
 			if (err != nil) != tt.wantErr {
 				t.Errorf("generateGoReleaserConfig() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -181,6 +183,7 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				if !strings.HasPrefix(contentStr, "# GoReleaser configuration") {
 					t.Error("Config should start with comment header")
 				}
+
 				if !strings.Contains(contentStr, "version: 2") {
 					t.Error("Config should specify version 2")
 				}
@@ -266,6 +269,7 @@ func TestGenerateGitHubActions(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+
 			if err := os.Chdir(tmpDir); err != nil {
 				t.Fatal(err)
 			}
@@ -281,6 +285,7 @@ func TestGenerateGitHubActions(t *testing.T) {
 			// Check error
 			if (err != nil) != tt.wantErr {
 				t.Errorf("generateGitHubActions() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
@@ -304,7 +309,8 @@ func TestDetectProjectInfo(t *testing.T) {
 				// Create go.mod
 				goMod := `module github.com/user/myapp
 go 1.21`
-				if err := os.WriteFile("go.mod", []byte(goMod), 0o644); err != nil {
+				err := os.WriteFile("go.mod", []byte(goMod), 0o644)
+				if err != nil {
 					return err
 				}
 				// Create main.go
@@ -323,13 +329,16 @@ go 1.21`
 				// Create go.mod
 				goMod := `module github.com/user/complexapp
 go 1.21`
-				if err := os.WriteFile("go.mod", []byte(goMod), 0o644); err != nil {
+				err := os.WriteFile("go.mod", []byte(goMod), 0o644)
+				if err != nil {
 					return err
 				}
 				// Create cmd/complexapp/main.go
-				if err := os.MkdirAll("cmd/complexapp", 0o755); err != nil {
+				err := os.MkdirAll("cmd/complexapp", 0o755)
+				if err != nil {
 					return err
 				}
+
 				return os.WriteFile("cmd/complexapp/main.go", []byte("package main"), 0o644)
 			},
 			expected: ProjectConfig{
@@ -355,6 +364,7 @@ go 1.21`
 			if err != nil {
 				t.Fatal(err)
 			}
+
 			if err := os.Chdir(tmpDir); err != nil {
 				t.Fatal(err)
 			}
@@ -373,12 +383,15 @@ go 1.21`
 			if config.ProjectName != tt.expected.ProjectName {
 				t.Errorf("ProjectName = %q, want %q", config.ProjectName, tt.expected.ProjectName)
 			}
+
 			if config.MainPath != tt.expected.MainPath {
 				t.Errorf("MainPath = %q, want %q", config.MainPath, tt.expected.MainPath)
 			}
+
 			if config.BinaryName != tt.expected.BinaryName {
 				t.Errorf("BinaryName = %q, want %q", config.BinaryName, tt.expected.BinaryName)
 			}
+
 			if config.ProjectType != tt.expected.ProjectType {
 				t.Errorf("ProjectType = %q, want %q", config.ProjectType, tt.expected.ProjectType)
 			}

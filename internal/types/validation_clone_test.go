@@ -23,21 +23,27 @@ func TestValidationError_Clone(t *testing.T) {
 	if clone.Code != original.Code {
 		t.Errorf("Code mismatch: got %v, want %v", clone.Code, original.Code)
 	}
+
 	if clone.Field != original.Field {
 		t.Errorf("Field mismatch: got %v, want %v", clone.Field, original.Field)
 	}
+
 	if clone.Message != original.Message {
 		t.Errorf("Message mismatch: got %v, want %v", clone.Message, original.Message)
 	}
+
 	if clone.Details != original.Details {
 		t.Errorf("Details mismatch: got %v, want %v", clone.Details, original.Details)
 	}
+
 	if clone.Context != original.Context {
 		t.Errorf("Context mismatch: got %v, want %v", clone.Context, original.Context)
 	}
+
 	if clone.Level != original.Level {
 		t.Errorf("Level mismatch: got %v, want %v", clone.Level, original.Level)
 	}
+
 	if clone.Suggestion != original.Suggestion {
 		t.Errorf("Suggestion mismatch: got %v, want %v", clone.Suggestion, original.Suggestion)
 	}
@@ -54,21 +60,27 @@ func TestValidationError_Clone(t *testing.T) {
 	if original.Code == clone.Code {
 		t.Error("Clone modification affected original Code")
 	}
+
 	if original.Field == clone.Field {
 		t.Error("Clone modification affected original Field")
 	}
+
 	if original.Message == clone.Message {
 		t.Error("Clone modification affected original Message")
 	}
+
 	if original.Details == clone.Details {
 		t.Error("Clone modification affected original Details")
 	}
+
 	if original.Context == clone.Context {
 		t.Error("Clone modification affected original Context")
 	}
+
 	if original.Level == clone.Level {
 		t.Error("Clone modification affected original Level")
 	}
+
 	if original.Suggestion == clone.Suggestion {
 		t.Error("Clone modification affected original Suggestion")
 	}
@@ -96,21 +108,27 @@ func TestValidationWarning_Clone(t *testing.T) {
 	if clone.Code != original.Code {
 		t.Errorf("Code mismatch: got %v, want %v", clone.Code, original.Code)
 	}
+
 	if clone.Field != original.Field {
 		t.Errorf("Field mismatch: got %v, want %v", clone.Field, original.Field)
 	}
+
 	if clone.Message != original.Message {
 		t.Errorf("Message mismatch: got %v, want %v", clone.Message, original.Message)
 	}
+
 	if clone.Details != original.Details {
 		t.Errorf("Details mismatch: got %v, want %v", clone.Details, original.Details)
 	}
+
 	if clone.Context != original.Context {
 		t.Errorf("Context mismatch: got %v, want %v", clone.Context, original.Context)
 	}
+
 	if clone.Level != original.Level {
 		t.Errorf("Level mismatch: got %v, want %v", clone.Level, original.Level)
 	}
+
 	if clone.Suggestion != original.Suggestion {
 		t.Errorf("Suggestion mismatch: got %v, want %v", clone.Suggestion, original.Suggestion)
 	}
@@ -127,21 +145,27 @@ func TestValidationWarning_Clone(t *testing.T) {
 	if original.Code == clone.Code {
 		t.Error("Clone modification affected original Code")
 	}
+
 	if original.Field == clone.Field {
 		t.Error("Clone modification affected original Field")
 	}
+
 	if original.Message == clone.Message {
 		t.Error("Clone modification affected original Message")
 	}
+
 	if original.Details == clone.Details {
 		t.Error("Clone modification affected original Details")
 	}
+
 	if original.Context == clone.Context {
 		t.Error("Clone modification affected original Context")
 	}
+
 	if original.Level == clone.Level {
 		t.Error("Clone modification affected original Level")
 	}
+
 	if original.Suggestion == clone.Suggestion {
 		t.Error("Clone modification affected original Suggestion")
 	}

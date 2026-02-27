@@ -27,6 +27,7 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	config := &domain.SafeProjectConfig{}
 	if err := detectProjectInfo(config); err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -35,8 +36,10 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 
 	// If interactive mode, prompt for confirmation/changes
 	if interactive {
-		if err := runInteractiveWizard(config); err != nil {
+		err := runInteractiveWizard(config)
+		if err != nil {
 			displayError(err)
+
 			return
 		}
 	}
@@ -48,6 +51,7 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	workflow, err := builder.BuildWorkflow(WorkflowTypeFullWizard, config, force)
 	if err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -55,6 +59,7 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	if err := workflow.Execute(ctx); err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -106,7 +111,9 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 
 	// Parse module name from go.mod
 	scanner := bufio.NewScanner(strings.NewReader(string(content)))
+
 	var moduleName string
+
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
 		if strings.HasPrefix(line, "module ") {
@@ -114,6 +121,7 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 			if len(parts) >= 2 {
 				moduleName = parts[1]
 			}
+
 			break
 		}
 	}
@@ -183,10 +191,12 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 					if part == "src" || part == "pkg" && i+1 < len(parts) {
 						binaryName = filepath.Base(matches[0])
 						binaryName = strings.TrimSuffix(binaryName, ".go")
+
 						return pattern.path, binaryName, pattern.projType
 					}
 				}
 			}
+
 			return pattern.path, pattern.binName, pattern.projType
 		}
 	}
@@ -201,6 +211,7 @@ func runInteractiveWizard(config *domain.SafeProjectConfig) error {
 
 	// Confirm and modify detected information
 	var err error
+
 	config, err = prompter.confirmDetectedInfo(config)
 	if err != nil {
 		return err

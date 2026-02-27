@@ -78,9 +78,20 @@ func (al ActionLevel) GetRecommendedTriggers() []ActionTrigger {
 	case ActionLevelStandard:
 		return []ActionTrigger{ActionTriggerManual, ActionTriggerVersionTags, ActionTriggerMainPush}
 	case ActionLevelAdvanced:
-		return []ActionTrigger{ActionTriggerManual, ActionTriggerVersionTags, ActionTriggerMainPush, ActionTriggerPullRequest}
+		return []ActionTrigger{
+			ActionTriggerManual,
+			ActionTriggerVersionTags,
+			ActionTriggerMainPush,
+			ActionTriggerPullRequest,
+		}
 	case ActionLevelEnterprise:
-		return []ActionTrigger{ActionTriggerManual, ActionTriggerVersionTags, ActionTriggerMainPush, ActionTriggerPullRequest, ActionTriggerSchedule}
+		return []ActionTrigger{
+			ActionTriggerManual,
+			ActionTriggerVersionTags,
+			ActionTriggerMainPush,
+			ActionTriggerPullRequest,
+			ActionTriggerSchedule,
+		}
 	default:
 		return []ActionTrigger{}
 	}
@@ -98,7 +109,13 @@ func (al ActionLevel) GetRequiredPermissions() []string {
 	case ActionLevelAdvanced:
 		return []string{"contents: write", "packages: write", "id-token: write"}
 	case ActionLevelEnterprise:
-		return []string{"contents: write", "packages: write", "id-token: write", "issues: write", "pull-requests: write"}
+		return []string{
+			"contents: write",
+			"packages: write",
+			"id-token: write",
+			"issues: write",
+			"pull-requests: write",
+		}
 	default:
 		return []string{}
 	}
@@ -194,5 +211,6 @@ func ValidateDockerSupport(support DockerSupport) error {
 	if !support.IsValid() {
 		return fmt.Errorf("invalid Docker support level: %s", support)
 	}
+
 	return nil
 }

@@ -78,6 +78,7 @@ func ValidateBuildLevel(level BuildLevel) error {
 	if !level.IsValid() {
 		return fmt.Errorf("invalid build level: %s", level)
 	}
+
 	return nil
 }
 
@@ -107,11 +108,20 @@ func (bl BuildLevel) GetBuildTags() []BuildTag {
 	case BuildLevelBasic:
 		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation")}
 	case BuildLevelStandard:
-		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation"), CreateBuildTag("static", "Static linking")}
+		return []BuildTag{
+			CreateBuildTag("pure", "Pure Go compilation"),
+			CreateBuildTag("static", "Static linking"),
+		}
 	case BuildLevelAdvanced:
-		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation"), CreateBuildTag("static", "Static linking")}
+		return []BuildTag{
+			CreateBuildTag("pure", "Pure Go compilation"),
+			CreateBuildTag("static", "Static linking"),
+		}
 	case BuildLevelEnterprise:
-		return []BuildTag{CreateBuildTag("pure", "Pure Go compilation"), CreateBuildTag("static", "Static linking")}
+		return []BuildTag{
+			CreateBuildTag("pure", "Pure Go compilation"),
+			CreateBuildTag("static", "Static linking"),
+		}
 	default:
 		return []BuildTag{}
 	}

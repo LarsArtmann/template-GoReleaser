@@ -25,7 +25,11 @@ func ValidatePlatformArchCompatibility(platforms []Platform, architectures []Arc
 	for _, platform := range platforms {
 		for _, arch := range architectures {
 			if !arch.IsCompatibleWith(platform) {
-				return fmt.Errorf("architecture %s is not compatible with platform %s", arch, platform)
+				return fmt.Errorf(
+					"architecture %s is not compatible with platform %s",
+					arch,
+					platform,
+				)
 			}
 		}
 	}

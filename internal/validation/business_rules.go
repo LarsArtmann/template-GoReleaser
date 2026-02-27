@@ -19,27 +19,32 @@ func ValidateConfiguration(config *domain.SafeProjectConfig) (*types.ValidationR
 	}
 
 	// Step 1: Basic field validation
-	if err := validateBasicFields(config, result); err != nil {
+	err := validateBasicFields(config, result)
+	if err != nil {
 		return nil, err
 	}
 
 	// Step 2: Type validation
-	if err := validateTypes(config, result); err != nil {
+	err := validateTypes(config, result)
+	if err != nil {
 		return nil, err
 	}
 
 	// Step 3: Platform-architecture compatibility
-	if err := validatePlatformArchCompatibility(config, result); err != nil {
+	err := validatePlatformArchCompatibility(config, result)
+	if err != nil {
 		return nil, err
 	}
 
 	// Step 4: Business rule validation
-	if err := validateBusinessRules(config, result); err != nil {
+	err := validateBusinessRules(config, result)
+	if err != nil {
 		return nil, err
 	}
 
 	// Step 5: Security validation
-	if err := validateSecurity(config, result); err != nil {
+	err := validateSecurity(config, result)
+	if err != nil {
 		return nil, err
 	}
 
@@ -55,7 +60,8 @@ func ValidateConfiguration(config *domain.SafeProjectConfig) (*types.ValidationR
 // validateBasicFields validates basic required fields.
 func validateBasicFields(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Project name validation
-	if err := ValidateProjectName(config.ProjectName); err != nil {
+	err := ValidateProjectName(config.ProjectName)
+	if err != nil {
 		result.AddError(&types.ValidationError{
 			Code:       errors.ErrInvalidProject,
 			Field:      "project_name",
@@ -66,7 +72,8 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	}
 
 	// Binary name validation
-	if err := ValidateBinaryName(config.BinaryName); err != nil {
+	err := ValidateBinaryName(config.BinaryName)
+	if err != nil {
 		result.AddError(&types.ValidationError{
 			Code:       errors.ErrInvalidBinary,
 			Field:      "binary_name",
@@ -77,7 +84,8 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	}
 
 	// Main path validation
-	if err := ValidateMainPath(config.MainPath); err != nil {
+	err := ValidateMainPath(config.MainPath)
+	if err != nil {
 		result.AddError(&types.ValidationError{
 			Code:       errors.ErrInvalidMainPath,
 			Field:      "main_path",
@@ -89,7 +97,8 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 
 	// Project description validation (optional)
 	if config.ProjectDescription != "" {
-		if err := ValidateProjectDescription(config.ProjectDescription); err != nil {
+		err := ValidateProjectDescription(config.ProjectDescription)
+		if err != nil {
 			result.AddError(&types.ValidationError{
 				Code:       errors.ErrInvalidProjectDescription,
 				Field:      "project_description",
@@ -208,7 +217,10 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 }
 
 // validatePlatformArchCompatibility validates platform-architecture combinations.
-func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validatePlatformArchCompatibility(
+	config *domain.SafeProjectConfig,
+	result *types.ValidationResult,
+) error {
 	// Validate platforms
 	for i, platform := range config.Platforms {
 		if !platform.IsValid() {
@@ -240,9 +252,13 @@ func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result 
 		for _, arch := range config.Architectures {
 			if !arch.IsCompatibleWith(platform) {
 				result.AddError(&types.ValidationError{
-					Code:       errors.ErrInvalidConfig,
-					Field:      "platform_arch_compatibility",
-					Message:    fmt.Sprintf("Incompatible platform/architecture: %s + %s", platform.String(), arch.String()),
+					Code:  errors.ErrInvalidConfig,
+					Field: "platform_arch_compatibility",
+					Message: fmt.Sprintf(
+						"Incompatible platform/architecture: %s + %s",
+						platform.String(),
+						arch.String(),
+					),
 					Level:      types.ErrorLevelHigh,
 					Suggestion: "Choose compatible platform-architecture combinations",
 				})
@@ -266,9 +282,13 @@ func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result 
 
 		if platformExists && archExists {
 			result.AddWarning(&types.ValidationWarning{
-				Code:       "PLATFORM_ARCH_WARNING",
-				Field:      "platform_arch_compatibility",
-				Message:    fmt.Sprintf("Potentially unsupported combination: %s + %s", combo.platform.String(), combo.arch.String()),
+				Code:  "PLATFORM_ARCH_WARNING",
+				Field: "platform_arch_compatibility",
+				Message: fmt.Sprintf(
+					"Potentially unsupported combination: %s + %s",
+					combo.platform.String(),
+					combo.arch.String(),
+				),
 				Level:      types.WarningLevelMedium,
 				Suggestion: "Test this combination thoroughly or consider using supported alternatives",
 			})
@@ -281,22 +301,26 @@ func validatePlatformArchCompatibility(config *domain.SafeProjectConfig, result 
 // validateBusinessRules validates business logic rules.
 func validateBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
 	// Docker configuration validation
-	if err := validateDockerBusinessRules(config, result); err != nil {
+	err := validateDockerBusinessRules(config, result)
+	if err != nil {
 		return err
 	}
 
 	// Signing configuration validation
-	if err := validateSigningBusinessRules(config, result); err != nil {
+	err := validateSigningBusinessRules(config, result)
+	if err != nil {
 		return err
 	}
 
 	// Actions configuration validation
-	if err := validateActionsBusinessRules(config, result); err != nil {
+	err := validateActionsBusinessRules(config, result)
+	if err != nil {
 		return err
 	}
 
 	// Project type-specific validation
-	if err := validateProjectTypeBusinessRules(config, result); err != nil {
+	err := validateProjectTypeBusinessRules(config, result)
+	if err != nil {
 		return err
 	}
 
@@ -304,7 +328,10 @@ func validateBusinessRules(config *domain.SafeProjectConfig, result *types.Valid
 }
 
 // validateDockerBusinessRules validates Docker business rules.
-func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateDockerBusinessRules(
+	config *domain.SafeProjectConfig,
+	result *types.ValidationResult,
+) error {
 	// Docker support must be compatible with project type
 	validateFeatureSupport(
 		result,
@@ -324,8 +351,11 @@ func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *types
 				result.AddWarning(&types.ValidationWarning{
 					Code:  "DOCKER_GIT_COMPATIBILITY",
 					Field: "docker_registry",
-					Message: fmt.Sprintf("Docker registry (%s) may not be optimal for Git provider (%s)",
-						config.DockerRegistry.String(), config.GitProvider.String()),
+					Message: fmt.Sprintf(
+						"Docker registry (%s) may not be optimal for Git provider (%s)",
+						config.DockerRegistry.String(),
+						config.GitProvider.String(),
+					),
 					Level: types.WarningLevelMedium,
 					Suggestion: fmt.Sprintf("Consider using %s registry for %s",
 						compatibleRegistry.String(), config.GitProvider.String()),
@@ -344,7 +374,8 @@ func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *types
 			})
 		} else {
 			// Validate Docker image name
-			if err := ValidateDockerImageName(config.DockerImage); err != nil {
+			err := ValidateDockerImageName(config.DockerImage)
+			if err != nil {
 				result.AddError(&types.ValidationError{
 					Code:       errors.ErrInvalidDockerImage,
 					Field:      "docker_image",
@@ -360,7 +391,10 @@ func validateDockerBusinessRules(config *domain.SafeProjectConfig, result *types
 }
 
 // validateSigningBusinessRules validates signing business rules.
-func validateSigningBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateSigningBusinessRules(
+	config *domain.SafeProjectConfig,
+	result *types.ValidationResult,
+) error {
 	// Signing tools availability
 	if config.SigningLevel.IsEnabled() {
 		requiredTools := config.SigningLevel.GetRequiredTools()
@@ -394,7 +428,10 @@ func validateSigningBusinessRules(config *domain.SafeProjectConfig, result *type
 }
 
 // validateActionsBusinessRules validates Actions business rules.
-func validateActionsBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateActionsBusinessRules(
+	config *domain.SafeProjectConfig,
+	result *types.ValidationResult,
+) error {
 	// Actions must be compatible with Git provider
 	validateFeatureSupport(
 		result,
@@ -434,13 +471,19 @@ func validateActionsBusinessRules(config *domain.SafeProjectConfig, result *type
 }
 
 // validateProjectTypeBusinessRules validates project type-specific business rules.
-func validateProjectTypeBusinessRules(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateProjectTypeBusinessRules(
+	config *domain.SafeProjectConfig,
+	result *types.ValidationResult,
+) error {
 	// CGO requirements based on project type
 	if config.ProjectType.DefaultCGOEnabled() && config.CGOStatus.IsDisabled() {
 		result.AddWarning(&types.ValidationWarning{
-			Code:       "CGO_PROJECT_TYPE",
-			Field:      "cgo_status",
-			Message:    fmt.Sprintf("Project type %s typically requires CGO", config.ProjectType.String()),
+			Code:  "CGO_PROJECT_TYPE",
+			Field: "cgo_status",
+			Message: fmt.Sprintf(
+				"Project type %s typically requires CGO",
+				config.ProjectType.String(),
+			),
 			Level:      types.WarningLevelMedium,
 			Suggestion: "Consider enabling CGO or verify your project works without CGO",
 		})
@@ -512,8 +555,10 @@ func generateWarnings(config *domain.SafeProjectConfig, result *types.Validation
 		result.AddWarning(&types.ValidationWarning{
 			Code:  "BUILD_PERFORMANCE",
 			Field: "platform_arch_count",
-			Message: fmt.Sprintf("Large build matrix (%d combos) may significantly increase build time",
-				len(config.Platforms)*len(config.Architectures)),
+			Message: fmt.Sprintf(
+				"Large build matrix (%d combos) may significantly increase build time",
+				len(config.Platforms)*len(config.Architectures),
+			),
 			Level:      types.WarningLevelLow,
 			Suggestion: "Consider reducing platform/architecture combinations for faster builds",
 		})
@@ -556,7 +601,11 @@ func generateWarnings(config *domain.SafeProjectConfig, result *types.Validation
 // Helper functions.
 
 // validateFeatureSupport validates that a feature is compatible with its target.
-func validateFeatureSupport(result *types.ValidationResult, featureEnabled, targetSupported bool, field, featureName, unsupportedTarget, suggestion string) {
+func validateFeatureSupport(
+	result *types.ValidationResult,
+	featureEnabled, targetSupported bool,
+	field, featureName, unsupportedTarget, suggestion string,
+) {
 	if featureEnabled && !targetSupported {
 		result.AddError(&types.ValidationError{
 			Code:       errors.ErrInvalidConfig,

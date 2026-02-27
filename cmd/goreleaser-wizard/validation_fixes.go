@@ -14,8 +14,10 @@ func attemptFixes(results *ValidationResults) error {
 
 	// Fix missing configuration directory
 	if !results.ConfigExists {
-		if err := os.MkdirAll(".github/workflows", 0o755); err == nil {
+		err := os.MkdirAll(".github/workflows", 0o755)
+		if err == nil {
 			fmt.Println(successStyle.Render("✅ Created .github/workflows directory"))
+
 			fixed++
 		}
 	}
@@ -23,8 +25,10 @@ func attemptFixes(results *ValidationResults) error {
 	// Try to create basic configuration if missing
 	if !results.ConfigExists {
 		configContent := generateBasicConfig()
-		if err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0o644); err == nil {
+		err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0o644)
+		if err == nil {
 			fmt.Println(successStyle.Render("✅ Created basic .goreleaser.yaml"))
+
 			fixed++
 		}
 	}

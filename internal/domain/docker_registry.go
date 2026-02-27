@@ -63,6 +63,7 @@ var dockerRegistryMetaMap = map[DockerRegistry]dockerRegistryMeta{
 // IsValid returns true if DockerRegistry is valid.
 func (dr DockerRegistry) IsValid() bool {
 	_, exists := dockerRegistryMetaMap[dr]
+
 	return exists
 }
 
@@ -89,6 +90,7 @@ func (dr DockerRegistry) URLPattern() string {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.urlPattern
 	}
+
 	return ""
 }
 
@@ -97,6 +99,7 @@ func (dr DockerRegistry) SupportsHTTPSOnly() bool {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.supportsHTTPSOnly
 	}
+
 	return true
 }
 
@@ -105,6 +108,7 @@ func (dr DockerRegistry) RequiresAuthentication() bool {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.requiresAuthentication
 	}
+
 	return true
 }
 
@@ -113,6 +117,7 @@ func (dr DockerRegistry) DefaultNamespace() string {
 	if meta, exists := dockerRegistryMetaMap[dr]; exists {
 		return meta.defaultNamespace
 	}
+
 	return ""
 }
 
@@ -125,6 +130,7 @@ func ValidateDockerRegistry(registry DockerRegistry) error {
 			fmt.Sprintf("'%s' is not a valid Docker registry", registry),
 		)
 	}
+
 	return nil
 }
 
@@ -158,7 +164,11 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 		if matched, err := regexp.MatchString(pattern, url); err != nil {
 			return fmt.Errorf("invalid URL pattern for registry %s: %w", registry, err)
 		} else if !matched {
-			return fmt.Errorf("URL '%s' does not match expected pattern for registry %s", url, registry)
+			return fmt.Errorf(
+				"URL '%s' does not match expected pattern for registry %s",
+				url,
+				registry,
+			)
 		}
 	}
 
@@ -177,12 +187,17 @@ func ValidateDockerImageName(name string) error {
 
 	// Docker image name pattern: lowercase, numbers, dots, hyphens, underscores, forward slashes
 	pattern := `^[a-z0-9][a-z0-9/_.-]*$`
+
 	matched, err := regexp.MatchString(pattern, name)
 	if err != nil {
 		return fmt.Errorf("invalid image name pattern: %w", err)
 	}
+
 	if !matched {
-		return fmt.Errorf("Docker image name '%s' must start with lowercase letter/number and contain only lowercase letters, numbers, dots, hyphens, underscores, and forward slashes", name)
+		return fmt.Errorf(
+			"Docker image name '%s' must start with lowercase letter/number and contain only lowercase letters, numbers, dots, hyphens, underscores, and forward slashes",
+			name,
+		)
 	}
 
 	return nil

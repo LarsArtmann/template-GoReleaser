@@ -58,6 +58,7 @@ var configStateMetaMap = map[ConfigState]configStateMeta{
 // IsValid returns true if ConfigState is valid.
 func (cs ConfigState) IsValid() bool {
 	_, exists := configStateMetaMap[cs]
+
 	return exists
 }
 
@@ -84,6 +85,7 @@ func (cs ConfigState) Description() string {
 	if meta, exists := configStateMetaMap[cs]; exists {
 		return meta.description
 	}
+
 	return ""
 }
 
@@ -92,6 +94,7 @@ func (cs ConfigState) IsFinal() bool {
 	if meta, exists := configStateMetaMap[cs]; exists {
 		return meta.isFinal
 	}
+
 	return false
 }
 
@@ -100,6 +103,7 @@ func (cs ConfigState) AllowsValidation() bool {
 	if meta, exists := configStateMetaMap[cs]; exists {
 		return meta.allowsValidation
 	}
+
 	return false
 }
 
@@ -108,6 +112,7 @@ func (cs ConfigState) AllowsGeneration() bool {
 	if meta, exists := configStateMetaMap[cs]; exists {
 		return meta.allowsGeneration
 	}
+
 	return false
 }
 
@@ -120,6 +125,7 @@ func ValidateConfigState(state ConfigState) error {
 			fmt.Sprintf("'%s' is not a valid configuration state", state),
 		)
 	}
+
 	return nil
 }
 

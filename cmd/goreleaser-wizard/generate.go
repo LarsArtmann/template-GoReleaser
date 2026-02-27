@@ -24,6 +24,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	config := &domain.SafeProjectConfig{}
 	if err := detectProjectInfo(config); err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -31,12 +32,15 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	if name, _ := cmd.Flags().GetString("project-name"); name != "" {
 		config.ProjectName = name
 	}
+
 	if path, _ := cmd.Flags().GetString("main-path"); path != "" {
 		config.MainPath = path
 	}
+
 	if binName, _ := cmd.Flags().GetString("binary-name"); binName != "" {
 		config.BinaryName = binName
 	}
+
 	if projType, _ := cmd.Flags().GetString("project-type"); projType != "" {
 		config.ProjectType = domain.ProjectType(projType)
 	}
@@ -55,6 +59,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	workflow, err := builder.BuildWorkflow(workflowType, config, force)
 	if err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -62,6 +67,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	ctx := context.Background()
 	if err := workflow.Execute(ctx); err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -69,18 +75,24 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	displayJobResults(workflow.GetResults())
 
 	fmt.Println()
+
 	if configOnly {
 		fmt.Println(successStyle.Render("📄 GoReleaser configuration generated successfully!"))
 	} else {
-		fmt.Println(successStyle.Render("🎉 GoReleaser configuration and workflow generated successfully!"))
+		fmt.Println(
+			successStyle.Render("🎉 GoReleaser configuration and workflow generated successfully!"),
+		)
 	}
+
 	fmt.Println()
 	fmt.Println("Next steps:")
 	fmt.Println("  • Review generated files")
 	fmt.Println("  • Run 'goreleaser-wizard validate' to check configuration")
+
 	if !configOnly {
 		fmt.Println("  • Commit .github/workflows/release.yml to enable CI/CD")
 	}
+
 	fmt.Println("  • Test configuration with 'goreleaser check'")
 }
 

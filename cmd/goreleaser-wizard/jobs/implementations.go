@@ -54,7 +54,11 @@ type ConfigGenerationJob struct {
 }
 
 // NewConfigGenerationJob creates a new config generation job.
-func NewConfigGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *ConfigGenerationJob {
+func NewConfigGenerationJob(
+	config *domain.SafeProjectConfig,
+	force bool,
+	logger Logger,
+) *ConfigGenerationJob {
 	return &ConfigGenerationJob{
 		id:        "config-generation",
 		config:    config,
@@ -97,6 +101,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	// Validate config
 	if j.config.ProjectName == "" {
 		j.config.State = domain.ConfigStateInvalid
+
 		return errors.NewValidationError(
 			errors.ErrInvalidProject,
 			"Project name is required",
@@ -108,6 +113,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	if !j.force {
 		if _, err := os.Stat(".goreleaser.yaml"); err == nil {
 			j.config.State = domain.ConfigStateDraft
+
 			return errors.NewConfigError(
 				errors.ErrConfigFound,
 				".goreleaser.yaml already exists",
@@ -123,13 +129,19 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	err := j.generator.Generate(ctx)
 	if err != nil {
 		j.config.State = domain.ConfigStateInvalid
-		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate GoReleaser config")
+
+		return errors.WrapError(
+			err,
+			errors.ErrConfigGeneration,
+			"Failed to generate GoReleaser config",
+		)
 	}
 
 	// Transition to Generated state
 	j.config.State = domain.ConfigStateGenerated
 
 	j.logger.Info("GoReleaser configuration generated successfully")
+
 	return nil
 }
 
@@ -149,24 +161,28 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 			err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
 			if err != nil {
 				j.logger.Error("Failed to restore backup", "error", err)
+
 				return errors.NewFileError(
 					errors.ErrFileOperation,
 					"Failed to restore backup",
 					err.Error(),
 				).WithCause(err)
 			}
+
 			j.logger.Info("Restored backup configuration")
 		} else {
 			// Remove generated file
 			err := os.Remove(".goreleaser.yaml")
 			if err != nil {
 				j.logger.Error("Failed to remove generated config", "error", err)
+
 				return errors.NewFileError(
 					errors.ErrFileOperation,
 					"Failed to remove generated config",
 					err.Error(),
 				).WithCause(err)
 			}
+
 			j.logger.Info("Removed generated configuration")
 		}
 	}
@@ -183,7 +199,10 @@ type GitHubActionsGenerationJob struct {
 }
 
 // NewGitHubActionsGenerationJob creates a new GitHub Actions generation job.
-func NewGitHubActionsGenerationJob(config *domain.SafeProjectConfig, logger Logger) *GitHubActionsGenerationJob {
+func NewGitHubActionsGenerationJob(
+	config *domain.SafeProjectConfig,
+	logger Logger,
+) *GitHubActionsGenerationJob {
 	return &GitHubActionsGenerationJob{
 		id:        "github-actions-generation",
 		config:    config,
@@ -222,10 +241,15 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	// Generate workflow
 	err := j.generator.Generate(ctx)
 	if err != nil {
-		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate GitHub Actions workflow")
+		return errors.WrapError(
+			err,
+			errors.ErrConfigGeneration,
+			"Failed to generate GitHub Actions workflow",
+		)
 	}
 
 	j.logger.Info("GitHub Actions workflow generated successfully")
+
 	return nil
 }
 
@@ -289,12 +313,14 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	// This would include checking for go.mod, main.go, etc.
 
 	j.logger.Info("Project structure validation passed")
+
 	return nil
 }
 
 func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
 	// Validation job doesn't create any files, so rollback is a no-op
 	j.logger.Info("Project validation rollback is a no-op")
+
 	return nil
 }
 
@@ -362,12 +388,14 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("All dependencies are available")
+
 	return nil
 }
 
 func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
 	// Dependency check doesn't modify state, so rollback is a no-op
 	j.logger.Info("Dependency check rollback is a no-op")
+
 	return nil
 }
 
@@ -381,7 +409,11 @@ type DockerfileGenerationJob struct {
 }
 
 // NewDockerfileGenerationJob creates a new Dockerfile generation job.
-func NewDockerfileGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *DockerfileGenerationJob {
+func NewDockerfileGenerationJob(
+	config *domain.SafeProjectConfig,
+	force bool,
+	logger Logger,
+) *DockerfileGenerationJob {
 	return &DockerfileGenerationJob{
 		id:        "dockerfile-generation",
 		config:    config,
@@ -416,6 +448,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 	// Skip if Docker support is disabled
 	if !j.config.DockerSupport.ShouldBuild() {
 		j.logger.Info("Docker support disabled, skipping Dockerfile generation")
+
 		return nil
 	}
 
@@ -431,6 +464,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("Dockerfile generated successfully")
+
 	return nil
 }
 
@@ -448,7 +482,11 @@ type HomebrewGenerationJob struct {
 }
 
 // NewHomebrewGenerationJob creates a new Homebrew generation job.
-func NewHomebrewGenerationJob(config *domain.SafeProjectConfig, force bool, logger Logger) *HomebrewGenerationJob {
+func NewHomebrewGenerationJob(
+	config *domain.SafeProjectConfig,
+	force bool,
+	logger Logger,
+) *HomebrewGenerationJob {
 	return &HomebrewGenerationJob{
 		id:        "homebrew-generation",
 		config:    config,
@@ -483,6 +521,7 @@ func (j *HomebrewGenerationJob) Execute(ctx context.Context) error {
 	// Skip if Homebrew support is disabled
 	if !j.config.Homebrew {
 		j.logger.Info("Homebrew support disabled, skipping formula generation")
+
 		return nil
 	}
 
@@ -494,10 +533,15 @@ func (j *HomebrewGenerationJob) Execute(ctx context.Context) error {
 	// Generate formula
 	err := j.generator.Generate(ctx)
 	if err != nil {
-		return errors.WrapError(err, errors.ErrConfigGeneration, "Failed to generate Homebrew formula")
+		return errors.WrapError(
+			err,
+			errors.ErrConfigGeneration,
+			"Failed to generate Homebrew formula",
+		)
 	}
 
 	j.logger.Info("Homebrew formula generated successfully")
+
 	return nil
 }
 
@@ -506,7 +550,12 @@ func (j *HomebrewGenerationJob) Rollback(ctx context.Context) error {
 }
 
 // rollbackGeneration is a helper function that handles the common rollback pattern for generators.
-func rollbackGeneration(logger Logger, rollbacker Rollbacker, ctx context.Context, actionName string) error {
+func rollbackGeneration(
+	logger Logger,
+	rollbacker Rollbacker,
+	ctx context.Context,
+	actionName string,
+) error {
 	logger.Info("Rolling back " + actionName)
 
 	// Check context cancellation

@@ -73,14 +73,17 @@ func (w *Workflow) Execute(ctx context.Context) error {
 		rollbackErr := w.JobManager.RollbackFailedJobs(timeoutCtx)
 		if rollbackErr != nil {
 			w.JobManager.logger.Errorf("Rollback failed: %v", rollbackErr)
+
 			return fmt.Errorf("workflow failed and rollback failed: %w", err)
 		}
 
 		w.JobManager.logger.Info("Workflow rolled back successfully")
+
 		return fmt.Errorf("workflow failed: %w", err)
 	}
 
 	w.JobManager.logger.Info("Workflow completed successfully")
+
 	return nil
 }
 
@@ -95,6 +98,7 @@ func (w *Workflow) GetStatistics() map[string]any {
 	stats["workflow_name"] = w.Name
 	stats["workflow_description"] = w.Description
 	stats["timeout"] = w.Timeout
+
 	return stats
 }
 
@@ -125,24 +129,41 @@ func NewWorkflowBuilder(logger *log.Logger) *WorkflowBuilder {
 }
 
 // BuildWorkflow builds a workflow based on type and configuration.
-func (wb *WorkflowBuilder) BuildWorkflow(wfType WorkflowType, config *ProjectConfig, force bool) (*Workflow, error) {
-	var workflow *Workflow
-	var jobs []Job
+func (wb *WorkflowBuilder) BuildWorkflow(
+	wfType WorkflowType,
+	config *ProjectConfig,
+	force bool,
+) (*Workflow, error) {
+	var (
+		workflow *Workflow
+		jobs     []Job
+	)
 
 	switch wfType {
 	case WorkflowTypeFullWizard:
-		workflow = NewWorkflow("Full Wizard", "Complete GoReleaser setup with all features", wb.logger)
+		workflow = NewWorkflow(
+			"Full Wizard",
+			"Complete GoReleaser setup with all features",
+			wb.logger,
+		)
 		jobs = wb.factory.CreateFullWizardJobs(config, force)
+
 		workflow.SetParallel(false, 1) // Sequential execution for wizard
 
 	case WorkflowTypeConfigOnly:
-		workflow = NewWorkflow("Config Generation", "Generate GoReleaser configuration only", wb.logger)
+		workflow = NewWorkflow(
+			"Config Generation",
+			"Generate GoReleaser configuration only",
+			wb.logger,
+		)
 		jobs = wb.factory.CreateConfigOnlyJobs(config, force)
+
 		workflow.SetParallel(false, 1)
 
 	case WorkflowTypeValidationOnly:
 		workflow = NewWorkflow("Project Validation", "Validate project structure only", wb.logger)
 		jobs = []Job{wb.factory.CreateValidationOnlyJob(".")}
+
 		workflow.SetParallel(false, 1)
 
 	default:
@@ -168,7 +189,10 @@ func (wb *WorkflowBuilder) BuildWorkflow(wfType WorkflowType, config *ProjectCon
 }
 
 // BuildMigrateWorkflow builds a migration workflow.
-func (wb *WorkflowBuilder) BuildMigrateWorkflow(fromVersion, toVersion string, config *ProjectConfig) (*Workflow, error) {
+func (wb *WorkflowBuilder) BuildMigrateWorkflow(
+	fromVersion, toVersion string,
+	config *ProjectConfig,
+) (*Workflow, error) {
 	workflow := NewWorkflow(
 		fmt.Sprintf("Migration %s -> %s", fromVersion, toVersion),
 		fmt.Sprintf("Migrate configuration from version %s to %s", fromVersion, toVersion),
@@ -189,7 +213,10 @@ func (wb *WorkflowBuilder) BuildMigrateWorkflow(fromVersion, toVersion string, c
 }
 
 // BuildUpdateWorkflow builds an update workflow.
-func (wb *WorkflowBuilder) BuildUpdateWorkflow(config *ProjectConfig, dryRun bool) (*Workflow, error) {
+func (wb *WorkflowBuilder) BuildUpdateWorkflow(
+	config *ProjectConfig,
+	dryRun bool,
+) (*Workflow, error) {
 	workflow := NewWorkflow(
 		"Update Configuration",
 		fmt.Sprintf("Update GoReleaser configuration (dry-run: %v)", dryRun),
@@ -210,7 +237,10 @@ func (wb *WorkflowBuilder) BuildUpdateWorkflow(config *ProjectConfig, dryRun boo
 }
 
 // createMigrationJobs creates jobs for migration workflow.
-func (wb *WorkflowBuilder) createMigrationJobs(fromVersion, toVersion string, config *ProjectConfig) []Job {
+func (wb *WorkflowBuilder) createMigrationJobs(
+	fromVersion, toVersion string,
+	config *ProjectConfig,
+) []Job {
 	var jobs []Job
 
 	// Backup current configuration
@@ -282,6 +312,7 @@ func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 	// Check if .goreleaser.yaml exists
 	if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
 		j.logger.Info("No existing configuration to backup")
+
 		return nil
 	}
 
@@ -295,6 +326,7 @@ func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Infof("Configuration backed up to: %s", backupFile)
+
 	return nil
 }
 
@@ -329,6 +361,7 @@ func (j *MigrationValidationJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("Migration compatibility validated")
+
 	return nil
 }
 
@@ -365,6 +398,7 @@ func (j *ConfigMigrationJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("Configuration migrated successfully")
+
 	return nil
 }
 
@@ -386,6 +420,7 @@ func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 	}
 
 	j.logger.Infof("Configuration rolled back from: %s", latestBackup)
+
 	return nil
 }
 
@@ -408,6 +443,7 @@ func (j *ConfigUpdateJob) Name() string {
 func (j *ConfigUpdateJob) Execute(ctx context.Context) error {
 	if j.dryRun {
 		j.logger.Info("Dry-run: Skipping configuration update")
+
 		return nil
 	}
 
@@ -419,11 +455,13 @@ func (j *ConfigUpdateJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("Configuration updated successfully")
+
 	return nil
 }
 
 func (j *ConfigUpdateJob) Rollback(ctx context.Context) error {
 	// In real implementation, this would restore previous configuration
 	j.logger.Info("Configuration update rollback not implemented")
+
 	return nil
 }

@@ -79,6 +79,7 @@ var architectureMetaMap = map[Architecture]architectureMeta{
 // IsValid returns true if Architecture is valid.
 func (a Architecture) IsValid() bool {
 	_, exists := architectureMetaMap[a]
+
 	return exists
 }
 
@@ -113,6 +114,7 @@ func (a Architecture) SupportedByAllPlatforms() bool {
 	if meta, exists := architectureMetaMap[a]; exists {
 		return meta.supportedByAllPlatforms
 	}
+
 	return false
 }
 
@@ -121,6 +123,7 @@ func (a Architecture) Is64Bit() bool {
 	if meta, exists := architectureMetaMap[a]; exists {
 		return meta.is64Bit
 	}
+
 	return false
 }
 
@@ -129,6 +132,7 @@ func (a Architecture) GoSupport() string {
 	if meta, exists := architectureMetaMap[a]; exists {
 		return meta.goSupport
 	}
+
 	return "unknown"
 }
 

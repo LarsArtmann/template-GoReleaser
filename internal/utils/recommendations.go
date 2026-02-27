@@ -17,12 +17,15 @@ func GetRecommendedProjectType() domain.ProjectType {
 		if hasFile("main.go") || hasFile("cmd/main.go") {
 			return domain.ProjectTypeCLI
 		}
+
 		if hasFile("api/") || hasFile("server/") {
 			return domain.ProjectTypeWebAPI
 		}
+
 		if hasFile("grpc/") || hasFile("pb/") {
 			return domain.ProjectTypeGRPCService
 		}
+
 		return domain.ProjectTypeLibrary
 	}
 
@@ -68,9 +71,11 @@ func GetRecommendedGitProvider() domain.GitProvider {
 		if strings.Contains(remoteStr, "github.com") {
 			return domain.GitProviderGitHub
 		}
+
 		if strings.Contains(remoteStr, "gitlab.com") {
 			return domain.GitProviderGitLab
 		}
+
 		if strings.Contains(remoteStr, "bitbucket.org") {
 			return domain.GitProviderBitbucket
 		}
@@ -108,6 +113,7 @@ func GetGitHubOwner() string {
 	if owner := git.GetGitHubOwner(); owner != "owner" {
 		return owner
 	}
+
 	return "owner"
 }
 
@@ -116,6 +122,7 @@ func GetGitHubRepo() string {
 	if repo := git.GetGitHubRepo(); repo != "repo" {
 		return repo
 	}
+
 	return "repo"
 }
 
@@ -138,11 +145,14 @@ func GetEnvironment() string {
 	if env := os.Getenv("GO_ENV"); env != "" {
 		return env
 	}
+
 	if env := os.Getenv("ENV"); env != "" {
 		return env
 	}
+
 	if env := os.Getenv("NODE_ENV"); env != "" {
 		return env
 	}
+
 	return "development"
 }

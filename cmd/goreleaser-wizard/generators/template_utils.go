@@ -26,7 +26,12 @@ func ValidateTemplate(templateName, templateContent string) error {
 }
 
 // GeneratePreview generates a preview of a template without writing to file.
-func GeneratePreview(ctx context.Context, logger Logger, templateName, templateContent, logPrefix string, templateData any) (string, error) {
+func GeneratePreview(
+	ctx context.Context,
+	logger Logger,
+	templateName, templateContent, logPrefix string,
+	templateData any,
+) (string, error) {
 	logger.Debug(logPrefix)
 
 	// Check context cancellation
@@ -36,6 +41,7 @@ func GeneratePreview(ctx context.Context, logger Logger, templateName, templateC
 
 	// Create and parse template
 	tmpl := template.New(templateName)
+
 	tmpl, err := tmpl.Parse(templateContent)
 	if err != nil {
 		return "", errors.NewConfigError(
@@ -59,7 +65,12 @@ func GeneratePreview(ctx context.Context, logger Logger, templateName, templateC
 }
 
 // GenerateTemplate generates and executes a template, returning the output.
-func GenerateTemplate(ctx context.Context, logger Logger, templateName, templateContent, logPrefix string, templateData any) ([]byte, error) {
+func GenerateTemplate(
+	ctx context.Context,
+	logger Logger,
+	templateName, templateContent, logPrefix string,
+	templateData any,
+) ([]byte, error) {
 	logger.Info(logPrefix)
 
 	// Check context cancellation
@@ -69,6 +80,7 @@ func GenerateTemplate(ctx context.Context, logger Logger, templateName, template
 
 	// Create and parse template
 	tmpl := template.New(templateName)
+
 	tmpl, err := tmpl.Parse(templateContent)
 	if err != nil {
 		return nil, errors.NewConfigError(
@@ -94,15 +106,18 @@ func GenerateTemplate(ctx context.Context, logger Logger, templateName, template
 // removeGeneratedFile removes a generated file if it exists.
 func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) error {
 	if _, err := os.Stat(filePath); err == nil {
-		if err := os.Remove(filePath); err != nil {
+		err := os.Remove(filePath)
+		if err != nil {
 			return errors.NewFileError(
 				errors.ErrFileOperation,
 				errorMsg,
 				err.Error(),
 			).WithCause(err)
 		}
+
 		logger.Info(successMsg, "path", filePath)
 	}
+
 	return nil
 }
 
@@ -110,10 +125,12 @@ func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) e
 func removeEmptyDirectory(logger Logger, dirPath string) error {
 	files, err := os.ReadDir(dirPath)
 	if err == nil && len(files) == 0 {
-		if err := os.Remove(dirPath); err == nil {
+		err := os.Remove(dirPath)
+		if err == nil {
 			logger.Info("Removed empty directory", "path", dirPath)
 		}
 	}
+
 	return nil
 }
 

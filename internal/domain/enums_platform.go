@@ -187,6 +187,7 @@ func ValidatePlatform(platform Platform) error {
 			fmt.Sprintf("'%s' is not a valid platform", platform),
 		)
 	}
+
 	return nil
 }
 

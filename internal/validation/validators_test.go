@@ -13,7 +13,12 @@ type testCase[T any] struct {
 }
 
 // runValidatorTests executes test cases for validation functions.
-func runValidatorTests[T any](t *testing.T, tests []testCase[T], validatorName string, validator func(T) error) {
+func runValidatorTests[T any](
+	t *testing.T,
+	tests []testCase[T],
+	validatorName string,
+	validator func(T) error,
+) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := validator(tt.input)
@@ -32,7 +37,12 @@ type transformationTestCase struct {
 }
 
 // runTransformationTests executes test cases for string transformation functions.
-func runTransformationTests(t *testing.T, tests []transformationTestCase, funcName string, transform func(string) string) {
+func runTransformationTests(
+	t *testing.T,
+	tests []transformationTestCase,
+	funcName string,
+	transform func(string) string,
+) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			result := transform(tt.input)

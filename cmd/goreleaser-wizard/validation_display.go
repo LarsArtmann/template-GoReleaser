@@ -41,36 +41,45 @@ func displayValidationResults(results *ValidationResults, verbose bool) {
 	// Display errors
 	if len(results.Errors) > 0 {
 		fmt.Println(errorStyle.Render("❌ Errors:"))
+
 		for _, err := range results.Errors {
 			fmt.Printf("  • %s\n", err.Message)
+
 			if verbose {
 				fmt.Printf("    Details: %s\n", err.Details)
+
 				if err.Context != "" {
 					fmt.Printf("    Context: %s\n", err.Context)
 				}
 			}
 		}
+
 		fmt.Println()
 	}
 
 	// Display warnings
 	if len(results.Warnings) > 0 {
 		fmt.Println(infoStyle.Render("⚠️  Warnings:"))
+
 		for _, warning := range results.Warnings {
 			fmt.Printf("  • %s\n", warning.Message)
+
 			if verbose {
 				fmt.Printf("    Details: %s\n", warning.Details)
 			}
 		}
+
 		fmt.Println()
 	}
 
 	// Display recommendations
 	if len(results.Recommendations) > 0 {
 		fmt.Println(infoStyle.Render("💡 Recommendations:"))
+
 		for _, rec := range results.Recommendations {
 			fmt.Printf("  • %s\n", rec)
 		}
+
 		fmt.Println()
 	}
 }

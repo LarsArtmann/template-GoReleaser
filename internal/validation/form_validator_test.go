@@ -5,7 +5,14 @@ import (
 )
 
 // runValidationTest is a generic helper function that tests a validator with valid and invalid inputs.
-func runValidationTest[T any](t *testing.T, fv *FormValidator, validator func(T) error, field string, validInput, invalidInput T, checkFieldError bool) {
+func runValidationTest[T any](
+	t *testing.T,
+	fv *FormValidator,
+	validator func(T) error,
+	field string,
+	validInput, invalidInput T,
+	checkFieldError bool,
+) {
 	// Test valid input
 	err := validator(validInput)
 	if err != nil {
@@ -27,7 +34,12 @@ func runValidationTest[T any](t *testing.T, fv *FormValidator, validator func(T)
 }
 
 // runValidatorWithParamsTest is a helper function that tests a validator created with parameters.
-func runValidatorWithParamsTest(t *testing.T, fv *FormValidator, validator func(string) error, testName, validInput, invalidInput string) {
+func runValidatorWithParamsTest(
+	t *testing.T,
+	fv *FormValidator,
+	validator func(string) error,
+	testName, validInput, invalidInput string,
+) {
 	runValidationTest(t, fv, validator, testName, validInput, invalidInput, false)
 }
 
@@ -48,10 +60,19 @@ func TestFormValidatorValidateProjectName(t *testing.T) {
 	fv := NewFormValidator()
 
 	// Test valid name and invalid name with dots
-	runValidationTest(t, fv, fv.ValidateProjectName(), "project_name", "myproject", "invalid..name", true)
+	runValidationTest(
+		t,
+		fv,
+		fv.ValidateProjectName(),
+		"project_name",
+		"myproject",
+		"invalid..name",
+		true,
+	)
 
 	// Clear errors and test
 	fv.ClearErrors()
+
 	if fv.HasErrors() {
 		t.Errorf("ClearErrors() should clear all errors")
 	}
@@ -64,22 +85,54 @@ func TestFormValidatorValidateBinaryName(t *testing.T) {
 
 func TestFormValidatorValidateMainPath(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateMainPath(), "main_path", "./cmd/app", "../../../etc/passwd", true)
+	runValidationTest(
+		t,
+		fv,
+		fv.ValidateMainPath(),
+		"main_path",
+		"./cmd/app",
+		"../../../etc/passwd",
+		true,
+	)
 }
 
 func TestFormValidatorValidateProjectDescription(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateProjectDescription(), "project_description", "A great app", "<script>alert('xss')</script>", true)
+	runValidationTest(
+		t,
+		fv,
+		fv.ValidateProjectDescription(),
+		"project_description",
+		"A great app",
+		"<script>alert('xss')</script>",
+		true,
+	)
 }
 
 func TestFormValidatorValidateDockerRegistry(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateDockerRegistry(), "docker_registry", "ghcr.io/username/app", "http://registry.example.com/app", true)
+	runValidationTest(
+		t,
+		fv,
+		fv.ValidateDockerRegistry(),
+		"docker_registry",
+		"ghcr.io/username/app",
+		"http://registry.example.com/app",
+		true,
+	)
 }
 
 func TestFormValidatorValidateBuildTags(t *testing.T) {
 	fv := NewFormValidator()
-	runValidationTest(t, fv, fv.ValidateBuildTags, "build_tags", []string{"prod", "linux"}, []string{"prod;rm"}, true)
+	runValidationTest(
+		t,
+		fv,
+		fv.ValidateBuildTags,
+		"build_tags",
+		[]string{"prod", "linux"},
+		[]string{"prod;rm"},
+		true,
+	)
 }
 
 func TestFormValidatorErrorSummary(t *testing.T) {
@@ -162,13 +215,27 @@ func TestFormValidatorValidateLength(t *testing.T) {
 func TestFormValidatorValidateNoShellMetacharacters(t *testing.T) {
 	fv := NewFormValidator()
 	validator := fv.ValidateNoShellMetacharacters("Test Field")
-	runValidatorWithParamsTest(t, fv, validator, "ValidateNoShellMetacharacters", "test-safe", "test;rm")
+	runValidatorWithParamsTest(
+		t,
+		fv,
+		validator,
+		"ValidateNoShellMetacharacters",
+		"test-safe",
+		"test;rm",
+	)
 }
 
 func TestFormValidatorValidateNoPathTraversal(t *testing.T) {
 	fv := NewFormValidator()
 	validator := fv.ValidateNoPathTraversal("Test Field")
-	runValidatorWithParamsTest(t, fv, validator, "ValidateNoPathTraversal", "./cmd/app", "../../../etc")
+	runValidatorWithParamsTest(
+		t,
+		fv,
+		validator,
+		"ValidateNoPathTraversal",
+		"./cmd/app",
+		"../../../etc",
+	)
 }
 
 func TestFormValidatorSetFieldError(t *testing.T) {
@@ -181,7 +248,11 @@ func TestFormValidatorSetFieldError(t *testing.T) {
 	}
 
 	if fv.GetFieldError("test_field") != "test error message" {
-		t.Errorf("GetFieldError() = %v, want %v", fv.GetFieldError("test_field"), "test error message")
+		t.Errorf(
+			"GetFieldError() = %v, want %v",
+			fv.GetFieldError("test_field"),
+			"test error message",
+		)
 	}
 }
 
@@ -199,5 +270,6 @@ func findSubstring(s, substr string) bool {
 			return true
 		}
 	}
+
 	return false
 }

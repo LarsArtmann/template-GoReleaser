@@ -119,7 +119,8 @@ func (spc *SafeProjectConfig) applyGeneralDefaults() {
 	}
 
 	// Set default build tags based on CGO status
-	if spc.CGOStatus.IsDisabled() && !slices.Contains(spc.BuildTags, CreateBuildTag("pure", "Pure Go compilation")) {
+	if spc.CGOStatus.IsDisabled() &&
+		!slices.Contains(spc.BuildTags, CreateBuildTag("pure", "Pure Go compilation")) {
 		spc.BuildTags = append(spc.BuildTags, CreateBuildTag("pure", "Pure Go compilation"))
 	}
 }
@@ -135,6 +136,7 @@ func (spc *SafeProjectConfig) GetDockerImageName() string {
 		// Convert to lowercase and replace spaces with hyphens
 		imageName := strings.ToLower(spc.ProjectName)
 		imageName = strings.ReplaceAll(imageName, " ", "-")
+
 		return imageName
 	}
 

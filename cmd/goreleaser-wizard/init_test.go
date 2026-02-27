@@ -30,6 +30,7 @@ go 1.21
 `
 				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
 				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
+
 				return dir
 			},
 			expectError: false,
@@ -40,6 +41,7 @@ go 1.21
 			flags: map[string]string{},
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-init-test")
+
 				return dir
 			},
 			expectError: true,
@@ -53,6 +55,7 @@ go 1.21
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
@@ -108,6 +111,7 @@ go 1.21
 `
 				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
 				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
+
 				return dir
 			},
 			expectedProject: ProjectConfig{
@@ -126,7 +130,12 @@ go 1.21
 `
 				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
 				os.MkdirAll(dir+"/cmd/cmdapp", 0o755)
-				os.WriteFile(dir+"/cmd/cmdapp/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					dir+"/cmd/cmdapp/main.go",
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
+
 				return dir
 			},
 			expectedProject: ProjectConfig{
@@ -145,6 +154,7 @@ go 1.21
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
@@ -154,7 +164,11 @@ go 1.21
 
 			// Check detected information
 			if config.ProjectName != tt.expectedProject.ProjectName {
-				t.Errorf("ProjectName = %q, want %q", config.ProjectName, tt.expectedProject.ProjectName)
+				t.Errorf(
+					"ProjectName = %q, want %q",
+					config.ProjectName,
+					tt.expectedProject.ProjectName,
+				)
 			}
 
 			if config.MainPath != tt.expectedProject.MainPath {
@@ -162,11 +176,19 @@ go 1.21
 			}
 
 			if config.BinaryName != tt.expectedProject.BinaryName {
-				t.Errorf("BinaryName = %q, want %q", config.BinaryName, tt.expectedProject.BinaryName)
+				t.Errorf(
+					"BinaryName = %q, want %q",
+					config.BinaryName,
+					tt.expectedProject.BinaryName,
+				)
 			}
 
 			if config.ProjectType != tt.expectedProject.ProjectType {
-				t.Errorf("ProjectType = %q, want %q", config.ProjectType, tt.expectedProject.ProjectType)
+				t.Errorf(
+					"ProjectType = %q, want %q",
+					config.ProjectType,
+					tt.expectedProject.ProjectType,
+				)
 			}
 		})
 	}

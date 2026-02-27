@@ -67,6 +67,7 @@ var gitProviderMetaMap = map[GitProvider]gitProviderMeta{
 // IsValid returns true if GitProvider is valid.
 func (gp GitProvider) IsValid() bool {
 	_, exists := gitProviderMetaMap[gp]
+
 	return exists
 }
 
@@ -93,6 +94,7 @@ func (gp GitProvider) DefaultRegistry() DockerRegistry {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.defaultRegistry
 	}
+
 	return DockerRegistryCustom
 }
 
@@ -101,6 +103,7 @@ func (gp GitProvider) ActionsSupported() bool {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.actionsSupported
 	}
+
 	return false
 }
 
@@ -109,6 +112,7 @@ func (gp GitProvider) APIURL() string {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.apiURL
 	}
+
 	return ""
 }
 
@@ -117,6 +121,7 @@ func (gp GitProvider) WebURL() string {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.webURL
 	}
+
 	return ""
 }
 
@@ -125,6 +130,7 @@ func (gp GitProvider) RequiresPersonalAccessToken() bool {
 	if meta, exists := gitProviderMetaMap[gp]; exists {
 		return meta.requiresPersonalAccessToken
 	}
+
 	return true
 }
 
@@ -137,6 +143,7 @@ func ValidateGitProvider(provider GitProvider) error {
 			fmt.Sprintf("'%s' is not a valid git provider", provider),
 		)
 	}
+
 	return nil
 }
 

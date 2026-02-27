@@ -57,14 +57,17 @@ func createHomebrewTemplateData(config *domain.SafeProjectConfig) *HomebrewTempl
 		ProjectName:        config.ProjectName,
 		ProjectDescription: description,
 		Homepage:           "https://github.com/user/" + config.ProjectName,
-		ArchiveURL:         fmt.Sprintf("https://github.com/user/%s/archive/v{{version}}.tar.gz", config.ProjectName),
-		Checksum:           "{{sha256}}", // Will be filled by GoReleaser
-		License:            "MIT",
-		MainPath:           config.MainPath,
-		LDFlags:            "-s -w -X main.version={{version}}",
-		BinaryName:         config.BinaryName,
-		TestOutput:         config.BinaryName + " version",
-		Service:            config.ProjectType == domain.ProjectTypeWebAPI,
+		ArchiveURL: fmt.Sprintf(
+			"https://github.com/user/%s/archive/v{{version}}.tar.gz",
+			config.ProjectName,
+		),
+		Checksum:   "{{sha256}}", // Will be filled by GoReleaser
+		License:    "MIT",
+		MainPath:   config.MainPath,
+		LDFlags:    "-s -w -X main.version={{version}}",
+		BinaryName: config.BinaryName,
+		TestOutput: config.BinaryName + " version",
+		Service:    config.ProjectType == domain.ProjectTypeWebAPI,
 	}
 }
 
@@ -74,6 +77,7 @@ func toCamelCase(s string) string {
 	words := splitWords(s)
 
 	var result strings.Builder
+
 	for _, word := range words {
 		if len(word) > 0 {
 			result.WriteString(strings.ToUpper(word[:1]) + strings.ToLower(word[1:]))
@@ -86,6 +90,7 @@ func toCamelCase(s string) string {
 // splitWords splits a string into words by common separators.
 func splitWords(s string) []string {
 	var words []string
+
 	current := ""
 
 	for _, r := range s {
@@ -108,7 +113,14 @@ func splitWords(s string) []string {
 
 // Generate generates Homebrew formula.
 func (g *HomebrewGenerator) Generate(ctx context.Context) error {
-	output, err := GenerateTemplate(ctx, g.logger, "homebrew", templates.HomebrewTemplate, "Generating Homebrew formula", g.templateData)
+	output, err := GenerateTemplate(
+		ctx,
+		g.logger,
+		"homebrew",
+		templates.HomebrewTemplate,
+		"Generating Homebrew formula",
+		g.templateData,
+	)
 	if err != nil {
 		return err
 	}
@@ -134,6 +146,7 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 	}
 
 	g.logger.Info("Homebrew formula generated successfully", "path", formulaPath)
+
 	return nil
 }
 
@@ -144,7 +157,14 @@ func (g *HomebrewGenerator) ValidateTemplate() error {
 
 // GeneratePreview generates a preview without writing to file.
 func (g *HomebrewGenerator) GeneratePreview(ctx context.Context) (string, error) {
-	return GeneratePreview(ctx, g.logger, "homebrew", templates.HomebrewTemplate, "Generating Homebrew formula preview", g.templateData)
+	return GeneratePreview(
+		ctx,
+		g.logger,
+		"homebrew",
+		templates.HomebrewTemplate,
+		"Generating Homebrew formula preview",
+		g.templateData,
+	)
 }
 
 // Rollback removes generated Homebrew formula.
@@ -158,7 +178,13 @@ func (g *HomebrewGenerator) Rollback(ctx context.Context) error {
 
 	// Remove generated formula
 	formulaPath := fmt.Sprintf("homebrew/%s.rb", g.templateData.FormulaName)
-	if err := removeGeneratedFile(g.logger, formulaPath, "Failed to remove generated formula", "Removed generated formula"); err != nil {
+	err := removeGeneratedFile(
+		g.logger,
+		formulaPath,
+		"Failed to remove generated formula",
+		"Removed generated formula",
+	)
+	if err != nil {
 		return err
 	}
 

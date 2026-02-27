@@ -19,25 +19,39 @@ func NewFormValidator() *FormValidator {
 }
 
 // validateWithFunction is a generic helper for string validation functions.
-func (fv *FormValidator) validateWithFunction(fieldName string, validateFunc func(string) error) func(string) error {
+func (fv *FormValidator) validateWithFunction(
+	fieldName string,
+	validateFunc func(string) error,
+) func(string) error {
 	return func(value string) error {
-		if err := validateFunc(value); err != nil {
+		err := validateFunc(value)
+		if err != nil {
 			fv.errors[fieldName] = err.Error()
+
 			return err
 		}
+
 		delete(fv.errors, fieldName)
+
 		return nil
 	}
 }
 
 // validateStringSliceWithFunction is a helper for string slice validation functions.
-func (fv *FormValidator) validateStringSliceWithFunction(fieldName string, validateFunc func([]string) error) func([]string) error {
+func (fv *FormValidator) validateStringSliceWithFunction(
+	fieldName string,
+	validateFunc func([]string) error,
+) func([]string) error {
 	return func(value []string) error {
-		if err := validateFunc(value); err != nil {
+		err := validateFunc(value)
+		if err != nil {
 			fv.errors[fieldName] = err.Error()
+
 			return err
 		}
+
 		delete(fv.errors, fieldName)
+
 		return nil
 	}
 }
@@ -102,12 +116,16 @@ func (fv *FormValidator) ClearErrors() {
 }
 
 // SanitizeAndValidate sanitizes input and validates it.
-func (fv *FormValidator) SanitizeAndValidate(input string, validator func(string) error) (string, error) {
+func (fv *FormValidator) SanitizeAndValidate(
+	input string,
+	validator func(string) error,
+) (string, error) {
 	// First sanitize the input
 	sanitized := SanitizeInput(input)
 
 	// Then validate it
-	if err := validator(sanitized); err != nil {
+	err := validator(sanitized)
+	if err != nil {
 		return "", err
 	}
 
@@ -130,9 +148,12 @@ func (fv *FormValidator) ValidateRequired(fieldName string) func(string) error {
 		if strings.TrimSpace(value) == "" {
 			err := fmt.Errorf("%s is required", fieldName)
 			fv.errors[fieldName] = err.Error()
+
 			return err
 		}
+
 		delete(fv.errors, fieldName)
+
 		return nil
 	}
 }
@@ -144,22 +165,32 @@ func (fv *FormValidator) ValidateLength(min, max int, fieldName string) func(str
 		if length < min || length > max {
 			err := fmt.Errorf("%s must be between %d and %d characters", fieldName, min, max)
 			fv.errors[fieldName] = err.Error()
+
 			return err
 		}
+
 		delete(fv.errors, fieldName)
+
 		return nil
 	}
 }
 
 // validatePattern is a generic helper for pattern-based validation.
-func (fv *FormValidator) validatePattern(fieldName string, pattern *regexp.Regexp, errorMessage string) func(string) error {
+func (fv *FormValidator) validatePattern(
+	fieldName string,
+	pattern *regexp.Regexp,
+	errorMessage string,
+) func(string) error {
 	return func(value string) error {
 		if pattern.MatchString(value) {
 			err := fmt.Errorf("%s %s", fieldName, errorMessage)
 			fv.errors[fieldName] = err.Error()
+
 			return err
 		}
+
 		delete(fv.errors, fieldName)
+
 		return nil
 	}
 }

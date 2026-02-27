@@ -51,90 +51,107 @@ func (vr *ValidationResult) GetWarningCount() int {
 // GetCriticalErrors returns critical errors.
 func (vr *ValidationResult) GetCriticalErrors() []*ValidationError {
 	var critical []*ValidationError
+
 	for _, err := range vr.Errors {
 		if err.Level == ErrorLevelCritical {
 			critical = append(critical, err)
 		}
 	}
+
 	return critical
 }
 
 // GetHighErrors returns high-severity errors.
 func (vr *ValidationResult) GetHighErrors() []*ValidationError {
 	var high []*ValidationError
+
 	for _, err := range vr.Errors {
 		if err.Level == ErrorLevelHigh {
 			high = append(high, err)
 		}
 	}
+
 	return high
 }
 
 // GetMediumErrors returns medium-severity errors.
 func (vr *ValidationResult) GetMediumErrors() []*ValidationError {
 	var medium []*ValidationError
+
 	for _, err := range vr.Errors {
 		if err.Level == ErrorLevelMedium {
 			medium = append(medium, err)
 		}
 	}
+
 	return medium
 }
 
 // GetLowErrors returns low-severity errors.
 func (vr *ValidationResult) GetLowErrors() []*ValidationError {
 	var low []*ValidationError
+
 	for _, err := range vr.Errors {
 		if err.Level == ErrorLevelLow {
 			low = append(low, err)
 		}
 	}
+
 	return low
 }
 
 // GetHighWarnings returns high-severity warnings.
 func (vr *ValidationResult) GetHighWarnings() []*ValidationWarning {
 	var high []*ValidationWarning
+
 	for _, warn := range vr.Warnings {
 		if warn.Level == WarningLevelHigh {
 			high = append(high, warn)
 		}
 	}
+
 	return high
 }
 
 // GetMediumWarnings returns medium-severity warnings.
 func (vr *ValidationResult) GetMediumWarnings() []*ValidationWarning {
 	var medium []*ValidationWarning
+
 	for _, warn := range vr.Warnings {
 		if warn.Level == WarningLevelMedium {
 			medium = append(medium, warn)
 		}
 	}
+
 	return medium
 }
 
 // GetLowWarnings returns low-severity warnings.
 func (vr *ValidationResult) GetLowWarnings() []*ValidationWarning {
 	var low []*ValidationWarning
+
 	for _, warn := range vr.Warnings {
 		if warn.Level == WarningLevelLow {
 			low = append(low, warn)
 		}
 	}
+
 	return low
 }
 
 // groupByField groups validation items by field name.
 func groupByField[T validationItem](items []T) map[string][]T {
 	fieldGroups := make(map[string][]T)
+
 	for _, item := range items {
 		field := item.GetField()
 		if field == "" {
 			field = "general"
 		}
+
 		fieldGroups[field] = append(fieldGroups[field], item)
 	}
+
 	return fieldGroups
 }
 
@@ -154,6 +171,7 @@ func (vr *ValidationResult) GetErrorsByCode() map[errors.ErrorCode][]*Validation
 	for _, err := range vr.Errors {
 		codeErrors[err.Code] = append(codeErrors[err.Code], err)
 	}
+
 	return codeErrors
 }
 
@@ -163,6 +181,7 @@ func (vr *ValidationResult) GetWarningsByCode() map[string][]*ValidationWarning 
 	for _, warn := range vr.Warnings {
 		codeWarnings[warn.Code] = append(codeWarnings[warn.Code], warn)
 	}
+
 	return codeWarnings
 }
 
@@ -200,6 +219,7 @@ func toValidationItems[T validationItem](items []T) []validationItem {
 	for i, item := range items {
 		result[i] = item
 	}
+
 	return result
 }
 
@@ -255,8 +275,16 @@ func appendValidationItems[T validationItem](
 	}
 
 	fmt.Fprintf(result, "\n\n%s %s (%d):", emoji, label, len(items))
+
 	for _, item := range items {
-		fmt.Fprintf(result, "\n  • [%s] %s: %s", item.GetLevel(), item.GetField(), item.GetMessage())
+		fmt.Fprintf(
+			result,
+			"\n  • [%s] %s: %s",
+			item.GetLevel(),
+			item.GetField(),
+			item.GetMessage(),
+		)
+
 		if item.GetSuggestion() != "" {
 			result.WriteString("\n    💡 " + item.GetSuggestion())
 		}
@@ -334,6 +362,7 @@ func formatValidationItem(code, field, message, context string) string {
 	if context != "" {
 		return fmt.Sprintf("[%s] %s: %s (%s)", code, field, message, context)
 	}
+
 	return fmt.Sprintf("[%s] %s: %s", code, field, message)
 }
 
@@ -345,24 +374,28 @@ func (ve *ValidationError) Error() string {
 // WithContext adds context to the validation error.
 func (ve *ValidationError) WithContext(context string) *ValidationError {
 	ve.Context = context
+
 	return ve
 }
 
 // WithDetails adds details to the validation error.
 func (ve *ValidationError) WithDetails(details string) *ValidationError {
 	ve.Details = details
+
 	return ve
 }
 
 // WithSuggestion adds suggestion to the validation error.
 func (ve *ValidationError) WithSuggestion(suggestion string) *ValidationError {
 	ve.Suggestion = suggestion
+
 	return ve
 }
 
 // cloneStruct creates a deep copy of a struct by value.
 func cloneStruct[T any](item T) *T {
 	clone := item
+
 	return &clone
 }
 
@@ -390,18 +423,21 @@ func (vw *ValidationWarning) String() string {
 // WithContext adds context to the validation warning.
 func (vw *ValidationWarning) WithContext(context string) *ValidationWarning {
 	vw.Context = context
+
 	return vw
 }
 
 // WithDetails adds details to the validation warning.
 func (vw *ValidationWarning) WithDetails(details string) *ValidationWarning {
 	vw.Details = details
+
 	return vw
 }
 
 // WithSuggestion adds suggestion to the validation warning.
 func (vw *ValidationWarning) WithSuggestion(suggestion string) *ValidationWarning {
 	vw.Suggestion = suggestion
+
 	return vw
 }
 
@@ -641,6 +677,7 @@ func (f *ValidationFilter) Filter(result *ValidationResult) *ValidationResult {
 	}
 
 	filtered.UpdateSummary()
+
 	return filtered
 }
 
@@ -715,6 +752,7 @@ func isZero(v any) bool {
 	if v == nil {
 		return true
 	}
+
 	switch val := v.(type) {
 	case []ErrorLevel:
 		return len(val) == 0

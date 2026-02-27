@@ -29,11 +29,16 @@ require github.com/charmbracelet/lipgloss v1.1.0
 	// Create main and cmd structure
 	os.MkdirAll(filepath.Join(tmpDir, "cmd", "benchmark-test"), 0o755)
 	os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
-	os.WriteFile(filepath.Join(tmpDir, "cmd", "benchmark-test", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+	os.WriteFile(
+		filepath.Join(tmpDir, "cmd", "benchmark-test", "main.go"),
+		[]byte("package main\n\nfunc main() {}"),
+		0o644,
+	)
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	for b.Loop() {
@@ -58,6 +63,7 @@ go 1.21
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	config := &ProjectConfig{
@@ -83,6 +89,7 @@ go 1.21
 		if err != nil {
 			b.Fatalf("Config generation failed: %v", err)
 		}
+
 		os.Remove(".goreleaser.yaml") // Clean up for next iteration
 	}
 }
@@ -103,6 +110,7 @@ go 1.21
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	config := &ProjectConfig{
@@ -119,6 +127,7 @@ go 1.21
 		if err != nil {
 			b.Fatalf("GitHub Actions generation failed: %v", err)
 		}
+
 		os.RemoveAll(".github") // Clean up for next iteration
 	}
 }
@@ -130,6 +139,7 @@ func BenchmarkFileOperations(b *testing.B) {
 
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	testContent := []string{
@@ -187,6 +197,7 @@ func TestPerformanceCharacteristics(t *testing.T) {
 
 			originalDir, _ := os.Getwd()
 			defer os.Chdir(originalDir)
+
 			os.Chdir(tmpDir)
 
 			// Run full wizard workflow
@@ -219,6 +230,7 @@ func TestPerformanceCharacteristics(t *testing.T) {
 func TestMemoryUsage(t *testing.T) {
 	// Get initial memory stats
 	var m1, m2 runtime.MemStats
+
 	runtime.GC()
 	runtime.ReadMemStats(&m1)
 
@@ -253,7 +265,11 @@ func TestMemoryUsage(t *testing.T) {
 	allocDiff := m2.Alloc - m1.Alloc
 	totalAllocDiff := m2.TotalAlloc - m1.TotalAlloc
 
-	t.Logf("Memory usage: Alloc diff = %d bytes, TotalAlloc diff = %d bytes", allocDiff, totalAllocDiff)
+	t.Logf(
+		"Memory usage: Alloc diff = %d bytes, TotalAlloc diff = %d bytes",
+		allocDiff,
+		totalAllocDiff,
+	)
 
 	// Memory usage should be reasonable (less than 50MB for 10 projects)
 	if totalAllocDiff > 50*1024*1024 {
@@ -281,18 +297,25 @@ func TestConcurrentOperations(t *testing.T) {
 			// Create project
 			goMod := fmt.Sprintf("module github.com/user/concurrent-test-%d\ngo 1.21\n", id)
 			os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0o644)
-			os.WriteFile(filepath.Join(tmpDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+			os.WriteFile(
+				filepath.Join(tmpDir, "main.go"),
+				[]byte("package main\n\nfunc main() {}"),
+				0o644,
+			)
 
 			originalDir, _ := os.Getwd()
 			defer os.Chdir(originalDir)
+
 			os.Chdir(tmpDir)
 
 			// Run wizard operations
 			config := &ProjectConfig{}
 			detectProjectInfo(config)
+
 			err := generateGoReleaserConfig(config)
 			if err != nil {
 				errors <- fmt.Errorf("project %d: %w", id, err)
+
 				return
 			}
 		}(i)
@@ -305,6 +328,7 @@ func TestConcurrentOperations(t *testing.T) {
 
 	// Check for errors
 	close(errors)
+
 	for err := range errors {
 		t.Errorf("Concurrent operation error: %v", err)
 	}
@@ -325,15 +349,19 @@ go 1.21
 	if complexity >= 1 {
 		addCmdStructure(dir)
 	}
+
 	if complexity >= 3 {
 		addInternalStructure(dir)
 	}
+
 	if complexity >= 5 {
 		addAPIStructure(dir)
 	}
+
 	if complexity >= 7 {
 		addPkgStructure(dir)
 	}
+
 	if complexity >= 10 {
 		addExtensiveStructure(dir, 5)
 	}
@@ -374,6 +402,7 @@ func addPkgStructure(dir string) {
 func createDirAndFiles(baseDir, dirPath string, files map[string]string) {
 	fullDir := filepath.Join(baseDir, filepath.FromSlash(dirPath))
 	os.MkdirAll(fullDir, 0o755)
+
 	for filename, content := range files {
 		os.WriteFile(filepath.Join(fullDir, filename), []byte(content), 0o644)
 	}
@@ -384,6 +413,10 @@ func addExtensiveStructure(dir string, count int) {
 	for i := range count {
 		pkgName := fmt.Sprintf("pkg%02d", i)
 		os.MkdirAll(filepath.Join(dir, pkgName), 0o755)
-		os.WriteFile(filepath.Join(dir, pkgName, pkgName+".go"), fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName), 0o644)
+		os.WriteFile(
+			filepath.Join(dir, pkgName, pkgName+".go"),
+			fmt.Appendf(nil, "package %s\n\nfunc Func() {}", pkgName),
+			0o644,
+		)
 	}
 }

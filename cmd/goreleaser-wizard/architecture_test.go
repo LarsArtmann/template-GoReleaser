@@ -100,6 +100,7 @@ go 1.21
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	tests := []struct {
@@ -152,6 +153,7 @@ func TestJobRollback(t *testing.T) {
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	// Create basic project
@@ -191,6 +193,7 @@ go 1.21
 			err := tt.job.Execute(ctx)
 			if err != nil && tt.job.Name() != "Dependency Check" {
 				t.Errorf("%s.Execute() failed: %v", tt.job.Name(), err)
+
 				return
 			}
 
@@ -223,6 +226,7 @@ go 1.21
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	tests := []struct {
@@ -236,6 +240,7 @@ go 1.21
 				wf := NewWorkflow("Validation Test", "Test validation workflow", logger)
 				wf.JobManager.AddJob(NewProjectValidationJob(".", logger))
 				wf.SetTimeout(5 * time.Minute)
+
 				return wf
 			}(),
 			wantErr: false,
@@ -252,6 +257,7 @@ go 1.21
 					GitProvider: "GitHub",
 				}, false, logger))
 				wf.SetTimeout(5 * time.Minute)
+
 				return wf
 			}(),
 			wantErr: false,
@@ -301,6 +307,7 @@ go 1.21
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	config := &ProjectConfig{
@@ -355,12 +362,14 @@ go 1.21
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("BuildWorkflow() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
 			if !tt.wantErr {
 				// Execute workflow
 				ctx := context.Background()
+
 				err = workflow.Execute(ctx)
 				if err != nil {
 					t.Errorf("Workflow.Execute() error = %v", err)
@@ -386,12 +395,17 @@ func TestConcurrentJobExecution(t *testing.T) {
 
 		goMod := fmt.Sprintf("module github.com/user/concurrent-test-%d\ngo 1.21\n", i)
 		os.WriteFile(filepath.Join(projectDir, "go.mod"), []byte(goMod), 0o644)
-		os.WriteFile(filepath.Join(projectDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+		os.WriteFile(
+			filepath.Join(projectDir, "main.go"),
+			[]byte("package main\n\nfunc main() {}"),
+			0o644,
+		)
 	}
 
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	// Add validation jobs for all projects
@@ -406,6 +420,7 @@ func TestConcurrentJobExecution(t *testing.T) {
 
 	// Execute jobs
 	ctx := context.Background()
+
 	err := jm.ExecuteJobs(ctx)
 	if err != nil {
 		t.Errorf("Concurrent job execution failed: %v", err)

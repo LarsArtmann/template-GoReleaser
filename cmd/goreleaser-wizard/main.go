@@ -129,7 +129,8 @@ func Execute() {
 	// Set up panic recovery using domain error handling
 	defer recoverFromPanic("command execution")
 
-	if err := rootCmd.Execute(); err != nil {
+	err := rootCmd.Execute()
+	if err != nil {
 		displayError(err)
 	}
 }
@@ -202,7 +203,8 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	// Global flags
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.goreleaser-wizard.yaml)")
+	rootCmd.PersistentFlags().
+		StringVar(&cfgFile, "config", "", "config file (default is $HOME/.goreleaser-wizard.yaml)")
 	rootCmd.PersistentFlags().Bool("no-color", false, "disable color output")
 	rootCmd.PersistentFlags().Bool("debug", false, "enable debug output")
 
@@ -227,8 +229,10 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 
 		// Validate the config file exists and is readable using domain types
-		if err := validateFileExists(cfgFile, false); err != nil {
+		err := validateFileExists(cfgFile, false)
+		if err != nil {
 			displayError(err)
+
 			return
 		}
 	} else {
@@ -241,6 +245,7 @@ func initConfig() {
 				"System could not determine the user's home directory",
 				err,
 			).WithContext("config_initialization"))
+
 			return
 		}
 
@@ -254,7 +259,8 @@ func initConfig() {
 	viper.AutomaticEnv() // read in environment variables that match
 
 	// If a config file is found, read it in.
-	if err := viper.ReadInConfig(); err != nil {
+	err := viper.ReadInConfig()
+	if err != nil {
 		// Only log if it's not a "file not found" error for optional config
 		if cfgFile != "" || !os.IsNotExist(err) {
 			logger.Warn("Config file error", "error", err, "file", viper.ConfigFileUsed())
@@ -276,6 +282,7 @@ func validateFileExists(path string, requireDir bool) *domain.DomainError {
 				err,
 			).WithContext(path)
 		}
+
 		return domain.NewSystemError(
 			domain.ErrFileReadFailed,
 			"File access error",
@@ -303,9 +310,11 @@ var versionCmd = &cobra.Command{
 		fmt.Printf("  Build Date: %s\n", date)
 		fmt.Printf("  Git Commit: %s\n", commit)
 		fmt.Printf("  Built By: %s\n", builtBy)
+
 		if gitState != "" {
 			fmt.Printf("  Git State: %s\n", gitState)
 		}
+
 		if gitDescription != "" {
 			fmt.Printf("  Git Summary: %s\n", gitDescription)
 		}
@@ -350,7 +359,8 @@ func configureInitCommand(cmd *cobra.Command) {
 // configureGenerateCommand adds flags specific to the generate command.
 func configureGenerateCommand(cmd *cobra.Command) {
 	addCommonFlags(cmd)
-	cmd.Flags().Bool("config-only", false, "generate only GoReleaser configuration (no GitHub Actions)")
+	cmd.Flags().
+		Bool("config-only", false, "generate only GoReleaser configuration (no GitHub Actions)")
 }
 
 func main() {

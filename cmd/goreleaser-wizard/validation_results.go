@@ -18,8 +18,10 @@ func (vr *ValidationResults) GetExitCode() int {
 	if len(vr.Errors) > 0 {
 		return 1
 	}
+
 	if len(vr.Warnings) > 0 {
 		return 2
 	}
+
 	return 0
 }

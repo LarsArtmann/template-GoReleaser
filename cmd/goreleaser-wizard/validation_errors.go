@@ -18,6 +18,7 @@ func (de *DomainError) Error() string {
 	if de.Context != "" {
 		return fmt.Sprintf("[%s] %s (context: %s)", de.Code, de.Message, de.Context)
 	}
+
 	return fmt.Sprintf("[%s] %s", de.Code, de.Message)
 }
 

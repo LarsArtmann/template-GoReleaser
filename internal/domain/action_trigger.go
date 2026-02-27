@@ -41,9 +41,14 @@ var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 		recommendedFor: []ProjectType{ProjectTypeLibrary},
 	},
 	ActionTriggerManual: {
-		githubPattern:  "workflow_dispatch:",
-		description:    "Can be triggered manually from GitHub UI",
-		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeDesktop},
+		githubPattern: "workflow_dispatch:",
+		description:   "Can be triggered manually from GitHub UI",
+		recommendedFor: []ProjectType{
+			ProjectTypeCLI,
+			ProjectTypeWebAPI,
+			ProjectTypeGRPCService,
+			ProjectTypeDesktop,
+		},
 	},
 	ActionTriggerMain: {
 		githubPattern:  "push:\n  branches:\n    - main",
@@ -51,15 +56,21 @@ var actionTriggerMetaMap = map[ActionTrigger]actionTriggerMeta{
 		recommendedFor: []ProjectType{ProjectTypeWebAPI, ProjectTypeGRPCService},
 	},
 	ActionTriggerRelease: {
-		githubPattern:  "release:\n    types: [published]",
-		description:    "Triggers when a GitHub release is published",
-		recommendedFor: []ProjectType{ProjectTypeCLI, ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeDesktop},
+		githubPattern: "release:\n    types: [published]",
+		description:   "Triggers when a GitHub release is published",
+		recommendedFor: []ProjectType{
+			ProjectTypeCLI,
+			ProjectTypeWebAPI,
+			ProjectTypeGRPCService,
+			ProjectTypeDesktop,
+		},
 	},
 }
 
 // IsValid returns true if ActionTrigger is valid.
 func (at ActionTrigger) IsValid() bool {
 	_, exists := actionTriggerMetaMap[at]
+
 	return exists
 }
 
@@ -86,6 +97,7 @@ func (at ActionTrigger) GitHubPattern() string {
 	if meta, exists := actionTriggerMetaMap[at]; exists {
 		return meta.githubPattern
 	}
+
 	return ""
 }
 
@@ -94,6 +106,7 @@ func (at ActionTrigger) Description() string {
 	if meta, exists := actionTriggerMetaMap[at]; exists {
 		return meta.description
 	}
+
 	return ""
 }
 
@@ -102,6 +115,7 @@ func (at ActionTrigger) RecommendedFor() []ProjectType {
 	if meta, exists := actionTriggerMetaMap[at]; exists {
 		return meta.recommendedFor
 	}
+
 	return []ProjectType{}
 }
 
@@ -123,12 +137,14 @@ func ValidateActionTriggers(triggers []ActionTrigger) error {
 // GetRecommendedTriggers returns recommended triggers for a project type.
 func GetRecommendedTriggers(projectType ProjectType) []ActionTrigger {
 	recommended := []ActionTrigger{}
+
 	for _, trigger := range GetAllActionTriggers() {
 		meta := actionTriggerMetaMap[trigger]
 		if slices.Contains(meta.recommendedFor, projectType) {
 			recommended = append(recommended, trigger)
 		}
 	}
+
 	return recommended
 }
 

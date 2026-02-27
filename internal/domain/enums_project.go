@@ -79,7 +79,9 @@ func (pt ProjectType) IsLibrary() bool {
 
 // IsService returns true for service-oriented project types.
 func (pt ProjectType) IsService() bool {
-	return pt == ProjectTypeWebAPI || pt == ProjectTypeGRPCService || pt == ProjectTypeMicroservice || pt == ProjectTypeDaemon
+	return pt == ProjectTypeWebAPI || pt == ProjectTypeGRPCService ||
+		pt == ProjectTypeMicroservice ||
+		pt == ProjectTypeDaemon
 }
 
 // DefaultCGOEnabled returns true if project type typically requires CGO.
@@ -192,7 +194,8 @@ func (fl FeatureLevel) IsEnabled() bool {
 
 // IncludesBasic returns true if feature level includes basic features.
 func (fl FeatureLevel) IncludesBasic() bool {
-	return fl == FeatureLevelBasic || fl == FeatureLevelStandard || fl == FeatureLevelAdvanced || fl == FeatureLevelEnterprise
+	return fl == FeatureLevelBasic || fl == FeatureLevelStandard || fl == FeatureLevelAdvanced ||
+		fl == FeatureLevelEnterprise
 }
 
 // IncludesAdvanced returns true if feature level includes advanced features.

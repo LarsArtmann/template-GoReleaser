@@ -122,6 +122,7 @@ func (de *DomainError) Error() string {
 	if de.Details != "" {
 		return fmt.Sprintf("[%s] %s: %s", de.Code, de.Message, de.Details)
 	}
+
 	return fmt.Sprintf("[%s] %s", de.Code, de.Message)
 }
 
@@ -133,30 +134,35 @@ func (de *DomainError) Unwrap() error {
 // WithContext adds context to the error.
 func (de *DomainError) WithContext(context string) *DomainError {
 	de.Context = context
+
 	return de
 }
 
 // WithField adds field information to the error.
 func (de *DomainError) WithField(field string) *DomainError {
 	de.Field = field
+
 	return de
 }
 
 // WithLevel sets the error level.
 func (de *DomainError) WithLevel(level ErrorLevel) *DomainError {
 	de.Level = level
+
 	return de
 }
 
 // WithRetryable sets if the error is retryable.
 func (de *DomainError) WithRetryable(retryable bool) *DomainError {
 	de.Retryable = retryable
+
 	return de
 }
 
 // WithCause adds the underlying cause.
 func (de *DomainError) WithCause(cause error) *DomainError {
 	de.Cause = cause
+
 	return de
 }
 
@@ -167,12 +173,14 @@ func (de *DomainError) WithCaller() *DomainError {
 		de.File = file
 		de.Line = line
 	}
+
 	return de
 }
 
 // WithSuggestion adds a suggestion to the error.
 func (de *DomainError) WithSuggestion(suggestion string) *DomainError {
 	de.Context = suggestion
+
 	return de
 }
 
@@ -185,6 +193,7 @@ func NewValidationError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelMedium,
 		Retryable: false,
 	}
+
 	return err.WithCaller()
 }
 
@@ -197,6 +206,7 @@ func NewConfigError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelHigh,
 		Retryable: false,
 	}
+
 	return err.WithCaller()
 }
 
@@ -209,6 +219,7 @@ func NewFileError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelMedium,
 		Retryable: true,
 	}
+
 	return err.WithCaller()
 }
 
@@ -221,6 +232,7 @@ func NewGitError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelMedium,
 		Retryable: true,
 	}
+
 	return err.WithCaller()
 }
 
@@ -233,6 +245,7 @@ func NewJobError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelHigh,
 		Retryable: false,
 	}
+
 	return err.WithCaller()
 }
 
@@ -245,6 +258,7 @@ func NewWorkflowError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelHigh,
 		Retryable: false,
 	}
+
 	return err.WithCaller()
 }
 
@@ -257,6 +271,7 @@ func NewNetworkError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelMedium,
 		Retryable: true,
 	}
+
 	return err.WithCaller()
 }
 
@@ -269,6 +284,7 @@ func NewPermissionError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelHigh,
 		Retryable: false,
 	}
+
 	return err.WithCaller()
 }
 
@@ -281,6 +297,7 @@ func NewSystemError(code ErrorCode, message, details string) *DomainError {
 		Level:     ErrorLevelCritical,
 		Retryable: false,
 	}
+
 	return err.WithCaller()
 }
 
@@ -294,6 +311,7 @@ func WrapError(err error, code ErrorCode, message string) *DomainError {
 		Level:     ErrorLevelMedium,
 		Retryable: false,
 	}
+
 	return domainErr.WithCaller()
 }
 
@@ -303,6 +321,7 @@ func IsRetryable(err error) bool {
 	if errors.As(err, &domainErr) {
 		return domainErr.Retryable
 	}
+
 	return false
 }
 
@@ -312,6 +331,7 @@ func GetErrorCode(err error) ErrorCode {
 	if errors.As(err, &domainErr) {
 		return domainErr.Code
 	}
+
 	return ErrUnknown
 }
 
@@ -323,5 +343,6 @@ func GetErrorLevel(err error) ErrorLevel {
 			return domainErr.Level
 		}
 	}
+
 	return ErrorLevelMedium
 }

@@ -150,7 +150,11 @@ type JobExecutionPlan struct {
 }
 
 // NewJobExecutionPlan creates a new job execution plan.
-func NewJobExecutionPlan(id, name, description string, jobs []Job, options WorkflowOptions) *JobExecutionPlan {
+func NewJobExecutionPlan(
+	id, name, description string,
+	jobs []Job,
+	options WorkflowOptions,
+) *JobExecutionPlan {
 	return &JobExecutionPlan{
 		ID:           id,
 		Name:         name,
@@ -168,6 +172,7 @@ func (p *JobExecutionPlan) AddDependency(jobID, dependsOn string) {
 	if p.Dependencies == nil {
 		p.Dependencies = make(map[string][]string)
 	}
+
 	p.Dependencies[jobID] = append(p.Dependencies[jobID], dependsOn)
 	p.UpdatedAt = time.Now()
 }
@@ -178,12 +183,15 @@ func (p *JobExecutionPlan) RemoveDependency(jobID, dependsOn string) {
 		for i, dep := range deps {
 			if dep == dependsOn {
 				p.Dependencies[jobID] = append(deps[:i], deps[i+1:]...)
+
 				break
 			}
 		}
+
 		if len(p.Dependencies[jobID]) == 0 {
 			delete(p.Dependencies, jobID)
 		}
+
 		p.UpdatedAt = time.Now()
 	}
 }
@@ -195,6 +203,7 @@ func (p *JobExecutionPlan) HasDependency(jobID, dependsOn string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -203,15 +212,18 @@ func (p *JobExecutionPlan) GetDependencies(jobID string) []string {
 	if deps, ok := p.Dependencies[jobID]; ok {
 		result := make([]string, len(deps))
 		copy(result, deps)
+
 		return result
 	}
+
 	return nil
 }
 
 // ValidatePlan validates the execution plan.
 func (p *JobExecutionPlan) ValidatePlan() error {
 	// Check for circular dependencies
-	if err := p.validateCircularDependencies(); err != nil {
+	err := p.validateCircularDependencies()
+	if err != nil {
 		return errors.NewValidationError(
 			errors.ErrInvalidConfig,
 			"Invalid job execution plan",
@@ -220,7 +232,8 @@ func (p *JobExecutionPlan) ValidatePlan() error {
 	}
 
 	// Check for missing dependencies
-	if err := p.validateMissingDependencies(); err != nil {
+	err := p.validateMissingDependencies()
+	if err != nil {
 		return errors.NewValidationError(
 			errors.ErrInvalidConfig,
 			"Invalid job execution plan",
@@ -229,7 +242,8 @@ func (p *JobExecutionPlan) ValidatePlan() error {
 	}
 
 	// Check for self-dependencies
-	if err := p.validateSelfDependencies(); err != nil {
+	err := p.validateSelfDependencies()
+	if err != nil {
 		return errors.NewValidationError(
 			errors.ErrInvalidConfig,
 			"Invalid job execution plan",
@@ -246,7 +260,8 @@ func (p *JobExecutionPlan) validateCircularDependencies() error {
 	recursionStack := make(map[string]bool)
 
 	for _, job := range p.Jobs {
-		if err := p.checkCircularDependency(job.ID(), visited, recursionStack); err != nil {
+		err := p.checkCircularDependency(job.ID(), visited, recursionStack)
+		if err != nil {
 			return err
 		}
 	}
@@ -255,7 +270,10 @@ func (p *JobExecutionPlan) validateCircularDependencies() error {
 }
 
 // checkCircularDependency recursively checks for circular dependencies.
-func (p *JobExecutionPlan) checkCircularDependency(jobID string, visited, recursionStack map[string]bool) error {
+func (p *JobExecutionPlan) checkCircularDependency(
+	jobID string,
+	visited, recursionStack map[string]bool,
+) error {
 	if recursionStack[jobID] {
 		return errors.NewValidationError(
 			errors.ErrInvalidConfig,
@@ -272,12 +290,14 @@ func (p *JobExecutionPlan) checkCircularDependency(jobID string, visited, recurs
 	recursionStack[jobID] = true
 
 	for _, depID := range p.GetDependencies(jobID) {
-		if err := p.checkCircularDependency(depID, visited, recursionStack); err != nil {
+		err := p.checkCircularDependency(depID, visited, recursionStack)
+		if err != nil {
 			return err
 		}
 	}
 
 	delete(recursionStack, jobID)
+
 	return nil
 }
 

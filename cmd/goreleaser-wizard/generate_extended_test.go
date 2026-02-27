@@ -23,7 +23,12 @@ func TestRunGenerate(t *testing.T) {
 go 1.21
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					filepath.Join(dir, "main.go"),
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
+
 				return dir
 			},
 			expectError: false,
@@ -32,6 +37,7 @@ go 1.21
 			name: "generate_in_non_go_project",
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-generate-test")
+
 				return dir
 			},
 			expectError: true,
@@ -45,6 +51,7 @@ go 1.21
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
@@ -133,6 +140,7 @@ func TestTemplateGeneration(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -142,6 +150,7 @@ func TestTemplateGeneration(t *testing.T) {
 			// Check error
 			if (err != nil) != tt.expectError {
 				t.Errorf("generateGoReleaserConfig() error = %v, wantErr %v", err, tt.expectError)
+
 				return
 			}
 
@@ -217,6 +226,7 @@ func TestGitHubActionsGeneration(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -230,6 +240,7 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			// Check error
 			if (err != nil) != tt.expectError {
 				t.Errorf("generateGitHubActions() error = %v, wantErr %v", err, tt.expectError)
+
 				return
 			}
 
@@ -299,6 +310,7 @@ func TestConfigValidation(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -329,6 +341,7 @@ func TestFileOperations(t *testing.T) {
 			name: "read_existing_file_with_safe_read",
 			operation: func() error {
 				content := []byte("test content for reading")
+
 				err := os.WriteFile("test-safe-read.txt", content, 0o644)
 				if err != nil {
 					return err
@@ -354,8 +367,10 @@ func TestFileOperations(t *testing.T) {
 				if err != nil {
 					return err
 				}
+
 				file.WriteString("test content")
 				file.Close()
+
 				return nil
 			},
 			wantErr: false,
@@ -370,6 +385,7 @@ func TestFileOperations(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -413,6 +429,7 @@ func TestBackupCreation(t *testing.T) {
 
 			// Change to temp directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
@@ -430,6 +447,7 @@ func TestBackupCreation(t *testing.T) {
 			err := os.WriteFile(testFile, []byte(tt.newContent), 0o644)
 			if err != nil {
 				t.Errorf("SafeFileWrite() error = %v", err)
+
 				return
 			}
 
@@ -444,7 +462,11 @@ func TestBackupCreation(t *testing.T) {
 				// Read backup to ensure it contains original content
 				backupContent, _ := os.ReadFile(backupFile)
 				if string(backupContent) != tt.originalContent {
-					t.Errorf("Backup content = %q, want %q", string(backupContent), tt.originalContent)
+					t.Errorf(
+						"Backup content = %q, want %q",
+						string(backupContent),
+						tt.originalContent,
+					)
 				}
 			} else if !tt.expectBackup && backupExists {
 				t.Error("Backup file should not exist for new file")
@@ -475,6 +497,7 @@ func TestErrorRecovery(t *testing.T) {
 			testFunc: func() {
 				// This should panic
 				var nilPointer *string = nil
+
 				_ = *nilPointer // This will panic
 			},
 		},

@@ -79,6 +79,7 @@ func (de *DomainError) Error() string {
 	if de.Context != "" {
 		return fmt.Sprintf("[%s] %s (context: %s)", de.Code, de.Message, de.Context)
 	}
+
 	return fmt.Sprintf("[%s] %s", de.Code, de.Message)
 }
 
@@ -112,13 +113,16 @@ func (de *DomainError) WithCause(cause error) *DomainError {
 // IsErrorCode checks if an error matches a specific error code.
 func IsErrorCode(err error, code ErrorCode) bool {
 	var domainErr *DomainError
+
 	errAs := &DomainError{}
 	if errors.As(err, &errAs) {
 		return errAs.Code == code
 	}
+
 	if errors.As(err, &domainErr) {
 		return domainErr.Code == code
 	}
+
 	return false
 }
 
@@ -174,62 +178,121 @@ func NewExternalServiceError(code ErrorCode, message, details string) *DomainErr
 
 // Common validation error constructors.
 func InvalidProjectNameError(value string) *DomainError {
-	return NewValidationError(ErrInvalidProjectName, "Invalid project name", fmt.Sprintf("'%s' does not meet validation requirements", value))
+	return NewValidationError(
+		ErrInvalidProjectName,
+		"Invalid project name",
+		fmt.Sprintf("'%s' does not meet validation requirements", value),
+	)
 }
 
 func InvalidBinaryNameError(value string) *DomainError {
-	return NewValidationError(ErrInvalidBinaryName, "Invalid binary name", fmt.Sprintf("'%s' does not meet validation requirements", value))
+	return NewValidationError(
+		ErrInvalidBinaryName,
+		"Invalid binary name",
+		fmt.Sprintf("'%s' does not meet validation requirements", value),
+	)
 }
 
 func InvalidMainPathError(value string) *DomainError {
-	return NewValidationError(ErrInvalidMainPath, "Invalid main path", fmt.Sprintf("'%s' does not meet validation requirements", value))
+	return NewValidationError(
+		ErrInvalidMainPath,
+		"Invalid main path",
+		fmt.Sprintf("'%s' does not meet validation requirements", value),
+	)
 }
 
 func InvalidPlatformError(value string) *DomainError {
-	return NewValidationError(ErrInvalidPlatform, "Invalid platform", fmt.Sprintf("'%s' is not a supported platform", value))
+	return NewValidationError(
+		ErrInvalidPlatform,
+		"Invalid platform",
+		fmt.Sprintf("'%s' is not a supported platform", value),
+	)
 }
 
 func InvalidArchitectureError(value string) *DomainError {
-	return NewValidationError(ErrInvalidArchitecture, "Invalid architecture", fmt.Sprintf("'%s' is not a supported architecture", value))
+	return NewValidationError(
+		ErrInvalidArchitecture,
+		"Invalid architecture",
+		fmt.Sprintf("'%s' is not a supported architecture", value),
+	)
 }
 
 func DockerNotSupportedError(projectType ProjectType) *DomainError {
-	return NewConfigurationError(ErrDockerNotSupported, "Docker not supported", fmt.Sprintf("Project type %s does not support Docker", projectType))
+	return NewConfigurationError(
+		ErrDockerNotSupported,
+		"Docker not supported",
+		fmt.Sprintf("Project type %s does not support Docker", projectType),
+	)
 }
 
 func PlatformArchMismatchError(platform Platform, arch Architecture) *DomainError {
-	return NewConfigurationError(ErrPlatformArchMismatch, "Platform-architecture mismatch", fmt.Sprintf("Architecture %s is not supported on platform %s", arch, platform))
+	return NewConfigurationError(
+		ErrPlatformArchMismatch,
+		"Platform-architecture mismatch",
+		fmt.Sprintf("Architecture %s is not supported on platform %s", arch, platform),
+	)
 }
 
 // System error constructors.
 func FileNotFoundError(path string, cause error) *DomainError {
-	return NewSystemError(ErrFileNotFound, "File not found", fmt.Sprintf("File '%s' does not exist", path), cause)
+	return NewSystemError(
+		ErrFileNotFound,
+		"File not found",
+		fmt.Sprintf("File '%s' does not exist", path),
+		cause,
+	)
 }
 
 func PermissionDeniedError(path string, cause error) *DomainError {
-	return NewSystemError(ErrPermissionDenied, "Permission denied", fmt.Sprintf("Permission denied for '%s'", path), cause)
+	return NewSystemError(
+		ErrPermissionDenied,
+		"Permission denied",
+		fmt.Sprintf("Permission denied for '%s'", path),
+		cause,
+	)
 }
 
 func FileWriteFailedError(path string, cause error) *DomainError {
-	return NewSystemError(ErrFileWriteFailed, "File write failed", fmt.Sprintf("Failed to write file '%s'", path), cause)
+	return NewSystemError(
+		ErrFileWriteFailed,
+		"File write failed",
+		fmt.Sprintf("Failed to write file '%s'", path),
+		cause,
+	)
 }
 
 // Template error constructors.
 func TemplateNotFoundError(template string) *DomainError {
-	return NewTemplateError(ErrTemplateNotFound, "Template not found", fmt.Sprintf("Template '%s' not found", template))
+	return NewTemplateError(
+		ErrTemplateNotFound,
+		"Template not found",
+		fmt.Sprintf("Template '%s' not found", template),
+	)
 }
 
 func TemplateExecutionFailedError(template string, cause error) *DomainError {
-	return NewTemplateError(ErrTemplateExecutionFailed, "Template execution failed", fmt.Sprintf("Failed to execute template '%s'", template)).WithCause(cause)
+	return NewTemplateError(
+		ErrTemplateExecutionFailed,
+		"Template execution failed",
+		fmt.Sprintf("Failed to execute template '%s'", template),
+	).WithCause(cause)
 }
 
 // External service error constructors.
 func GitOperationFailedError(operation string, cause error) *DomainError {
-	return NewExternalServiceError(ErrGitOperationFailed, "Git operation failed", "Failed to perform "+operation).WithCause(cause)
+	return NewExternalServiceError(
+		ErrGitOperationFailed,
+		"Git operation failed",
+		"Failed to perform "+operation,
+	).WithCause(cause)
 }
 
 func RegistryAccessDeniedError(registry string) *DomainError {
-	return NewExternalServiceError(ErrRegistryAccessDenied, "Registry access denied", fmt.Sprintf("Access denied to registry '%s'", registry))
+	return NewExternalServiceError(
+		ErrRegistryAccessDenied,
+		"Registry access denied",
+		fmt.Sprintf("Access denied to registry '%s'", registry),
+	)
 }
 
 // Error recovery suggestions based on error codes.
@@ -290,6 +353,7 @@ func (de *DomainError) GetSeverity() ErrorSeverity {
 // IsRecoverable returns true if the error can be recovered from by the user.
 func (de *DomainError) IsRecoverable() bool {
 	severity := de.GetSeverity()
+
 	return severity <= ErrorSeverityError
 }
 

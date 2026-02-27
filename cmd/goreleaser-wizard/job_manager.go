@@ -83,6 +83,7 @@ func NewJobManager(logger *log.Logger) *JobManager {
 func (jm *JobManager) SetParallel(parallel bool) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
+
 	jm.parallel = parallel
 }
 
@@ -90,6 +91,7 @@ func (jm *JobManager) SetParallel(parallel bool) {
 func (jm *JobManager) SetMaxJobs(maxJobs int) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
+
 	jm.maxJobs = maxJobs
 }
 
@@ -97,6 +99,7 @@ func (jm *JobManager) SetMaxJobs(maxJobs int) {
 func (jm *JobManager) AddJob(job Job) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
+
 	jm.jobs = append(jm.jobs, job)
 }
 
@@ -105,6 +108,7 @@ func (jm *JobManager) ExecuteJobs(ctx context.Context) error {
 	if jm.parallel {
 		return jm.executeParallel(ctx)
 	}
+
 	return jm.executeSequential(ctx)
 }
 
@@ -129,6 +133,7 @@ func (jm *JobManager) executeSequential(ctx context.Context) error {
 // executeParallel executes jobs in parallel with concurrency limits.
 func (jm *JobManager) executeParallel(ctx context.Context) error {
 	var wg sync.WaitGroup
+
 	semaphore := make(chan struct{}, jm.maxJobs)
 	errChan := make(chan error, len(jm.jobs))
 
@@ -140,11 +145,13 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 		}
 
 		wg.Add(1)
+
 		go func(j Job) {
 			defer wg.Done()
 
 			// Acquire semaphore
 			semaphore <- struct{}{}
+
 			defer func() { <-semaphore }()
 
 			result := jm.executeJob(ctx, j)
@@ -185,6 +192,7 @@ func (jm *JobManager) executeJob(ctx context.Context, job Job) JobResult {
 	status := JobStatusCompleted
 	if err != nil {
 		status = JobStatusFailed
+
 		jm.logger.Errorf("Job %s failed: %v", job.Name(), err)
 	} else {
 		jm.logger.Infof("Job %s completed successfully", job.Name())
@@ -216,6 +224,7 @@ func (jm *JobManager) updateJobStatus(jobID string, status JobStatus) {
 func (jm *JobManager) addResult(result JobResult) {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
+
 	jm.results = append(jm.results, result)
 }
 
@@ -226,6 +235,7 @@ func (jm *JobManager) GetResults() []JobResult {
 
 	results := make([]JobResult, len(jm.results))
 	copy(results, jm.results)
+
 	return results
 }
 
@@ -235,11 +245,13 @@ func (jm *JobManager) getResultsByStatus(status JobStatus) []JobResult {
 	defer jm.mu.Unlock()
 
 	filtered := make([]JobResult, 0)
+
 	for _, result := range jm.results {
 		if result.Status == status {
 			filtered = append(filtered, result)
 		}
 	}
+
 	return filtered
 }
 
@@ -287,6 +299,7 @@ func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 func (jm *JobManager) Clear() {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
+
 	jm.jobs = make([]Job, 0)
 	jm.results = make([]JobResult, 0)
 }
@@ -316,6 +329,7 @@ func (jm *JobManager) GetStatistics() map[string]any {
 	}
 
 	stats["total_duration"] = totalDuration
+
 	stats["average_duration"] = time.Duration(0)
 	if len(jm.results) > 0 {
 		stats["average_duration"] = totalDuration / time.Duration(len(jm.results))
@@ -329,9 +343,18 @@ func displayJobResults(results []JobResult) {
 	for _, result := range results {
 		switch result.Status {
 		case JobStatusCompleted:
-			fmt.Printf("%s %s completed successfully\n", successStyle.Render("✅"), result.Job.Name())
+			fmt.Printf(
+				"%s %s completed successfully\n",
+				successStyle.Render("✅"),
+				result.Job.Name(),
+			)
 		case JobStatusFailed:
-			fmt.Printf("%s %s failed: %v\n", errorStyle.Render("❌"), result.Job.Name(), result.Error)
+			fmt.Printf(
+				"%s %s failed: %v\n",
+				errorStyle.Render("❌"),
+				result.Job.Name(),
+				result.Error,
+			)
 		}
 	}
 }

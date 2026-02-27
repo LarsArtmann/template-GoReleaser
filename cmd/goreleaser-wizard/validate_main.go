@@ -22,6 +22,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 				"Cannot access "+configPath,
 				err,
 			).WithContext(configPath))
+
 		return nil
 	}
 
@@ -36,12 +37,14 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 			).WithContext(configPath))
 		results.Recommendations = append(results.Recommendations,
 			"Run 'goreleaser-wizard init' to create configuration")
+
 		return nil
 	}
 
 	// Check if config is valid YAML
 	if err := validateYAML(configPath, results); err != nil {
 		results.ConfigValid = false
+
 		return nil
 	}
 
@@ -89,6 +92,7 @@ func validateGitHubActions(results *ValidationResults) error {
 				"Cannot access "+workflowPath,
 				err,
 			).WithContext(workflowPath))
+
 		return nil
 	}
 
@@ -96,16 +100,19 @@ func validateGitHubActions(results *ValidationResults) error {
 	if !exists {
 		results.Recommendations = append(results.Recommendations,
 			"Consider adding GitHub Actions workflow for automated releases")
+
 		return nil
 	}
 
 	// Validate workflow content
 	if err := validateWorkflowContent(workflowPath, results); err != nil {
 		results.ActionsValid = false
+
 		return nil
 	}
 
 	results.ActionsValid = true
+
 	return nil
 }
 
@@ -120,6 +127,7 @@ func validateProjectStructure(results *ValidationResults) error {
 				"Cannot access go.mod file",
 				err,
 			).WithContext("go.mod"))
+
 		return nil
 	} else if !exists {
 		results.Errors = append(results.Errors,
@@ -129,6 +137,7 @@ func validateProjectStructure(results *ValidationResults) error {
 				"Run 'go mod init' to initialize Go module",
 			).WithContext("go.mod"))
 		results.ProjectValid = false
+
 		return nil
 	}
 
@@ -142,6 +151,7 @@ func validateProjectStructure(results *ValidationResults) error {
 				"Cannot access "+mainPath,
 				err,
 			).WithContext(mainPath))
+
 		return nil
 	} else if !exists {
 		// Try common alternatives
@@ -155,6 +165,7 @@ func validateProjectStructure(results *ValidationResults) error {
 						fmt.Sprintf("Found %s instead of %s", alt, mainPath),
 					).WithContext(alt))
 				results.ProjectValid = true
+
 				return nil
 			}
 		}
@@ -166,10 +177,12 @@ func validateProjectStructure(results *ValidationResults) error {
 				"Create cmd directory with main package",
 			).WithContext(mainPath))
 		results.ProjectValid = false
+
 		return nil
 	}
 
 	results.ProjectValid = true
+
 	return nil
 }
 
@@ -190,15 +203,18 @@ func validateYAML(filePath string, results *ValidationResults) error {
 				"Empty YAML file",
 				filePath+" is empty",
 			).WithContext(filePath))
+
 		return nil
 	}
 
 	// Check for common YAML structure indicators
 	hasYamlStructure := false
+
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if strings.Contains(trimmed, ":") && !strings.HasPrefix(trimmed, "#") {
 			hasYamlStructure = true
+
 			break
 		}
 	}
@@ -210,6 +226,7 @@ func validateYAML(filePath string, results *ValidationResults) error {
 				"Invalid YAML structure",
 				filePath+" does not appear to be valid YAML",
 			).WithContext(filePath))
+
 		return nil
 	}
 

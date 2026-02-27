@@ -44,7 +44,9 @@ func NewInteractivePrompter() *InteractivePrompter {
 }
 
 // confirmDetectedInfo prompts user to confirm detected project information.
-func (ip *InteractivePrompter) confirmDetectedInfo(config *domain.SafeProjectConfig) (*domain.SafeProjectConfig, error) {
+func (ip *InteractivePrompter) confirmDetectedInfo(
+	config *domain.SafeProjectConfig,
+) (*domain.SafeProjectConfig, error) {
 	fmt.Println(titleStyle.Render("📋 Project Information Detected:"))
 	fmt.Printf("  Project Name: %s\n", config.ProjectName)
 	fmt.Printf("  Main Path: %s\n", config.MainPath)
@@ -67,12 +69,15 @@ func (ip *InteractivePrompter) confirmDetectedInfo(config *domain.SafeProjectCon
 }
 
 // promptProjectInfo prompts for project information.
-func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfig) (*domain.SafeProjectConfig, error) {
+func (ip *InteractivePrompter) promptProjectInfo(
+	config *domain.SafeProjectConfig,
+) (*domain.SafeProjectConfig, error) {
 	// Project name
 	name, err := ip.promptString("Project Name", config.ProjectName)
 	if err != nil {
 		return nil, err
 	}
+
 	config.ProjectName = name
 
 	// Project description
@@ -80,6 +85,7 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 	if err != nil {
 		return nil, err
 	}
+
 	config.ProjectDescription = desc
 
 	// Binary name
@@ -87,6 +93,7 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 	if err != nil {
 		return nil, err
 	}
+
 	config.BinaryName = binName
 
 	// Main path
@@ -94,6 +101,7 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 	if err != nil {
 		return nil, err
 	}
+
 	config.MainPath = mainPath
 
 	// Project type
@@ -101,6 +109,7 @@ func (ip *InteractivePrompter) promptProjectInfo(config *domain.SafeProjectConfi
 	if err != nil {
 		return nil, err
 	}
+
 	config.ProjectType = projectType
 
 	return config, nil
@@ -115,7 +124,15 @@ func promptSingleOption[T comparable](
 	promptLabel string,
 	toString func(T) string,
 ) (T, error) {
-	return promptSingleOptionWithDescription(ip, header, options, current, promptLabel, toString, nil)
+	return promptSingleOptionWithDescription(
+		ip,
+		header,
+		options,
+		current,
+		promptLabel,
+		toString,
+		nil,
+	)
 }
 
 // promptSingleOptionWithDescription is a generic helper for single-option selection with optional descriptions.
@@ -135,6 +152,7 @@ func promptSingleOptionWithDescription[T comparable](
 		if opt == current {
 			marker = "•"
 		}
+
 		if getDescription != nil {
 			fmt.Printf("  %s %d. %s - %s\n", marker, i+1, toString(opt), getDescription(opt))
 		} else {
@@ -145,6 +163,7 @@ func promptSingleOptionWithDescription[T comparable](
 	selection, err := ip.promptInt(promptLabel, 1, len(options))
 	if err != nil {
 		var zero T
+
 		return zero, err
 	}
 
@@ -152,14 +171,25 @@ func promptSingleOptionWithDescription[T comparable](
 }
 
 // promptProjectType prompts for project type selection.
-func (ip *InteractivePrompter) promptProjectType(current domain.ProjectType) (domain.ProjectType, error) {
-	return promptSingleOption(ip, headerProjectType, projectTypeOptions, current, "Select project type (number)", func(t domain.ProjectType) string {
-		return t.String()
-	})
+func (ip *InteractivePrompter) promptProjectType(
+	current domain.ProjectType,
+) (domain.ProjectType, error) {
+	return promptSingleOption(
+		ip,
+		headerProjectType,
+		projectTypeOptions,
+		current,
+		"Select project type (number)",
+		func(t domain.ProjectType) string {
+			return t.String()
+		},
+	)
 }
 
 // promptPlatforms prompts for target platforms.
-func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]domain.Platform, error) {
+func (ip *InteractivePrompter) promptPlatforms(
+	current []domain.Platform,
+) ([]domain.Platform, error) {
 	fmt.Println(infoStyle.Render("\n🖥️  Select Target Platforms:"))
 
 	available := []domain.Platform{
@@ -173,10 +203,15 @@ func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]dom
 		if containsPlatform(current, platform) {
 			marker = "✓"
 		}
+
 		fmt.Printf("  %s %d. %s\n", marker, i+1, platform)
 	}
 
-	selections, err := ip.promptMultiInt("Select platforms (comma-separated numbers)", 1, len(available))
+	selections, err := ip.promptMultiInt(
+		"Select platforms (comma-separated numbers)",
+		1,
+		len(available),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -190,7 +225,9 @@ func (ip *InteractivePrompter) promptPlatforms(current []domain.Platform) ([]dom
 }
 
 // promptArchitectures prompts for target architectures.
-func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture) ([]domain.Architecture, error) {
+func (ip *InteractivePrompter) promptArchitectures(
+	current []domain.Architecture,
+) ([]domain.Architecture, error) {
 	fmt.Println(infoStyle.Render("\n🏗️  Select Target Architectures:"))
 
 	available := []domain.Architecture{
@@ -203,10 +240,15 @@ func (ip *InteractivePrompter) promptArchitectures(current []domain.Architecture
 		if containsArchitecture(current, arch) {
 			marker = "✓"
 		}
+
 		fmt.Printf("  %s %d. %s\n", marker, i+1, arch)
 	}
 
-	selections, err := ip.promptMultiInt("Select architectures (comma-separated numbers)", 1, len(available))
+	selections, err := ip.promptMultiInt(
+		"Select architectures (comma-separated numbers)",
+		1,
+		len(available),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -227,13 +269,23 @@ func (ip *InteractivePrompter) promptCGO(current domain.CGOStatus) (domain.CGOSt
 		domain.CGOStatusRequired,
 	}
 
-	return promptSingleOptionWithDescription(ip, "\n⚙️  CGO Configuration:", statuses, current, "Select CGO status (number)", func(s domain.CGOStatus) string {
-		return s.String()
-	}, ip.getCGODescription)
+	return promptSingleOptionWithDescription(
+		ip,
+		"\n⚙️  CGO Configuration:",
+		statuses,
+		current,
+		"Select CGO status (number)",
+		func(s domain.CGOStatus) string {
+			return s.String()
+		},
+		ip.getCGODescription,
+	)
 }
 
 // promptDocker prompts for Docker configuration.
-func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domain.DockerSupport, error) {
+func (ip *InteractivePrompter) promptDocker(
+	current domain.DockerSupport,
+) (domain.DockerSupport, error) {
 	levels := []domain.DockerSupport{
 		domain.DockerSupportNone,
 		domain.DockerSupportBuild,
@@ -241,16 +293,33 @@ func (ip *InteractivePrompter) promptDocker(current domain.DockerSupport) (domai
 		domain.DockerSupportBoth,
 	}
 
-	return promptSingleOptionWithDescription(ip, "\n🐳 Docker Support:", levels, current, "Select Docker support level (number)", func(d domain.DockerSupport) string {
-		return d.String()
-	}, ip.getDockerDescription)
+	return promptSingleOptionWithDescription(
+		ip,
+		"\n🐳 Docker Support:",
+		levels,
+		current,
+		"Select Docker support level (number)",
+		func(d domain.DockerSupport) string {
+			return d.String()
+		},
+		ip.getDockerDescription,
+	)
 }
 
 // promptGitProvider prompts for Git provider.
-func (ip *InteractivePrompter) promptGitProvider(current domain.GitProvider) (domain.GitProvider, error) {
-	return promptSingleOption(ip, headerGitProvider, gitProviderOptions, current, "Select Git provider (number)", func(p domain.GitProvider) string {
-		return p.String()
-	})
+func (ip *InteractivePrompter) promptGitProvider(
+	current domain.GitProvider,
+) (domain.GitProvider, error) {
+	return promptSingleOption(
+		ip,
+		headerGitProvider,
+		gitProviderOptions,
+		current,
+		"Select Git provider (number)",
+		func(p domain.GitProvider) string {
+			return p.String()
+		},
+	)
 }
 
 // promptAdvancedOptions prompts for advanced configuration options.
@@ -262,13 +331,18 @@ func (ip *InteractivePrompter) promptAdvancedOptions(config *domain.SafeProjectC
 	if err != nil {
 		return err
 	}
+
 	config.LDFlags = ldflags
 
 	// Code signing
-	signing, err := ip.promptYesNo("Enable code signing?", config.SigningLevel != domain.SigningLevelNone)
+	signing, err := ip.promptYesNo(
+		"Enable code signing?",
+		config.SigningLevel != domain.SigningLevelNone,
+	)
 	if err != nil {
 		return err
 	}
+
 	if signing {
 		config.SigningLevel = domain.SigningLevelBasic
 	} else {
@@ -280,6 +354,7 @@ func (ip *InteractivePrompter) promptAdvancedOptions(config *domain.SafeProjectC
 	if err != nil {
 		return err
 	}
+
 	config.SBOM = sbom
 
 	// Homebrew
@@ -287,6 +362,7 @@ func (ip *InteractivePrompter) promptAdvancedOptions(config *domain.SafeProjectC
 	if err != nil {
 		return err
 	}
+
 	config.Homebrew = homebrew
 
 	// Snap
@@ -294,13 +370,18 @@ func (ip *InteractivePrompter) promptAdvancedOptions(config *domain.SafeProjectC
 	if err != nil {
 		return err
 	}
+
 	config.Snap = snap
 
 	// GitHub Actions
-	actions, err := ip.promptYesNo("Generate GitHub Actions workflow?", config.ActionLevel != domain.ActionLevelNone)
+	actions, err := ip.promptYesNo(
+		"Generate GitHub Actions workflow?",
+		config.ActionLevel != domain.ActionLevelNone,
+	)
 	if err != nil {
 		return err
 	}
+
 	if actions {
 		config.ActionLevel = domain.ActionLevelBasic
 	} else {
@@ -326,6 +407,7 @@ func (ip *InteractivePrompter) promptString(label, defaultValue string) (string,
 	if value == "" && defaultValue != "" {
 		return defaultValue, nil
 	}
+
 	return value, nil
 }
 
@@ -362,11 +444,13 @@ func (ip *InteractivePrompter) promptInt(label string, min, max int) (int, error
 		value, err := strconv.Atoi(strings.TrimSpace(ip.scanner.Text()))
 		if err != nil {
 			fmt.Println(errorStyle.Render("Please enter a valid number"))
+
 			continue
 		}
 
 		if value < min || value > max {
 			fmt.Printf("Please enter a number between %d and %d\n", min, max)
+
 			continue
 		}
 
@@ -389,19 +473,24 @@ func (ip *InteractivePrompter) promptMultiInt(label string, min, max int) ([]int
 		}
 
 		parts := strings.Split(input, ",")
+
 		var selections []int
 
 		for _, part := range parts {
 			value, err := strconv.Atoi(strings.TrimSpace(part))
 			if err != nil {
 				fmt.Println(errorStyle.Render("Please enter valid numbers separated by commas"))
+
 				selections = nil
+
 				break
 			}
 
 			if value < min || value > max {
 				fmt.Printf("Please enter numbers between %d and %d\n", min, max)
+
 				selections = nil
+
 				break
 			}
 

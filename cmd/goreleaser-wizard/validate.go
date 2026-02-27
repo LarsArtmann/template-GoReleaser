@@ -49,21 +49,27 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	if !projectOnly {
 		// Validate GoReleaser configuration
-		if err := validateGoReleaserConfig(results); err != nil {
+		err := validateGoReleaserConfig(results)
+		if err != nil {
 			displayError(err)
+
 			return
 		}
 
 		// Validate GitHub Actions workflow
-		if err := validateGitHubActions(results); err != nil {
+		err := validateGitHubActions(results)
+		if err != nil {
 			displayError(err)
+
 			return
 		}
 	}
 
 	// Validate project structure
-	if err := validateProjectStructure(results); err != nil {
+	err := validateProjectStructure(results)
+	if err != nil {
 		displayError(err)
+
 		return
 	}
 
@@ -72,8 +78,10 @@ func runValidate(cmd *cobra.Command, args []string) {
 
 	// Attempt fixes if requested
 	if fix && len(results.Errors) > 0 {
-		if err := attemptFixes(results); err != nil {
+		err := attemptFixes(results)
+		if err != nil {
 			displayError(err)
+
 			return
 		}
 	}

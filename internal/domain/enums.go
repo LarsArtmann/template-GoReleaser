@@ -83,6 +83,7 @@ func ValidateCGOStatus(status CGOStatus) error {
 			fmt.Sprintf("'%s' is not a valid CGO status", status),
 		)
 	}
+
 	return nil
 }
 
@@ -182,6 +183,7 @@ func ValidateSigningLevel(level SigningLevel) error {
 			fmt.Sprintf("'%s' is not a valid signing level", level),
 		)
 	}
+
 	return nil
 }
 
@@ -192,6 +194,7 @@ func CGOStatusFromBool(enabled bool) CGOStatus {
 	if enabled {
 		return CGOStatusEnabled
 	}
+
 	return CGOStatusDisabled
 }
 
@@ -200,6 +203,7 @@ func DockerSupportFromBool(enabled bool) DockerSupport {
 	if enabled {
 		return DockerSupportBoth
 	}
+
 	return DockerSupportNone
 }
 
@@ -208,6 +212,7 @@ func SigningLevelFromBool(enabled bool) SigningLevel {
 	if enabled {
 		return SigningLevelBasic
 	}
+
 	return SigningLevelNone
 }
 
@@ -216,6 +221,7 @@ func ActionLevelFromBool(enabled bool) ActionLevel {
 	if enabled {
 		return ActionLevelBasic
 	}
+
 	return ActionLevelNone
 }
 
@@ -224,6 +230,7 @@ func FeatureLevelFromBool(enabled bool) FeatureLevel {
 	if enabled {
 		return FeatureLevelStandard
 	}
+
 	return FeatureLevelBasic
 }
 
@@ -234,6 +241,7 @@ func GetDefaultCGOStatus(projectType ProjectType) CGOStatus {
 	if projectType.DefaultCGOEnabled() {
 		return CGOStatusEnabled
 	}
+
 	return CGOStatusDisabled
 }
 
@@ -242,6 +250,7 @@ func GetDefaultDockerSupport(projectType ProjectType) DockerSupport {
 	if projectType.DockerSupported() {
 		return DockerSupportBuild
 	}
+
 	return DockerSupportNone
 }
 

@@ -5,7 +5,12 @@ func (pt ProjectType) RequiresMainPath() bool {
 	switch pt {
 	case ProjectTypeCLI, ProjectTypeDesktop, ProjectTypeDaemon, ProjectTypeTool:
 		return true
-	case ProjectTypeLibrary, ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeMicroservice, ProjectTypePlugin, ProjectTypeMobile:
+	case ProjectTypeLibrary,
+		ProjectTypeWebAPI,
+		ProjectTypeGRPCService,
+		ProjectTypeMicroservice,
+		ProjectTypePlugin,
+		ProjectTypeMobile:
 		return false
 	default:
 		return false

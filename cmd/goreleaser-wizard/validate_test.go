@@ -58,7 +58,11 @@ build:
 `
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 				// Create main.go
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					filepath.Join(dir, "main.go"),
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
 				// Initialize git
 				exec.Command("git", "init").Dir = dir
 				exec.Command("git", "init").Run()
@@ -68,6 +72,7 @@ build:
 				exec.Command("git", "add", ".").Run()
 				exec.Command("git", "commit", "-m", "init").Dir = dir
 				exec.Command("git", "commit", "-m", "init").Run()
+
 				return dir
 			},
 			args:       []string{},
@@ -82,6 +87,7 @@ build:
 go 1.21
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+
 				return dir
 			},
 			args:        []string{},
@@ -97,11 +103,13 @@ go 1.21
 go 1.21
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
 `
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
+
 				return dir
 			},
 			args:  []string{},
@@ -116,6 +124,7 @@ project_name: test
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
@@ -144,6 +153,7 @@ project_name: test
 						// Expected to fail
 						return
 					}
+
 					t.Errorf("runValidate() panicked: %v", r)
 				}
 			}()
@@ -151,6 +161,7 @@ project_name: test
 			// Run validation
 			func() {
 				defer recoverFromPanic("validate test")
+
 				runValidate(cmd, tt.args)
 			}()
 		})
@@ -173,6 +184,7 @@ func TestCheckFileExists(t *testing.T) {
 			setupFunc: func() string {
 				file, _ := os.CreateTemp(t.TempDir(), "wizard-test-file")
 				file.Close()
+
 				return file.Name()
 			},
 		},
@@ -182,6 +194,7 @@ func TestCheckFileExists(t *testing.T) {
 			wantErr:    false,
 			setupFunc: func() string {
 				dir, _ := os.MkdirTemp("", "wizard-test-dir")
+
 				return dir
 			},
 		},
@@ -200,6 +213,7 @@ func TestCheckFileExists(t *testing.T) {
 			setupFunc: func() string {
 				file, _ := os.CreateTemp(t.TempDir(), "wizard-test-file")
 				file.Close()
+
 				return file.Name()
 			},
 		},
@@ -209,6 +223,7 @@ func TestCheckFileExists(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.setupFunc != nil {
 				tt.path = tt.setupFunc()
+
 				defer func() {
 					if tt.path != "" {
 						os.Remove(tt.path)
@@ -220,16 +235,26 @@ func TestCheckFileExists(t *testing.T) {
 
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CheckFileExists() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
 
 			if tt.wantErr && tt.errContains != "" {
 				if err == nil {
-					t.Errorf("CheckFileExists() expected error containing %q, got nil", tt.errContains)
+					t.Errorf(
+						"CheckFileExists() expected error containing %q, got nil",
+						tt.errContains,
+					)
+
 					return
 				}
+
 				if !strings.Contains(err.Error(), tt.errContains) {
-					t.Errorf("CheckFileExists() error = %v, want to contain %q", err, tt.errContains)
+					t.Errorf(
+						"CheckFileExists() error = %v, want to contain %q",
+						err,
+						tt.errContains,
+					)
 				}
 			}
 		})
@@ -251,7 +276,12 @@ func TestValidateProjectStructure(t *testing.T) {
 go 1.21
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
-				os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					filepath.Join(dir, "main.go"),
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
+
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -260,6 +290,7 @@ build:
   binary: test
 `
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
+
 				return dir
 			},
 			expectIssues: []string{},
@@ -273,7 +304,12 @@ go 1.21
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
 				os.MkdirAll(filepath.Join(dir, "cmd", "test"), 0o755)
-				os.WriteFile(filepath.Join(dir, "cmd", "test", "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+				os.WriteFile(
+					filepath.Join(dir, "cmd", "test", "main.go"),
+					[]byte("package main\n\nfunc main() {}"),
+					0o644,
+				)
+
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -282,6 +318,7 @@ build:
   binary: test
 `
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
+
 				return dir
 			},
 			expectIssues: []string{},
@@ -294,6 +331,7 @@ build:
 go 1.21
 `
 				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+
 				goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -302,6 +340,7 @@ build:
   binary: test
 `
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
+
 				return dir
 			},
 			expectWarnings: []string{"No main.go found"},
@@ -315,6 +354,7 @@ build:
 
 			// Change to test directory
 			originalDir, _ := os.Getwd()
+
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
@@ -325,6 +365,7 @@ build:
 
 			// Check main package existence (simplified version of validate logic)
 			mainFound := false
+
 			commonPaths := []string{
 				"main.go",
 				"./cmd/*/main.go",
@@ -334,6 +375,7 @@ build:
 				matches, _ := filepath.Glob(path)
 				if len(matches) > 0 {
 					mainFound = true
+
 					break
 				}
 			}
@@ -354,10 +396,17 @@ build:
 			for i, warning := range warnings {
 				if i >= len(tt.expectWarnings) {
 					t.Errorf("Unexpected warning: %s", warning)
+
 					continue
 				}
+
 				if !strings.Contains(warning, tt.expectWarnings[i]) {
-					t.Errorf("Warning %d = %q, want to contain %q", i, warning, tt.expectWarnings[i])
+					t.Errorf(
+						"Warning %d = %q, want to contain %q",
+						i,
+						warning,
+						tt.expectWarnings[i],
+					)
 				}
 			}
 		})
@@ -468,6 +517,7 @@ func TestValidateOutputFormatting(t *testing.T) {
 go 1.21
 `
 	os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+
 	goreleaser := `# GoReleaser configuration
 version: 2
 project_name: test
@@ -479,6 +529,7 @@ build:
 	os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	originalDir, _ := os.Getwd()
+
 	os.Chdir(dir)
 	defer os.Chdir(originalDir)
 
@@ -494,6 +545,7 @@ build:
 	// Run validation and check that it doesn't panic
 	func() {
 		defer recoverFromPanic("validate output test")
+
 		runValidate(cmd, []string{})
 	}()
 

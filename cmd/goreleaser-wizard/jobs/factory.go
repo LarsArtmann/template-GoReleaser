@@ -71,7 +71,11 @@ func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) Job {
 }
 
 // CreateCustomJobs creates jobs for custom operations.
-func (jf *JobFactory) CreateCustomJobs(operation string, config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
+func (jf *JobFactory) CreateCustomJobs(
+	operation string,
+	config *domain.SafeProjectConfig,
+	options map[string]any,
+) ([]Job, error) {
 	switch operation {
 	case "preview":
 		return jf.createPreviewJobs(config, options)
@@ -89,7 +93,10 @@ func (jf *JobFactory) CreateCustomJobs(operation string, config *domain.SafeProj
 }
 
 // createPreviewJobs creates jobs for preview operations.
-func (jf *JobFactory) createPreviewJobs(config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
+func (jf *JobFactory) createPreviewJobs(
+	config *domain.SafeProjectConfig,
+	options map[string]any,
+) ([]Job, error) {
 	var jobs []Job
 
 	// Add validation job
@@ -104,7 +111,10 @@ func (jf *JobFactory) createPreviewJobs(config *domain.SafeProjectConfig, option
 }
 
 // createValidationJobs creates jobs for validation operations.
-func (jf *JobFactory) createValidationJobs(config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
+func (jf *JobFactory) createValidationJobs(
+	config *domain.SafeProjectConfig,
+	options map[string]any,
+) ([]Job, error) {
 	var jobs []Job
 
 	// Add project validation
@@ -123,7 +133,10 @@ func (jf *JobFactory) createValidationJobs(config *domain.SafeProjectConfig, opt
 }
 
 // createRollbackJobs creates jobs for rollback operations.
-func (jf *JobFactory) createRollbackJobs(config *domain.SafeProjectConfig, options map[string]any) ([]Job, error) {
+func (jf *JobFactory) createRollbackJobs(
+	config *domain.SafeProjectConfig,
+	options map[string]any,
+) ([]Job, error) {
 	var jobs []Job
 
 	// Add rollback validation
@@ -137,7 +150,10 @@ func (jf *JobFactory) createRollbackJobs(config *domain.SafeProjectConfig, optio
 }
 
 // createPreviewJob creates a preview generation job.
-func (jf *JobFactory) createPreviewJob(config *domain.SafeProjectConfig, options map[string]any) (Job, error) {
+func (jf *JobFactory) createPreviewJob(
+	config *domain.SafeProjectConfig,
+	options map[string]any,
+) (Job, error) {
 	return &PreviewGenerationJob{
 		id:          "preview-generation",
 		config:      config,
@@ -174,7 +190,8 @@ func (jf *JobFactory) getRequiredDependencies(config *domain.SafeProjectConfig) 
 	}
 
 	// Only require cosign for advanced signing levels
-	if config.SigningLevel == domain.SigningLevelAdvanced || config.SigningLevel == domain.SigningLevelEnterprise {
+	if config.SigningLevel == domain.SigningLevelAdvanced ||
+		config.SigningLevel == domain.SigningLevelEnterprise {
 		dependencies = append(dependencies, "cosign")
 	}
 
@@ -186,6 +203,7 @@ func getStringOption(options map[string]any, key, defaultValue string) string {
 	if value, ok := options[key].(string); ok {
 		return value
 	}
+
 	return defaultValue
 }
 
@@ -231,9 +249,11 @@ func (j *PreviewGenerationJob) Execute(ctx context.Context) error {
 	case "github-actions":
 		return j.generateGitHubActionsPreview(ctx)
 	case "all":
-		if err := j.generateGoReleaserPreview(ctx); err != nil {
+		err := j.generateGoReleaserPreview(ctx)
+		if err != nil {
 			return err
 		}
+
 		return j.generateGitHubActionsPreview(ctx)
 	default:
 		return errors.NewValidationError(
@@ -250,29 +270,41 @@ type PreviewGenerator interface {
 }
 
 // generatePreview is a helper function that generates a preview using any PreviewGenerator.
-func (j *PreviewGenerationJob) generatePreview(ctx context.Context, generator PreviewGenerator, label string) error {
+func (j *PreviewGenerationJob) generatePreview(
+	ctx context.Context,
+	generator PreviewGenerator,
+	label string,
+) error {
 	preview, err := generator.GeneratePreview(ctx)
 	if err != nil {
-		return errors.WrapError(err, errors.ErrConfigGeneration, fmt.Sprintf("Failed to generate %s preview", label))
+		return errors.WrapError(
+			err,
+			errors.ErrConfigGeneration,
+			fmt.Sprintf("Failed to generate %s preview", label),
+		)
 	}
 
 	j.logger.Info(label+" preview generated", "preview", preview)
+
 	return nil
 }
 
 func (j *PreviewGenerationJob) generateGoReleaserPreview(ctx context.Context) error {
 	generator := generators.NewGoReleaserGenerator(j.config, j.logger)
+
 	return j.generatePreview(ctx, generator, "GoReleaser")
 }
 
 func (j *PreviewGenerationJob) generateGitHubActionsPreview(ctx context.Context) error {
 	generator := generators.NewGitHubActionsGenerator(j.config, j.logger)
+
 	return j.generatePreview(ctx, generator, "GitHub Actions")
 }
 
 func (j *PreviewGenerationJob) Rollback(ctx context.Context) error {
 	// Preview generation doesn't create any files, so rollback is a no-op
 	j.logger.Info("Preview generation rollback is a no-op")
+
 	return nil
 }
 
@@ -314,12 +346,14 @@ func (j *ConfigValidationJob) Execute(ctx context.Context) error {
 	// This would validate all fields, business rules, etc.
 
 	j.logger.Info("Configuration validation passed")
+
 	return nil
 }
 
 func (j *ConfigValidationJob) Rollback(ctx context.Context) error {
 	// Validation job doesn't modify state, so rollback is a no-op
 	j.logger.Info("Configuration validation rollback is a no-op")
+
 	return nil
 }
 
@@ -362,11 +396,13 @@ func (j *JobRollbackJob) Execute(ctx context.Context) error {
 	// This would find the job and call its Rollback method
 
 	j.logger.Info("Job rollback completed", "job_id", j.jobID)
+
 	return nil
 }
 
 func (j *JobRollbackJob) Rollback(ctx context.Context) error {
 	// Rollback job doesn't create any state, so rollback is a no-op
 	j.logger.Info("Job rollback is a no-op")
+
 	return nil
 }

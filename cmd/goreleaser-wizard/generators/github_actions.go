@@ -20,7 +20,10 @@ type GitHubActionsGenerator struct {
 }
 
 // NewGitHubActionsGenerator creates a new GitHub Actions generator.
-func NewGitHubActionsGenerator(config *domain.SafeProjectConfig, logger Logger) *GitHubActionsGenerator {
+func NewGitHubActionsGenerator(
+	config *domain.SafeProjectConfig,
+	logger Logger,
+) *GitHubActionsGenerator {
 	return &GitHubActionsGenerator{
 		templateData: types.NewGitHubActionsTemplateData(config),
 		logger:       logger,
@@ -34,6 +37,7 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	// Check if GitHub Actions generation is enabled
 	if !g.shouldGenerate() {
 		g.logger.Info("GitHub Actions generation is disabled, skipping")
+
 		return nil
 	}
 
@@ -85,6 +89,7 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	}
 
 	g.logger.Info("GitHub Actions workflow generated successfully", "path", workflowPath)
+
 	return nil
 }
 
@@ -160,7 +165,13 @@ func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 
 	// Remove generated workflow
 	workflowPath := filepath.Join(".github", "workflows", "release.yml")
-	if err := removeGeneratedFile(g.logger, workflowPath, "Failed to remove generated workflow", "Removed generated workflow"); err != nil {
+	err := removeGeneratedFile(
+		g.logger,
+		workflowPath,
+		"Failed to remove generated workflow",
+		"Removed generated workflow",
+	)
+	if err != nil {
 		return err
 	}
 

@@ -89,7 +89,10 @@ func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileT
 			Timeout:     "10s",
 			StartPeriod: "5s",
 			Retries:     3,
-			Commands:    []string{"CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1"},
+			Commands: []string{
+				"CMD-SHELL",
+				"wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1",
+			},
 		}
 	}
 
@@ -98,7 +101,14 @@ func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileT
 
 // Generate generates Dockerfile.
 func (g *DockerfileGenerator) Generate(ctx context.Context) error {
-	output, err := GenerateTemplate(ctx, g.logger, "dockerfile", templates.DockerfileTemplate, "Generating Dockerfile", g.templateData)
+	output, err := GenerateTemplate(
+		ctx,
+		g.logger,
+		"dockerfile",
+		templates.DockerfileTemplate,
+		"Generating Dockerfile",
+		g.templateData,
+	)
 	if err != nil {
 		return err
 	}
@@ -113,6 +123,7 @@ func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 	}
 
 	g.logger.Info("Dockerfile generated successfully")
+
 	return nil
 }
 
@@ -123,7 +134,14 @@ func (g *DockerfileGenerator) ValidateTemplate() error {
 
 // GeneratePreview generates a preview without writing to file.
 func (g *DockerfileGenerator) GeneratePreview(ctx context.Context) (string, error) {
-	return GeneratePreview(ctx, g.logger, "dockerfile", templates.DockerfileTemplate, "Generating Dockerfile preview", g.templateData)
+	return GeneratePreview(
+		ctx,
+		g.logger,
+		"dockerfile",
+		templates.DockerfileTemplate,
+		"Generating Dockerfile preview",
+		g.templateData,
+	)
 }
 
 // Rollback removes generated Dockerfile.
@@ -145,6 +163,7 @@ func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 				err.Error(),
 			).WithCause(err)
 		}
+
 		g.logger.Info("Removed generated Dockerfile")
 	}
 

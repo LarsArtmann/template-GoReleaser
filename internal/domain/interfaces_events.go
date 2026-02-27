@@ -154,12 +154,14 @@ func (e *BaseEvent) Version() int {
 // WithData updates event data.
 func (e *BaseEvent) WithData(data any) *BaseEvent {
 	e.data = data
+
 	return e
 }
 
 // WithVersion updates event version.
 func (e *BaseEvent) WithVersion(version int) *BaseEvent {
 	e.version = version
+
 	return e
 }
 
@@ -179,7 +181,9 @@ type ConfigCreatedEvent struct {
 }
 
 // NewConfigCreatedEvent creates a new config created event.
-func NewConfigCreatedEvent(configID, configType, createdBy, projectName string) *ConfigCreatedEvent {
+func NewConfigCreatedEvent(
+	configID, configType, createdBy, projectName string,
+) *ConfigCreatedEvent {
 	return &ConfigCreatedEvent{
 		BaseEvent: NewBaseEvent(EventTypeConfigCreated, map[string]any{
 			"config_id":    configID,
@@ -207,6 +211,7 @@ type JobStartedEvent struct {
 // NewJobStartedEvent creates a new job started event.
 func NewJobStartedEvent(jobID, jobName, startedBy string) *JobStartedEvent {
 	startTime := time.Now()
+
 	return &JobStartedEvent{
 		BaseEvent: NewBaseEvent(EventTypeJobStarted, map[string]any{
 			"job_id":     jobID,
@@ -236,8 +241,13 @@ type WorkflowCompletedEvent struct {
 }
 
 // NewWorkflowCompletedEvent creates a new workflow completed event.
-func NewWorkflowCompletedEvent(workflowID, workflowName string, startTime, endTime time.Time, totalJobs, successfulJobs, failedJobs int) *WorkflowCompletedEvent {
+func NewWorkflowCompletedEvent(
+	workflowID, workflowName string,
+	startTime, endTime time.Time,
+	totalJobs, successfulJobs, failedJobs int,
+) *WorkflowCompletedEvent {
 	duration := endTime.Sub(startTime)
+
 	return &WorkflowCompletedEvent{
 		BaseEvent: NewBaseEvent(EventTypeWorkflowCompleted, map[string]any{
 			"workflow_id":     workflowID,

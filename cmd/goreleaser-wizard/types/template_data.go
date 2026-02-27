@@ -205,6 +205,7 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 		for i, platform := range config.Platforms {
 			platforms[i] = string(platform)
 		}
+
 		data.Platforms = platforms
 	}
 
@@ -214,6 +215,7 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 		for i, arch := range config.Architectures {
 			architectures[i] = string(arch)
 		}
+
 		data.Architectures = architectures
 	}
 
@@ -223,6 +225,7 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 		for i, tag := range config.BuildTags {
 			tags[i] = tag.String()
 		}
+
 		data.BuildTags = tags
 	}
 
@@ -253,6 +256,7 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 		for i, trigger := range config.ActionsOn {
 			triggers[i] = trigger.GitHubPattern()
 		}
+
 		data.Triggers = triggers
 	}
 
@@ -270,20 +274,24 @@ func parseGitHubRemote() (owner, repo string) {
 	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			remote := strings.TrimSpace(string(output))
+
 			return git.ParseGitHubURL(remote)
 		}
 	}
+
 	return "owner", "repo" // fallbacks
 }
 
 // GetGitHubOwner tries to get GitHub owner from git remote.
 func GetGitHubOwner() string {
 	owner, _ := parseGitHubRemote()
+
 	return owner
 }
 
 // GetGitHubRepo tries to get GitHub repo from git remote.
 func GetGitHubRepo() string {
 	_, repo := parseGitHubRemote()
+
 	return repo
 }

@@ -52,6 +52,7 @@ func ValidateBuildTag(tag BuildTag) error {
 	if !tag.IsValid() {
 		return fmt.Errorf("invalid build tag: %s", tag.Name)
 	}
+
 	return nil
 }
 
@@ -62,7 +63,8 @@ func ValidateBuildTags(tags []BuildTag) error {
 	}
 
 	for _, tag := range tags {
-		if err := ValidateBuildTag(tag); err != nil {
+		err := ValidateBuildTag(tag)
+		if err != nil {
 			return err
 		}
 	}
@@ -73,6 +75,7 @@ func ValidateBuildTags(tags []BuildTag) error {
 		if seen[tag.Name] {
 			return fmt.Errorf("duplicate build tag: %s", tag.Name)
 		}
+
 		seen[tag.Name] = true
 	}
 
@@ -126,10 +129,12 @@ func FilterBuildTagsByPlatform(tags []BuildTag, platform Platform) []BuildTag {
 	for _, tag := range tags {
 		// Keep tags that are platform-specific and compatible, or general tags
 		isPlatformSpecific := false
+
 		for _, pt := range GetAllPlatforms() {
 			if slices.Contains(platformTags[pt], tag.Name) {
 				isPlatformSpecific = true
 			}
+
 			if isPlatformSpecific {
 				break
 			}

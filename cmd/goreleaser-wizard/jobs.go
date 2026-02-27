@@ -211,7 +211,8 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 	// Create backup if file exists
 	if _, err := os.Stat(".goreleaser.yaml"); err == nil {
 		backupPath := ".goreleaser.yaml.backup"
-		if err := os.Rename(".goreleaser.yaml", backupPath); err != nil {
+		err := os.Rename(".goreleaser.yaml", backupPath)
+		if err != nil {
 			return fmt.Errorf("failed to create backup: %w", err)
 		}
 	}
@@ -278,7 +279,11 @@ type ConfigGenerationJob struct {
 }
 
 // NewConfigGenerationJob creates a new config generation job.
-func NewConfigGenerationJob(config *domain.SafeProjectConfig, force bool, logger *log.Logger) *ConfigGenerationJob {
+func NewConfigGenerationJob(
+	config *domain.SafeProjectConfig,
+	force bool,
+	logger *log.Logger,
+) *ConfigGenerationJob {
 	return &ConfigGenerationJob{
 		id:     "config-generation",
 		config: config,
@@ -309,6 +314,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	// Validate config
 	if j.config.ProjectName == "" {
 		j.config.State = domain.ConfigStateInvalid
+
 		return errors.New("project name is required")
 	}
 
@@ -316,6 +322,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	if !j.force {
 		if _, err := os.Stat(".goreleaser.yaml"); err == nil {
 			j.config.State = domain.ConfigStateDraft
+
 			return errors.New(".goreleaser.yaml already exists (use --force to overwrite)")
 		}
 	}
@@ -327,6 +334,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	err := generateGoReleaserConfig(j.config)
 	if err != nil {
 		j.config.State = domain.ConfigStateInvalid
+
 		return fmt.Errorf("failed to generate GoReleaser config: %w", err)
 	}
 
@@ -334,6 +342,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	j.config.State = domain.ConfigStateGenerated
 
 	j.logger.Info("GoReleaser configuration generated successfully")
+
 	return nil
 }
 
@@ -353,16 +362,20 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 			err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
 			if err != nil {
 				j.logger.Errorf("Failed to restore backup: %v", err)
+
 				return err
 			}
+
 			j.logger.Info("Restored backup configuration")
 		} else {
 			// Remove generated file
 			err := os.Remove(".goreleaser.yaml")
 			if err != nil {
 				j.logger.Errorf("Failed to remove generated config: %v", err)
+
 				return err
 			}
+
 			j.logger.Info("Removed generated configuration")
 		}
 	}
@@ -378,7 +391,10 @@ type GitHubActionsGenerationJob struct {
 }
 
 // NewGitHubActionsGenerationJob creates a new GitHub Actions generation job.
-func NewGitHubActionsGenerationJob(config *domain.SafeProjectConfig, logger *log.Logger) *GitHubActionsGenerationJob {
+func NewGitHubActionsGenerationJob(
+	config *domain.SafeProjectConfig,
+	logger *log.Logger,
+) *GitHubActionsGenerationJob {
 	return &GitHubActionsGenerationJob{
 		id:     "github-actions-generation",
 		config: config,
@@ -405,11 +421,13 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	// Check if GitHub Actions is enabled
 	if !j.config.GetGenerateActions() {
 		j.logger.Info("GitHub Actions generation is disabled, skipping")
+
 		return nil
 	}
 
 	// Create .github/workflows directory
 	workflowDir := ".github/workflows"
+
 	err := os.MkdirAll(workflowDir, 0o755)
 	if err != nil {
 		return fmt.Errorf("failed to create workflow directory: %w", err)
@@ -422,6 +440,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("GitHub Actions workflow generated successfully")
+
 	return nil
 }
 
@@ -439,13 +458,16 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 		err := os.Remove(workflowPath)
 		if err != nil {
 			j.logger.Errorf("Failed to remove generated workflow: %v", err)
+
 			return err
 		}
+
 		j.logger.Info("Removed generated workflow")
 	}
 
 	// Try to remove .github directory if empty
 	workflowDir := filepath.Join(".github", "workflows")
+
 	workflowFiles, err := filepath.Glob(filepath.Join(workflowDir, "*.yml"))
 	if err == nil && len(workflowFiles) == 0 {
 		os.Remove(workflowDir)
@@ -506,10 +528,12 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	}
 
 	var mainFound bool
+
 	for _, mainPath := range mainPaths {
 		matches, err := filepath.Glob(mainPath)
 		if err == nil && len(matches) > 0 {
 			mainFound = true
+
 			break
 		}
 	}
@@ -519,12 +543,14 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("Project structure validation passed")
+
 	return nil
 }
 
 func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
 	// Validation job doesn't create any files, so rollback is a no-op
 	j.logger.Info("Project validation rollback is a no-op")
+
 	return nil
 }
 
@@ -577,12 +603,14 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 	}
 
 	j.logger.Info("All dependencies are available")
+
 	return nil
 }
 
 func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
 	// Dependency check doesn't modify state, so rollback is a no-op
 	j.logger.Info("Dependency check rollback is a no-op")
+
 	return nil
 }
 
@@ -614,9 +642,11 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 		dependencies = append(dependencies, "docker")
 	}
 	// Only require cosign for advanced signing levels (basic can work without installation)
-	if safeConfig.SigningLevel == domain.SigningLevelAdvanced || safeConfig.SigningLevel == domain.SigningLevelEnterprise {
+	if safeConfig.SigningLevel == domain.SigningLevelAdvanced ||
+		safeConfig.SigningLevel == domain.SigningLevelEnterprise {
 		dependencies = append(dependencies, "cosign")
 	}
+
 	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
 
 	// Add config generation job
@@ -679,6 +709,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		for i, platform := range config.Platforms {
 			platforms[i] = string(platform) // Use raw constant value
 		}
+
 		data["Platforms"] = platforms
 	}
 
@@ -688,6 +719,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		for i, arch := range config.Architectures {
 			architectures[i] = string(arch) // Use raw constant value
 		}
+
 		data["Architectures"] = architectures
 	}
 
@@ -697,6 +729,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		for i, tag := range config.BuildTags {
 			tags[i] = tag.String()
 		}
+
 		data["BuildTags"] = tags
 	}
 
@@ -732,6 +765,7 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 		for i, trigger := range config.ActionsOn {
 			triggers[i] = trigger.GitHubPattern()
 		}
+
 		data["Triggers"] = triggers
 	}
 
@@ -791,5 +825,6 @@ func getCommitHash() string {
 			}
 		}
 	}
+
 	return "unknown"
 }
