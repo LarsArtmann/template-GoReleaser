@@ -334,8 +334,8 @@ build:
 			expectIssues: []string{},
 		},
 		{
-			name:      "missing_main_package",
-			setupFunc: setupBasicTestProject("wizard-structure-test", true, "build:\n  main: .\n  binary: test\n"),
+			name:           "missing_main_package",
+			setupFunc:      setupBasicTestProject("wizard-structure-test", true, "build:\n  main: .\n  binary: test\n"),
 			expectWarnings: []string{"No main.go found"},
 		},
 	}
