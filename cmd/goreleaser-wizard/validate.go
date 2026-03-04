@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/spf13/cobra"
 )
 
 // Validation repository (would be injected in real implementation).
-var fileSystemRepo FileSystemRepository
+var fileSystemRepo domain.FileSystemRepository
 
 var validateCmd = &cobra.Command{
 	Use:   "validate",
