@@ -26,6 +26,30 @@ import (
 	"github.com/spf13/viper"
 )
 
+// setupBasicTestProject creates a minimal test project with go.mod and optional .goreleaser.yaml
+func setupBasicTestProject(prefix string, includeGoreleaser bool, goreleaserExtra string) func() string {
+	return func() string {
+		dir, _ := os.MkdirTemp("", prefix)
+		goMod := `module github.com/user/test
+go 1.21
+`
+		os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
+
+		if includeGoreleaser {
+			goreleaser := `# GoReleaser configuration
+version: 2
+project_name: test
+`
+			if goreleaserExtra != "" {
+				goreleaser += goreleaserExtra
+			}
+			os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
+		}
+
+		return dir
+	}
+}
+
 func TestRunValidate(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -96,24 +120,10 @@ go 1.21
 			expectError: true,
 		},
 		{
-			name: "with_verbose_flag",
-			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-validate-test")
-				goMod := `module github.com/user/test
-go 1.21
-`
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
-
-				goreleaser := `# GoReleaser configuration
-version: 2
-project_name: test
-`
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
-
-				return dir
-			},
-			args:  []string{},
-			flags: map[string]bool{"verbose": true, "fix": false},
+			name:      "with_verbose_flag",
+			setupFunc: setupBasicTestProject("wizard-validate-test", true, ""),
+			args:      []string{},
+			flags:     map[string]bool{"verbose": true, "fix": false},
 		},
 	}
 
@@ -324,25 +334,8 @@ build:
 			expectIssues: []string{},
 		},
 		{
-			name: "missing_main_package",
-			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-structure-test")
-				goMod := `module github.com/user/test
-go 1.21
-`
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
-
-				goreleaser := `# GoReleaser configuration
-version: 2
-project_name: test
-build:
-  main: .
-  binary: test
-`
-				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
-
-				return dir
-			},
+			name:      "missing_main_package",
+			setupFunc: setupBasicTestProject("wizard-structure-test", true, "build:\n  main: .\n  binary: test\n"),
 			expectWarnings: []string{"No main.go found"},
 		},
 	}
