@@ -25,25 +25,25 @@ func ValidateConfiguration(config *domain.SafeProjectConfig) (*types.ValidationR
 	}
 
 	// Step 2: Type validation
-	err := validateTypes(config, result)
+	err = validateTypes(config, result)
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 3: Platform-architecture compatibility
-	err := validatePlatformArchCompatibility(config, result)
+	err = validatePlatformArchCompatibility(config, result)
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 4: Business rule validation
-	err := validateBusinessRules(config, result)
+	err = validateBusinessRules(config, result)
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 5: Security validation
-	err := validateSecurity(config, result)
+	err = validateSecurity(config, result)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	}
 
 	// Binary name validation
-	err := ValidateBinaryName(config.BinaryName)
+	err = ValidateBinaryName(config.BinaryName)
 	if err != nil {
 		result.AddError(&types.ValidationError{
 			Code:       errors.ErrInvalidBinary,
@@ -84,7 +84,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	}
 
 	// Main path validation
-	err := ValidateMainPath(config.MainPath)
+	err = ValidateMainPath(config.MainPath)
 	if err != nil {
 		result.AddError(&types.ValidationError{
 			Code:       errors.ErrInvalidMainPath,
@@ -97,7 +97,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 
 	// Project description validation (optional)
 	if config.ProjectDescription != "" {
-		err := ValidateProjectDescription(config.ProjectDescription)
+		err = ValidateProjectDescription(config.ProjectDescription)
 		if err != nil {
 			result.AddError(&types.ValidationError{
 				Code:       errors.ErrInvalidProjectDescription,
@@ -307,19 +307,19 @@ func validateBusinessRules(config *domain.SafeProjectConfig, result *types.Valid
 	}
 
 	// Signing configuration validation
-	err := validateSigningBusinessRules(config, result)
+	err = validateSigningBusinessRules(config, result)
 	if err != nil {
 		return err
 	}
 
 	// Actions configuration validation
-	err := validateActionsBusinessRules(config, result)
+	err = validateActionsBusinessRules(config, result)
 	if err != nil {
 		return err
 	}
 
 	// Project type-specific validation
-	err := validateProjectTypeBusinessRules(config, result)
+	err = validateProjectTypeBusinessRules(config, result)
 	if err != nil {
 		return err
 	}

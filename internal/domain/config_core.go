@@ -75,18 +75,18 @@ func (spc *SafeProjectConfig) Validate() error {
 		return err
 	}
 
-	err := ValidateBinaryName(spc.BinaryName)
+	err = ValidateBinaryName(spc.BinaryName)
 	if err != nil {
 		return err
 	}
 
-	err := ValidateMainPath(spc.MainPath)
+	err = ValidateMainPath(spc.MainPath)
 	if err != nil {
 		return err
 	}
 
 	if spc.ProjectDescription != "" {
-		err := ValidateProjectDescription(spc.ProjectDescription)
+		err = ValidateProjectDescription(spc.ProjectDescription)
 		if err != nil {
 			return err
 		}
@@ -222,19 +222,19 @@ func (spc *SafeProjectConfig) validateBusinessRules() error {
 	}
 
 	// Validate Docker configuration
-	err := spc.validateDockerConfiguration()
+	err = spc.validateDockerConfiguration()
 	if err != nil {
 		return err
 	}
 
 	// Validate signing configuration
-	err := spc.validateSigningConfiguration()
+	err = spc.validateSigningConfiguration()
 	if err != nil {
 		return err
 	}
 
 	// Validate Actions configuration
-	err := spc.validateActionsConfiguration()
+	err = spc.validateActionsConfiguration()
 	if err != nil {
 		return err
 	}

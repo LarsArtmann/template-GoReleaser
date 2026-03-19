@@ -58,7 +58,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 		}
 
 		// Validate GitHub Actions workflow
-		err := validateGitHubActions(results)
+		err = validateGitHubActions(results)
 		if err != nil {
 			displayError(err)
 

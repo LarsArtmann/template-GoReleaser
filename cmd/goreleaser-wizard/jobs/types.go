@@ -232,7 +232,7 @@ func (p *JobExecutionPlan) ValidatePlan() error {
 	}
 
 	// Check for missing dependencies
-	err := p.validateMissingDependencies()
+	err = p.validateMissingDependencies()
 	if err != nil {
 		return errors.NewValidationError(
 			errors.ErrInvalidConfig,
@@ -242,7 +242,7 @@ func (p *JobExecutionPlan) ValidatePlan() error {
 	}
 
 	// Check for self-dependencies
-	err := p.validateSelfDependencies()
+	err = p.validateSelfDependencies()
 	if err != nil {
 		return errors.NewValidationError(
 			errors.ErrInvalidConfig,

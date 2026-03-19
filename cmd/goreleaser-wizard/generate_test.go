@@ -334,7 +334,7 @@ go 1.21`
 					return err
 				}
 				// Create cmd/complexapp/main.go
-				err := os.MkdirAll("cmd/complexapp", 0o755)
+				err = os.MkdirAll("cmd/complexapp", 0o755)
 				if err != nil {
 					return err
 				}

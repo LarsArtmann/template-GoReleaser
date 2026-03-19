@@ -54,28 +54,28 @@ func (vu *ValidationUseCase) ValidateConfiguration(
 	}
 
 	// Step 2: Type validation
-	err := vu.validateTypes(ctx, config)
+	err = vu.validateTypes(ctx, config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 3: Platform-architecture compatibility
-	err := vu.validatePlatformArchCompatibility(ctx, config)
+	err = vu.validatePlatformArchCompatibility(ctx, config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 4: Business rule validation
-	err := vu.validateBusinessRules(ctx, config)
+	err = vu.validateBusinessRules(ctx, config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 5: Security validation
-	err := vu.validateSecurity(ctx, config)
+	err = vu.validateSecurity(ctx, config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
@@ -114,7 +114,7 @@ func (vu *ValidationUseCase) validateBasicFields(
 	}
 
 	// Binary name validation
-	err := ValidateBinaryName(config.BinaryName)
+	err = ValidateBinaryName(config.BinaryName)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidBinaryName,
@@ -124,7 +124,7 @@ func (vu *ValidationUseCase) validateBasicFields(
 	}
 
 	// Main path validation
-	err := ValidateMainPath(config.MainPath)
+	err = ValidateMainPath(config.MainPath)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidMainPath,
@@ -135,7 +135,7 @@ func (vu *ValidationUseCase) validateBasicFields(
 
 	// Project description validation (optional)
 	if config.ProjectDescription != "" {
-		err := ValidateProjectDescription(config.ProjectDescription)
+		err = ValidateProjectDescription(config.ProjectDescription)
 		if err != nil {
 			return NewValidationError(
 				ErrInvalidProjectDescription,
@@ -173,7 +173,7 @@ func (vu *ValidationUseCase) validateTypes(
 	}
 
 	// Architecture validation
-	err := ValidateArchitectures(config.Architectures)
+	err = ValidateArchitectures(config.Architectures)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidArchitecture,
@@ -183,7 +183,7 @@ func (vu *ValidationUseCase) validateTypes(
 	}
 
 	// Git provider validation
-	err := ValidateGitProvider(config.GitProvider)
+	err = ValidateGitProvider(config.GitProvider)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidGitProvider,
@@ -193,7 +193,7 @@ func (vu *ValidationUseCase) validateTypes(
 	}
 
 	// Docker registry validation
-	err := ValidateDockerRegistry(config.DockerRegistry)
+	err = ValidateDockerRegistry(config.DockerRegistry)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidDockerRegistry,
@@ -203,7 +203,7 @@ func (vu *ValidationUseCase) validateTypes(
 	}
 
 	// Action triggers validation
-	err := ValidateActionTriggers(config.ActionsOn)
+	err = ValidateActionTriggers(config.ActionsOn)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidActionTrigger,
@@ -214,7 +214,7 @@ func (vu *ValidationUseCase) validateTypes(
 
 	// Build tags validation
 	if len(config.BuildTags) > 0 {
-		err := ValidateBuildTags(config.BuildTags)
+		err = ValidateBuildTags(config.BuildTags)
 		if err != nil {
 			return NewValidationError(
 				ErrInvalidBuildTag,
@@ -225,7 +225,7 @@ func (vu *ValidationUseCase) validateTypes(
 	}
 
 	// Configuration state validation
-	err := ValidateConfigState(config.State)
+	err = ValidateConfigState(config.State)
 	if err != nil {
 		return NewValidationError(
 			ErrInvalidConfigState,
