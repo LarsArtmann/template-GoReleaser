@@ -14,7 +14,7 @@ import (
 )
 
 // runInitWizard runs the init command.
-func runInitWizard(cmd *cobra.Command, args []string) {
+func runInitWizard(cmd *cobra.Command, _ []string) {
 	defer recoverFromPanic("init wizard")
 
 	force, _ := cmd.Flags().GetBool("force")
@@ -22,6 +22,17 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 
 	fmt.Println(titleStyle.Render("🧙 Initializing GoReleaser Configuration"))
 	fmt.Println()
+
+	// If interactive mode requested but not in a terminal, error with helpful message
+	if interactive && !IsTerminal() {
+		err := domain.NewValidationError(
+			domain.ErrInvalidConfiguration,
+			"Interactive mode requires a terminal",
+			NonInteractiveHelp,
+		).WithContext("init wizard")
+		displayError(err)
+		return
+	}
 
 	// Detect project information
 	config := &domain.SafeProjectConfig{}
@@ -34,9 +45,9 @@ func runInitWizard(cmd *cobra.Command, args []string) {
 	// Apply defaults to ensure complete configuration
 	config.ApplyDefaults()
 
-	// If interactive mode, prompt for confirmation/changes
+	// If interactive mode, run the TUI wizard
 	if interactive {
-		err := runInteractiveWizard(config)
+		err := RunTUIWizard(config)
 		if err != nil {
 			displayError(err)
 
@@ -203,74 +214,6 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 
 	// Default fallback
 	return ".", filepath.Base(wd), "cli"
-}
-
-// runInteractiveWizard runs an interactive wizard for configuration.
-func runInteractiveWizard(config *domain.SafeProjectConfig) error {
-	prompter := NewInteractivePrompter()
-
-	// Confirm and modify detected information
-	var err error
-
-	config, err = prompter.confirmDetectedInfo(config)
-	if err != nil {
-		return err
-	}
-
-	// Prompt for platforms
-	config.Platforms, err = prompter.promptPlatforms(config.Platforms)
-	if err != nil {
-		return err
-	}
-
-	// Prompt for architectures
-	config.Architectures, err = prompter.promptArchitectures(config.Architectures)
-	if err != nil {
-		return err
-	}
-
-	// Prompt for CGO configuration
-	config.CGOStatus, err = prompter.promptCGO(config.CGOStatus)
-	if err != nil {
-		return err
-	}
-
-	// Prompt for Docker support
-	config.DockerSupport, err = prompter.promptDocker(config.DockerSupport)
-	if err != nil {
-		return err
-	}
-
-	// Prompt for Git provider
-	config.GitProvider, err = prompter.promptGitProvider(config.GitProvider)
-	if err != nil {
-		return err
-	}
-
-	// Prompt for advanced options
-	if err := prompter.promptAdvancedOptions(config); err != nil {
-		return err
-	}
-
-	// Apply any needed defaults based on selections
-	config.ApplyDefaults()
-
-	// Show final configuration
-	fmt.Println(titleStyle.Render("\n📋 Final Configuration:"))
-	fmt.Printf("  Project: %s (%s)\n", config.ProjectName, config.ProjectType)
-	fmt.Printf("  Binary: %s\n", config.BinaryName)
-	fmt.Printf("  Main: %s\n", config.MainPath)
-	fmt.Printf("  Platforms: %v\n", config.Platforms)
-	fmt.Printf("  Architectures: %v\n", config.Architectures)
-	fmt.Printf("  CGO: %s\n", config.CGOStatus)
-	fmt.Printf("  Docker: %s\n", config.DockerSupport)
-	fmt.Printf("  Git Provider: %s\n", config.GitProvider)
-	fmt.Printf("  Code Signing: %s\n", config.SigningLevel)
-	fmt.Printf("  Homebrew: %v\n", config.Homebrew)
-	fmt.Printf("  GitHub Actions: %v\n", config.ActionLevel != domain.ActionLevelNone)
-	fmt.Println()
-
-	return nil
 }
 
 func init() {

@@ -9,7 +9,6 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
-	"github.com/kaptinlin/messageformat-go/pkg/logger"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -138,7 +137,7 @@ func Execute() {
 // recoverFromPanic provides graceful panic recovery using domain types.
 func recoverFromPanic(context string) {
 	if r := recover(); r != nil {
-		logger.Error("Panic recovered", "context", context, "panic", r)
+		log.Error("Panic recovered", "context", context, "panic", r)
 
 		err := domain.NewSystemError(
 			domain.ErrTemplateExecutionFailed,
@@ -191,7 +190,7 @@ func displayError(err error) {
 	}
 
 	// Log the full error for debugging
-	logger.Error("Domain error",
+	log.Error("Domain error",
 		"code", domainErr.Code,
 		"message", domainErr.Message,
 		"details", domainErr.Details,
@@ -263,10 +262,10 @@ func initConfig() {
 	if err != nil {
 		// Only log if it's not a "file not found" error for optional config
 		if cfgFile != "" || !os.IsNotExist(err) {
-			logger.Warn("Config file error", "error", err, "file", viper.ConfigFileUsed())
+			log.Warn("Config file error", "error", err, "file", viper.ConfigFileUsed())
 		}
 	} else if viper.GetBool("debug") {
-		logger.Info("Using config file", "file", viper.ConfigFileUsed())
+		log.Info("Using config file", "file", viper.ConfigFileUsed())
 	}
 }
 
