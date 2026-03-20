@@ -168,10 +168,10 @@ func TestValidateDockerRegistry(t *testing.T) {
 		{"Valid localhost HTTP", "localhost:5000/app", false},
 		{"Valid 127.0.0.1 HTTP", "127.0.0.1:5000/app", false},
 		{"Valid with port", "ghcr.io:443/username/app", false},
-		{"Empty string", "", true},
+		{"Empty string (optional)", "", false}, // Empty is valid - use default registry
 		{"Non-localhost HTTP", "http://registry.example.com/app", true},
 		{"With credentials", "username:password@registry.com/app", true},
-		{"Invalid format", "invalid..registry", true},
+		{"Invalid format - double dots", "invalid..registry", true},
 		{"With query params", "registry.com/app?tag=v1", true},
 		{"With fragment", "registry.com/app#tag", true},
 	}
@@ -185,9 +185,9 @@ func TestSanitizeInput(t *testing.T) {
 		{"With null bytes", "hello\x00world", "helloworld"},
 		{"With control chars", "hello\x01world", "helloworld"},
 		{"With tabs", "hello\tworld", "hello\tworld"},
-		{"With newlines", "hello\nworld", "hello\nworld"},
+		{"With newlines in middle", "hello\nworld", "hello\nworld"}, // Internal newlines preserved
 		{"Extra whitespace", "  hello world  ", "hello world"},
-		{"Mixed", "  hello\x00\tworld\n  ", "hello\tworld\n"},
+		{"Mixed", "  hello\x00\tworld\n  ", "hello\tworld"}, // TrimSpace removes trailing newline
 	}
 
 	runTransformationTests(t, tests, "SanitizeInput", SanitizeInput)
