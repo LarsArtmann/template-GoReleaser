@@ -1,5 +1,7 @@
 package main
 
+const exitCodeWarnings = 2
+
 // ValidationResults holds all validation results.
 type ValidationResults struct {
 	ConfigExists    bool
@@ -20,7 +22,7 @@ func (vr *ValidationResults) GetExitCode() int {
 	}
 
 	if len(vr.Warnings) > 0 {
-		return 2
+		return exitCodeWarnings
 	}
 
 	return 0

@@ -79,7 +79,7 @@ func (j *ConfigGenerationJob) Name() string {
 func (j *ConfigGenerationJob) GetMetadata() JobMetadata {
 	return JobMetadata{
 		Description:   "Generates GoReleaser configuration from project settings",
-		EstimatedTime: 5 * time.Second,
+		EstimatedTime: defaultEstimatedTime,
 		Retryable:     false,
 		MaxRetries:    0,
 		Dependencies:  []string{},
@@ -222,9 +222,9 @@ func (j *GitHubActionsGenerationJob) Name() string {
 func (j *GitHubActionsGenerationJob) GetMetadata() JobMetadata {
 	return JobMetadata{
 		Description:   "Generates GitHub Actions workflow for automated releases",
-		EstimatedTime: 3 * time.Second,
+		EstimatedTime: shortEstimatedTime,
 		Retryable:     true,
-		MaxRetries:    2,
+		MaxRetries:    defaultMaxRetries,
 		Dependencies:  []string{"config-generation"},
 		Tags:          []string{"workflow", "github", "ci-cd"},
 	}
@@ -284,7 +284,7 @@ func (j *ProjectValidationJob) Name() string {
 func (j *ProjectValidationJob) GetMetadata() JobMetadata {
 	return JobMetadata{
 		Description:   "Validates project structure and dependencies",
-		EstimatedTime: 2 * time.Second,
+		EstimatedTime: veryShortEstimatedTime,
 		Retryable:     true,
 		MaxRetries:    1,
 		Dependencies:  []string{},
@@ -434,7 +434,7 @@ func (j *DockerfileGenerationJob) Name() string {
 func (j *DockerfileGenerationJob) GetMetadata() JobMetadata {
 	return JobMetadata{
 		Description:   "Generates Dockerfile for container builds",
-		EstimatedTime: 3 * time.Second,
+		EstimatedTime: shortEstimatedTime,
 		Retryable:     false,
 		MaxRetries:    0,
 		Dependencies:  []string{},

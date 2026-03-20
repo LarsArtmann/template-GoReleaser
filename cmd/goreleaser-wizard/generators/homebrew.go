@@ -127,7 +127,7 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 
 	// Ensure homebrew directory exists
 	formulaDir := "homebrew"
-	if err := os.MkdirAll(formulaDir, 0o755); err != nil {
+	if err := os.MkdirAll(formulaDir, directoryPermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to create homebrew directory",
@@ -137,7 +137,7 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 
 	// Write formula file
 	formulaPath := fmt.Sprintf("%s/%s.rb", formulaDir, g.templateData.FormulaName)
-	if err := os.WriteFile(formulaPath, output, 0o644); err != nil {
+	if err := os.WriteFile(formulaPath, output, filePermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write Homebrew formula",

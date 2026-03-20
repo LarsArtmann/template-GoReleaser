@@ -88,7 +88,7 @@ func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileT
 			Interval:    "30s",
 			Timeout:     "10s",
 			StartPeriod: "5s",
-			Retries:     3,
+			Retries:     defaultHealthRetries,
 			Commands: []string{
 				"CMD-SHELL",
 				"wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1",
@@ -114,7 +114,7 @@ func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write Dockerfile
-	if err := os.WriteFile("Dockerfile", output, 0o644); err != nil {
+	if err := os.WriteFile("Dockerfile", output, filePermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write Dockerfile",

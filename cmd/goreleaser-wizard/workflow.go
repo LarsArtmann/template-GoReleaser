@@ -40,7 +40,7 @@ func NewWorkflow(name, description string, logger *log.Logger) *Workflow {
 		Description: description,
 		JobManager:  NewJobManager(logger),
 		Factory:     NewJobFactory(logger),
-		Timeout:     30 * time.Minute, // Default timeout
+		Timeout:     defaultTimeout, // Default timeout
 	}
 }
 
@@ -178,11 +178,11 @@ func (wb *WorkflowBuilder) BuildWorkflow(
 	// Set appropriate timeout based on workflow type
 	switch wfType {
 	case WorkflowTypeFullWizard:
-		workflow.SetTimeout(10 * time.Minute)
+		workflow.SetTimeout(fullWizardTimeout)
 	case WorkflowTypeConfigOnly:
-		workflow.SetTimeout(5 * time.Minute)
+		workflow.SetTimeout(configOnlyTimeout)
 	case WorkflowTypeValidationOnly:
-		workflow.SetTimeout(2 * time.Minute)
+		workflow.SetTimeout(validationTimeout)
 	}
 
 	return workflow, nil
@@ -206,7 +206,7 @@ func (wb *WorkflowBuilder) BuildMigrateWorkflow(
 		workflow.JobManager.AddJob(job)
 	}
 
-	workflow.SetTimeout(15 * time.Minute)
+	workflow.SetTimeout(migrationTimeout)
 	workflow.SetParallel(false, 1)
 
 	return workflow, nil
@@ -230,7 +230,7 @@ func (wb *WorkflowBuilder) BuildUpdateWorkflow(
 		workflow.JobManager.AddJob(job)
 	}
 
-	workflow.SetTimeout(10 * time.Minute)
+	workflow.SetTimeout(updateTimeout)
 	workflow.SetParallel(false, 1)
 
 	return workflow, nil

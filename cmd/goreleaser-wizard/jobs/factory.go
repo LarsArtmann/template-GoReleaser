@@ -226,7 +226,7 @@ func (j *PreviewGenerationJob) Name() string {
 func (j *PreviewGenerationJob) GetMetadata() JobMetadata {
 	return JobMetadata{
 		Description:   "Generates preview of configurations without writing files",
-		EstimatedTime: 2 * time.Second,
+		EstimatedTime: veryShortEstimatedTime,
 		Retryable:     true,
 		MaxRetries:    1,
 		Dependencies:  []string{"project-validation"},
@@ -376,9 +376,9 @@ func (j *JobRollbackJob) Name() string {
 func (j *JobRollbackJob) GetMetadata() JobMetadata {
 	return JobMetadata{
 		Description:   "Rolls back a specific job execution",
-		EstimatedTime: 5 * time.Second,
+		EstimatedTime: shortEstimatedTime,
 		Retryable:     true,
-		MaxRetries:    2,
+		MaxRetries:    defaultMaxRetries,
 		Dependencies:  []string{},
 		Tags:          []string{"rollback", "recovery"},
 	}

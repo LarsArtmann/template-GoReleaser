@@ -80,7 +80,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write configuration file
-	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), filePermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write GoReleaser config",

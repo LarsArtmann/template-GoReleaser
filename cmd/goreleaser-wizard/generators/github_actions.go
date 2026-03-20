@@ -70,7 +70,7 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 
 	// Ensure .github/workflows directory exists
 	workflowDir := filepath.Join(".github", "workflows")
-	if err := os.MkdirAll(workflowDir, 0o755); err != nil {
+	if err := os.MkdirAll(workflowDir, directoryPermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to create workflow directory",
@@ -80,7 +80,7 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 
 	// Write workflow file
 	workflowPath := filepath.Join(workflowDir, "release.yml")
-	if err := os.WriteFile(workflowPath, output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(workflowPath, output.Bytes(), filePermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write GitHub Actions workflow",

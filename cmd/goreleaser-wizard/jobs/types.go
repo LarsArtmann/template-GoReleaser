@@ -105,7 +105,7 @@ type WorkflowOptions struct {
 func DefaultWorkflowOptions() WorkflowOptions {
 	return WorkflowOptions{
 		Parallel:        false,
-		Timeout:         30 * time.Minute,
+		Timeout:         defaultWorkflowTimeout,
 		RetryFailed:     false,
 		MaxRetries:      2,
 		ContinueOnError: false,
@@ -128,7 +128,7 @@ type JobExecutionOptions struct {
 // DefaultJobExecutionOptions returns default job execution options.
 func DefaultJobExecutionOptions() JobExecutionOptions {
 	return JobExecutionOptions{
-		Timeout:       5 * time.Minute,
+		Timeout:       defaultJobTimeout,
 		RetryCount:    0,
 		MaxRetries:    2,
 		IgnoreError:   false,
