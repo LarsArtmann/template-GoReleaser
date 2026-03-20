@@ -4,7 +4,7 @@
 
 version: 2
 
-project_name: test-github-actions
+project_name: GoReleaser-Wizard
 
 before:
   hooks:
@@ -18,7 +18,7 @@ builds:
     binary: GoReleaser-Wizard
 
     env:
-      - CGO_ENABLED=
+      - CGO_ENABLED=0
 
     goos:
       - linux
@@ -36,9 +36,13 @@ builds:
       - goos: windows
         goarch: arm64
 
+    # Build tags for pure Go builds
+    tags:
+      - pure
+
 archives:
   - id: default
-    name_template: "test-github-actions_81d04b0-dirty_{{.Os}}_{{.Arch}}"
+    name_template: "GoReleaser-Wizard_7e85f9e-dirty_{{.Os}}_{{.Arch}}"
 
     format_overrides:
       - goos: windows
@@ -54,7 +58,7 @@ checksum:
   algorithm: sha256
 
 snapshot:
-  version_template: "81d04b0-dirty-next-next"
+  version_template: "7e85f9e-dirty-next-next"
 
 changelog:
   sort: asc
@@ -82,16 +86,16 @@ release:
 
 dockers:
   - image_templates:
-      - "GitHub Container Registry/test-github-actions:81d04b0-dirty"
-      - "GitHub Container Registry/test-github-actions:v81d04b0-dirty"
-      - "GitHub Container Registry/test-github-actions:latest"
+      - "GitHub Container Registry/goreleaser-wizard:7e85f9e-dirty"
+      - "GitHub Container Registry/goreleaser-wizard:v7e85f9e-dirty"
+      - "GitHub Container Registry/goreleaser-wizard:latest"
 
     dockerfile: Dockerfile
 
     build_flag_templates:
       - "--pull"
-      - "--label=org.opencontainers.image.created=2025-12-13"
-      - "--label=org.opencontainers.image.title=test-github-actions"
-      - "--label=org.opencontainers.image.revision=81d04b0becd20783ad978d57cc1aee7f9242b0c8"
-      - "--label=org.opencontainers.image.version=81d04b0-dirty"
+      - "--label=org.opencontainers.image.created=2026-03-20"
+      - "--label=org.opencontainers.image.title=GoReleaser-Wizard"
+      - "--label=org.opencontainers.image.revision=7e85f9e384d955adf1438806eab6930e62f415e0"
+      - "--label=org.opencontainers.image.version=7e85f9e-dirty"
       - "--platform=linux/amd64"

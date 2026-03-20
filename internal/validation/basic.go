@@ -27,7 +27,9 @@ var (
 	dockerImagePattern = regexp.MustCompile(`^[a-z0-9]+(?:[._-][a-z0-9]+)*$`)
 
 	// Docker registry URL validation - allows domains, localhost, and IP addresses with optional paths.
-	dockerRegistryPattern = regexp.MustCompile(`^(?:[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?|[lL]ocalhost|127\.0\.0\.1)(?::[0-9]+)?(?:/[a-zA-Z0-9._-]+)*/?$`)
+	dockerRegistryPattern = regexp.MustCompile(
+		`^(?:[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?|[lL]ocalhost|127\.0\.0\.1)(?::[0-9]+)?(?:/[a-zA-Z0-9._-]+)*/?$`,
+	)
 )
 
 // ValidateProjectName validates project name.
@@ -181,7 +183,23 @@ func ValidateMainPath(path string) error {
 	}
 
 	// Check for shell metacharacters
-	shellMetachars := []string{";", "&", "|", "<", ">", "`", "$", "(", ")", "{", "}", "!", "*", "?", "~"}
+	shellMetachars := []string{
+		";",
+		"&",
+		"|",
+		"<",
+		">",
+		"`",
+		"$",
+		"(",
+		")",
+		"{",
+		"}",
+		"!",
+		"*",
+		"?",
+		"~",
+	}
 	for _, char := range shellMetachars {
 		if strings.Contains(normalizedPath, char) {
 			return errors.NewValidationError(

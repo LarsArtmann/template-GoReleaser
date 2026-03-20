@@ -32,7 +32,6 @@ func IsTerminal() bool {
 
 // RunTUIWizard runs the interactive TUI wizard using huh.
 func RunTUIWizard(config *domain.SafeProjectConfig) error {
-
 	// Basic project information
 	var projectName, projectDesc, binaryName, mainPath string
 	var projectType domain.ProjectType
@@ -317,7 +316,14 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 	// Convert platform selections
 	config.Platforms = nil
 	for _, p := range selectedPlatforms {
-		if slices.Contains([]string{string(domain.PlatformLinux), string(domain.PlatformDarwin), string(domain.PlatformWindows)}, p) {
+		if slices.Contains(
+			[]string{
+				string(domain.PlatformLinux),
+				string(domain.PlatformDarwin),
+				string(domain.PlatformWindows),
+			},
+			p,
+		) {
 			config.Platforms = append(config.Platforms, domain.Platform(p))
 		}
 	}
@@ -325,7 +331,10 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 	// Convert architecture selections
 	config.Architectures = nil
 	for _, a := range selectedArchitectures {
-		if slices.Contains([]string{string(domain.ArchitectureAMD64), string(domain.ArchitectureARM64)}, a) {
+		if slices.Contains(
+			[]string{string(domain.ArchitectureAMD64), string(domain.ArchitectureARM64)},
+			a,
+		) {
 			config.Architectures = append(config.Architectures, domain.Architecture(a))
 		}
 	}
