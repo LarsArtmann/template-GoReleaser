@@ -11,6 +11,8 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
+const defaultGitCommandTimeout = 30 * time.Second
+
 // Command represents a git command with context.
 type Command struct {
 	ctx     context.Context
@@ -23,7 +25,7 @@ type Command struct {
 func NewCommand(ctx context.Context) *Command {
 	return &Command{
 		ctx:     ctx,
-		timeout: 30 * time.Second,
+		timeout: defaultGitCommandTimeout,
 	}
 }
 

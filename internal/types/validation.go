@@ -466,14 +466,14 @@ func (vs *ValidationSummary) GetScore() int {
 	}
 
 	if vs.TotalWarnings == 0 {
-		return 100
+		return perfectScore
 	}
 
 	// Deduct points based on warning severity
-	score := 100
-	score -= vs.HighWarnings * 10
-	score -= vs.MediumWarnings * 5
-	score -= vs.LowWarnings * 2
+	score := perfectScore
+	score -= vs.HighWarnings * highWarningDeduction
+	score -= vs.MediumWarnings * mediumWarningDeduction
+	score -= vs.LowWarnings * lowWarningDeduction
 
 	if score < 0 {
 		score = 0
@@ -486,25 +486,25 @@ func (vs *ValidationSummary) GetScore() int {
 func (vs *ValidationSummary) GetGrade() string {
 	score := vs.GetScore()
 
-	if score == 100 {
+	if score == gradeThresholdAPlus {
 		return "A+"
-	} else if score >= 95 {
+	} else if score >= gradeThresholdA {
 		return "A"
-	} else if score >= 90 {
+	} else if score >= gradeThresholdAMinus {
 		return "A-"
-	} else if score >= 85 {
+	} else if score >= gradeThresholdBPlus {
 		return "B+"
-	} else if score >= 80 {
+	} else if score >= gradeThresholdB {
 		return "B"
-	} else if score >= 75 {
+	} else if score >= gradeThresholdBMinus {
 		return "B-"
-	} else if score >= 70 {
+	} else if score >= gradeThresholdCPlus {
 		return "C+"
-	} else if score >= 65 {
+	} else if score >= gradeThresholdC {
 		return "C"
-	} else if score >= 60 {
+	} else if score >= gradeThresholdCMinus {
 		return "C-"
-	} else if score >= 50 {
+	} else if score >= gradeThresholdD {
 		return "D"
 	} else {
 		return "F"

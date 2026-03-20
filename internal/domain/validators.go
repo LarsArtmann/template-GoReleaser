@@ -179,7 +179,7 @@ func ValidateMainPath(path string) error {
 
 // ValidateProjectDescription validates project description.
 func ValidateProjectDescription(desc string) error {
-	if len(desc) > 255 {
+	if len(desc) > maxDescriptionLength {
 		return errors.New("project description must be 255 characters or less")
 	}
 

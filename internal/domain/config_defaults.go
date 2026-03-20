@@ -307,7 +307,7 @@ func (spc *SafeProjectConfig) GetBuildComplexity() int {
 
 	// Add complexity from CGO
 	if spc.CGOStatus.IsEnabled() {
-		complexity += 5
+		complexity += complexityCGOEnabled
 	}
 
 	// Add complexity from build tags
@@ -315,12 +315,12 @@ func (spc *SafeProjectConfig) GetBuildComplexity() int {
 
 	// Add complexity from Docker
 	if spc.DockerSupport.IsEnabled() {
-		complexity += 10
+		complexity += complexityDockerEnabled
 	}
 
 	// Add complexity from signing
 	if spc.SigningLevel.IsEnabled() {
-		complexity += len(spc.SigningLevel.GetRequiredTools()) * 3
+		complexity += len(spc.SigningLevel.GetRequiredTools()) * complexitySigningTool
 	}
 
 	return complexity
@@ -328,7 +328,7 @@ func (spc *SafeProjectConfig) GetBuildComplexity() int {
 
 // GetEstimatedBuildTime returns estimated build time in seconds.
 func (spc *SafeProjectConfig) GetEstimatedBuildTime() int {
-	baseTime := 30 // Base build time in seconds
+	baseTime := baseBuildTimeSeconds // Base build time in seconds
 
 	// Multiply by number of platform/arch combinations
 	combos := len(spc.Platforms) * len(spc.Architectures)
@@ -336,17 +336,17 @@ func (spc *SafeProjectConfig) GetEstimatedBuildTime() int {
 
 	// Add time for CGO
 	if spc.CGOStatus.IsEnabled() {
-		buildTime += 10 * combos
+		buildTime += cgoBuildTimeAdditional * combos
 	}
 
 	// Add time for Docker
 	if spc.DockerSupport.IsEnabled() {
-		buildTime += 60 // Additional time for Docker builds
+		buildTime += dockerBuildTimeAdditional // Additional time for Docker builds
 	}
 
 	// Add time for signing
 	if spc.SigningLevel.IsEnabled() {
-		buildTime += 5 * combos
+		buildTime += signingBuildTimeAdditional * combos
 	}
 
 	return buildTime
@@ -354,11 +354,11 @@ func (spc *SafeProjectConfig) GetEstimatedBuildTime() int {
 
 // GetDependencyCount returns estimated number of external dependencies.
 func (spc *SafeProjectConfig) GetDependencyCount() int {
-	deps := 2 // Base Go dependencies
+	deps := baseDependencies // Base Go dependencies
 
 	// Add dependencies for features
 	if spc.DockerSupport.IsEnabled() {
-		deps += 1 // Docker
+		deps += dockerDependency // Docker
 	}
 
 	if spc.SigningLevel.RequiresCosign() {

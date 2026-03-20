@@ -181,7 +181,7 @@ func ValidateDockerImageName(name string) error {
 		return nil // Empty is allowed, will default to project name
 	}
 
-	if len(name) > 255 {
+	if len(name) > maxDockerNameLength {
 		return errors.New("Docker image name must be 255 characters or less")
 	}
 

@@ -58,7 +58,7 @@ func ValidateBuildTag(tag BuildTag) error {
 
 // ValidateBuildTags validates a slice of build tags.
 func ValidateBuildTags(tags []BuildTag) error {
-	if len(tags) > 50 {
+	if len(tags) > maxBuildTags {
 		return errors.New("too many build tags (max 50)")
 	}
 
