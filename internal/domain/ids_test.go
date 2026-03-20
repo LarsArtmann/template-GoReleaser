@@ -44,7 +44,9 @@ func TestJobID(t *testing.T) {
 
 	t.Run("json deserialization", func(t *testing.T) {
 		data := []byte(`"job-123"`)
+
 		var id JobID
+
 		err := json.Unmarshal(data, &id)
 		require.NoError(t, err)
 		assert.Equal(t, "job-123", id.Get())
@@ -52,6 +54,7 @@ func TestJobID(t *testing.T) {
 
 	t.Run("zero value serializes to null", func(t *testing.T) {
 		var id JobID
+
 		data, err := json.Marshal(id)
 		require.NoError(t, err)
 		assert.Equal(t, "null", string(data))
@@ -59,6 +62,7 @@ func TestJobID(t *testing.T) {
 
 	t.Run("or returns default for zero", func(t *testing.T) {
 		var empty JobID
+
 		defaultID := NewJobID("default")
 
 		result := empty.Or(defaultID)
@@ -85,19 +89,21 @@ func TestWorkflowID(t *testing.T) {
 	t.Run("workflow and job IDs are distinct types", func(t *testing.T) {
 		// This test verifies at compile time that JobID and WorkflowID
 		// are distinct types. If they weren't, this would compile.
-
 		jobID := NewJobID("job-123")
 		workflowID := NewWorkflowID("wf-123")
 
 		// These should work - same type
-		var _ JobID = jobID
-		var _ WorkflowID = workflowID
+		var (
+			_ JobID      = jobID
+			_ WorkflowID = workflowID
+		)
 
 		// The compiler prevents this:
 		// var _ WorkflowID = jobID  // Compile error!
 		// var _ JobID = workflowID  // Compile error!
 
 		// Verify they're different values
+
 		assert.NotEqual(t, jobID.Get(), workflowID.Get())
 	})
 }
@@ -137,7 +143,9 @@ func TestGitHubRepoID(t *testing.T) {
 
 	t.Run("json deserialization", func(t *testing.T) {
 		data := []byte(`12345`)
+
 		var id GitHubRepoID
+
 		err := json.Unmarshal(data, &id)
 		require.NoError(t, err)
 		assert.Equal(t, int64(12345), id.Get())
@@ -185,7 +193,6 @@ func TestGitHubUserID(t *testing.T) {
 func TestIDTypeSafety(t *testing.T) {
 	// These are all distinct types - if they weren't, the compiler would
 	// allow assigning one to another.
-
 	jobID := NewJobID("job-123")
 	workflowID := NewWorkflowID("wf-123")
 	planID := NewExecutionPlanID("plan-123")

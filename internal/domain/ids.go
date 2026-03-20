@@ -41,7 +41,7 @@ type (
 	executionPlanBrand struct{} // Brand for ExecutionPlanID
 )
 
-// GitHub entity brands
+// GitHub entity brands.
 type (
 	gitHubRepoBrand     struct{} // Brand for GitHubRepoID
 	gitHubReleaseBrand  struct{} // Brand for GitHubReleaseID

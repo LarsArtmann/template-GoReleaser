@@ -165,6 +165,7 @@ func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 
 	// Remove generated workflow
 	workflowPath := filepath.Join(".github", "workflows", "release.yml")
+
 	err := removeGeneratedFile(
 		g.logger,
 		workflowPath,

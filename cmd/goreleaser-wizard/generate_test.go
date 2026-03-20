@@ -309,6 +309,7 @@ func TestDetectProjectInfo(t *testing.T) {
 				// Create go.mod
 				goMod := `module github.com/user/myapp
 go 1.21`
+
 				err := os.WriteFile("go.mod", []byte(goMod), 0o644)
 				if err != nil {
 					return err
@@ -329,6 +330,7 @@ go 1.21`
 				// Create go.mod
 				goMod := `module github.com/user/complexapp
 go 1.21`
+
 				err := os.WriteFile("go.mod", []byte(goMod), 0o644)
 				if err != nil {
 					return err

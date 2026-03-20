@@ -26,8 +26,12 @@ import (
 	"github.com/spf13/viper"
 )
 
-// setupBasicTestProject creates a minimal test project with go.mod and optional .goreleaser.yaml
-func setupBasicTestProject(prefix string, includeGoreleaser bool, goreleaserExtra string) func() string {
+// setupBasicTestProject creates a minimal test project with go.mod and optional .goreleaser.yaml.
+func setupBasicTestProject(
+	prefix string,
+	includeGoreleaser bool,
+	goreleaserExtra string,
+) func() string {
 	return func() string {
 		dir, _ := os.MkdirTemp("", prefix)
 		goMod := `module github.com/user/test
@@ -43,6 +47,7 @@ project_name: test
 			if goreleaserExtra != "" {
 				goreleaser += goreleaserExtra
 			}
+
 			os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
 		}
 
@@ -334,8 +339,12 @@ build:
 			expectIssues: []string{},
 		},
 		{
-			name:           "missing_main_package",
-			setupFunc:      setupBasicTestProject("wizard-structure-test", true, "build:\n  main: .\n  binary: test\n"),
+			name: "missing_main_package",
+			setupFunc: setupBasicTestProject(
+				"wizard-structure-test",
+				true,
+				"build:\n  main: .\n  binary: test\n",
+			),
 			expectWarnings: []string{"No main.go found"},
 		},
 	}

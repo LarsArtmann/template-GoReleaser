@@ -25,6 +25,7 @@ func attemptFixes(results *ValidationResults) error {
 	// Try to create basic configuration if missing
 	if !results.ConfigExists {
 		configContent := generateBasicConfig()
+
 		err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0o644)
 		if err == nil {
 			fmt.Println(successStyle.Render("✅ Created basic .goreleaser.yaml"))

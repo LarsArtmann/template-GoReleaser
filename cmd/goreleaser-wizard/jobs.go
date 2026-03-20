@@ -211,6 +211,7 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 	// Create backup if file exists
 	if _, err := os.Stat(".goreleaser.yaml"); err == nil {
 		backupPath := ".goreleaser.yaml.backup"
+
 		err := os.Rename(".goreleaser.yaml", backupPath)
 		if err != nil {
 			return fmt.Errorf("failed to create backup: %w", err)

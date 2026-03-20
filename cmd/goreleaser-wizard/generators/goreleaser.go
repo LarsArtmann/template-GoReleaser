@@ -97,6 +97,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 func (g *GoReleaserGenerator) createBackup(filename string) error {
 	if _, err := os.Stat(filename); err == nil {
 		backupPath := filename + ".backup"
+
 		err := os.Rename(filename, backupPath)
 		if err != nil {
 			return errors.NewFileError(
