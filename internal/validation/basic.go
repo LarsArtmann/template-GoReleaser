@@ -11,23 +11,23 @@ import (
 
 // Validation patterns.
 var (
-	// Project name validation: alphanumeric, hyphens, underscores, 1-50 chars.
-	projectNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,49}$`)
+	// Project name validation: alphanumeric, hyphens, underscores, dots, 1-50 chars.
+	projectNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{0,49}$`)
 
-	// Binary name validation: alphanumeric, hyphens, 1-30 chars.
-	binaryNamePattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]{0,29}$`)
+	// Binary name validation: must start with letter, then alphanumeric, hyphens, underscores, 1-30 chars.
+	binaryNamePattern = regexp.MustCompile(`^[a-zA-Z][a-zA-Z0-9_-]{0,29}$`)
 
-	// Main path validation: relative path, no invalid characters.
+	// Main path validation: relative path only, no absolute paths, no invalid characters.
 	mainPathPattern = regexp.MustCompile(`^(\.|\./|\.\./)?[^\\:*?"<>|]+$`)
 
-	// Project description validation: 1-500 chars, printable.
-	projectDescriptionPattern = regexp.MustCompile(`^[[:print:]]{1,500}$`)
+	// Project description validation: 1-500 printable chars including newlines.
+	projectDescriptionPattern = regexp.MustCompile(`^[[:print:]\n\r]{1,500}$`)
 
 	// Docker image name validation: lowercase, alphanum, separators, max 255.
 	dockerImagePattern = regexp.MustCompile(`^[a-z0-9]+(?:[._-][a-z0-9]+)*$`)
 
-	// Docker registry URL validation.
-	dockerRegistryPattern = regexp.MustCompile(`^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$`)
+	// Docker registry URL validation - allows domains, localhost, and IP addresses with optional paths.
+	dockerRegistryPattern = regexp.MustCompile(`^(?:[a-zA-Z0-9](?:[a-zA-Z0-9.-]*[a-zA-Z0-9])?|[lL]ocalhost|127\.0\.0\.1)(?::[0-9]+)?(?:/[a-zA-Z0-9._-]+)*/?$`)
 )
 
 // ValidateProjectName validates project name.
@@ -56,10 +56,31 @@ func ValidateProjectName(name string) error {
 		).WithField("project_name").WithSuggestion("Use alphanumeric characters with hyphens and underscores only")
 	}
 
-	// Check for reserved names
+	// Check for names ending with hyphen or dot
+	if strings.HasSuffix(name, "-") || strings.HasSuffix(name, ".") {
+		return errors.NewValidationError(
+			errors.ErrInvalidProject,
+			"Invalid project name",
+			"Project name cannot end with hyphen or dot",
+		).WithField("project_name").WithSuggestion("Remove trailing hyphens or dots")
+	}
+
+	// Check for consecutive hyphens or dots
+	if strings.Contains(name, "--") || strings.Contains(name, "..") {
+		return errors.NewValidationError(
+			errors.ErrInvalidProject,
+			"Invalid project name",
+			"Project name cannot contain consecutive hyphens or dots",
+		).WithField("project_name").WithSuggestion("Use single hyphens or dots")
+	}
+
+	// Check for reserved names (Windows device names and common reserved words)
 	reservedNames := []string{
-		"test", "temp", "tmp", "default", "admin", "root", "system",
+		"go", "test", "temp", "tmp", "default", "admin", "root", "system",
 		"null", "undefined", "none", "false", "true",
+		"con", "prn", "aux", "nul", "com1", "com2", "com3",
+		"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
+		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
 	}
 
 	lowerName := strings.ToLower(name)
@@ -100,8 +121,11 @@ func ValidateBinaryName(name string) error {
 		).WithField("binary_name").WithSuggestion("Use alphanumeric characters with hyphens and underscores only")
 	}
 
-	// Check for system reserved names
+	// Check for system reserved names (Windows device names and common system commands)
 	reservedNames := []string{
+		"con", "prn", "aux", "nul", "com1", "com2", "com3",
+		"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
+		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
 		"test", "temp", "tmp", "debug", "release", "build", "install",
 		"setup", "config", "init", "run", "start", "stop", "restart",
 	}
@@ -131,6 +155,15 @@ func ValidateMainPath(path string) error {
 	// Normalize path
 	normalizedPath := strings.ReplaceAll(path, "\\", "/")
 
+	// Check for absolute paths - reject them
+	if strings.HasPrefix(normalizedPath, "/") {
+		return errors.NewValidationError(
+			errors.ErrInvalidMainPath,
+			"Absolute paths not allowed",
+			"Main path must be a relative path, not an absolute path",
+		).WithField("main_path").WithSuggestion("Use relative paths like '.', './cmd/app', or './main'")
+	}
+
 	if len(normalizedPath) > 200 {
 		return errors.NewValidationError(
 			errors.ErrInvalidMainPath,
@@ -147,15 +180,42 @@ func ValidateMainPath(path string) error {
 		).WithField("main_path").WithSuggestion("Use relative paths like '.', './cmd/app', or './main'")
 	}
 
-	// Check for invalid path components
+	// Check for shell metacharacters
+	shellMetachars := []string{";", "&", "|", "<", ">", "`", "$", "(", ")", "{", "}", "!", "*", "?", "~"}
+	for _, char := range shellMetachars {
+		if strings.Contains(normalizedPath, char) {
+			return errors.NewValidationError(
+				errors.ErrInvalidMainPath,
+				"Shell metacharacters not allowed",
+				fmt.Sprintf("Main path contains shell metacharacter '%s'", char),
+			).WithField("main_path").WithSuggestion("Use safe path characters only")
+		}
+	}
+
+	// Check for path traversal
+	if strings.Contains(normalizedPath, "..") {
+		return errors.NewValidationError(
+			errors.ErrInvalidMainPath,
+			"Path traversal not allowed",
+			"Main path contains path traversal sequences",
+		).WithField("main_path").WithSuggestion("Use relative paths without '..'")
+	}
+
+	// Check for invalid path components (reserved Windows device names and path traversal)
 	invalidComponents := []string{
-		"..", "con", "prn", "aux", "nul", "com1", "com2", "com3",
+		"con", "prn", "aux", "nul", "com1", "com2", "com3",
 		"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
 		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
 	}
 
-	components := strings.SplitSeq(normalizedPath, "/")
-	for component := range components {
+	// Check for reserved system directories
+	reservedDirs := []string{"etc", "bin", "usr", "sbin", "var", "sys", "proc", "dev"}
+
+	components := strings.Split(normalizedPath, "/")
+	for _, component := range components {
+		if component == "" {
+			continue
+		}
 		lowerComponent := strings.ToLower(component)
 		if slices.Contains(invalidComponents, lowerComponent) {
 			return errors.NewValidationError(
@@ -163,6 +223,13 @@ func ValidateMainPath(path string) error {
 				"Invalid path component",
 				fmt.Sprintf("'%s' is not allowed in path", component),
 			).WithField("main_path").WithSuggestion("Remove invalid components from path")
+		}
+		if slices.Contains(reservedDirs, lowerComponent) {
+			return errors.NewValidationError(
+				errors.ErrInvalidMainPath,
+				"Reserved directory",
+				fmt.Sprintf("'%s' is a reserved system directory", component),
+			).WithField("main_path").WithSuggestion("Use project directories instead")
 		}
 	}
 
@@ -185,11 +252,11 @@ func ValidateProjectDescription(description string) error {
 		).WithField("project_description").WithSuggestion("Provide a meaningful description")
 	}
 
-	if len(trimmed) > 500 {
+	if len(trimmed) > 255 {
 		return errors.NewValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Project description too long",
-			"Project description must be 500 characters or less",
+			"Project description must be 255 characters or less",
 		).WithField("project_description").WithSuggestion("Use a shorter description")
 	}
 
@@ -201,13 +268,40 @@ func ValidateProjectDescription(description string) error {
 		).WithField("project_description").WithSuggestion("Use only printable characters")
 	}
 
-	// Check for common description issues
+	// Check for script injection patterns
+	lowerDesc := strings.ToLower(trimmed)
+	if strings.Contains(lowerDesc, "<script") || strings.Contains(lowerDesc, "javascript:") {
+		return errors.NewValidationError(
+			errors.ErrInvalidProjectDescription,
+			"Invalid content in project description",
+			"Project description contains script injection patterns",
+		).WithField("project_description").WithSuggestion("Remove script tags and javascript: prefixes")
+	}
+
+	// Check for suspicious patterns
 	if strings.Contains(trimmed, "TODO") || strings.Contains(trimmed, "FIXME") {
 		return errors.NewValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Incomplete project description",
 			"Project description contains TODO or FIXME markers",
 		).WithField("project_description").WithSuggestion("Complete the project description")
+	}
+
+	// Check for suspicious whitespace patterns (mostly spaces)
+	if len(trimmed) > 10 {
+		spaceCount := 0
+		for _, r := range trimmed {
+			if r == ' ' {
+				spaceCount++
+			}
+		}
+		if spaceCount > len(trimmed)/2 {
+			return errors.NewValidationError(
+				errors.ErrInvalidProjectDescription,
+				"Suspicious whitespace pattern",
+				"Project description contains too much whitespace",
+			).WithField("project_description").WithSuggestion("Use normal spacing in description")
+		}
 	}
 
 	return nil
@@ -426,14 +520,14 @@ func ValidateBuildTags(tags []string) error {
 			).WithField("build_tags").WithSuggestion("Remove empty build tags")
 		}
 
-		// Validate build tag format
-		tagPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_-]*$`)
+		// Validate build tag format (alphanumeric and underscores only, no hyphens)
+		tagPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_]*$`)
 		if !tagPattern.MatchString(tag) {
 			return errors.NewValidationError(
 				errors.ErrInvalidBuildTag,
 				"Invalid build tag format",
 				fmt.Sprintf("Build tag '%s' is invalid", tag),
-			).WithField("build_tags").WithSuggestion("Use alphanumeric characters with hyphens and underscores only")
+			).WithField("build_tags").WithSuggestion("Use alphanumeric characters and underscores only")
 		}
 
 		if len(tag) > 50 {
