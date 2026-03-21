@@ -152,8 +152,8 @@ go 1.21
 			wantErr: false,
 		},
 		{
-			name: "config_generation_success",
-			job:  NewConfigGenerationJob(createValidTestConfig("job-test"), false, logger),
+			name:    "config_generation_success",
+			job:     NewConfigGenerationJob(createValidTestConfig("job-test"), false, logger),
 			wantErr: false,
 		},
 		{
@@ -202,7 +202,7 @@ go 1.21
 		executeRollback bool
 	}{
 		{
-			name: "config_generation_rollback",
+			name:            "config_generation_rollback",
 			job:             NewConfigGenerationJob(createValidTestConfig("rollback-test"), false, logger),
 			executeRollback: true,
 		},

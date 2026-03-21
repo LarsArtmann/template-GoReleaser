@@ -103,17 +103,21 @@ func (pt ProjectType) DockerSupported() bool {
 func (pt ProjectType) RecommendedPlatforms() []Platform {
 	switch pt {
 	case ProjectTypeCLI, ProjectTypeTool:
-		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
+		// Note: Windows is not included by default because it doesn't support ARM64
+		// Add Windows explicitly if needed for AMD64/386 only builds
+		return []Platform{PlatformLinux, PlatformDarwin}
 	case ProjectTypeDesktop, ProjectTypeDaemon:
 		return []Platform{PlatformLinux, PlatformDarwin}
 	case ProjectTypeWebAPI, ProjectTypeGRPCService, ProjectTypeMicroservice:
 		return []Platform{PlatformLinux, PlatformDarwin}
 	case ProjectTypeLibrary:
-		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
+		// Note: Windows is not included by default because it doesn't support ARM64
+		return []Platform{PlatformLinux, PlatformDarwin}
 	case ProjectTypeMobile:
 		return []Platform{} // Mobile projects handled differently
 	case ProjectTypePlugin:
-		return []Platform{PlatformLinux, PlatformDarwin, PlatformWindows}
+		// Note: Windows is not included by default because it doesn't support ARM64
+		return []Platform{PlatformLinux, PlatformDarwin}
 	default:
 		return []Platform{PlatformLinux}
 	}
