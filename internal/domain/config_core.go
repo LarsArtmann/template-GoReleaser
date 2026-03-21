@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os/exec"
 
-	"gopkg.in/yaml.v3"
+	"github.com/go-faster/yaml"
 )
 
 // SafeProjectConfig represents single source of truth for project configuration

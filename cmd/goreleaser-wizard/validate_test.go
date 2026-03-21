@@ -21,9 +21,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // setupBasicTestProject creates a minimal test project with go.mod and optional .goreleaser.yaml.
@@ -143,9 +143,9 @@ go 1.21
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
-			// Reset viper
-			viper.Reset()
-			viper.Set("debug", false)
+			// Reset config manager
+			config.GetManager().Reset()
+			config.GetManager().Set("debug", false)
 
 			// Create test command
 			cmd := &cobra.Command{}
@@ -535,9 +535,9 @@ build:
 	os.Chdir(dir)
 	defer os.Chdir(originalDir)
 
-	// Reset viper
-	viper.Reset()
-	viper.Set("debug", false)
+	// Reset config manager
+	config.GetManager().Reset()
+	config.GetManager().Set("debug", false)
 
 	// Create test command
 	cmd := &cobra.Command{}

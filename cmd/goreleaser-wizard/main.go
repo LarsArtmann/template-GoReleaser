@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // Type alias for backward compatibility during migration
@@ -106,7 +106,7 @@ func init() {
 	infoStyle = lipgloss.NewStyle().
 		Foreground(lipgloss.Color("86"))
 
-	if viper.GetBool("debug") {
+	if config.GetManager().IsDebug() {
 		appLogger.(*LoggerAdapter).logger.SetLevel(log.DebugLevel)
 	}
 }
@@ -207,9 +207,8 @@ func init() {
 	rootCmd.PersistentFlags().Bool("no-color", false, "disable color output")
 	rootCmd.PersistentFlags().Bool("debug", false, "enable debug output")
 
-	// Bind flags to viper
-	viper.BindPFlag("no-color", rootCmd.PersistentFlags().Lookup("no-color"))
-	viper.BindPFlag("debug", rootCmd.PersistentFlags().Lookup("debug"))
+	// Bind flags to config manager
+	config.GetManager().RegisterFlags(rootCmd.PersistentFlags())
 
 	// Add commands
 	rootCmd.AddCommand(versionCmd)
@@ -223,49 +222,20 @@ func initConfig() {
 	// Set up panic recovery for config initialization
 	defer recoverFromPanic("config initialization")
 
-	if cfgFile != "" {
-		// Use config file from the flag.
-		viper.SetConfigFile(cfgFile)
-
-		// Validate the config file exists and is readable using domain types
-		err := validateFileExists(cfgFile, false)
-		if err != nil {
-			displayError(err)
-
-			return
-		}
-	} else {
-		// Find home directory.
-		home, err := os.UserHomeDir()
-		if err != nil {
+	if err := config.GetManager().Load(cfgFile); err != nil {
+		// Only log if it's not a "file not found" error for optional config
+		if cfgFile != "" {
 			displayError(domain.NewSystemError(
-				domain.ErrPermissionDenied,
-				"Unable to determine user home directory",
-				"System could not determine the user's home directory",
+				domain.ErrFileReadFailed,
+				"Failed to load configuration",
+				err.Error(),
 				err,
-			).WithContext("config_initialization"))
-
-			return
+			).WithContext(cfgFile))
 		}
-
-		// Search config in home directory with name ".goreleaser-wizard" (with .yaml extension).
-		viper.AddConfigPath(home)
-		viper.SetConfigName(".goreleaser-wizard")
-		viper.SetConfigType("yaml")
 	}
 
-	viper.SetEnvPrefix("GORELEASER_WIZARD")
-	viper.AutomaticEnv() // read in environment variables that match
-
-	// If a config file is found, read it in.
-	err := viper.ReadInConfig()
-	if err != nil {
-		// Only log if it's not a "file not found" error for optional config
-		if cfgFile != "" || !os.IsNotExist(err) {
-			log.Warn("Config file error", "error", err, "file", viper.ConfigFileUsed())
-		}
-	} else if viper.GetBool("debug") {
-		log.Info("Using config file", "file", viper.ConfigFileUsed())
+	if config.GetManager().IsDebug() {
+		log.Info("Configuration loaded")
 	}
 }
 

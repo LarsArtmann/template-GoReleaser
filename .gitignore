@@ -184,3 +184,5 @@ config.local.yml
 .circleci/local/
 .gitlab-ci-local/goreleaser-cli*
 .claude/settings.local.json
+# Dependencies
+node_modules/

@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/validation"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 func TestInitCommand(t *testing.T) {
@@ -59,8 +59,8 @@ go 1.21
 			os.Chdir(testDir)
 			defer os.Chdir(originalDir)
 
-			// Reset viper
-			viper.Reset()
+			// Reset config manager
+			config.GetManager().Reset()
 
 			// Create command
 			cmd := &cobra.Command{
@@ -322,26 +322,26 @@ func TestFlagHandling(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Reset viper
-			viper.Reset()
+			// Reset config manager
+			config.GetManager().Reset()
 
 			// Simulate flag parsing (simplified)
 			for flag, value := range tt.flags {
 				switch flag {
 				case "debug":
-					viper.Set("debug", value == "true")
+					config.GetManager().Set("debug", value == "true")
 				case "force":
-					viper.Set("force", value == "true")
+					config.GetManager().Set("force", value == "true")
 				default:
-					viper.Set(flag, value)
+					config.GetManager().Set(flag, value)
 				}
 			}
 
-			// Check viper values
+			// Check config values
 			for key, expected := range tt.expectedViper {
-				actual := viper.Get(key)
+				actual := config.GetManager().GetRaw(key)
 				if actual != expected {
-					t.Errorf("Viper.Get(%q) = %v, want %v", key, actual, expected)
+					t.Errorf("Config.Get(%q) = %v, want %v", key, actual, expected)
 				}
 			}
 		})
