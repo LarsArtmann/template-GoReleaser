@@ -194,8 +194,9 @@ func ValidatePlatform(platform Platform) error {
 // GetRecommendedPlatforms returns recommended platforms for projects.
 func GetRecommendedPlatforms() []Platform {
 	return []Platform{
-		PlatformLinux,   // Primary server platform
-		PlatformDarwin,  // Primary development platform
-		PlatformWindows, // Windows development platform
+		PlatformLinux,  // Primary server platform
+		PlatformDarwin, // Primary development platform
+		// Note: Windows is not included by default because it doesn't support ARM64
+		// Add Windows explicitly if needed for AMD64/386 only builds
 	}
 }

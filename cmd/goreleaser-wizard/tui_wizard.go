@@ -62,6 +62,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 		huh.NewOption("Linux", string(domain.PlatformLinux)),
 		huh.NewOption("macOS", string(domain.PlatformDarwin)),
 		huh.NewOption("Windows", string(domain.PlatformWindows)),
+		huh.NewOption("FreeBSD", string(domain.PlatformFreeBSD)),
 	}
 
 	archOptions := []huh.Option[string]{
@@ -106,15 +107,15 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 		huh.NewOption("Bitbucket", domain.GitProviderBitbucket),
 	}
 
-	// Advanced options
+	// Advanced options (default to true for richer configuration)
 	var includeLDFlags, enableSigning, generateSBOM, generateHomebrew, generateSnap, generateActions bool
 
-	includeLDFlags = config.LDFlags
-	enableSigning = config.SigningLevel != domain.SigningLevelNone
-	generateSBOM = config.SBOM
-	generateHomebrew = config.Homebrew
-	generateSnap = config.Snap
-	generateActions = config.ActionLevel != domain.ActionLevelNone
+	includeLDFlags = true
+	enableSigning = true
+	generateSBOM = true
+	generateHomebrew = true
+	generateSnap = true
+	generateActions = true
 
 	// Form theme with lipgloss
 	theme := huh.ThemeCharm()
@@ -321,6 +322,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				string(domain.PlatformLinux),
 				string(domain.PlatformDarwin),
 				string(domain.PlatformWindows),
+				string(domain.PlatformFreeBSD),
 			},
 			p,
 		) {

@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
@@ -155,29 +156,60 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	// Set configuration values
 	config.ProjectName = projectName
 	config.MainPath = mainPath
-	config.BinaryName = binaryName
+	// Use project name as binary name when main.go is in root (not temp dir name)
+	if mainPath == "." {
+		config.BinaryName = projectName
+	} else {
+		config.BinaryName = binaryName
+	}
 	config.ProjectType = domain.ProjectType(projectType)
+	config.ProjectDescription = git.GetGitHubRepoDescription()
 
 	return nil
 }
 
 // detectMainStructure detects the main.go structure and determines project type.
 func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
+	const cli = "cli"
+
 	// Check for main.go in root
 	if _, err := os.Stat(filepath.Join(wd, "main.go")); err == nil {
-		return ".", filepath.Base(wd), "cli"
+		return ".", filepath.Base(wd), cli
 	}
 
-	// Check for cmd/*/main.go structure
+	// Check for cmd/*/main.go structure (prefer single binary projects)
 	cmdDir := filepath.Join(wd, "cmd")
-	if entries, err := os.ReadDir(cmdDir); err == nil {
+	entries, err := os.ReadDir(cmdDir)
+	if err == nil {
+		// Collect all directories with main.go
+		var cmdDirs []string
 		for _, entry := range entries {
 			if entry.IsDir() {
 				mainFile := filepath.Join(cmdDir, entry.Name(), "main.go")
 				if _, err := os.Stat(mainFile); err == nil {
-					return "./cmd/" + entry.Name(), entry.Name(), "cli"
+					cmdDirs = append(cmdDirs, entry.Name())
 				}
 			}
+		}
+
+		if len(cmdDirs) > 0 {
+			// Single binary: use it directory name
+			if len(cmdDirs) == 1 {
+				return "./cmd/" + cmdDirs[0], cmdDirs[0], cli
+			}
+
+			// Multiple binaries: prefer the one matching project name or first alphabetically
+			binaryName := cmdDirs[0]
+			for _, dir := range cmdDirs {
+				if filepath.Base(wd) == dir {
+					binaryName = dir
+					break
+				}
+				if dir < binaryName {
+					binaryName = dir
+				}
+			}
+			return "./cmd/" + binaryName, binaryName, cli
 		}
 	}
 
@@ -189,7 +221,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 	}{
 		{"src/*/main.go", "", "library"},
 		{"pkg/*/main.go", "", "library"},
-		{"*.go", filepath.Base(wd), "cli"},
+		{"*.go", filepath.Base(wd), cli},
 	}
 
 	for _, pattern := range patterns {
@@ -199,7 +231,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 				// Extract binary name from path
 				parts := strings.Split(matches[0], string(filepath.Separator))
 				for i, part := range parts {
-					if part == "src" || part == "pkg" && i+1 < len(parts) {
+					if part == "src" || (part == "pkg" && i+1 < len(parts)) {
 						binaryName = filepath.Base(matches[0])
 						binaryName = strings.TrimSuffix(binaryName, ".go")
 
@@ -213,7 +245,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 	}
 
 	// Default fallback
-	return ".", filepath.Base(wd), "cli"
+	return ".", filepath.Base(wd), cli
 }
 
 func init() {

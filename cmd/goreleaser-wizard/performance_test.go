@@ -201,7 +201,18 @@ func TestPerformanceCharacteristics(t *testing.T) {
 			os.Chdir(tmpDir)
 
 			// Run full wizard workflow
-			config := &ProjectConfig{}
+			config := &ProjectConfig{
+				GitProvider:    domain.GitProviderGitHub,
+				ProjectType:    domain.ProjectTypeCLI,
+				CGOStatus:      domain.CGOStatusDisabled,
+				DockerSupport:  domain.DockerSupportNone,
+				DockerRegistry: domain.DockerRegistryDockerHub,
+				SigningLevel:   domain.SigningLevelNone,
+				ActionLevel:    domain.ActionLevelBasic,
+				FeatureLevel:   domain.FeatureLevelStandard,
+				State:          domain.ConfigStateValid,
+				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+			}
 			detectProjectInfo(config)
 
 			err := generateGoReleaserConfig(config)
@@ -309,7 +320,18 @@ func TestConcurrentOperations(t *testing.T) {
 			os.Chdir(tmpDir)
 
 			// Run wizard operations
-			config := &ProjectConfig{}
+			config := &ProjectConfig{
+				GitProvider:    domain.GitProviderGitHub,
+				ProjectType:    domain.ProjectTypeCLI,
+				CGOStatus:      domain.CGOStatusDisabled,
+				DockerSupport:  domain.DockerSupportNone,
+				DockerRegistry: domain.DockerRegistryDockerHub,
+				SigningLevel:   domain.SigningLevelNone,
+				ActionLevel:    domain.ActionLevelBasic,
+				FeatureLevel:   domain.FeatureLevelStandard,
+				State:          domain.ConfigStateValid,
+				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+			}
 			detectProjectInfo(config)
 
 			err := generateGoReleaserConfig(config)

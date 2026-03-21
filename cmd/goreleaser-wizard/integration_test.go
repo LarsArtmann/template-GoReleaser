@@ -61,6 +61,9 @@ require github.com/charmbracelet/bubbletea v0.25.0
 			config := &ProjectConfig{}
 			detectProjectInfo(config)
 
+			// Apply defaults to ensure all required fields are set
+			config.ApplyDefaults()
+
 			// Verify project was detected correctly
 			if config.ProjectName == "" {
 				t.Error("Project name should be detected")
@@ -125,11 +128,16 @@ func TestConfigurationValidation(t *testing.T) {
 				BinaryName:         "test-cli",
 				MainPath:           "./cmd/test-cli",
 				ProjectType:        domain.ProjectTypeCLI,
-				Platforms:          []domain.Platform{"linux", "darwin", "windows"},
+				Platforms:          []domain.Platform{"linux", "darwin"},
 				Architectures:      []domain.Architecture{"amd64", "arm64"},
 				CGOStatus:          domain.CGOStatusDisabled,
 				GitProvider:        domain.GitProviderGitHub,
+				DockerSupport:      domain.DockerSupportNone,
+				DockerRegistry:     domain.DockerRegistryDockerHub,
+				SigningLevel:       domain.SigningLevelNone,
 				ActionLevel:        domain.ActionLevelBasic,
+				FeatureLevel:       domain.FeatureLevelStandard,
+				State:              domain.ConfigStateValid,
 				ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 			},
 			expectError: false,
@@ -148,6 +156,11 @@ func TestConfigurationValidation(t *testing.T) {
 				GitProvider:        domain.GitProviderGitHub,
 				DockerSupport:      domain.DockerSupportBoth,
 				DockerRegistry:     domain.DockerRegistryGitHub,
+				SigningLevel:       domain.SigningLevelBasic,
+				ActionLevel:        domain.ActionLevelBasic,
+				FeatureLevel:       domain.FeatureLevelStandard,
+				State:              domain.ConfigStateValid,
+				ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
 				Homebrew:           true,
 			},
 			expectError: false,
@@ -155,8 +168,14 @@ func TestConfigurationValidation(t *testing.T) {
 		{
 			name: "missing_project_name",
 			config: ProjectConfig{
-				BinaryName: "test",
-				MainPath:   ".",
+				BinaryName:    "myapp",
+				MainPath:      ".",
+				DockerSupport: domain.DockerSupportNone,
+				DockerRegistry: domain.DockerRegistryDockerHub,
+				SigningLevel:  domain.SigningLevelNone,
+				ActionLevel:   domain.ActionLevelBasic,
+				FeatureLevel:  domain.FeatureLevelStandard,
+				State:         domain.ConfigStateValid,
 			},
 			expectError:   true,
 			errorContains: "project name",
@@ -164,8 +183,14 @@ func TestConfigurationValidation(t *testing.T) {
 		{
 			name: "missing_binary_name",
 			config: ProjectConfig{
-				ProjectName: "test",
-				MainPath:    ".",
+				ProjectName:   "myapp",
+				MainPath:      ".",
+				DockerSupport: domain.DockerSupportNone,
+				DockerRegistry: domain.DockerRegistryDockerHub,
+				SigningLevel:  domain.SigningLevelNone,
+				ActionLevel:   domain.ActionLevelBasic,
+				FeatureLevel:  domain.FeatureLevelStandard,
+				State:         domain.ConfigStateValid,
 			},
 			expectError:   true,
 			errorContains: "binary name",
@@ -276,14 +301,24 @@ func TestDifferentProjectTypes(t *testing.T) {
 			defer os.Chdir(originalDir)
 
 			// Create basic Go project
-			goMod := `module github.com/user/test
+			goMod := `module github.com/user/myapp
 go 1.21
 `
 			os.WriteFile("go.mod", []byte(goMod), 0o644)
 			os.WriteFile("main.go", []byte("package main\n\nfunc main() {}"), 0o644)
 
-			// Test project detection
-			config := &ProjectConfig{}
+			// Test project detection with valid defaults
+			config := &ProjectConfig{
+				GitProvider:    domain.GitProviderGitHub,
+				CGOStatus:      domain.CGOStatusDisabled,
+				DockerSupport:  domain.DockerSupportNone,
+				DockerRegistry: domain.DockerRegistryDockerHub,
+				SigningLevel:   domain.SigningLevelNone,
+				ActionLevel:    domain.ActionLevelBasic,
+				FeatureLevel:   domain.FeatureLevelStandard,
+				State:          domain.ConfigStateValid,
+				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+			}
 			detectProjectInfo(config)
 
 			// Override project type for testing

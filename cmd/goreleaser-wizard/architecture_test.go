@@ -25,9 +25,47 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+// createValidTestConfig creates a fully valid ProjectConfig for testing.
+func createValidTestConfig(name string) *ProjectConfig {
+	return &ProjectConfig{
+		ProjectName:    name,
+		BinaryName:     name,
+		MainPath:       ".",
+		ProjectType:    domain.ProjectTypeCLI,
+		Platforms:      []domain.Platform{domain.PlatformLinux, domain.PlatformDarwin},
+		Architectures:  []domain.Architecture{domain.ArchitectureAMD64, domain.ArchitectureARM64},
+		CGOStatus:      domain.CGOStatusDisabled,
+		GitProvider:    domain.GitProviderGitHub,
+		DockerSupport:  domain.DockerSupportNone,
+		DockerRegistry: domain.DockerRegistryDockerHub,
+		SigningLevel:   domain.SigningLevelNone,
+		ActionLevel:    domain.ActionLevelBasic,
+		FeatureLevel:   domain.FeatureLevelStandard,
+		State:          domain.ConfigStateValid,
+		ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+	}
+}
+
 // TestJobManager tests the job manager functionality.
 func TestJobManager(t *testing.T) {
 	logger := log.New(os.Stderr)
+
+	// Create temporary directory for testing
+	tmpDir, _ := os.MkdirTemp("", "jobmanager-test")
+	defer os.RemoveAll(tmpDir)
+
+	// Create basic project
+	goMod := `module github.com/user/jobmanager-test
+go 1.21
+`
+	os.WriteFile(tmpDir+"/go.mod", []byte(goMod), 0o644)
+	os.WriteFile(tmpDir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
+
+	// Change to test directory
+	originalDir, _ := os.Getwd()
+	defer os.Chdir(originalDir)
+	os.Chdir(tmpDir)
+
 	jm := NewJobManager(logger)
 
 	// Test basic job manager
@@ -115,12 +153,7 @@ go 1.21
 		},
 		{
 			name: "config_generation_success",
-			job: NewConfigGenerationJob(&ProjectConfig{
-				ProjectName: "job-test",
-				BinaryName:  "job-test",
-				MainPath:    ".",
-				GitProvider: "GitHub",
-			}, false, logger),
+			job:  NewConfigGenerationJob(createValidTestConfig("job-test"), false, logger),
 			wantErr: false,
 		},
 		{
@@ -170,12 +203,7 @@ go 1.21
 	}{
 		{
 			name: "config_generation_rollback",
-			job: NewConfigGenerationJob(&ProjectConfig{
-				ProjectName: "rollback-test",
-				BinaryName:  "rollback-test",
-				MainPath:    ".",
-				GitProvider: "GitHub",
-			}, false, logger),
+			job:             NewConfigGenerationJob(createValidTestConfig("rollback-test"), false, logger),
 			executeRollback: true,
 		},
 		{
@@ -250,12 +278,7 @@ go 1.21
 			workflow: func() *Workflow {
 				wf := NewWorkflow("Config Test", "Test config generation workflow", logger)
 				wf.JobManager.AddJob(NewProjectValidationJob(".", logger))
-				wf.JobManager.AddJob(NewConfigGenerationJob(&ProjectConfig{
-					ProjectName: "workflow-test",
-					BinaryName:  "workflow-test",
-					MainPath:    ".",
-					GitProvider: "GitHub",
-				}, false, logger))
+				wf.JobManager.AddJob(NewConfigGenerationJob(createValidTestConfig("workflow-test"), false, logger))
 				wf.SetTimeout(5 * time.Minute)
 
 				return wf
@@ -310,19 +333,8 @@ go 1.21
 
 	os.Chdir(tmpDir)
 
-	config := &ProjectConfig{
-		ProjectName:        "builder-test",
-		ProjectDescription: "A test project for workflow builder",
-		ProjectType:        "CLI Application",
-		BinaryName:         "builder-test",
-		MainPath:           ".",
-		Platforms:          []domain.Platform{domain.PlatformLinux, domain.PlatformDarwin},
-		Architectures:      []domain.Architecture{domain.ArchitectureAMD64},
-		CGOStatus:          domain.CGOStatusDisabled,
-		GitProvider:        domain.GitProviderGitHub,
-		ActionLevel:        domain.ActionLevelBasic,
-		ActionsOn:          []domain.ActionTrigger{domain.ActionTriggerVersionTags},
-	}
+	config := createValidTestConfig("builder-test")
+	config.ProjectDescription = "A test project for workflow builder"
 
 	tests := []struct {
 		name         string
@@ -339,7 +351,7 @@ go 1.21
 		{
 			name:         "config_only_workflow",
 			workflowType: WorkflowTypeConfigOnly,
-			force:        false,
+			force:        true, // Force to overwrite file from previous test
 			wantErr:      false,
 		},
 		{

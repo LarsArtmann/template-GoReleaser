@@ -183,6 +183,11 @@ jobs:
 
 // generateGoReleaserConfig generates GoReleaser configuration from SafeProjectConfig.
 func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
+	// Validate configuration before generating
+	if err := config.Validate(); err != nil {
+		return fmt.Errorf("configuration validation failed: %w", err)
+	}
+
 	// Generate configuration (state is managed by ConfigGenerationJob)
 
 	// Use embedded template for reliable distribution

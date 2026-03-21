@@ -8,6 +8,11 @@ import (
 
 // ApplyDefaults applies smart defaults based on project type and context.
 func (spc *SafeProjectConfig) ApplyDefaults() {
+	// Set default feature level first (required by other defaults)
+	if spc.FeatureLevel == "" {
+		spc.FeatureLevel = FeatureLevelStandard
+	}
+
 	// Apply project type-specific defaults
 	spc.applyProjectTypeDefaults()
 
