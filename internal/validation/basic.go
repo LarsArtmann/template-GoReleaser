@@ -422,6 +422,15 @@ func ValidateDockerRegistry(registry string) error {
 		).WithField("docker_registry").WithSuggestion("Use a valid domain name (e.g., registry.example.com)")
 	}
 
+	// Check for consecutive dots (invalid in domain names)
+	if strings.Contains(registry, "..") {
+		return errors.NewValidationError(
+			errors.ErrInvalidDockerRegistry,
+			"Invalid Docker registry URL format",
+			"Docker registry URL cannot contain consecutive dots",
+		).WithField("docker_registry").WithSuggestion("Use a valid domain name (e.g., registry.example.com)")
+	}
+
 	// Check for common registry domains
 	knownRegistries := []string{
 		"docker.io", "ghcr.io", "registry.gitlab.com", "gcr.io",
