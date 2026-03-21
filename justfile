@@ -20,6 +20,12 @@ build:
     go build -o goreleaser-wizard ./cmd/goreleaser-wizard
     @echo "✓ Build complete"
 
+# Install locally to GOBIN
+install-local:
+    @echo "Installing goreleaser-wizard to GOBIN..."
+    go install ./cmd/goreleaser-wizard/
+    @echo "✓ Installed goreleaser-wizard"
+
 # Run tests
 test:
     @echo "Running tests..."
