@@ -43,7 +43,7 @@ builds:
 
 archives:
   - id: default
-    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}"
+    name_template: "{{"{{"}}.ProjectName{{"}}"}}_{{"{{"}}.Version{{"}}"}}_{{"{{"}}.Os{{"}}"}}_{{"{{"}}.Arch{{"}}"}}"
     
     format_overrides:
       - goos: windows
@@ -59,7 +59,7 @@ checksum:
   algorithm: sha256
 
 snapshot:
-  version_template: "{{incpatch .Version}}-next"
+  version_template: "{{"{{"}}"incpatch .Version{{"}}"}}-next"
 
 changelog:
   sort: asc
@@ -74,8 +74,8 @@ changelog:
 
 release:
   github:
-    owner: "{{.Env.GITHUB_OWNER}}"
-    name: "{{.Env.GITHUB_REPO}}"
+    owner: "{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}"
+    name: "{{"{{"}}.Env.GITHUB_REPO{{"}}"}}"
   
   draft: false
   prerelease: auto
@@ -88,18 +88,18 @@ release:
 {{if .DockerEnabled}}
 dockers:
   - image_templates:
-      - "{{.DockerRegistry}}/{{.DockerImage}}:{{.Tag}}"
-      - "{{.DockerRegistry}}/{{.DockerImage}}:v{{.Major}}"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:v{{"{{"}}.Major{{"}}"}}"
       - "{{.DockerRegistry}}/{{.DockerImage}}:latest"
     
     dockerfile: Dockerfile
     
     build_flag_templates:
       - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.created={{"{{"}}.Date{{"}}"}}"
+      - "--label=org.opencontainers.image.title={{"{{"}}.ProjectName{{"}}"}}"
+      - "--label=org.opencontainers.image.revision={{"{{"}}.FullCommit{{"}}"}}"
+      - "--label=org.opencontainers.image.version={{"{{"}}.Version{{"}}"}}"
       - "--platform=linux/amd64"
 {{end}}`
 

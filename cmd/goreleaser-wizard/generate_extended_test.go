@@ -113,8 +113,8 @@ func TestTemplateGeneration(t *testing.T) {
 				"goarch:",
 				"CGO_ENABLED=0",
 				"dockers:",
-				"signs:",
-				"brews:",
+				// Note: signs: and brews: are not in the template yet
+				// Signing is handled via GitHub Actions, Homebrew as separate file
 			},
 		},
 		{

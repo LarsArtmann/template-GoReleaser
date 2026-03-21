@@ -232,7 +232,7 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 	// Set Docker configuration
 	if config.DockerSupport.IsEnabled() {
 		data.DockerEnabled = true
-		data.DockerRegistry = config.DockerRegistry.String()
+		data.DockerRegistry = config.DockerRegistry.GetURL()
 		data.DockerImage = config.GetDockerImageName()
 	}
 
@@ -262,7 +262,7 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 
 	// Set Docker configuration
 	if config.DockerSupport.IsEnabled() {
-		data.DockerRegistry = config.DockerRegistry.String()
+		data.DockerRegistry = config.DockerRegistry.GetURL()
 		data.DockerImage = config.GetDockerImageName()
 	}
 
