@@ -311,6 +311,7 @@ func TestConcurrentOperations(t *testing.T) {
 		)
 
 		originalDir, _ := os.Getwd()
+
 		os.Chdir(tmpDir)
 
 		// Run wizard operations

@@ -32,6 +32,7 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 			NonInteractiveHelp,
 		).WithContext("init wizard")
 		displayError(err)
+
 		return
 	}
 
@@ -162,6 +163,7 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	} else {
 		config.BinaryName = binaryName
 	}
+
 	config.ProjectType = domain.ProjectType(projectType)
 	config.ProjectDescription = git.GetGitHubRepoDescription()
 
@@ -179,10 +181,12 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 
 	// Check for cmd/*/main.go structure (prefer single binary projects)
 	cmdDir := filepath.Join(wd, "cmd")
+
 	entries, err := os.ReadDir(cmdDir)
 	if err == nil {
 		// Collect all directories with main.go
 		var cmdDirs []string
+
 		for _, entry := range entries {
 			if entry.IsDir() {
 				mainFile := filepath.Join(cmdDir, entry.Name(), "main.go")
@@ -203,12 +207,15 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 			for _, dir := range cmdDirs {
 				if filepath.Base(wd) == dir {
 					binaryName = dir
+
 					break
 				}
+
 				if dir < binaryName {
 					binaryName = dir
 				}
 			}
+
 			return "./cmd/" + binaryName, binaryName, cli
 		}
 	}

@@ -64,6 +64,7 @@ go 1.21
 	// Change to test directory
 	originalDir, _ := os.Getwd()
 	defer os.Chdir(originalDir)
+
 	os.Chdir(tmpDir)
 
 	jm := NewJobManager(logger)
@@ -202,8 +203,12 @@ go 1.21
 		executeRollback bool
 	}{
 		{
-			name:            "config_generation_rollback",
-			job:             NewConfigGenerationJob(createValidTestConfig("rollback-test"), false, logger),
+			name: "config_generation_rollback",
+			job: NewConfigGenerationJob(
+				createValidTestConfig("rollback-test"),
+				false,
+				logger,
+			),
 			executeRollback: true,
 		},
 		{
@@ -278,7 +283,9 @@ go 1.21
 			workflow: func() *Workflow {
 				wf := NewWorkflow("Config Test", "Test config generation workflow", logger)
 				wf.JobManager.AddJob(NewProjectValidationJob(".", logger))
-				wf.JobManager.AddJob(NewConfigGenerationJob(createValidTestConfig("workflow-test"), false, logger))
+				wf.JobManager.AddJob(
+					NewConfigGenerationJob(createValidTestConfig("workflow-test"), false, logger),
+				)
 				wf.SetTimeout(5 * time.Minute)
 
 				return wf

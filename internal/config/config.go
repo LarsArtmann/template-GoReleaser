@@ -53,16 +53,18 @@ func (m *Manager) Load(cfgFile string) error {
 	defer m.mu.Unlock()
 
 	// 1. Load defaults (lowest priority)
-	if err := m.k.Load(confmap.Provider(map[string]any{
+	err := m.k.Load(confmap.Provider(map[string]any{
 		"debug":    false,
 		"no-color": false,
-	}, "."), nil); err != nil {
+	}, "."), nil)
+	if err != nil {
 		return fmt.Errorf("failed to load defaults: %w", err)
 	}
 
 	// 2. Load config file if specified or found
 	if cfgFile != "" {
-		if err := m.loadFile(cfgFile); err != nil {
+		err := m.loadFile(cfgFile)
+		if err != nil {
 			return err
 		}
 	} else {
@@ -70,7 +72,8 @@ func (m *Manager) Load(cfgFile string) error {
 		if home, err := os.UserHomeDir(); err == nil {
 			configPath := filepath.Join(home, ".goreleaser-wizard.yaml")
 			if _, err := os.Stat(configPath); err == nil {
-				if err := m.loadFile(configPath); err != nil {
+				err := m.loadFile(configPath)
+				if err != nil {
 					// Config file exists but couldn't be read - warn but don't fail
 					fmt.Fprintf(os.Stderr, "Warning: could not read config file: %v\n", err)
 				}
@@ -79,28 +82,30 @@ func (m *Manager) Load(cfgFile string) error {
 	}
 
 	// 3. Load environment variables (higher priority)
-	if err := m.k.Load(env.Provider(".", env.Opt{
+	err := m.k.Load(env.Provider(".", env.Opt{
 		Prefix: "GORELEASER_WIZARD_",
 		TransformFunc: func(key, value string) (string, any) {
-			// GORELEASER_WIZARD_DEBUG -> debug
-			// GORELEASER_WIZARD_NO_COLOR -> no-color
 			key = strings.ToLower(key)
 			key = strings.ReplaceAll(key, "_", "-")
+
 			return key, value
 		},
-	}), nil); err != nil {
+	}), nil)
+	if err != nil {
 		return fmt.Errorf("failed to load environment: %w", err)
 	}
 
 	// 4. Load flags (highest priority)
 	if m.flags != nil {
-		if err := m.k.Load(posflag.Provider(m.flags, ".", m.k), nil); err != nil {
+		err := m.k.Load(posflag.Provider(m.flags, ".", m.k), nil)
+		if err != nil {
 			return fmt.Errorf("failed to load flags: %w", err)
 		}
 	}
 
 	// Unmarshal into config struct
-	if err := m.k.Unmarshal("", &m.cfg); err != nil {
+	err := m.k.Unmarshal("", &m.cfg)
+	if err != nil {
 		return fmt.Errorf("failed to unmarshal config: %w", err)
 	}
 
@@ -113,7 +118,8 @@ func (m *Manager) loadFile(path string) error {
 		return fmt.Errorf("config file not found: %s", path)
 	}
 
-	if err := m.k.Load(file.Provider(path), yaml.Parser()); err != nil {
+	err := m.k.Load(file.Provider(path), yaml.Parser())
+	if err != nil {
 		return fmt.Errorf("failed to load config file: %w", err)
 	}
 
@@ -124,6 +130,7 @@ func (m *Manager) loadFile(path string) error {
 func (m *Manager) Get() Config {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
+
 	return m.cfg
 }
 
@@ -143,7 +150,8 @@ func (m *Manager) Set(key string, value any) error {
 	defer m.mu.Unlock()
 
 	values := map[string]any{key: value}
-	if err := m.k.Load(confmap.Provider(values, "."), nil); err != nil {
+	err := m.k.Load(confmap.Provider(values, "."), nil)
+	if err != nil {
 		return err
 	}
 
@@ -163,10 +171,11 @@ func (m *Manager) Reset() {
 func (m *Manager) GetRaw(key string) any {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
+
 	return m.k.Get(key)
 }
 
-// Global config manager instance
+// Global config manager instance.
 var globalManager = NewManager()
 
 // GetManager returns the global config manager.

@@ -229,11 +229,12 @@ func ValidateMainPath(path string) error {
 	// Check for reserved system directories
 	reservedDirs := []string{"etc", "bin", "usr", "sbin", "var", "sys", "proc", "dev"}
 
-	components := strings.Split(normalizedPath, "/")
-	for _, component := range components {
+	components := strings.SplitSeq(normalizedPath, "/")
+	for component := range components {
 		if component == "" {
 			continue
 		}
+
 		lowerComponent := strings.ToLower(component)
 		if slices.Contains(invalidComponents, lowerComponent) {
 			return errors.NewValidationError(
@@ -242,6 +243,7 @@ func ValidateMainPath(path string) error {
 				fmt.Sprintf("'%s' is not allowed in path", component),
 			).WithField("main_path").WithSuggestion("Remove invalid components from path")
 		}
+
 		if slices.Contains(reservedDirs, lowerComponent) {
 			return errors.NewValidationError(
 				errors.ErrInvalidMainPath,
@@ -308,11 +310,13 @@ func ValidateProjectDescription(description string) error {
 	// Check for suspicious whitespace patterns (mostly spaces)
 	if len(trimmed) > 10 {
 		spaceCount := 0
+
 		for _, r := range trimmed {
 			if r == ' ' {
 				spaceCount++
 			}
 		}
+
 		if spaceCount > len(trimmed)/2 {
 			return errors.NewValidationError(
 				errors.ErrInvalidProjectDescription,

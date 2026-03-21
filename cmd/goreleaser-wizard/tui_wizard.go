@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"slices"
@@ -33,8 +34,10 @@ func IsTerminal() bool {
 // RunTUIWizard runs the interactive TUI wizard using huh.
 func RunTUIWizard(config *domain.SafeProjectConfig) error {
 	// Basic project information
-	var projectName, projectDesc, binaryName, mainPath string
-	var projectType domain.ProjectType
+	var (
+		projectName, projectDesc, binaryName, mainPath string
+		projectType                                    domain.ProjectType
+	)
 
 	projectName = config.ProjectName
 	projectDesc = config.ProjectDescription
@@ -55,8 +58,10 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 	}
 
 	// Platform and architecture selections
-	var selectedPlatforms []string
-	var selectedArchitectures []string
+	var (
+		selectedPlatforms     []string
+		selectedArchitectures []string
+	)
 
 	platformOptions := []huh.Option[string]{
 		huh.NewOption("Linux", string(domain.PlatformLinux)),
@@ -80,9 +85,11 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 	}
 
 	// CGO, Docker, Git Provider
-	var cgoStatus domain.CGOStatus
-	var dockerSupport domain.DockerSupport
-	var gitProvider domain.GitProvider
+	var (
+		cgoStatus     domain.CGOStatus
+		dockerSupport domain.DockerSupport
+		gitProvider   domain.GitProvider
+	)
 
 	cgoStatus = config.CGOStatus
 	dockerSupport = config.DockerSupport
@@ -135,7 +142,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&projectName).
 				Validate(func(s string) error {
 					if s == "" {
-						return fmt.Errorf("project name is required")
+						return errors.New("project name is required")
 					}
 
 					return domain.ValidateProjectName(s)
@@ -161,7 +168,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&binaryName).
 				Validate(func(s string) error {
 					if s == "" {
-						return fmt.Errorf("binary name is required")
+						return errors.New("binary name is required")
 					}
 
 					return domain.ValidateBinaryName(s)
@@ -174,7 +181,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&mainPath).
 				Validate(func(s string) error {
 					if s == "" {
-						return fmt.Errorf("main path is required")
+						return errors.New("main path is required")
 					}
 
 					return domain.ValidateMainPath(s)
@@ -200,7 +207,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&selectedPlatforms).
 				Validate(func(s []string) error {
 					if len(s) == 0 {
-						return fmt.Errorf("at least one platform is required")
+						return errors.New("at least one platform is required")
 					}
 
 					return nil
@@ -213,7 +220,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&selectedArchitectures).
 				Validate(func(s []string) error {
 					if len(s) == 0 {
-						return fmt.Errorf("at least one architecture is required")
+						return errors.New("at least one architecture is required")
 					}
 
 					return nil
@@ -316,6 +323,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 
 	// Convert platform selections
 	config.Platforms = nil
+
 	for _, p := range selectedPlatforms {
 		if slices.Contains(
 			[]string{
@@ -332,6 +340,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 
 	// Convert architecture selections
 	config.Architectures = nil
+
 	for _, a := range selectedArchitectures {
 		if slices.Contains(
 			[]string{string(domain.ArchitectureAMD64), string(domain.ArchitectureARM64)},

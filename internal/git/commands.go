@@ -331,7 +331,17 @@ func GetGitHubRepoDescription() string {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	cmd := exec.CommandContext(ctx, "gh", "repo", "view", "--json", "description", "-q", ".description")
+	cmd := exec.CommandContext(
+		ctx,
+		"gh",
+		"repo",
+		"view",
+		"--json",
+		"description",
+		"-q",
+		".description",
+	)
+
 	output, err := cmd.Output()
 	if err != nil {
 		return ""

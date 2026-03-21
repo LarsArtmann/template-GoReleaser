@@ -222,7 +222,8 @@ func initConfig() {
 	// Set up panic recovery for config initialization
 	defer recoverFromPanic("config initialization")
 
-	if err := config.GetManager().Load(cfgFile); err != nil {
+	err := config.GetManager().Load(cfgFile)
+	if err != nil {
 		// Only log if it's not a "file not found" error for optional config
 		if cfgFile != "" {
 			displayError(domain.NewSystemError(

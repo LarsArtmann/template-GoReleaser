@@ -16,14 +16,13 @@ builds:
   - id: concurrent-test-1
     main: .
     binary: concurrent-test-1
-    
+
     env:
       - CGO_ENABLED=0
-    
+
     goos:
 
     goarch:
-
 
     # Ignore certain platform combinations
     ignore:
@@ -32,23 +31,21 @@ builds:
       - goos: windows
         goarch: arm64
 
-
-
 archives:
   - id: default
     name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}"
-    
+
     format_overrides:
       - goos: windows
         format: zip
-    
+
     files:
       - LICENSE*
       - README*
       - CHANGELOG*
 
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
   algorithm: sha256
 
 snapshot:
@@ -59,9 +56,9 @@ changelog:
   use: github
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
-      - '^chore:'
+      - "^docs:"
+      - "^test:"
+      - "^chore:"
       - Merge pull request
       - Merge branch
 
@@ -69,13 +66,11 @@ release:
   github:
     owner: "{{.Env.GITHUB_OWNER}}"
     name: "{{.Env.GITHUB_REPO}}"
-  
+
   draft: false
   prerelease: auto
   mode: append
-  
+
   footer: |
     ## Installation
     Download the appropriate archive for your platform from the assets below.
-
-

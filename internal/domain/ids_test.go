@@ -94,8 +94,8 @@ func TestWorkflowID(t *testing.T) {
 
 		// These should work - same type
 		var (
-			_ JobID      = jobID
-			_ WorkflowID = workflowID
+			_ = jobID
+			_ = workflowID
 		)
 
 		// The compiler prevents this:
