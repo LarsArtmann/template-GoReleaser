@@ -31,7 +31,14 @@ func init() {
 	validateCmd.Flags().Bool("project-only", false, "validate project structure only")
 }
 
-func runValidate(cmd *cobra.Command, args []string) {
+func runValidate(cmd *cobra.Command, _ []string) {
+	exitCode := performValidation(cmd)
+	os.Exit(exitCode)
+}
+
+// performValidation executes the validation logic and returns the exit code.
+// This function is separated from runValidate to allow testing without os.Exit.
+func performValidation(cmd *cobra.Command) int {
 	// Set up panic recovery using domain error handling
 	defer recoverFromPanic("validate command")
 
@@ -54,7 +61,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 		if err != nil {
 			displayError(err)
 
-			return
+			return 1
 		}
 
 		// Validate GitHub Actions workflow
@@ -62,7 +69,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 		if err != nil {
 			displayError(err)
 
-			return
+			return 1
 		}
 	}
 
@@ -71,7 +78,7 @@ func runValidate(cmd *cobra.Command, args []string) {
 	if err != nil {
 		displayError(err)
 
-		return
+		return 1
 	}
 
 	// Display results
@@ -83,10 +90,9 @@ func runValidate(cmd *cobra.Command, args []string) {
 		if err != nil {
 			displayError(err)
 
-			return
+			return 1
 		}
 	}
 
-	// Exit with appropriate code
-	os.Exit(results.GetExitCode())
+	return results.GetExitCode()
 }

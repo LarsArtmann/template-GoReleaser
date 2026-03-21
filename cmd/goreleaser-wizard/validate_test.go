@@ -86,9 +86,11 @@ build:
     - amd64
 `
 				os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
-				// Create main.go
+				// Create cmd directory with main.go (expected project structure)
+				cmdDir := filepath.Join(dir, "cmd")
+				os.MkdirAll(cmdDir, 0o755)
 				os.WriteFile(
-					filepath.Join(dir, "main.go"),
+					filepath.Join(cmdDir, "main.go"),
 					[]byte("package main\n\nfunc main() {}"),
 					0o644,
 				)
@@ -169,7 +171,7 @@ go 1.21
 						return
 					}
 
-					t.Errorf("runValidate() panicked: %v", r)
+					t.Errorf("performValidation() panicked: %v", r)
 				}
 			}()
 
@@ -177,7 +179,7 @@ go 1.21
 			func() {
 				defer recoverFromPanic("validate test")
 
-				runValidate(cmd, tt.args)
+				performValidation(cmd)
 			}()
 		})
 	}
@@ -528,7 +530,11 @@ build:
   binary: test
 `
 	os.WriteFile(filepath.Join(dir, ".goreleaser.yaml"), []byte(goreleaser), 0o644)
-	os.WriteFile(filepath.Join(dir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
+
+	// Create cmd directory with main.go (expected project structure)
+	cmdDir := filepath.Join(dir, "cmd")
+	os.MkdirAll(cmdDir, 0o755)
+	os.WriteFile(filepath.Join(cmdDir, "main.go"), []byte("package main\n\nfunc main() {}"), 0o644)
 
 	originalDir, _ := os.Getwd()
 
@@ -548,7 +554,7 @@ build:
 	func() {
 		defer recoverFromPanic("validate output test")
 
-		runValidate(cmd, []string{})
+		performValidation(cmd)
 	}()
 
 	// If we get here without panic, the output formatting is working
