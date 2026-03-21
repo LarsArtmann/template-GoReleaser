@@ -36,7 +36,7 @@ builds:
 
 archives:
   - id: default
-    name_template: "concurrent-test-1_v0.1.0_{{.Os}}_{{.Arch}}"
+    name_template: "{{.ProjectName}}_{{.Version}}_{{.Os}}_{{.Arch}}"
     
     format_overrides:
       - goos: windows
@@ -52,7 +52,7 @@ checksum:
   algorithm: sha256
 
 snapshot:
-  version_template: "v0.1.1-next-next"
+  version_template: "{{incpatch .Version}}-next"
 
 changelog:
   sort: asc
@@ -67,8 +67,8 @@ changelog:
 
 release:
   github:
-    owner: "owner"
-    name: "repo"
+    owner: "{{.Env.GITHUB_OWNER}}"
+    name: "{{.Env.GITHUB_REPO}}"
   
   draft: false
   prerelease: auto

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -54,8 +53,8 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				"- amd64",
 				"- arm64",
 				"CGO_ENABLED=0",
-				`owner: "owner"`, // Template renders to actual value
-				`name: "repo"`,   // Template renders to actual value
+				`owner: "{{.Env.GITHUB_OWNER}}"`, // GoReleaser template variable
+				`name: "{{.Env.GITHUB_REPO}}"`,   // GoReleaser template variable
 			},
 		},
 		{
@@ -193,9 +192,6 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				}
 
 				contentStr := string(content)
-
-				// Debug: print content for debugging
-				fmt.Printf("Generated content (full):\n%s\n", contentStr)
 
 				// Check for expected strings
 				for _, check := range tt.checks {
