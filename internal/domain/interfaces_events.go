@@ -107,18 +107,18 @@ type EventBus interface {
 
 // BaseEvent provides a base implementation for domain events.
 type BaseEvent struct {
-	id          string
+	id          IdID
 	eventType   EventType
 	data        any
 	occurredAt  time.Time
-	aggregateID string
+	aggregateID AggregateID
 	version     int
 }
 
 // NewBaseEvent creates a new base event.
-func NewBaseEvent(eventType EventType, data any, aggregateID string) *BaseEvent {
+func NewBaseEvent(eventType EventType, data any, aggregateID AggregateID) *BaseEvent {
 	return &BaseEvent{
-		id:          generateEventID(),
+		id:          NewIdID(generateEventID()),
 		eventType:   eventType,
 		data:        data,
 		occurredAt:  time.Now(),
@@ -128,7 +128,7 @@ func NewBaseEvent(eventType EventType, data any, aggregateID string) *BaseEvent 
 }
 
 func (e *BaseEvent) ID() string {
-	return e.id
+	return e.id.Get()
 }
 
 func (e *BaseEvent) Type() EventType {
@@ -144,7 +144,7 @@ func (e *BaseEvent) OccurredAt() time.Time {
 }
 
 func (e *BaseEvent) AggregateID() string {
-	return e.aggregateID
+	return e.aggregateID.Get()
 }
 
 func (e *BaseEvent) Version() int {
@@ -174,15 +174,15 @@ func generateEventID() string {
 type ConfigCreatedEvent struct {
 	*BaseEvent
 
-	ConfigID    string `json:"config_id"`
-	ConfigType  string `json:"config_type"`
-	CreatedBy   string `json:"created_by"`
-	ProjectName string `json:"project_name"`
+	ConfigID    ConfigID `json:"config_id"`
+	ConfigType  string   `json:"config_type"`
+	CreatedBy   string   `json:"created_by"`
+	ProjectName string   `json:"project_name"`
 }
 
 // NewConfigCreatedEvent creates a new config created event.
 func NewConfigCreatedEvent(
-	configID, configType, createdBy, projectName string,
+	configID ConfigID, configType, createdBy, projectName string,
 ) *ConfigCreatedEvent {
 	return &ConfigCreatedEvent{
 		BaseEvent: NewBaseEvent(EventTypeConfigCreated, map[string]any{
@@ -190,7 +190,7 @@ func NewConfigCreatedEvent(
 			"config_type":  configType,
 			"created_by":   createdBy,
 			"project_name": projectName,
-		}, configID),
+		}, NewAggregateID(configID.Get())),
 		ConfigID:    configID,
 		ConfigType:  configType,
 		CreatedBy:   createdBy,
@@ -202,14 +202,14 @@ func NewConfigCreatedEvent(
 type JobStartedEvent struct {
 	*BaseEvent
 
-	JobID     string    `json:"job_id"`
+	JobID     JobID     `json:"job_id"`
 	JobName   string    `json:"job_name"`
 	StartedBy string    `json:"started_by"`
 	StartTime time.Time `json:"start_time"`
 }
 
 // NewJobStartedEvent creates a new job started event.
-func NewJobStartedEvent(jobID, jobName, startedBy string) *JobStartedEvent {
+func NewJobStartedEvent(jobID JobID, jobName, startedBy string) *JobStartedEvent {
 	startTime := time.Now()
 
 	return &JobStartedEvent{
@@ -218,7 +218,7 @@ func NewJobStartedEvent(jobID, jobName, startedBy string) *JobStartedEvent {
 			"job_name":   jobName,
 			"started_by": startedBy,
 			"start_time": startTime,
-		}, jobID),
+		}, NewAggregateID(jobID.Get())),
 		JobID:     jobID,
 		JobName:   jobName,
 		StartedBy: startedBy,
@@ -230,7 +230,7 @@ func NewJobStartedEvent(jobID, jobName, startedBy string) *JobStartedEvent {
 type WorkflowCompletedEvent struct {
 	*BaseEvent
 
-	WorkflowID     string        `json:"workflow_id"`
+	WorkflowID     WorkflowID    `json:"workflow_id"`
 	WorkflowName   string        `json:"workflow_name"`
 	StartTime      time.Time     `json:"start_time"`
 	EndTime        time.Time     `json:"end_time"`
@@ -242,7 +242,7 @@ type WorkflowCompletedEvent struct {
 
 // NewWorkflowCompletedEvent creates a new workflow completed event.
 func NewWorkflowCompletedEvent(
-	workflowID, workflowName string,
+	workflowID WorkflowID, workflowName string,
 	startTime, endTime time.Time,
 	totalJobs, successfulJobs, failedJobs int,
 ) *WorkflowCompletedEvent {
@@ -258,7 +258,7 @@ func NewWorkflowCompletedEvent(
 			"total_jobs":      totalJobs,
 			"successful_jobs": successfulJobs,
 			"failed_jobs":     failedJobs,
-		}, workflowID),
+		}, NewAggregateID(workflowID.Get())),
 		WorkflowID:     workflowID,
 		WorkflowName:   workflowName,
 		StartTime:      startTime,

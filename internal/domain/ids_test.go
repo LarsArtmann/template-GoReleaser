@@ -129,9 +129,17 @@ func TestGitHubRepoID(t *testing.T) {
 		id1 := NewGitHubRepoID(100)
 		id2 := NewGitHubRepoID(200)
 
-		assert.Equal(t, -1, id1.Compare(id2))
-		assert.Equal(t, 1, id2.Compare(id1))
-		assert.Equal(t, 0, id1.Compare(id1))
+		result, err := id1.Compare(id2)
+		require.NoError(t, err)
+		assert.Equal(t, -1, result)
+
+		result, err = id2.Compare(id1)
+		require.NoError(t, err)
+		assert.Equal(t, 1, result)
+
+		result, err = id1.Compare(id1)
+		require.NoError(t, err)
+		assert.Equal(t, 0, result)
 	})
 
 	t.Run("json serialization as number", func(t *testing.T) {

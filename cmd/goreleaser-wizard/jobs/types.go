@@ -7,12 +7,13 @@ import (
 	"time"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
 // JobExecutionStatus represents the status of a job execution.
 type JobExecutionStatus struct {
-	JobID       string                 `json:"job_id"`
+	JobID       domain.JobID           `json:"job_id"`
 	JobName     string                 `json:"job_name"`
 	Status      JobExecutionStatusType `json:"status"`
 	Duration    time.Duration          `json:"duration"`

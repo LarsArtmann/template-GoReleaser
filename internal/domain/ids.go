@@ -39,6 +39,12 @@ type (
 	jobBrand           struct{} // Brand for JobID
 	workflowBrand      struct{} // Brand for WorkflowID
 	executionPlanBrand struct{} // Brand for ExecutionPlanID
+	configBrand        struct{} // Brand for ConfigID
+	idBrand            struct{} // Brand for IdID
+	iDIDBrand          struct{} // Brand for IDID
+	keyBrand           struct{} // Brand for KeyID
+	aggregateBrand     struct{} // Brand for AggregateID
+	dockerImageBrand   struct{} // Brand for DockerImageID
 )
 
 // GitHub entity brands.
@@ -85,6 +91,30 @@ type (
 	// GitHubUserID is a strongly-typed GitHub user identifier.
 	// Use NewGitHubUserID() to create instances.
 	GitHubUserID = id.ID[gitHubUserBrand, int64]
+
+	// ConfigID is a strongly-typed configuration identifier.
+	// Use NewConfigID() to create instances.
+	ConfigID = id.ID[configBrand, string]
+
+	// IdID is a strongly-typed generic identifier.
+	// Use NewIdID() to create instances.
+	IdID = id.ID[idBrand, string]
+
+	// IDID is a strongly-typed identifier for generic ID fields.
+	// Use NewIDID() to create instances.
+	IDID = id.ID[iDIDBrand, string]
+
+	// KeyID is a strongly-typed signing key identifier.
+	// Use NewKeyID() to create instances.
+	KeyID = id.ID[keyBrand, string]
+
+	// AggregateID is a strongly-typed aggregate identifier for events.
+	// Use NewAggregateID() to create instances.
+	AggregateID = id.ID[aggregateBrand, string]
+
+	// DockerImageID is a strongly-typed Docker image identifier.
+	// Use NewDockerImageID() to create instances.
+	DockerImageID = id.ID[dockerImageBrand, string]
 )
 
 // Constructor functions for better ergonomics and type inference.
@@ -171,6 +201,26 @@ func NewGitHubUserID(value int64) GitHubUserID {
 	return id.NewID[gitHubUserBrand, int64](value)
 }
 
+// NewConfigID creates a new ConfigID from a string value.
+// Returns a zero ConfigID if the input is empty.
+func NewConfigID(value string) ConfigID { return id.NewID[configBrand](value) }
+
+// NewIdID creates a new IdID from a string value.
+// Returns a zero IdID if the input is empty.
+func NewIdID(value string) IdID { return id.NewID[idBrand](value) }
+
+// NewKeyID creates a new KeyID from a string value.
+// Returns a zero KeyID if the input is empty.
+func NewKeyID(value string) KeyID { return id.NewID[keyBrand](value) }
+
+// NewAggregateID creates a new AggregateID from a string value.
+// Returns a zero AggregateID if the input is empty.
+func NewAggregateID(value string) AggregateID { return id.NewID[aggregateBrand](value) }
+
+// NewDockerImageID creates a new DockerImageID from a string value.
+// Returns a zero DockerImageID if the input is empty.
+func NewDockerImageID(value string) DockerImageID { return id.NewID[dockerImageBrand](value) }
+
 // Compile-time interface assertions to ensure ID types implement expected interfaces.
 // These will fail at compile time if the ID types don't satisfy the interfaces.
 
@@ -179,6 +229,11 @@ var (
 	_ interface{ Get() string } = JobID{}
 	_ interface{ Get() string } = WorkflowID{}
 	_ interface{ Get() string } = ExecutionPlanID{}
+	_ interface{ Get() string } = ConfigID{}
+	_ interface{ Get() string } = IdID{}
+	_ interface{ Get() string } = KeyID{}
+	_ interface{ Get() string } = AggregateID{}
+	_ interface{ Get() string } = DockerImageID{}
 
 	_ interface{ IsZero() bool }     = JobID{}
 	_ interface{ Equal(JobID) bool } = JobID{}
@@ -193,6 +248,21 @@ var (
 	_ interface {
 		Or(ExecutionPlanID) ExecutionPlanID
 	} = ExecutionPlanID{}
+
+	_ interface{ IsZero() bool }        = ConfigID{}
+	_ interface{ Equal(ConfigID) bool } = ConfigID{}
+
+	_ interface{ IsZero() bool }    = IdID{}
+	_ interface{ Equal(IdID) bool } = IdID{}
+
+	_ interface{ IsZero() bool }     = KeyID{}
+	_ interface{ Equal(KeyID) bool } = KeyID{}
+
+	_ interface{ IsZero() bool }           = AggregateID{}
+	_ interface{ Equal(AggregateID) bool } = AggregateID{}
+
+	_ interface{ IsZero() bool }             = DockerImageID{}
+	_ interface{ Equal(DockerImageID) bool } = DockerImageID{}
 )
 
 // Int64-based IDs implement comparable operations.
@@ -203,11 +273,9 @@ var (
 	_ interface{ Get() int64 } = GitHubWorkflowID{}
 	_ interface{ Get() int64 } = GitHubUserID{}
 
-	_ interface{ IsZero() bool }             = GitHubRepoID{}
-	_ interface{ Equal(GitHubRepoID) bool }  = GitHubRepoID{}
-	_ interface{ Compare(GitHubRepoID) int } = GitHubRepoID{}
+	_ interface{ IsZero() bool }            = GitHubRepoID{}
+	_ interface{ Equal(GitHubRepoID) bool } = GitHubRepoID{}
 
-	_ interface{ IsZero() bool }                = GitHubReleaseID{}
-	_ interface{ Equal(GitHubReleaseID) bool }  = GitHubReleaseID{}
-	_ interface{ Compare(GitHubReleaseID) int } = GitHubReleaseID{}
+	_ interface{ IsZero() bool }               = GitHubReleaseID{}
+	_ interface{ Equal(GitHubReleaseID) bool } = GitHubReleaseID{}
 )
