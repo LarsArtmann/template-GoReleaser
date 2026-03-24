@@ -82,7 +82,7 @@ func (m *Manager) Load(cfgFile string) error {
 	}
 
 	// 3. Load environment variables (higher priority)
-	err := m.k.Load(env.Provider(".", env.Opt{
+	err = m.k.Load(env.Provider(".", env.Opt{
 		Prefix: "GORELEASER_WIZARD_",
 		TransformFunc: func(key, value string) (string, any) {
 			key = strings.ToLower(key)
@@ -97,14 +97,14 @@ func (m *Manager) Load(cfgFile string) error {
 
 	// 4. Load flags (highest priority)
 	if m.flags != nil {
-		err := m.k.Load(posflag.Provider(m.flags, ".", m.k), nil)
+		err = m.k.Load(posflag.Provider(m.flags, ".", m.k), nil)
 		if err != nil {
 			return fmt.Errorf("failed to load flags: %w", err)
 		}
 	}
 
 	// Unmarshal into config struct
-	err := m.k.Unmarshal("", &m.cfg)
+	err = m.k.Unmarshal("", &m.cfg)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal config: %w", err)
 	}
@@ -150,6 +150,7 @@ func (m *Manager) Set(key string, value any) error {
 	defer m.mu.Unlock()
 
 	values := map[string]any{key: value}
+
 	err := m.k.Load(confmap.Provider(values, "."), nil)
 	if err != nil {
 		return err
