@@ -10,6 +10,15 @@ import (
 	"github.com/charmbracelet/huh"
 )
 
+// Sentinel errors for TUI validation.
+var (
+	ErrProjectNameRequired    = errors.New("project name is required")
+	ErrBinaryNameRequired     = errors.New("binary name is required")
+	ErrMainPathRequired       = errors.New("main path is required")
+	ErrPlatformRequired       = errors.New("at least one platform is required")
+	ErrArchitectureRequired   = errors.New("at least one architecture is required")
+)
+
 // NonInteractiveHelp is the help message shown when interactive mode is requested
 // but the command is not running in a terminal.
 const NonInteractiveHelp = `Interactive mode requires a terminal.
@@ -142,7 +151,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&projectName).
 				Validate(func(s string) error {
 					if s == "" {
-						return errors.New("project name is required")
+						return fmt.Errorf("validation failed: %w", ErrProjectNameRequired)
 					}
 
 					return domain.ValidateProjectName(s)
@@ -168,7 +177,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&binaryName).
 				Validate(func(s string) error {
 					if s == "" {
-						return errors.New("binary name is required")
+						return fmt.Errorf("validation failed: %w", ErrBinaryNameRequired)
 					}
 
 					return domain.ValidateBinaryName(s)
@@ -181,7 +190,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&mainPath).
 				Validate(func(s string) error {
 					if s == "" {
-						return errors.New("main path is required")
+						return fmt.Errorf("validation failed: %w", ErrMainPathRequired)
 					}
 
 					return domain.ValidateMainPath(s)
