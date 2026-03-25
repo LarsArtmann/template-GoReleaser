@@ -21,8 +21,8 @@ import (
 	"strings"
 	"testing"
 
+	"charm.land/lipgloss/v2"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
-	"github.com/charmbracelet/lipgloss"
 	"github.com/spf13/cobra"
 )
 

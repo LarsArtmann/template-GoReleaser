@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"strings"
 
+	"charm.land/log/v2"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
-	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
 

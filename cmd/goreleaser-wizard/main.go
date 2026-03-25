@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"os"
 
+	"charm.land/lipgloss/v2"
+	"charm.land/log/v2"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/charmbracelet/lipgloss"
-	"github.com/charmbracelet/log"
 	"github.com/spf13/cobra"
 )
 

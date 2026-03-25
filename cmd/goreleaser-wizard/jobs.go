@@ -23,10 +23,10 @@ import (
 	"text/template"
 	"time"
 
+	"charm.land/log/v2"
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
-	"github.com/charmbracelet/log"
 )
 
 const workflowDirPermission = 0o755
@@ -811,7 +811,14 @@ func getVersion() string {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if cmd := exec.CommandContext(ctx, "git", "describe", "--tags", "--always", "--dirty"); cmd != nil {
+	if cmd := exec.CommandContext(
+		ctx,
+		"git",
+		"describe",
+		"--tags",
+		"--always",
+		"--dirty",
+	); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			if version := strings.TrimSpace(string(output)); version != "" {
 				return version

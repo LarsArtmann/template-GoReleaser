@@ -21,8 +21,8 @@ import (
 	"testing"
 	"time"
 
+	"charm.land/log/v2"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/charmbracelet/log"
 )
 
 // createValidTestConfig creates a fully valid ProjectConfig for testing.

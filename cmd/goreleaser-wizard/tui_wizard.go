@@ -12,11 +12,11 @@ import (
 
 // Sentinel errors for TUI validation.
 var (
-	ErrProjectNameRequired    = errors.New("project name is required")
-	ErrBinaryNameRequired     = errors.New("binary name is required")
-	ErrMainPathRequired       = errors.New("main path is required")
-	ErrPlatformRequired       = errors.New("at least one platform is required")
-	ErrArchitectureRequired   = errors.New("at least one architecture is required")
+	ErrProjectNameRequired  = errors.New("project name is required")
+	ErrBinaryNameRequired   = errors.New("binary name is required")
+	ErrMainPathRequired     = errors.New("main path is required")
+	ErrPlatformRequired     = errors.New("at least one platform is required")
+	ErrArchitectureRequired = errors.New("at least one architecture is required")
 )
 
 // NonInteractiveHelp is the help message shown when interactive mode is requested
