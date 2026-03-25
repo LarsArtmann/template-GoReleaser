@@ -322,9 +322,13 @@ func (jm *JobManager) GetStatistics() map[string]any {
 		totalDuration += result.Duration
 		switch result.Status {
 		case JobStatusCompleted:
-			stats["completed"] = stats["completed"].(int) + 1
+			if v, ok := stats["completed"].(int); ok {
+				stats["completed"] = v + 1
+			}
 		case JobStatusFailed:
-			stats["failed"] = stats["failed"].(int) + 1
+			if v, ok := stats["failed"].(int); ok {
+				stats["failed"] = v + 1
+			}
 		}
 	}
 

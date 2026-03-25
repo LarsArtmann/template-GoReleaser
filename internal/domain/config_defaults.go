@@ -35,12 +35,12 @@ func (spc *SafeProjectConfig) applyProjectTypeDefaults() {
 	}
 
 	// Set platforms based on project type
-	if spc.Platforms == nil || len(spc.Platforms) == 0 {
+	if len(spc.Platforms) == 0 {
 		spc.Platforms = spc.ProjectType.RecommendedPlatforms()
 	}
 
 	// Set architectures based on project type
-	if spc.Architectures == nil || len(spc.Architectures) == 0 {
+	if len(spc.Architectures) == 0 {
 		spc.Architectures = spc.ProjectType.RecommendedArchitectures()
 	}
 
@@ -119,7 +119,7 @@ func (spc *SafeProjectConfig) applyGeneralDefaults() {
 	}
 
 	// Set default action triggers if actions are enabled
-	if spc.ActionLevel.IsEnabled() && (spc.ActionsOn == nil || len(spc.ActionsOn) == 0) {
+	if spc.ActionLevel.IsEnabled() && len(spc.ActionsOn) == 0 {
 		spc.ActionsOn = spc.ActionLevel.GetRecommendedTriggers()
 	}
 

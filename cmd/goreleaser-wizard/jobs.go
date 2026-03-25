@@ -21,6 +21,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
@@ -807,7 +808,10 @@ func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) Job {
 // getVersion gets the current version from git or fallback.
 func getVersion() string {
 	// Try to get version from git
-	if cmd := exec.Command("git", "describe", "--tags", "--always", "--dirty"); cmd != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if cmd := exec.CommandContext(ctx, "git", "describe", "--tags", "--always", "--dirty"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			if version := strings.TrimSpace(string(output)); version != "" {
 				return version
@@ -826,7 +830,10 @@ func getVersion() string {
 
 // getCommitHash gets the current git commit hash.
 func getCommitHash() string {
-	if cmd := exec.Command("git", "rev-parse", "HEAD"); cmd != nil {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if cmd := exec.CommandContext(ctx, "git", "rev-parse", "HEAD"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			if hash := strings.TrimSpace(string(output)); hash != "" {
 				return hash

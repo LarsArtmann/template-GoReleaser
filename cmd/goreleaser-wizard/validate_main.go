@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 // validateGoReleaserConfig validates GoReleaser configuration.
@@ -52,7 +53,10 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 	if _, err := exec.LookPath("goreleaser"); err == nil {
 		results.GoReleaserFound = true
 		// Run goreleaser check
-		cmd := exec.Command("goreleaser", "check", "--config", configPath)
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		cmd := exec.CommandContext(ctx, "goreleaser", "check", "--config", configPath)
 		if output, err := cmd.CombinedOutput(); err != nil {
 			results.ConfigValid = false
 			results.Errors = append(results.Errors,

@@ -107,7 +107,9 @@ func init() {
 		Foreground(lipgloss.Color("86"))
 
 	if config.GetManager().IsDebug() {
-		appLogger.(*LoggerAdapter).logger.SetLevel(log.DebugLevel)
+		if la, ok := appLogger.(*LoggerAdapter); ok {
+			la.logger.SetLevel(log.DebugLevel)
+		}
 	}
 }
 
