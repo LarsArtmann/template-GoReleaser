@@ -250,7 +250,7 @@ func validateFileExists(path string, requireDir bool) *domain.DomainError {
 			return domain.NewSystemError(
 				domain.ErrFileNotFound,
 				"File not found",
-				fmt.Sprintf("File %s does not exist", path),
+				fmt.Sprintf("File %s does not exist, require_dir=%t", path, requireDir),
 				err,
 			).WithContext(path)
 		}
@@ -258,7 +258,7 @@ func validateFileExists(path string, requireDir bool) *domain.DomainError {
 		return domain.NewSystemError(
 			domain.ErrFileReadFailed,
 			"File access error",
-			"Cannot access "+path,
+			fmt.Sprintf("Cannot access %s, require_dir=%t", path, requireDir),
 			err,
 		).WithContext(path)
 	}
@@ -267,7 +267,7 @@ func validateFileExists(path string, requireDir bool) *domain.DomainError {
 		return domain.NewValidationError(
 			domain.ErrInvalidCharacters,
 			"Expected directory",
-			path+" is not a directory",
+			fmt.Sprintf("%s is not a directory, require_dir=%t", path, requireDir),
 		).WithContext(path)
 	}
 

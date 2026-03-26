@@ -293,7 +293,7 @@ func (p *JobExecutionPlan) checkCircularDependency(
 	for _, depID := range p.GetDependencies(jobID) {
 		err := p.checkCircularDependency(depID, visited, recursionStack)
 		if err != nil {
-			return err
+			return fmt.Errorf("checking circular dependency for job %s: %w", jobID, err)
 		}
 	}
 
