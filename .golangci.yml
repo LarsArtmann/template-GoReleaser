@@ -1,92 +1,98 @@
 version: "2"
-
 run:
   timeout: 5m
   go: "1.25"
+  build-tags: []
   modules-download-mode: readonly
   allow-parallel-runners: true
+  allow-serial-runners: false
   tests: true
-
+output:
+  formats: {}
 linters:
-  default: none
   enable:
-    - errcheck
-    - staticcheck
-    - govet
-    - ineffassign
-    - unused
-    - gosec
-    - gocritic
-    - misspell
     - dupl
     - goconst
-    - predeclared
-    - unconvert
     - wastedassign
     - errorlint
-    - errname
-    - copyloopvar
-    - intrange
-    - usestdlibvars
-    - testifylint
-    - thelper
-    - gocyclo
-    - funlen
-    - cyclop
-    - revive
-    - whitespace
     - nlreturn
-    - godot
-    - makezero
-    - nakedret
-    - reassign
-    - dogsled
-    - durationcheck
+    - protogetter
+    - funlen
     - asciicheck
-
+    - bodyclose
+    - loggercheck
+    - thelper
+    - cyclop
+    - durationcheck
+    - gochecknoglobals
+    - interfacebloat
+    - recvcheck
+    - gochecksumtype
+    - maintidx
+    - paralleltest
+    - unparam
+    - usetesting
+    - unused
+    - gocritic
+    - reassign
+    - errcheck
+    - gosec
+    - prealloc
+    - nilnesserr
+    - govet
+    - misspell
+    - copyloopvar
+    - usestdlibvars
+    - exhaustive
+    - mirror
+    - dogsled
+    - errchkjson
+    - exhaustruct
+    - makezero
+    - staticcheck
+    - intrange
+    - nolintlint
+    - nakedret
+    - noctx
+    - gochecknoinits
+    - nilnil
+    - sqlclosecheck
+    - revive
+    - contextcheck
+    - forcetypeassert
+    - gosmopolitan
+    - zerologlint
+    - gocyclo
+    - sloglint
+    - testifylint
+    - gocognit
+    - musttag
+    - godot
+    - wrapcheck
+    - ginkgolinter
+    - nestif
+    - perfsprint
+    - rowserrcheck
+    - nilerr
+    - ineffassign
+    - predeclared
+    - unconvert
+    - errname
+    - whitespace
+    - spancheck
+  default: none
   settings:
-    revive:
-      rules:
-        - name: exported
-          disabled: true
-        - name: package-comments
-          disabled: true
-        - name: unused-parameter
-          disabled: true
-        - name: var-naming
-          disabled: true
-        - name: increment-decrement
-          disabled: true
-        - name: indent-error-flow
-          disabled: true
-        - name: empty-block
-          disabled: true
-        - name: redefines-builtin-id
-          disabled: true
-        - name: context-as-argument
-          disabled: true
-        - name: receiver-naming
-          disabled: true
-        - name: early-return
-          disabled: true
-        - name: identical-ifelseif-branches
-          disabled: true
-
     cyclop:
       max-complexity: 25
-
     funlen:
       lines: 350
       statements: 150
-
     goconst:
       min-len: 5
       min-occurrences: 6
-
     gocritic:
       disabled-checks:
         - ifElseChain
-
     gosec:
       excludes:
         - G304
@@ -94,7 +100,32 @@ linters:
         - G301
         - G117
         - G204
-
+    revive:
+      rules:
+        - disabled: true
+          name: exported
+        - disabled: true
+          name: package-comments
+        - disabled: true
+          name: unused-parameter
+        - disabled: true
+          name: var-naming
+        - disabled: true
+          name: increment-decrement
+        - disabled: true
+          name: indent-error-flow
+        - disabled: true
+          name: empty-block
+        - disabled: true
+          name: redefines-builtin-id
+        - disabled: true
+          name: context-as-argument
+        - disabled: true
+          name: receiver-naming
+        - disabled: true
+          name: early-return
+        - disabled: true
+          name: identical-ifelseif-branches
   exclusions:
     generated: lax
     rules:
@@ -112,23 +143,21 @@ linters:
           - thelper
           - unconvert
           - unused
-
-      - path: '.*\.generated\.go$'
+      - path: .*\.generated\.go$
         linters:
           - all
-
-      - linters:
+      - source: ^(//|/\*) .*TODO|FIXME|BUG|NOTE|HACK
+        linters:
           - godot
-        source: '^(//|/\*) .*TODO|FIXME|BUG|NOTE|HACK'
-
     paths:
       - vendor
       - third_party
       - testdata
       - examples
       - internal/mock
-      - ".*\\.pb\\.go$"
-      - ".*\\.gen\\.go$"
-
+      - .*\.pb\.go$
+      - .*\.gen\.go$
 formatters:
-  enable: []
+  enable:
+    - golines
+issues: {}
