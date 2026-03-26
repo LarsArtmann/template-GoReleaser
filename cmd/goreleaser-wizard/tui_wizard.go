@@ -151,7 +151,10 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&projectName).
 				Validate(func(s string) error {
 					if s == "" {
-						return fmt.Errorf("project_name validation failed: %w", ErrProjectNameRequired)
+						return fmt.Errorf(
+							"project_name validation failed: %w",
+							ErrProjectNameRequired,
+						)
 					}
 
 					return domain.ValidateProjectName(s)
@@ -177,7 +180,10 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&binaryName).
 				Validate(func(s string) error {
 					if s == "" {
-						return fmt.Errorf("binary_name validation failed: %w", ErrBinaryNameRequired)
+						return fmt.Errorf(
+							"binary_name validation failed: %w",
+							ErrBinaryNameRequired,
+						)
 					}
 
 					return domain.ValidateBinaryName(s)
@@ -229,7 +235,10 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&selectedArchitectures).
 				Validate(func(s []string) error {
 					if len(s) == 0 {
-						return fmt.Errorf("architectures validation failed: %w", ErrArchitectureRequired)
+						return fmt.Errorf(
+							"architectures validation failed: %w",
+							ErrArchitectureRequired,
+						)
 					}
 
 					return nil
