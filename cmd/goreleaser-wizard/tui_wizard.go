@@ -6,8 +6,8 @@ import (
 	"os"
 	"slices"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"charm.land/huh/v2"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // Sentinel errors for TUI validation.
