@@ -1,10 +1,10 @@
 module github.com/LarsArtmann/GoReleaser-Wizard
 
-go 1.26
+go 1.26.1
 
 require (
-	charm.land/huh/v2 v2.0.0
-	charm.land/lipgloss/v2 v2.0.1
+	charm.land/huh/v2 v2.0.3
+	charm.land/lipgloss/v2 v2.0.2
 	charm.land/log/v2 v2.0.0
 	github.com/go-faster/yaml v0.4.6
 	github.com/knadh/koanf/parsers/yaml v1.1.0
@@ -21,11 +21,11 @@ require (
 
 require (
 	charm.land/bubbles/v2 v2.0.0 // indirect
-	charm.land/bubbletea/v2 v2.0.0 // indirect
+	charm.land/bubbletea/v2 v2.0.2 // indirect
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20260205113103-524a6607adb8 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20260316091819-b93f6a3b8502 // indirect
 	github.com/charmbracelet/x/ansi v0.11.6 // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
