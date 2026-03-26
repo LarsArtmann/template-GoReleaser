@@ -7,7 +7,7 @@ import (
 	"slices"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/charmbracelet/huh"
+	"charm.land/huh/v2"
 )
 
 // Sentinel errors for TUI validation.
@@ -134,7 +134,7 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 	generateActions = true
 
 	// Form theme with lipgloss
-	theme := huh.ThemeCharm()
+	theme := huh.ThemeFunc(huh.ThemeCharm)
 
 	// Build the form
 	form := huh.NewForm(
