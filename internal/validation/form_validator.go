@@ -159,11 +159,11 @@ func (fv *FormValidator) ValidateRequired(fieldName string) func(string) error {
 }
 
 // ValidateLength validates string length within bounds.
-func (fv *FormValidator) ValidateLength(min, max int, fieldName string) func(string) error {
+func (fv *FormValidator) ValidateLength(minLen, maxLen int, fieldName string) func(string) error {
 	return func(value string) error {
 		length := len(strings.TrimSpace(value))
-		if length < min || length > max {
-			err := fmt.Errorf("%s must be between %d and %d characters", fieldName, min, max)
+		if length < minLen || length > maxLen {
+			err := fmt.Errorf("%s must be between %d and %d characters", fieldName, minLen, maxLen)
 			fv.errors[fieldName] = err.Error()
 
 			return err

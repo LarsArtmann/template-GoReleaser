@@ -137,6 +137,6 @@ func removeEmptyDirectory(logger Logger, dirPath string) error {
 // removeEmptyDirectories removes empty directories in a parent chain.
 func removeEmptyDirectories(logger Logger, parentDirs []string) {
 	for _, dir := range parentDirs {
-		removeEmptyDirectory(logger, dir)
+		_ = removeEmptyDirectory(logger, dir)
 	}
 }

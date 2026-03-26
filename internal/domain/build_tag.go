@@ -159,8 +159,3 @@ func CreateBuildTag(name, description string) BuildTag {
 		Description: description,
 	}
 }
-
-// contains checks if slice contains string.
-func contains(slice []string, item string) bool {
-	return slices.Contains(slice, item)
-}

@@ -57,7 +57,7 @@ func (p Platform) String() string {
 	case PlatformIOS:
 		return "iOS"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 

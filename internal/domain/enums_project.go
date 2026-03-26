@@ -53,7 +53,7 @@ func (pt ProjectType) String() string {
 	case ProjectTypeTool:
 		return "Command Line Tool"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 
@@ -187,7 +187,7 @@ func (fl FeatureLevel) String() string {
 	case FeatureLevelEnterprise:
 		return "Enterprise"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 

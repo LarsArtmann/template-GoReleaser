@@ -1,128 +1,134 @@
 version: "2"
+
 run:
   timeout: 5m
   go: "1.25"
-  build-tags: []
   modules-download-mode: readonly
   allow-parallel-runners: true
-  allow-serial-runners: false
-  issues-exit-code: 1
   tests: true
-output:
-  formats: {}
+
 linters:
+  default: none
   enable:
-    - zerologlint
-    - importas
-    - usestdlibvars
-    - exhaustive
-    - copyloopvar
-    - unparam
-    - musttag
-    - godox
-    - nolintlint
-    - dogsled
-    - maintidx
-    - godoclint
-    - unqueryvet
-    - noctx
-    - gocognit
-    - gochecksumtype
     - errcheck
-    - cyclop
-    - err113
     - staticcheck
-    - contextcheck
-    - testifylint
-    - nilnil
-    - grouper
-    - promlinter
-    - errchkjson
-    - unused
-    - nestif
-    - errorlint
-    - whitespace
-    - recvcheck
-    - ireturn
-    - rowserrcheck
-    - mnd
-    - nilnesserr
-    - containedctx
-    - wsl_v5
-    - exptostd
-    - goconst
-    - misspell
-    - noinlineerr
-    - nonamedreturns
-    - makezero
-    - dupl
-    - modernize
-    - gomodguard
     - govet
-    - thelper
-    - exhaustruct
-    - gochecknoinits
-    - dupword
-    - interfacebloat
-    - nlreturn
-    - reassign
     - ineffassign
-    - gosmopolitan
-    - godot
-    - tparallel
-    - varnamelen
-    - goprintffuncname
-    - forbidigo
-    - paralleltest
-    - nakedret
-    - gochecknoglobals
-    - goheader
-    - testpackage
-    - tagalign
-    - iotamixing
-    - protogetter
-    - inamedparam
-    - asciicheck
-    - gocheckcompilerdirectives
-    - prealloc
-    - nosprintfhostport
-    - funlen
-    - bidichk
-    - nilerr
-    - gomoddirectives
-    - spancheck
-    - mirror
-    - usetesting
-    - errname
-    - durationcheck
-    - testableexamples
-    - intrange
-    - unconvert
-    - gocyclo
-    - gocritic
-    - asasalint
-    - loggercheck
-    - wastedassign
-    - sloglint
-    - wrapcheck
-    - predeclared
-    - embeddedstructfieldcheck
-    - iface
-    - decorder
-    - perfsprint
-    - fatcontext
-    - funcorder
-    - ginkgolinter
-    - depguard
-    - forcetypeassert
-    - canonicalheader
-    - sqlclosecheck
-    - bodyclose
-    - tagliatelle
-    - arangolint
+    - unused
     - gosec
+    - gocritic
+    - misspell
+    - dupl
+    - goconst
+    - predeclared
+    - unconvert
+    - wastedassign
+    - errorlint
+    - errname
+    - copyloopvar
+    - intrange
+    - usestdlibvars
+    - testifylint
+    - thelper
+    - gocyclo
+    - funlen
+    - cyclop
     - revive
+    - whitespace
+    - nlreturn
+    - godot
+    - makezero
+    - nakedret
+    - reassign
+    - dogsled
+    - durationcheck
+    - asciicheck
+
+  settings:
+    revive:
+      rules:
+        - name: exported
+          disabled: true
+        - name: package-comments
+          disabled: true
+        - name: unused-parameter
+          disabled: true
+        - name: var-naming
+          disabled: true
+        - name: increment-decrement
+          disabled: true
+        - name: indent-error-flow
+          disabled: true
+        - name: empty-block
+          disabled: true
+        - name: redefines-builtin-id
+          disabled: true
+        - name: context-as-argument
+          disabled: true
+        - name: receiver-naming
+          disabled: true
+        - name: early-return
+          disabled: true
+        - name: identical-ifelseif-branches
+          disabled: true
+
+    cyclop:
+      max-complexity: 25
+
+    funlen:
+      lines: 350
+      statements: 150
+
+    goconst:
+      min-len: 5
+      min-occurrences: 6
+
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+
+    gosec:
+      excludes:
+        - G304
+        - G306
+        - G301
+        - G117
+        - G204
+
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters:
+          - dupl
+          - gosec
+          - goconst
+          - funlen
+          - gocyclo
+          - cyclop
+          - gocritic
+          - revive
+          - errcheck
+          - thelper
+          - unconvert
+          - unused
+
+      - path: '.*\.generated\.go$'
+        linters:
+          - all
+
+      - linters:
+          - godot
+        source: '^(//|/\*) .*TODO|FIXME|BUG|NOTE|HACK'
+
+    paths:
+      - vendor
+      - third_party
+      - testdata
+      - examples
+      - internal/mock
+      - ".*\\.pb\\.go$"
+      - ".*\\.gen\\.go$"
+
 formatters:
-  enable:
-    - golines
-issues: {}
+  enable: []

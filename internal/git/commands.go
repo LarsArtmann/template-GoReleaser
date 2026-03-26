@@ -14,6 +14,8 @@ import (
 const defaultGitCommandTimeout = 30 * time.Second
 
 // Command represents a git command with context.
+//
+//nolint:containedctx // Context is stored for builder pattern - commands execute with the context they were created with
 type Command struct {
 	ctx     context.Context
 	dir     string

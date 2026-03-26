@@ -17,6 +17,8 @@ import (
 	"fmt"
 )
 
+const unknownValue = "Unknown"
+
 // CGOStatus represents CGO compilation status with compile-time safety
 // Replaces bool CGOEnabled for better type safety and semantic clarity.
 type CGOStatus string
@@ -50,7 +52,7 @@ func (cs CGOStatus) String() string {
 	case CGOStatusRequired:
 		return "Required"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 
@@ -124,7 +126,7 @@ func (sl SigningLevel) String() string {
 	case SigningLevelEnterprise:
 		return "Enterprise"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 

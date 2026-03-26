@@ -39,7 +39,7 @@ func (al ActionLevel) String() string {
 	case ActionLevelEnterprise:
 		return "Enterprise"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 
@@ -172,7 +172,7 @@ func (ds DockerSupport) String() string {
 	case DockerSupportBoth:
 		return "Build & Deploy"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 

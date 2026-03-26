@@ -356,6 +356,12 @@ func (vu *ValidationUseCase) generateWarnings(
 
 	// Warning for missing Docker image name
 	if config.GetDockerEnabled() && config.DockerImage == "" {
+		warning := NewConfigurationError(
+			ErrMissingRequiredField,
+			"Missing Docker image name",
+			"Docker is enabled but no image name is specified",
+		).WithContext("docker_image")
+		result.Warnings = append(result.Warnings, warning)
 	}
 
 	// Warning for mismatched CGO setting

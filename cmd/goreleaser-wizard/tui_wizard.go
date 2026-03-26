@@ -152,7 +152,8 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Validate(func(s string) error {
 					if s == "" {
 						return fmt.Errorf(
-							"project_name validation failed: %w",
+							"project name validation failed (input: %q): %w",
+							projectName,
 							ErrProjectNameRequired,
 						)
 					}
@@ -181,7 +182,8 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Validate(func(s string) error {
 					if s == "" {
 						return fmt.Errorf(
-							"binary_name validation failed: %w",
+							"binary name validation failed (input: %q): %w",
+							binaryName,
 							ErrBinaryNameRequired,
 						)
 					}
@@ -196,7 +198,11 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&mainPath).
 				Validate(func(s string) error {
 					if s == "" {
-						return fmt.Errorf("main_path validation failed: %w", ErrMainPathRequired)
+						return fmt.Errorf(
+							"main path validation failed (input: %q): %w",
+							mainPath,
+							ErrMainPathRequired,
+						)
 					}
 
 					return domain.ValidateMainPath(s)
@@ -222,7 +228,11 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 				Value(&selectedPlatforms).
 				Validate(func(s []string) error {
 					if len(s) == 0 {
-						return fmt.Errorf("platforms validation failed: %w", ErrPlatformRequired)
+						return fmt.Errorf(
+							"platforms validation failed (selected: %v): %w",
+							selectedPlatforms,
+							ErrPlatformRequired,
+						)
 					}
 
 					return nil

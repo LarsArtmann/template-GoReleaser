@@ -141,7 +141,7 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	}
 
 	if url == "" {
-		return errors.New("Docker registry URL cannot be empty")
+		return errors.New("docker registry URL cannot be empty")
 	}
 
 	url = strings.TrimSpace(url)
@@ -150,7 +150,7 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	case DockerRegistryDockerHub:
 		// Docker Hub allows simple usernames or full registry URLs
 		if !strings.Contains(url, "docker.io") && !strings.Contains(url, "/") {
-			return errors.New("Docker Hub registry should include docker.io or be a valid username")
+			return errors.New("docker Hub registry should include docker.io or be a valid username")
 		}
 	case DockerRegistryGitHub:
 		if !strings.Contains(url, "ghcr.io") {
@@ -182,7 +182,7 @@ func ValidateDockerImageName(name string) error {
 	}
 
 	if len(name) > maxDockerNameLength {
-		return errors.New("Docker image name must be 255 characters or less")
+		return errors.New("docker image name must be 255 characters or less")
 	}
 
 	// Docker image name pattern: lowercase, numbers, dots, hyphens, underscores, forward slashes
@@ -195,7 +195,7 @@ func ValidateDockerImageName(name string) error {
 
 	if !matched {
 		return fmt.Errorf(
-			"Docker image name '%s' must start with lowercase letter/number and contain only lowercase letters, numbers, dots, hyphens, underscores, and forward slashes",
+			"docker image name '%s' must start with lowercase letter/number and contain only lowercase letters, numbers, dots, hyphens, underscores, and forward slashes",
 			name,
 		)
 	}

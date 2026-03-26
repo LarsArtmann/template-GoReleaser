@@ -479,8 +479,8 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 
 	workflowFiles, err := filepath.Glob(filepath.Join(workflowDir, "*.yml"))
 	if err == nil && len(workflowFiles) == 0 {
-		os.Remove(workflowDir)
-		os.Remove(".github")
+		_ = os.Remove(workflowDir)
+		_ = os.Remove(".github")
 		j.logger.Info("Removed empty .github directory")
 	}
 
@@ -639,31 +639,28 @@ func NewJobFactory(logger *log.Logger) *JobFactory {
 func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []Job {
 	var jobs []Job
 
-	// Convert to domain.SafeProjectConfig since ProjectConfig is an alias
-	safeConfig := (*domain.SafeProjectConfig)(config)
-
 	// Add project validation job
 	jobs = append(jobs, NewProjectValidationJob(".", jf.logger))
 
 	// Add dependency check job
 	dependencies := []string{"go"}
-	if safeConfig.GetDockerEnabled() {
+	if config.GetDockerEnabled() {
 		dependencies = append(dependencies, "docker")
 	}
 	// Only require cosign for advanced signing levels (basic can work without installation)
-	if safeConfig.SigningLevel == domain.SigningLevelAdvanced ||
-		safeConfig.SigningLevel == domain.SigningLevelEnterprise {
+	if config.SigningLevel == domain.SigningLevelAdvanced ||
+		config.SigningLevel == domain.SigningLevelEnterprise {
 		dependencies = append(dependencies, "cosign")
 	}
 
 	jobs = append(jobs, NewDependencyCheckJob(dependencies, jf.logger))
 
 	// Add config generation job
-	jobs = append(jobs, NewConfigGenerationJob(safeConfig, force, jf.logger))
+	jobs = append(jobs, NewConfigGenerationJob(config, force, jf.logger))
 
 	// Add GitHub Actions generation job
-	if safeConfig.GetGenerateActions() {
-		jobs = append(jobs, NewGitHubActionsGenerationJob(safeConfig, jf.logger))
+	if config.GetGenerateActions() {
+		jobs = append(jobs, NewGitHubActionsGenerationJob(config, jf.logger))
 	}
 
 	return jobs
@@ -789,12 +786,9 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 
 // CreateConfigOnlyJobs creates jobs for config generation only.
 func (jf *JobFactory) CreateConfigOnlyJobs(config *ProjectConfig, force bool) []Job {
-	// Convert to domain.SafeProjectConfig since ProjectConfig is an alias
-	safeConfig := (*domain.SafeProjectConfig)(config)
-
 	return []Job{
 		NewProjectValidationJob(".", jf.logger),
-		NewConfigGenerationJob(safeConfig, force, jf.logger),
+		NewConfigGenerationJob(config, force, jf.logger),
 	}
 }
 

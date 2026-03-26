@@ -3,7 +3,6 @@ package jobs
 import (
 	"fmt"
 	"slices"
-	"sync"
 	"time"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
@@ -58,7 +57,6 @@ type WorkflowExecution struct {
 	Results     []*types.JobExecutionResult `json:"results"`
 	Errors      []*types.JobError           `json:"errors,omitempty"`
 	Metadata    WorkflowExecutionMetadata   `json:"metadata"`
-	mu          sync.Mutex                  `json:"-"`
 }
 
 // WorkflowExecutionStatusType represents workflow status types.

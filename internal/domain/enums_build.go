@@ -44,7 +44,7 @@ func (bl BuildLevel) String() string {
 	case BuildLevelEnterprise:
 		return "Enterprise"
 	default:
-		return "Unknown"
+		return unknownValue
 	}
 }
 
