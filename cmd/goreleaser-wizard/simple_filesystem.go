@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -11,7 +12,12 @@ import (
 type SimpleFileSystemRepository struct{}
 
 func (r *SimpleFileSystemRepository) ReadFile(ctx context.Context, path string) ([]byte, error) {
-	return os.ReadFile(path)
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read file %q: %w", path, err)
+	}
+
+	return data, nil
 }
 
 func (r *SimpleFileSystemRepository) WriteFile(
@@ -20,18 +26,31 @@ func (r *SimpleFileSystemRepository) WriteFile(
 	data []byte,
 	perm os.FileMode,
 ) error {
-	return os.WriteFile(path, data, perm)
+	if err := os.WriteFile(path, data, perm); err != nil {
+		return fmt.Errorf("failed to write file %q: %w", path, err)
+	}
+
+	return nil
 }
 
 func (r *SimpleFileSystemRepository) CreateFile(
 	ctx context.Context,
 	path string,
 ) (io.WriteCloser, error) {
-	return os.Create(path)
+	f, err := os.Create(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create file %q: %w", path, err)
+	}
+
+	return f, nil
 }
 
 func (r *SimpleFileSystemRepository) DeleteFile(ctx context.Context, path string) error {
-	return os.Remove(path)
+	if err := os.Remove(path); err != nil {
+		return fmt.Errorf("failed to delete file %q: %w", path, err)
+	}
+
+	return nil
 }
 
 func (r *SimpleFileSystemRepository) FileExists(ctx context.Context, path string) (bool, error) {
@@ -44,7 +63,7 @@ func (r *SimpleFileSystemRepository) FileExists(ctx context.Context, path string
 		return false, nil
 	}
 
-	return false, err
+	return false, fmt.Errorf("failed to check file existence %q: %w", path, err)
 }
 
 func (r *SimpleFileSystemRepository) CreateDir(
@@ -52,7 +71,11 @@ func (r *SimpleFileSystemRepository) CreateDir(
 	path string,
 	perm os.FileMode,
 ) error {
-	return os.Mkdir(path, perm)
+	if err := os.Mkdir(path, perm); err != nil {
+		return fmt.Errorf("failed to create directory %q: %w", path, err)
+	}
+
+	return nil
 }
 
 func (r *SimpleFileSystemRepository) CreateDirAll(
@@ -60,7 +83,11 @@ func (r *SimpleFileSystemRepository) CreateDirAll(
 	path string,
 	perm os.FileMode,
 ) error {
-	return os.MkdirAll(path, perm)
+	if err := os.MkdirAll(path, perm); err != nil {
+		return fmt.Errorf("failed to create directories %q: %w", path, err)
+	}
+
+	return nil
 }
 
 func (r *SimpleFileSystemRepository) DirExists(ctx context.Context, path string) (bool, error) {
@@ -73,21 +100,29 @@ func (r *SimpleFileSystemRepository) DirExists(ctx context.Context, path string)
 		return false, nil
 	}
 
-	return false, err
+	return false, fmt.Errorf("failed to check directory existence %q: %w", path, err)
 }
 
 func (r *SimpleFileSystemRepository) ReadDir(
 	ctx context.Context,
 	path string,
 ) ([]os.DirEntry, error) {
-	return os.ReadDir(path)
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read directory %q: %w", path, err)
+	}
+	return entries, nil
 }
 
 func (r *SimpleFileSystemRepository) GetFileInfo(
 	ctx context.Context,
 	path string,
 ) (os.FileInfo, error) {
-	return os.Stat(path)
+	info, err := os.Stat(path)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get file info %q: %w", path, err)
+	}
+	return info, nil
 }
 
 func (r *SimpleFileSystemRepository) CheckPermissions(
@@ -96,18 +131,26 @@ func (r *SimpleFileSystemRepository) CheckPermissions(
 ) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("failed to check permissions for %q: %w", path, err)
 	}
 
 	return info.Mode().Perm()&0o777 != 0, nil
 }
 
 func (r *SimpleFileSystemRepository) AbsPath(path string) (string, error) {
-	return filepath.Abs(path)
+	abs, err := filepath.Abs(path)
+	if err != nil {
+		return "", fmt.Errorf("failed to get absolute path for %q: %w", path, err)
+	}
+	return abs, nil
 }
 
 func (r *SimpleFileSystemRepository) RelPath(base, target string) (string, error) {
-	return filepath.Rel(base, target)
+	rel, err := filepath.Rel(base, target)
+	if err != nil {
+		return "", fmt.Errorf("failed to get relative path from %q to %q: %w", base, target, err)
+	}
+	return rel, nil
 }
 
 func (r *SimpleFileSystemRepository) CleanPath(path string) string {
@@ -119,5 +162,9 @@ func (r *SimpleFileSystemRepository) JoinPath(elem ...string) string {
 }
 
 func (r *SimpleFileSystemRepository) TempDir(dir, pattern string) (string, error) {
-	return os.MkdirTemp(dir, pattern)
+	tempDir, err := os.MkdirTemp(dir, pattern)
+	if err != nil {
+		return "", fmt.Errorf("failed to create temp directory: %w", err)
+	}
+	return tempDir, nil
 }

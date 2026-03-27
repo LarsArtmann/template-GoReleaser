@@ -47,42 +47,42 @@ func (vu *ValidationUseCase) ValidateConfiguration(
 	}
 
 	// Step 1: Basic field validation
-	err := vu.validateBasicFields(ctx, config)
+	err := vu.validateBasicFields(config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 2: Type validation
-	err = vu.validateTypes(ctx, config)
+	err = vu.validateTypes(config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 3: Platform-architecture compatibility
-	err = vu.validatePlatformArchCompatibility(ctx, config)
+	err = vu.validatePlatformArchCompatibility(config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 4: Business rule validation
-	err = vu.validateBusinessRules(ctx, config)
+	err = vu.validateBusinessRules(config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 5: Security validation
-	err = vu.validateSecurity(ctx, config)
+	err = vu.validateSecurity(config)
 	if err != nil {
 		result.Errors = append(result.Errors, err)
 		result.IsValid = false
 	}
 
 	// Step 6: Generate warnings
-	vu.generateWarnings(ctx, config, result)
+	vu.generateWarnings(config, result)
 
 	vu.logger.DebugContext(
 		ctx,
@@ -100,7 +100,6 @@ func (vu *ValidationUseCase) ValidateConfiguration(
 
 // validateBasicFields validates basic required fields.
 func (vu *ValidationUseCase) validateBasicFields(
-	ctx context.Context,
 	config *SafeProjectConfig,
 ) *DomainError {
 	// Project name validation
@@ -150,7 +149,6 @@ func (vu *ValidationUseCase) validateBasicFields(
 
 // validateTypes validates enum types.
 func (vu *ValidationUseCase) validateTypes(
-	ctx context.Context,
 	config *SafeProjectConfig,
 ) *DomainError {
 	// Project type validation
@@ -239,7 +237,6 @@ func (vu *ValidationUseCase) validateTypes(
 
 // validatePlatformArchCompatibility validates platform-architecture compatibility.
 func (vu *ValidationUseCase) validatePlatformArchCompatibility(
-	ctx context.Context,
 	config *SafeProjectConfig,
 ) *DomainError {
 	err := ValidatePlatformArchCompatibility(config.Platforms, config.Architectures)
@@ -256,7 +253,6 @@ func (vu *ValidationUseCase) validatePlatformArchCompatibility(
 
 // validateBusinessRules validates domain business rules.
 func (vu *ValidationUseCase) validateBusinessRules(
-	ctx context.Context,
 	config *SafeProjectConfig,
 ) *DomainError {
 	// Docker support rule
@@ -303,7 +299,6 @@ func (vu *ValidationUseCase) validateBusinessRules(
 
 // validateSecurity performs security-focused validation.
 func (vu *ValidationUseCase) validateSecurity(
-	ctx context.Context,
 	config *SafeProjectConfig,
 ) *DomainError {
 	// Check for potential path traversal in main path
@@ -340,7 +335,6 @@ func (vu *ValidationUseCase) validateSecurity(
 
 // generateWarnings generates validation warnings.
 func (vu *ValidationUseCase) generateWarnings(
-	ctx context.Context,
 	config *SafeProjectConfig,
 	result *ValidationResult,
 ) {
@@ -422,7 +416,7 @@ func (vu *ValidationUseCase) ValidateProjectStructure(
 	result.Info = info
 
 	// Validate project structure
-	if err := vu.validateProjectRequirements(ctx, info); err != nil {
+	if err := vu.validateProjectRequirements(info); err != nil {
 		result.Issues = append(result.Issues, err)
 		result.IsValid = false
 	}
@@ -484,7 +478,7 @@ func (vu *ValidationUseCase) analyzeProjectStructure(
 	}
 
 	// Determine project type and binary name
-	vu.inferProjectType(ctx, info)
+	vu.inferProjectType(info)
 
 	return info, nil
 }
@@ -544,7 +538,7 @@ func (vu *ValidationUseCase) findMainFile(ctx context.Context, projectPath strin
 }
 
 // inferProjectType infers project type and binary name from structure.
-func (vu *ValidationUseCase) inferProjectType(ctx context.Context, info *ProjectInfo) {
+func (vu *ValidationUseCase) inferProjectType(info *ProjectInfo) {
 	// Infer binary name from module name
 	if info.Name != "" && info.MainFilePath != "" {
 		// Use directory name from main path as binary name
@@ -574,7 +568,6 @@ func (vu *ValidationUseCase) inferProjectType(ctx context.Context, info *Project
 
 // validateProjectRequirements validates project against requirements.
 func (vu *ValidationUseCase) validateProjectRequirements(
-	ctx context.Context,
 	info *ProjectInfo,
 ) *DomainError {
 	if !info.HasGoMod {

@@ -10,6 +10,7 @@ import (
 	"charm.land/log/v2"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
+	"github.com/charmbracelet/fang"
 	"github.com/spf13/cobra"
 )
 
@@ -130,7 +131,12 @@ func Execute() {
 	// Set up panic recovery using domain error handling
 	defer recoverFromPanic("command execution")
 
-	err := rootCmd.Execute()
+	err := fang.Execute(
+		context.Background(),
+		rootCmd,
+		fang.WithVersion(version),
+		fang.WithCommit(commit),
+	)
 	if err != nil {
 		displayError(err)
 	}

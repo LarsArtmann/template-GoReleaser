@@ -22,7 +22,7 @@ func BenchmarkProjectDetection(b *testing.B) {
 	goMod := `module github.com/user/benchmark-test
 go 1.21
 require github.com/charmbracelet/huh v0.7.0
-require github.com/charmbracelet/lipgloss v1.1.0
+require charm.land/lipgloss/v2 v2.0.2
 `
 	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0o644)
 

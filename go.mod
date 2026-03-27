@@ -6,6 +6,7 @@ require (
 	charm.land/huh/v2 v2.0.3
 	charm.land/lipgloss/v2 v2.0.2
 	charm.land/log/v2 v2.0.0
+	github.com/charmbracelet/fang v1.0.0
 	github.com/go-faster/yaml v0.4.6
 	github.com/knadh/koanf/parsers/yaml v1.1.0
 	github.com/knadh/koanf/providers/confmap v1.0.0
@@ -27,6 +28,7 @@ require (
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20260316091819-b93f6a3b8502 // indirect
 	github.com/charmbracelet/x/ansi v0.11.6 // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260323091123-df7b1bcffcca // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect
@@ -50,6 +52,10 @@ require (
 	github.com/mitchellh/hashstructure/v2 v2.0.2 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
+	github.com/muesli/mango v0.2.0 // indirect
+	github.com/muesli/mango-cobra v1.3.0 // indirect
+	github.com/muesli/mango-pflag v0.2.0 // indirect
+	github.com/muesli/roff v0.1.0 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
@@ -59,6 +65,7 @@ require (
 	golang.org/x/exp v0.0.0-20260312153236-7ab1446f8b90 // indirect
 	golang.org/x/sync v0.20.0 // indirect
 	golang.org/x/sys v0.42.0 // indirect
+	golang.org/x/text v0.35.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
