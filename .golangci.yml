@@ -221,6 +221,10 @@ linters:
       - path: internal/domain/(enums|validators|action_trigger|architecture|config_state|docker_registry|git_provider)\.go
         linters:
           - gochecknoglobals
+      # Repository interfaces following Clean Architecture are intentionally large
+      - path: internal/domain/interfaces\.go
+        linters:
+          - interfacebloat
       - path: .*\.generated\.go$
         linters:
           - all
