@@ -1,6 +1,7 @@
 package types
 
 import (
+	"context"
 	"os/exec"
 	"strings"
 
@@ -271,7 +272,8 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 
 // parseGitHubRemote tries to get GitHub owner and repo from git remote.
 func parseGitHubRemote() (owner, repo string) {
-	if cmd := exec.Command("git", "remote", "get-url", "origin"); cmd != nil {
+	ctx := context.Background()
+	if cmd := exec.CommandContext(ctx, "git", "remote", "get-url", "origin"); cmd != nil {
 		if output, err := cmd.Output(); err == nil {
 			remote := strings.TrimSpace(string(output))
 

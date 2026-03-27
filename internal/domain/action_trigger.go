@@ -87,6 +87,12 @@ func (at ActionTrigger) String() string {
 		return "Push to Main"
 	case ActionTriggerRelease:
 		return "Published Release"
+	case ActionTriggerMainPush:
+		return "Push to Main (explicit)"
+	case ActionTriggerPullRequest:
+		return "Pull Request"
+	case ActionTriggerSchedule:
+		return "Scheduled Trigger"
 	default:
 		return string(at)
 	}

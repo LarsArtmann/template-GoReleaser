@@ -138,6 +138,8 @@ func (sl SigningLevel) IsEnabled() bool {
 // RequiresCosign returns true if level requires cosign.
 func (sl SigningLevel) RequiresCosign() bool {
 	switch sl {
+	case SigningLevelNone, SigningLevelBasic:
+		return false
 	case SigningLevelAdvanced, SigningLevelEnterprise:
 		return true
 	default:
@@ -148,6 +150,8 @@ func (sl SigningLevel) RequiresCosign() bool {
 // RequiresKeyManagement returns true if level requires key management.
 func (sl SigningLevel) RequiresKeyManagement() bool {
 	switch sl {
+	case SigningLevelNone:
+		return false
 	case SigningLevelBasic, SigningLevelAdvanced, SigningLevelEnterprise:
 		return true
 	default:
@@ -267,6 +271,10 @@ func GetRecommendedActionLevel(projectType ProjectType) ActionLevel {
 		return ActionLevelBasic
 	case ProjectTypeDesktop:
 		return ActionLevelAdvanced
+	case ProjectTypeGRPCService:
+		return ActionLevelAdvanced
+	case ProjectTypeMobile, ProjectTypePlugin, ProjectTypeDaemon, ProjectTypeTool:
+		return ActionLevelBasic
 	default:
 		return ActionLevelBasic
 	}
@@ -283,6 +291,12 @@ func GetRecommendedSigningLevel(projectType ProjectType) SigningLevel {
 		return SigningLevelEnterprise
 	case ProjectTypeLibrary:
 		return SigningLevelNone
+	case ProjectTypeMicroservice,
+		ProjectTypeMobile,
+		ProjectTypePlugin,
+		ProjectTypeDaemon,
+		ProjectTypeTool:
+		return SigningLevelBasic
 	default:
 		return SigningLevelBasic
 	}
@@ -296,6 +310,12 @@ func GetRecommendedFeatureLevel(projectType ProjectType) FeatureLevel {
 	case ProjectTypeDesktop:
 		return FeatureLevelEnterprise
 	case ProjectTypeCLI, ProjectTypeLibrary:
+		return FeatureLevelBasic
+	case ProjectTypeMicroservice,
+		ProjectTypeMobile,
+		ProjectTypePlugin,
+		ProjectTypeDaemon,
+		ProjectTypeTool:
 		return FeatureLevelBasic
 	default:
 		return FeatureLevelBasic

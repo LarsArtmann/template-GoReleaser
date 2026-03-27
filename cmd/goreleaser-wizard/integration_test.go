@@ -339,6 +339,15 @@ go 1.21
 				config.CGOStatus = domain.CGOStatusEnabled
 			case domain.ProjectTypeLibrary:
 				config.CGOStatus = domain.CGOStatusDisabled
+			case domain.ProjectTypeGRPCService,
+				domain.ProjectTypeMicroservice,
+				domain.ProjectTypeDesktop:
+				config.CGOStatus = domain.CGOStatusEnabled
+			case domain.ProjectTypeMobile,
+				domain.ProjectTypePlugin,
+				domain.ProjectTypeDaemon,
+				domain.ProjectTypeTool:
+				config.CGOStatus = domain.CGOStatusDisabled
 			}
 
 			// Verify project type

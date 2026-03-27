@@ -183,6 +183,8 @@ func (wb *WorkflowBuilder) BuildWorkflow(
 		workflow.SetTimeout(configOnlyTimeout)
 	case WorkflowTypeValidationOnly:
 		workflow.SetTimeout(validationTimeout)
+	case WorkflowTypeMigrate, WorkflowTypeUpdate, WorkflowTypeRollback:
+		workflow.SetTimeout(migrationTimeout)
 	}
 
 	return workflow, nil
@@ -241,7 +243,7 @@ func (wb *WorkflowBuilder) createMigrationJobs(
 	fromVersion, toVersion string,
 	config *ProjectConfig,
 ) []Job {
-	var jobs []Job
+	jobs := make([]Job, 0, 3)
 
 	// Backup current configuration
 	backupJob := &ConfigBackupJob{
@@ -274,7 +276,7 @@ func (wb *WorkflowBuilder) createMigrationJobs(
 
 // createUpdateJobs creates jobs for update workflow.
 func (wb *WorkflowBuilder) createUpdateJobs(config *ProjectConfig, dryRun bool) []Job {
-	var jobs []Job
+	jobs := make([]Job, 0, 2)
 
 	// Validate project structure
 	validationJob := NewProjectValidationJob(".", wb.logger)

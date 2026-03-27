@@ -68,8 +68,8 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 
 	// Platform and architecture selections
 	var (
-		selectedPlatforms     []string
-		selectedArchitectures []string
+		selectedPlatforms     = make([]string, 0, len(config.Platforms))
+		selectedArchitectures = make([]string, 0, len(config.Architectures))
 	)
 
 	platformOptions := []huh.Option[string]{

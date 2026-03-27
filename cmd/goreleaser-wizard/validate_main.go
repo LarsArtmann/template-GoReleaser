@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -111,6 +112,10 @@ func validateGitHubActions(results *ValidationResults) error {
 	// Validate workflow content
 	if err := validateWorkflowContent(workflowPath, results); err != nil {
 		results.ActionsValid = false
+		var domainErr *DomainError
+		if errors.As(err, &domainErr) {
+			results.Errors = append(results.Errors, domainErr)
+		}
 
 		return nil
 	}

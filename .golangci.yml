@@ -100,6 +100,40 @@ linters:
         - G301
         - G117
         - G204
+    exhaustive:
+      default-signifies-exhaustive: true
+    exhaustruct:
+      exclude:
+        - ^cobra\.Command$
+        - ^github.com/spf13/cobra\.Command$
+        - ^omain\.DomainError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/errors\.DomainError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.SafeProjectConfig$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.DomainError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ValidationResult$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ProjectValidationResult$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ProjectInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.VersionInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationResult$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationWarning$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.GoReleaserTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.GitHubActionsTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types\.GoReleaserTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types\.GitHubActionsTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/config\.Config$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/config\.Manager$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.Command$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.RepositoryInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.VersionInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.JobManager$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.ValidationResults$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.DomainError$
+        - ^github.com/knadh/koanf/v2/providers/env\.Opt$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators\.GoReleaserGenerator$
+    wrapcheck:
+      ignore-package-globs:
+        - github.com/LarsArtmann/GoReleaser-Wizard/internal/*
     revive:
       rules:
         - disabled: true
@@ -143,6 +177,47 @@ linters:
           - thelper
           - unconvert
           - unused
+          - exhaustruct
+          - wrapcheck
+          - paralleltest
+          - usetesting
+          - noctx
+          - contextcheck
+          - gochecknoglobals
+      # CLI tools commonly use globals for version info and Cobra commands
+      - path: cmd/goreleaser-wizard/main\.go
+        linters:
+          - gochecknoglobals
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/validate\.go
+        linters:
+          - gochecknoglobals
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/generate\.go
+        linters:
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/init\.go
+        linters:
+          - gochecknoinits
+      # CLI tools don't need context propagation through entire call chain
+      - path: cmd/goreleaser-wizard/.*\.go
+        linters:
+          - contextcheck
+      - path: cmd/goreleaser-wizard/jobs/.*\.go
+        linters:
+          - contextcheck
+      - path: cmd/goreleaser-wizard/types/template_data\.go
+        linters:
+          - exhaustruct
+      # Config package uses globals for singleton pattern
+      - path: internal/config/.*\.go
+        linters:
+          - gochecknoglobals
+          - exhaustruct
+      # Domain enums use maps for metadata lookup
+      - path: internal/domain/(enums|validators|action_trigger|architecture|config_state|docker_registry|git_provider)\.go
+        linters:
+          - gochecknoglobals
       - path: .*\.generated\.go$
         linters:
           - all

@@ -156,6 +156,16 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 		if !strings.Contains(url, "ghcr.io") {
 			return errors.New("GitHub Container Registry should include ghcr.io")
 		}
+	case DockerRegistryGitLab:
+		if !strings.Contains(url, "registry.gitlab.com") {
+			return errors.New("GitLab Registry should include registry.gitlab.com")
+		}
+	case DockerRegistryQuay:
+		if !strings.Contains(url, "quay.io") {
+			return errors.New("quay.io registry should include quay.io")
+		}
+	case DockerRegistryCustom:
+		// Custom registry - no specific validation
 	}
 
 	// Validate against registry pattern if available

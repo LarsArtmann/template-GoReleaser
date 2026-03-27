@@ -116,7 +116,7 @@ func (jm *JobManager) ExecuteJobs(ctx context.Context) error {
 func (jm *JobManager) executeSequential(ctx context.Context) error {
 	for _, job := range jm.jobs {
 		if ctx.Err() != nil {
-			return ctx.Err()
+			return fmt.Errorf("context cancelled: %w", ctx.Err())
 		}
 
 		result := jm.executeJob(ctx, job)
@@ -140,7 +140,7 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 	for _, job := range jm.jobs {
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return fmt.Errorf("context cancelled: %w", ctx.Err())
 		default:
 		}
 
@@ -276,7 +276,7 @@ func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 
 		select {
 		case <-ctx.Done():
-			return ctx.Err()
+			return fmt.Errorf("context cancelled during rollback: %w", ctx.Err())
 		default:
 		}
 
@@ -329,6 +329,12 @@ func (jm *JobManager) GetStatistics() map[string]any {
 			if v, ok := stats["failed"].(int); ok {
 				stats["failed"] = v + 1
 			}
+		case JobStatusRolledBack:
+			if v, ok := stats["rolled_back"].(int); ok {
+				stats["rolled_back"] = v + 1
+			}
+		case JobStatusPending, JobStatusRunning:
+			// These statuses don't contribute to final stats
 		}
 	}
 
@@ -359,6 +365,14 @@ func displayJobResults(results []JobResult) {
 				result.Job.Name(),
 				result.Error,
 			)
+		case JobStatusRolledBack:
+			fmt.Printf(
+				"%s %s rolled back\n",
+				infoStyle.Render("↩️"),
+				result.Job.Name(),
+			)
+		case JobStatusPending, JobStatusRunning:
+			// These statuses are not displayed in final results
 		}
 	}
 }

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"runtime"
@@ -65,8 +66,10 @@ func GetRecommendedArchitectures() []domain.Architecture {
 
 // GetRecommendedGitProvider returns recommended Git provider based on analysis.
 func GetRecommendedGitProvider() domain.GitProvider {
+	ctx := context.Background()
 	// Try to detect from git remote
-	if remote, err := exec.Command("git", "remote", "get-url", "origin").Output(); err == nil {
+	if remote, err := exec.CommandContext(ctx, "git", "remote", "get-url", "origin").
+		Output(); err == nil {
 		remoteStr := strings.TrimSpace(string(remote))
 		if strings.Contains(remoteStr, "github.com") {
 			return domain.GitProviderGitHub
