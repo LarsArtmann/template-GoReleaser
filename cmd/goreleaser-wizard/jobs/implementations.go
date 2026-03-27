@@ -92,7 +92,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 
 	// Check if context is cancelled
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Transition to Processing state
@@ -150,42 +150,59 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 
 	// Check if context is cancelled
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
-	// Remove generated config
-	if _, err := os.Stat(".goreleaser.yaml"); err == nil {
-		// Check if backup exists
-		if _, err := os.Stat(".goreleaser.yaml.backup"); err == nil {
-			// Restore backup
-			err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
-			if err != nil {
-				j.logger.Error("Failed to restore backup", "error", err)
-
-				return errors.NewFileError(
-					errors.ErrFileOperation,
-					"Failed to restore backup",
-					err.Error(),
-				).WithCause(err)
-			}
-
-			j.logger.Info("Restored backup configuration")
-		} else {
-			// Remove generated file
-			err := os.Remove(".goreleaser.yaml")
-			if err != nil {
-				j.logger.Error("Failed to remove generated config", "error", err)
-
-				return errors.NewFileError(
-					errors.ErrFileOperation,
-					"Failed to remove generated config",
-					err.Error(),
-				).WithCause(err)
-			}
-
-			j.logger.Info("Removed generated configuration")
-		}
+	// Check if config file exists
+	if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
+		return nil // File doesn't exist, nothing to rollback
 	}
+
+	return j.rollbackConfigFile()
+}
+
+// rollbackConfigFile handles the rollback of the config file.
+func (j *ConfigGenerationJob) rollbackConfigFile() error {
+	// Check if backup exists
+	if _, err := os.Stat(".goreleaser.yaml.backup"); err == nil {
+		return j.restoreBackup()
+	}
+
+	return j.removeGeneratedConfig()
+}
+
+// restoreBackup restores the backup configuration file.
+func (j *ConfigGenerationJob) restoreBackup() error {
+	err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
+	if err != nil {
+		j.logger.Error("Failed to restore backup", "error", err)
+
+		return errors.NewFileError(
+			errors.ErrFileOperation,
+			"Failed to restore backup",
+			err.Error(),
+		).WithCause(err)
+	}
+
+	j.logger.Info("Restored backup configuration")
+
+	return nil
+}
+
+// removeGeneratedConfig removes the generated configuration file.
+func (j *ConfigGenerationJob) removeGeneratedConfig() error {
+	err := os.Remove(".goreleaser.yaml")
+	if err != nil {
+		j.logger.Error("Failed to remove generated config", "error", err)
+
+		return errors.NewFileError(
+			errors.ErrFileOperation,
+			"Failed to remove generated config",
+			err.Error(),
+		).WithCause(err)
+	}
+
+	j.logger.Info("Removed generated configuration")
 
 	return nil
 }
@@ -235,7 +252,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 
 	// Check if context is cancelled
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Generate workflow
@@ -297,7 +314,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 
 	// Check if context is cancelled
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Check if project directory exists
@@ -364,7 +381,7 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 
 	// Check if context is cancelled
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	var missingDeps []string
@@ -454,7 +471,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 
 	// Check context
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Generate Dockerfile
@@ -527,7 +544,7 @@ func (j *HomebrewGenerationJob) Execute(ctx context.Context) error {
 
 	// Check context
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Generate formula
@@ -560,7 +577,7 @@ func rollbackGeneration(
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Rollback generator

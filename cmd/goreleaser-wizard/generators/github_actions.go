@@ -3,6 +3,7 @@ package generators
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -43,7 +44,7 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Create template with custom delimiters to avoid GitHub Actions syntax conflict
@@ -126,7 +127,7 @@ func (g *GitHubActionsGenerator) GeneratePreview(ctx context.Context) (string, e
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return "", ctx.Err()
+		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Create template with custom delimiters
@@ -160,7 +161,7 @@ func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Remove generated workflow

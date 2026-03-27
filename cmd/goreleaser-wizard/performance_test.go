@@ -348,7 +348,7 @@ func TestConcurrentOperations(t *testing.T) {
 }
 
 // createBenchmarkProject creates a project with specified complexity.
-func createBenchmarkProject(t *testing.T, dir string, complexity int) {
+func createBenchmarkProject(_ *testing.T, dir string, complexity int) {
 	// Create basic structure
 	goMod := `module github.com/user/benchmark-project
 go 1.21

@@ -309,7 +309,12 @@ func (vr *ValidationResult) String() string {
 
 // ToJSON converts validation result to JSON.
 func (vr *ValidationResult) ToJSON() ([]byte, error) {
-	return json.MarshalIndent(vr, "", "  ")
+	data, err := json.MarshalIndent(vr, "", "  ")
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal validation result to JSON: %w", err)
+	}
+
+	return data, nil
 }
 
 // Merge merges another validation result into this one.
@@ -486,29 +491,34 @@ func (vs *ValidationSummary) GetScore() int {
 func (vs *ValidationSummary) GetGrade() string {
 	score := vs.GetScore()
 
+	// Special case: perfect score
 	if score == gradeThresholdAPlus {
 		return "A+"
-	} else if score >= gradeThresholdA {
-		return "A"
-	} else if score >= gradeThresholdAMinus {
-		return "A-"
-	} else if score >= gradeThresholdBPlus {
-		return "B+"
-	} else if score >= gradeThresholdB {
-		return "B"
-	} else if score >= gradeThresholdBMinus {
-		return "B-"
-	} else if score >= gradeThresholdCPlus {
-		return "C+"
-	} else if score >= gradeThresholdC {
-		return "C"
-	} else if score >= gradeThresholdCMinus {
-		return "C-"
-	} else if score >= gradeThresholdD {
-		return "D"
-	} else {
-		return "F"
 	}
+
+	// Grade thresholds in descending order for efficient lookup
+	gradeThresholds := []struct {
+		threshold int
+		grade     string
+	}{
+		{gradeThresholdA, "A"},
+		{gradeThresholdAMinus, "A-"},
+		{gradeThresholdBPlus, "B+"},
+		{gradeThresholdB, "B"},
+		{gradeThresholdBMinus, "B-"},
+		{gradeThresholdCPlus, "C+"},
+		{gradeThresholdC, "C"},
+		{gradeThresholdCMinus, "C-"},
+		{gradeThresholdD, "D"},
+	}
+
+	for _, g := range gradeThresholds {
+		if score >= g.threshold {
+			return g.grade
+		}
+	}
+
+	return "F"
 }
 
 // GetStatus returns a validation status.

@@ -9,77 +9,94 @@ func displayValidationResults(results *ValidationResults, verbose bool) {
 	fmt.Println("📋 Validation Summary:")
 	fmt.Println()
 
-	// Configuration status
-	if results.ConfigExists {
-		if results.ConfigValid {
-			fmt.Println(successStyle.Render("✅ GoReleaser configuration: Valid"))
-		} else {
-			fmt.Println(errorStyle.Render("❌ GoReleaser configuration: Invalid"))
-		}
-	} else {
+	displayConfigStatus(results)
+	displayActionsStatus(results)
+	displayProjectStatus(results)
+	displayErrors(results.Errors, verbose)
+	displayWarnings(results.Warnings, verbose)
+	displayRecommendations(results.Recommendations)
+}
+
+func displayConfigStatus(results *ValidationResults) {
+	switch {
+	case !results.ConfigExists:
 		fmt.Println(errorStyle.Render("❌ GoReleaser configuration: Not found"))
+	case results.ConfigValid:
+		fmt.Println(successStyle.Render("✅ GoReleaser configuration: Valid"))
+	default:
+		fmt.Println(errorStyle.Render("❌ GoReleaser configuration: Invalid"))
 	}
+}
 
-	// GitHub Actions status
-	if results.ActionsExists {
-		if results.ActionsValid {
-			fmt.Println(successStyle.Render("✅ GitHub Actions workflow: Valid"))
-		} else {
-			fmt.Println(errorStyle.Render("❌ GitHub Actions workflow: Invalid"))
-		}
-	} else {
+func displayActionsStatus(results *ValidationResults) {
+	switch {
+	case !results.ActionsExists:
 		fmt.Println(infoStyle.Render("ℹ️  GitHub Actions workflow: Not found"))
+	case results.ActionsValid:
+		fmt.Println(successStyle.Render("✅ GitHub Actions workflow: Valid"))
+	default:
+		fmt.Println(errorStyle.Render("❌ GitHub Actions workflow: Invalid"))
 	}
+}
 
-	// Project structure status
+func displayProjectStatus(results *ValidationResults) {
 	if results.ProjectValid {
 		fmt.Println(successStyle.Render("✅ Project structure: Valid"))
 	} else {
 		fmt.Println(errorStyle.Render("❌ Project structure: Invalid"))
 	}
+}
 
-	// Display errors
-	if len(results.Errors) > 0 {
-		fmt.Println(errorStyle.Render("❌ Errors:"))
+func displayErrors(errors []*DomainError, verbose bool) {
+	if len(errors) == 0 {
+		return
+	}
 
-		for _, err := range results.Errors {
-			fmt.Printf("  • %s\n", err.Message)
+	fmt.Println(errorStyle.Render("❌ Errors:"))
 
-			if verbose {
-				fmt.Printf("    Details: %s\n", err.Details)
+	for _, err := range errors {
+		fmt.Printf("  • %s\n", err.Message)
 
-				if err.Context != "" {
-					fmt.Printf("    Context: %s\n", err.Context)
-				}
+		if verbose {
+			fmt.Printf("    Details: %s\n", err.Details)
+
+			if err.Context != "" {
+				fmt.Printf("    Context: %s\n", err.Context)
 			}
 		}
-
-		fmt.Println()
 	}
 
-	// Display warnings
-	if len(results.Warnings) > 0 {
-		fmt.Println(infoStyle.Render("⚠️  Warnings:"))
+	fmt.Println()
+}
 
-		for _, warning := range results.Warnings {
-			fmt.Printf("  • %s\n", warning.Message)
+func displayWarnings(warnings []*DomainError, verbose bool) {
+	if len(warnings) == 0 {
+		return
+	}
 
-			if verbose {
-				fmt.Printf("    Details: %s\n", warning.Details)
-			}
+	fmt.Println(infoStyle.Render("⚠️  Warnings:"))
+
+	for _, warning := range warnings {
+		fmt.Printf("  • %s\n", warning.Message)
+
+		if verbose {
+			fmt.Printf("    Details: %s\n", warning.Details)
 		}
-
-		fmt.Println()
 	}
 
-	// Display recommendations
-	if len(results.Recommendations) > 0 {
-		fmt.Println(infoStyle.Render("💡 Recommendations:"))
+	fmt.Println()
+}
 
-		for _, rec := range results.Recommendations {
-			fmt.Printf("  • %s\n", rec)
-		}
-
-		fmt.Println()
+func displayRecommendations(recommendations []string) {
+	if len(recommendations) == 0 {
+		return
 	}
+
+	fmt.Println(infoStyle.Render("💡 Recommendations:"))
+
+	for _, rec := range recommendations {
+		fmt.Printf("  • %s\n", rec)
+	}
+
+	fmt.Println()
 }

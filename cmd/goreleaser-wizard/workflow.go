@@ -194,7 +194,7 @@ func (wb *WorkflowBuilder) BuildWorkflow(
 func (wb *WorkflowBuilder) BuildMigrateWorkflow(
 	fromVersion, toVersion string,
 	config *ProjectConfig,
-) (*Workflow, error) {
+) *Workflow {
 	workflow := NewWorkflow(
 		fmt.Sprintf("Migration %s -> %s", fromVersion, toVersion),
 		fmt.Sprintf("Migrate configuration from version %s to %s", fromVersion, toVersion),
@@ -211,14 +211,14 @@ func (wb *WorkflowBuilder) BuildMigrateWorkflow(
 	workflow.SetTimeout(migrationTimeout)
 	workflow.SetParallel(false, 1)
 
-	return workflow, nil
+	return workflow
 }
 
 // BuildUpdateWorkflow builds an update workflow.
 func (wb *WorkflowBuilder) BuildUpdateWorkflow(
 	config *ProjectConfig,
 	dryRun bool,
-) (*Workflow, error) {
+) *Workflow {
 	workflow := NewWorkflow(
 		"Update Configuration",
 		fmt.Sprintf("Update GoReleaser configuration (dry-run: %v)", dryRun),
@@ -235,7 +235,7 @@ func (wb *WorkflowBuilder) BuildUpdateWorkflow(
 	workflow.SetTimeout(updateTimeout)
 	workflow.SetParallel(false, 1)
 
-	return workflow, nil
+	return workflow
 }
 
 // createMigrationJobs creates jobs for migration workflow.

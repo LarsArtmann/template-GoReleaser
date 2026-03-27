@@ -84,7 +84,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 }
 
 // validateGitHubActions validates GitHub Actions workflow.
-func validateGitHubActions(results *ValidationResults) error {
+func validateGitHubActions(results *ValidationResults) {
 	workflowPath := filepath.Join(".github", "workflows", "release.yml")
 
 	// Check if workflow exists
@@ -98,7 +98,7 @@ func validateGitHubActions(results *ValidationResults) error {
 				err,
 			).WithContext(workflowPath))
 
-		return nil
+		return
 	}
 
 	results.ActionsExists = exists
@@ -106,7 +106,7 @@ func validateGitHubActions(results *ValidationResults) error {
 		results.Recommendations = append(results.Recommendations,
 			"Consider adding GitHub Actions workflow for automated releases")
 
-		return nil
+		return
 	}
 
 	// Validate workflow content
@@ -117,16 +117,14 @@ func validateGitHubActions(results *ValidationResults) error {
 			results.Errors = append(results.Errors, domainErr)
 		}
 
-		return nil
+		return
 	}
 
 	results.ActionsValid = true
-
-	return nil
 }
 
 // validateProjectStructure validates project structure.
-func validateProjectStructure(results *ValidationResults) error {
+func validateProjectStructure(results *ValidationResults) {
 	// Check for go.mod
 	if exists, err := fileSystemRepo.FileExists(context.Background(), "go.mod"); err != nil {
 		results.Errors = append(results.Errors,
@@ -137,7 +135,7 @@ func validateProjectStructure(results *ValidationResults) error {
 				err,
 			).WithContext("go.mod"))
 
-		return nil
+		return
 	} else if !exists {
 		results.Errors = append(results.Errors,
 			NewValidationError(
@@ -147,7 +145,7 @@ func validateProjectStructure(results *ValidationResults) error {
 			).WithContext("go.mod"))
 		results.ProjectValid = false
 
-		return nil
+		return
 	}
 
 	// Check for main.go directory
@@ -161,7 +159,7 @@ func validateProjectStructure(results *ValidationResults) error {
 				err,
 			).WithContext(mainPath))
 
-		return nil
+		return
 	} else if !exists {
 		// Try common alternatives
 		alternatives := []string{"main", "src"}
@@ -175,7 +173,7 @@ func validateProjectStructure(results *ValidationResults) error {
 					).WithContext(alt))
 				results.ProjectValid = true
 
-				return nil
+				return
 			}
 		}
 
@@ -187,12 +185,10 @@ func validateProjectStructure(results *ValidationResults) error {
 			).WithContext(mainPath))
 		results.ProjectValid = false
 
-		return nil
+		return
 	}
 
 	results.ProjectValid = true
-
-	return nil
 }
 
 // validateYAML validates YAML file.

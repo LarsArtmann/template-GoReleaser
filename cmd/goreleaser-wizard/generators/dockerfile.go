@@ -2,6 +2,7 @@ package generators
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
@@ -150,7 +151,7 @@ func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Remove generated Dockerfile

@@ -493,7 +493,7 @@ func TestValidateCommandFlags(t *testing.T) {
 	}
 }
 
-func TestValidateOutputFormatting(t *testing.T) {
+func TestValidateOutputFormatting(_ *testing.T) {
 	// Test that output is properly formatted (basic check)
 	originalErrorStyle := errorStyle
 	originalSuccessStyle := successStyle

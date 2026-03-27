@@ -3,6 +3,7 @@ package generators
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"text/template"
 
@@ -36,7 +37,7 @@ func GeneratePreview(
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return "", ctx.Err()
+		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Create and parse template
@@ -75,7 +76,7 @@ func GenerateTemplate(
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return nil, ctx.Err()
+		return nil, fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Create and parse template
@@ -122,7 +123,7 @@ func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) e
 }
 
 // removeEmptyDirectory removes a directory if it's empty.
-func removeEmptyDirectory(logger Logger, dirPath string) error {
+func removeEmptyDirectory(logger Logger, dirPath string) {
 	files, err := os.ReadDir(dirPath)
 	if err == nil && len(files) == 0 {
 		err := os.Remove(dirPath)
@@ -130,13 +131,11 @@ func removeEmptyDirectory(logger Logger, dirPath string) error {
 			logger.Info("Removed empty directory", "path", dirPath)
 		}
 	}
-
-	return nil
 }
 
 // removeEmptyDirectories removes empty directories in a parent chain.
 func removeEmptyDirectories(logger Logger, parentDirs []string) {
 	for _, dir := range parentDirs {
-		_ = removeEmptyDirectory(logger, dir)
+		removeEmptyDirectory(logger, dir)
 	}
 }

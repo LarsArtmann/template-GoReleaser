@@ -65,33 +65,18 @@ func performValidation(cmd *cobra.Command) int {
 		}
 
 		// Validate GitHub Actions workflow
-		err = validateGitHubActions(results)
-		if err != nil {
-			displayError(err)
-
-			return 1
-		}
+		validateGitHubActions(results)
 	}
 
 	// Validate project structure
-	err := validateProjectStructure(results)
-	if err != nil {
-		displayError(err)
-
-		return 1
-	}
+	validateProjectStructure(results)
 
 	// Display results
 	displayValidationResults(results, verbose)
 
 	// Attempt fixes if requested
 	if fix && len(results.Errors) > 0 {
-		err := attemptFixes(results)
-		if err != nil {
-			displayError(err)
-
-			return 1
-		}
+		attemptFixes(results)
 	}
 
 	return results.GetExitCode()

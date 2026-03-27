@@ -179,48 +179,74 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 		return ".", filepath.Base(wd), cli
 	}
 
-	// Check for cmd/*/main.go structure (prefer single binary projects)
-	cmdDir := filepath.Join(wd, "cmd")
-
-	entries, err := os.ReadDir(cmdDir)
-	if err == nil {
-		// Collect all directories with main.go
-		var cmdDirs []string
-
-		for _, entry := range entries {
-			if entry.IsDir() {
-				mainFile := filepath.Join(cmdDir, entry.Name(), "main.go")
-				if _, err := os.Stat(mainFile); err == nil {
-					cmdDirs = append(cmdDirs, entry.Name())
-				}
-			}
-		}
-
-		if len(cmdDirs) > 0 {
-			// Single binary: use it directory name
-			if len(cmdDirs) == 1 {
-				return "./cmd/" + cmdDirs[0], cmdDirs[0], cli
-			}
-
-			// Multiple binaries: prefer the one matching project name or first alphabetically
-			binaryName := cmdDirs[0]
-			for _, dir := range cmdDirs {
-				if filepath.Base(wd) == dir {
-					binaryName = dir
-
-					break
-				}
-
-				if dir < binaryName {
-					binaryName = dir
-				}
-			}
-
-			return "./cmd/" + binaryName, binaryName, cli
-		}
+	// Check for cmd/*/main.go structure
+	if mainPath, binaryName, ok := detectCmdStructure(wd); ok {
+		return mainPath, binaryName, cli
 	}
 
 	// Check for other common structures
+	return detectAlternativeStructure(wd)
+}
+
+// detectCmdStructure checks for cmd/*/main.go pattern and returns the best match.
+func detectCmdStructure(wd string) (mainPath, binaryName string, ok bool) {
+	cmdDir := filepath.Join(wd, "cmd")
+
+	entries, err := os.ReadDir(cmdDir)
+	if err != nil {
+		return "", "", false
+	}
+
+	// Collect all directories with main.go
+	var cmdDirs []string
+
+	for _, entry := range entries {
+		if !entry.IsDir() {
+			continue
+		}
+
+		mainFile := filepath.Join(cmdDir, entry.Name(), "main.go")
+		if _, err := os.Stat(mainFile); err == nil {
+			cmdDirs = append(cmdDirs, entry.Name())
+		}
+	}
+
+	if len(cmdDirs) == 0 {
+		return "", "", false
+	}
+
+	// Single binary: use its directory name
+	if len(cmdDirs) == 1 {
+		return "./cmd/" + cmdDirs[0], cmdDirs[0], true
+	}
+
+	// Multiple binaries: prefer the one matching project name or first alphabetically
+	binaryName = selectBestBinary(cmdDirs, filepath.Base(wd))
+
+	return "./cmd/" + binaryName, binaryName, true
+}
+
+// selectBestBinary chooses the best binary from multiple cmd directories.
+func selectBestBinary(cmdDirs []string, projectName string) string {
+	binaryName := cmdDirs[0]
+
+	for _, dir := range cmdDirs {
+		if projectName == dir {
+			return dir
+		}
+
+		if dir < binaryName {
+			binaryName = dir
+		}
+	}
+
+	return binaryName
+}
+
+// detectAlternativeStructure checks for alternative project structures.
+func detectAlternativeStructure(wd string) (mainPath, binaryName, projectType string) {
+	const cli = "cli"
+
 	patterns := []struct {
 		path     string
 		binName  string
@@ -233,26 +259,36 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 
 	for _, pattern := range patterns {
 		matches, _ := filepath.Glob(filepath.Join(wd, pattern.path))
-		if len(matches) > 0 {
-			if pattern.binName == "" {
-				// Extract binary name from path
-				parts := strings.Split(matches[0], string(filepath.Separator))
-				for i, part := range parts {
-					if part == "src" || (part == "pkg" && i+1 < len(parts)) {
-						binaryName = filepath.Base(matches[0])
-						binaryName = strings.TrimSuffix(binaryName, ".go")
-
-						return pattern.path, binaryName, pattern.projType
-					}
-				}
-			}
-
-			return pattern.path, pattern.binName, pattern.projType
+		if len(matches) == 0 {
+			continue
 		}
+
+		if pattern.binName == "" {
+			// Extract binary name from path
+			binaryName = extractBinaryFromPath(matches[0])
+
+			return pattern.path, binaryName, pattern.projType
+		}
+
+		return pattern.path, pattern.binName, pattern.projType
 	}
 
 	// Default fallback
 	return ".", filepath.Base(wd), cli
+}
+
+// extractBinaryFromPath extracts the binary name from a matched file path.
+func extractBinaryFromPath(matchPath string) string {
+	parts := strings.Split(matchPath, string(filepath.Separator))
+	for i, part := range parts {
+		if (part == "src" || part == "pkg") && i+1 < len(parts) {
+			binaryName := filepath.Base(matchPath)
+
+			return strings.TrimSuffix(binaryName, ".go")
+		}
+	}
+
+	return filepath.Base(matchPath)
 }
 
 func init() {

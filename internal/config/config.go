@@ -63,23 +63,11 @@ func (m *Manager) Load(cfgFile string) error {
 
 	// 2. Load config file if specified or found
 	if cfgFile != "" {
-		err := m.loadFile(cfgFile)
-		if err != nil {
-			return err
-		}
-	} else {
-		// Try to find config in home directory
-		if home, err := os.UserHomeDir(); err == nil {
-			configPath := filepath.Join(home, ".goreleaser-wizard.yaml")
-			if _, err := os.Stat(configPath); err == nil {
-				err := m.loadFile(configPath)
-				if err != nil {
-					// Config file exists but couldn't be read - warn but don't fail
-					fmt.Fprintf(os.Stderr, "Warning: could not read config file: %v\n", err)
-				}
-			}
-		}
+		return m.loadFile(cfgFile)
 	}
+
+	// Try to find config in home directory
+	m.tryLoadHomeConfig()
 
 	// 3. Load environment variables (higher priority)
 	err = m.k.Load(env.Provider(".", env.Opt{
@@ -126,6 +114,25 @@ func (m *Manager) loadFile(path string) error {
 	return nil
 }
 
+// tryLoadHomeConfig attempts to load config from home directory.
+func (m *Manager) tryLoadHomeConfig() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+
+	configPath := filepath.Join(home, ".goreleaser-wizard.yaml")
+	if _, err := os.Stat(configPath); err != nil {
+		return
+	}
+
+	err = m.loadFile(configPath)
+	if err != nil {
+		// Config file exists but couldn't be read - warn but don't fail
+		fmt.Fprintf(os.Stderr, "Warning: could not read config file: %v\n", err)
+	}
+}
+
 // Get returns the current configuration.
 func (m *Manager) Get() Config {
 	m.mu.RLock()
@@ -153,10 +160,10 @@ func (m *Manager) Set(key string, value any) error {
 
 	err := m.k.Load(confmap.Provider(values, "."), nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to load configuration value: %w", err)
 	}
 
-	return m.k.Unmarshal("", &m.cfg)
+	return fmt.Errorf("failed to unmarshal configuration: %w", m.k.Unmarshal("", &m.cfg))
 }
 
 // Reset clears all configuration (mainly for tests).

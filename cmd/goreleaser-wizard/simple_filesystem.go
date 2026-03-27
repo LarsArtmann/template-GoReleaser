@@ -111,6 +111,7 @@ func (r *SimpleFileSystemRepository) ReadDir(
 	if err != nil {
 		return nil, fmt.Errorf("failed to read directory %q: %w", path, err)
 	}
+
 	return entries, nil
 }
 
@@ -122,6 +123,7 @@ func (r *SimpleFileSystemRepository) GetFileInfo(
 	if err != nil {
 		return nil, fmt.Errorf("failed to get file info %q: %w", path, err)
 	}
+
 	return info, nil
 }
 
@@ -142,6 +144,7 @@ func (r *SimpleFileSystemRepository) AbsPath(path string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("failed to get absolute path for %q: %w", path, err)
 	}
+
 	return abs, nil
 }
 
@@ -150,6 +153,7 @@ func (r *SimpleFileSystemRepository) RelPath(base, target string) (string, error
 	if err != nil {
 		return "", fmt.Errorf("failed to get relative path from %q to %q: %w", base, target, err)
 	}
+
 	return rel, nil
 }
 
@@ -166,5 +170,6 @@ func (r *SimpleFileSystemRepository) TempDir(dir, pattern string) (string, error
 	if err != nil {
 		return "", fmt.Errorf("failed to create temp directory: %w", err)
 	}
+
 	return tempDir, nil
 }

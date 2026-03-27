@@ -3,6 +3,7 @@ package generators
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"text/template"
 
@@ -41,7 +42,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Create template with custom functions
@@ -59,10 +60,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Generate template data with git information
-	data, err := g.prepareTemplateData(ctx)
-	if err != nil {
-		return err
-	}
+	data := g.prepareTemplateData(ctx)
 
 	// Execute template
 	var output bytes.Buffer
@@ -80,7 +78,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write configuration file
-	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), filePermission); err != nil {
+	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0o644); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write GoReleaser config",
@@ -116,7 +114,7 @@ func (g *GoReleaserGenerator) createBackup(filename string) error {
 // prepareTemplateData prepares complete template data including git information.
 func (g *GoReleaserGenerator) prepareTemplateData(
 	ctx context.Context,
-) (*types.GoReleaserTemplateData, error) {
+) *types.GoReleaserTemplateData {
 	// Get version information from git
 	versionInfo, err := git.GetVersionInfo(ctx)
 	if err != nil {
@@ -144,7 +142,7 @@ func (g *GoReleaserGenerator) prepareTemplateData(
 	data.Env["GITHUB_OWNER"] = versionInfo.Owner
 	data.Env["GITHUB_REPO"] = versionInfo.Repo
 
-	return &data, nil
+	return &data
 }
 
 // ValidateTemplate validates the GoReleaser template.
@@ -171,7 +169,7 @@ func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, erro
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return "", ctx.Err()
+		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Create template
@@ -189,10 +187,7 @@ func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, erro
 	}
 
 	// Prepare template data
-	data, err := g.prepareTemplateData(ctx)
-	if err != nil {
-		return "", err
-	}
+	data := g.prepareTemplateData(ctx)
 
 	// Execute template
 	var output bytes.Buffer

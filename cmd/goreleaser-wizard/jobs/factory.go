@@ -97,15 +97,13 @@ func (jf *JobFactory) createPreviewJobs(
 	config *domain.SafeProjectConfig,
 	options map[string]any,
 ) ([]Job, error) {
-	var jobs []Job
+	jobs := make([]Job, 0, 2)
 
 	// Add validation job
 	jobs = append(jobs, NewProjectValidationJob(".", jf.logger))
 
 	// Add preview-specific jobs
-	if previewJob, err := jf.createPreviewJob(config, options); err == nil {
-		jobs = append(jobs, previewJob)
-	}
+	jobs = append(jobs, jf.createPreviewJob(config, options))
 
 	return jobs, nil
 }
@@ -153,13 +151,13 @@ func (jf *JobFactory) createRollbackJobs(
 func (jf *JobFactory) createPreviewJob(
 	config *domain.SafeProjectConfig,
 	options map[string]any,
-) (Job, error) {
+) Job {
 	return &PreviewGenerationJob{
 		id:          "preview-generation",
 		config:      config,
 		logger:      jf.logger,
 		previewType: getStringOption(options, "type", "all"),
-	}, nil
+	}
 }
 
 // createConfigValidationJob creates a config validation job.
@@ -239,7 +237,7 @@ func (j *PreviewGenerationJob) Execute(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// Generate preview based on type
@@ -339,7 +337,7 @@ func (j *ConfigValidationJob) Execute(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// TODO: Implement comprehensive configuration validation
@@ -389,7 +387,7 @@ func (j *JobRollbackJob) Execute(ctx context.Context) error {
 
 	// Check context cancellation
 	if ctx.Err() != nil {
-		return ctx.Err()
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
 	// TODO: Implement specific job rollback logic

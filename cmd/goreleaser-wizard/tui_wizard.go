@@ -40,21 +40,104 @@ func IsTerminal() bool {
 	return (fi.Mode() & os.ModeCharDevice) != 0
 }
 
+// tuiFormData holds the mutable form data for the TUI wizard.
+type tuiFormData struct {
+	projectName        string
+	projectDesc        string
+	binaryName         string
+	mainPath           string
+	projectType        domain.ProjectType
+	selectedPlatforms  []string
+	selectedArchitects []string
+	cgoStatus          domain.CGOStatus
+	dockerSupport      domain.DockerSupport
+	gitProvider        domain.GitProvider
+	includeLDFlags     bool
+	enableSigning      bool
+	generateSBOM       bool
+	generateHomebrew   bool
+	generateSnap       bool
+	generateActions    bool
+}
+
 // RunTUIWizard runs the interactive TUI wizard using huh.
 func RunTUIWizard(config *domain.SafeProjectConfig) error {
-	// Basic project information
-	var (
-		projectName, projectDesc, binaryName, mainPath string
-		projectType                                    domain.ProjectType
-	)
+	formData := initializeFormData(config)
+	platformOpts := getPlatformOptions()
+	archOpts := getArchitectureOptions()
 
-	projectName = config.ProjectName
-	projectDesc = config.ProjectDescription
-	binaryName = config.BinaryName
-	mainPath = config.MainPath
-	projectType = config.ProjectType
+	form := buildTUIForm(&formData, platformOpts, archOpts)
 
-	// Build project type options
+	if err := form.Run(); err != nil {
+		return fmt.Errorf("form cancelled: %w", err)
+	}
+
+	updateConfigFromForm(config, &formData)
+	config.ApplyDefaults()
+
+	return nil
+}
+
+func initializeFormData(config *domain.SafeProjectConfig) tuiFormData {
+	selectedPlatforms := make([]string, 0, len(config.Platforms))
+	for _, p := range config.Platforms {
+		selectedPlatforms = append(selectedPlatforms, string(p))
+	}
+
+	selectedArchitects := make([]string, 0, len(config.Architectures))
+	for _, a := range config.Architectures {
+		selectedArchitects = append(selectedArchitects, string(a))
+	}
+
+	return tuiFormData{
+		projectName:        config.ProjectName,
+		projectDesc:        config.ProjectDescription,
+		binaryName:         config.BinaryName,
+		mainPath:           config.MainPath,
+		projectType:        config.ProjectType,
+		selectedPlatforms:  selectedPlatforms,
+		selectedArchitects: selectedArchitects,
+		cgoStatus:          config.CGOStatus,
+		dockerSupport:      config.DockerSupport,
+		gitProvider:        config.GitProvider,
+		includeLDFlags:     true,
+		enableSigning:      true,
+		generateSBOM:       true,
+		generateHomebrew:   true,
+		generateSnap:       true,
+		generateActions:    true,
+	}
+}
+
+func getPlatformOptions() []huh.Option[string] {
+	return []huh.Option[string]{
+		huh.NewOption("Linux", string(domain.PlatformLinux)),
+		huh.NewOption("macOS", string(domain.PlatformDarwin)),
+		huh.NewOption("Windows", string(domain.PlatformWindows)),
+		huh.NewOption("FreeBSD", string(domain.PlatformFreeBSD)),
+	}
+}
+
+func getArchitectureOptions() []huh.Option[string] {
+	return []huh.Option[string]{
+		huh.NewOption("amd64 (x86_64)", string(domain.ArchitectureAMD64)),
+		huh.NewOption("arm64 (ARM64)", string(domain.ArchitectureARM64)),
+	}
+}
+
+func buildTUIForm(formData *tuiFormData, platformOpts, archOpts []huh.Option[string]) *huh.Form {
+	theme := huh.ThemeFunc(huh.ThemeCharm)
+
+	return huh.NewForm(
+		buildBasicInfoGroup(formData),
+		buildPlatformsGroup(formData, platformOpts, archOpts),
+		buildBuildConfigGroup(formData),
+		buildAdvancedOptionsGroup(formData),
+		buildConfirmationGroup(formData),
+	).WithTheme(theme)
+}
+
+func buildBasicInfoGroup(formData *tuiFormData) *huh.Group {
 	projectTypes := []huh.Option[domain.ProjectType]{
 		huh.NewOption("CLI Application", domain.ProjectTypeCLI),
 		huh.NewOption("Web API", domain.ProjectTypeWebAPI),
@@ -66,44 +149,128 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 		huh.NewOption("Command Line Tool", domain.ProjectTypeTool),
 	}
 
-	// Platform and architecture selections
-	var (
-		selectedPlatforms     = make([]string, 0, len(config.Platforms))
-		selectedArchitectures = make([]string, 0, len(config.Architectures))
+	return huh.NewGroup(
+		huh.NewNote().
+			Title("GoReleaser Wizard").
+			Description("Let's configure your GoReleaser setup!\nThis wizard will guide you through the configuration process."),
+
+		huh.NewInput().
+			Title("Project Name").
+			Description("The name of your project").
+			Placeholder("my-awesome-project").
+			Value(&formData.projectName).
+			Validate(func(s string) error {
+				if s == "" {
+					return fmt.Errorf(
+						"project name validation failed (input: %q): %w",
+						formData.projectName,
+						ErrProjectNameRequired,
+					)
+				}
+
+				return domain.ValidateProjectName(s)
+			}),
+
+		huh.NewInput().
+			Title("Project Description").
+			Description("A brief description of your project").
+			Placeholder("A CLI tool that does amazing things").
+			Value(&formData.projectDesc).
+			Validate(func(s string) error {
+				if s == "" {
+					return nil // Optional
+				}
+
+				return domain.ValidateProjectDescription(s)
+			}),
+
+		huh.NewInput().
+			Title("Binary Name").
+			Description("The name of the compiled binary").
+			Placeholder("myapp").
+			Value(&formData.binaryName).
+			Validate(func(s string) error {
+				if s == "" {
+					return fmt.Errorf(
+						"binary name validation failed (input: %q): %w",
+						formData.binaryName,
+						ErrBinaryNameRequired,
+					)
+				}
+
+				return domain.ValidateBinaryName(s)
+			}),
+
+		huh.NewInput().
+			Title("Main Package Path").
+			Description("Path to your main.go file (e.g., ./cmd/myapp)").
+			Placeholder("./cmd/myapp").
+			Value(&formData.mainPath).
+			Validate(func(s string) error {
+				if s == "" {
+					return fmt.Errorf(
+						"main path validation failed (input: %q): %w",
+						formData.mainPath,
+						ErrMainPathRequired,
+					)
+				}
+
+				return domain.ValidateMainPath(s)
+			}),
+
+		huh.NewSelect[domain.ProjectType]().
+			Title("Project Type").
+			Description("What type of project is this?").
+			Options(projectTypes...).
+			Value(&formData.projectType),
 	)
+}
 
-	platformOptions := []huh.Option[string]{
-		huh.NewOption("Linux", string(domain.PlatformLinux)),
-		huh.NewOption("macOS", string(domain.PlatformDarwin)),
-		huh.NewOption("Windows", string(domain.PlatformWindows)),
-		huh.NewOption("FreeBSD", string(domain.PlatformFreeBSD)),
-	}
+func buildPlatformsGroup(
+	formData *tuiFormData,
+	platformOpts, archOpts []huh.Option[string],
+) *huh.Group {
+	return huh.NewGroup(
+		huh.NewNote().
+			Title("Target Platforms").
+			Description("Select the platforms you want to build for."),
 
-	archOptions := []huh.Option[string]{
-		huh.NewOption("amd64 (x86_64)", string(domain.ArchitectureAMD64)),
-		huh.NewOption("arm64 (ARM64)", string(domain.ArchitectureARM64)),
-	}
+		huh.NewMultiSelect[string]().
+			Title("Platforms").
+			Description("Select target operating systems").
+			Options(platformOpts...).
+			Value(&formData.selectedPlatforms).
+			Validate(func(s []string) error {
+				if len(s) == 0 {
+					return fmt.Errorf(
+						"platforms validation failed (selected: %v): %w",
+						formData.selectedPlatforms,
+						ErrPlatformRequired,
+					)
+				}
 
-	// Initialize with current values
-	for _, p := range config.Platforms {
-		selectedPlatforms = append(selectedPlatforms, string(p))
-	}
+				return nil
+			}),
 
-	for _, a := range config.Architectures {
-		selectedArchitectures = append(selectedArchitectures, string(a))
-	}
+		huh.NewMultiSelect[string]().
+			Title("Architectures").
+			Description("Select target CPU architectures").
+			Options(archOpts...).
+			Value(&formData.selectedArchitects).
+			Validate(func(s []string) error {
+				if len(s) == 0 {
+					return fmt.Errorf(
+						"architectures validation failed: %w",
+						ErrArchitectureRequired,
+					)
+				}
 
-	// CGO, Docker, Git Provider
-	var (
-		cgoStatus     domain.CGOStatus
-		dockerSupport domain.DockerSupport
-		gitProvider   domain.GitProvider
+				return nil
+			}),
 	)
+}
 
-	cgoStatus = config.CGOStatus
-	dockerSupport = config.DockerSupport
-	gitProvider = config.GitProvider
-
+func buildBuildConfigGroup(formData *tuiFormData) *huh.Group {
 	cgoOptions := []huh.Option[domain.CGOStatus]{
 		huh.NewOption("Disabled (recommended)", domain.CGOStatusDisabled),
 		huh.NewOption("Enabled when available", domain.CGOStatusEnabled),
@@ -123,284 +290,145 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 		huh.NewOption("Bitbucket", domain.GitProviderBitbucket),
 	}
 
-	// Advanced options (default to true for richer configuration)
-	var includeLDFlags, enableSigning, generateSBOM, generateHomebrew, generateSnap, generateActions bool
+	return huh.NewGroup(
+		huh.NewNote().
+			Title("Build Configuration").
+			Description("Configure build options for your project."),
 
-	includeLDFlags = true
-	enableSigning = true
-	generateSBOM = true
-	generateHomebrew = true
-	generateSnap = true
-	generateActions = true
+		huh.NewSelect[domain.CGOStatus]().
+			Title("CGO Configuration").
+			Description("Should CGO be enabled for builds?").
+			Options(cgoOptions...).
+			Value(&formData.cgoStatus),
 
-	// Form theme with lipgloss
-	theme := huh.ThemeFunc(huh.ThemeCharm)
+		huh.NewSelect[domain.DockerSupport]().
+			Title("Docker Support").
+			Description("Configure Docker image building and publishing").
+			Options(dockerOptions...).
+			Value(&formData.dockerSupport),
 
-	// Build the form
-	form := huh.NewForm(
-		// Group 1: Basic Project Information
-		huh.NewGroup(
-			huh.NewNote().
-				Title("GoReleaser Wizard").
-				Description("Let's configure your GoReleaser setup!\nThis wizard will guide you through the configuration process."),
+		huh.NewSelect[domain.GitProvider]().
+			Title("Git Provider").
+			Description("Which Git hosting service do you use?").
+			Options(gitProviderOptions...).
+			Value(&formData.gitProvider),
+	)
+}
 
-			huh.NewInput().
-				Title("Project Name").
-				Description("The name of your project").
-				Placeholder("my-awesome-project").
-				Value(&projectName).
-				Validate(func(s string) error {
-					if s == "" {
-						return fmt.Errorf(
-							"project name validation failed (input: %q): %w",
-							projectName,
-							ErrProjectNameRequired,
-						)
-					}
+func buildAdvancedOptionsGroup(formData *tuiFormData) *huh.Group {
+	return huh.NewGroup(
+		huh.NewNote().
+			Title("Advanced Options").
+			Description("Additional features and integrations (optional)."),
 
-					return domain.ValidateProjectName(s)
-				}),
+		huh.NewConfirm().
+			Title("Include LDFlags?").
+			Description("Inject version information into the binary at build time").
+			Value(&formData.includeLDFlags),
 
-			huh.NewInput().
-				Title("Project Description").
-				Description("A brief description of your project").
-				Placeholder("A CLI tool that does amazing things").
-				Value(&projectDesc).
-				Validate(func(s string) error {
-					if s == "" {
-						return nil // Optional
-					}
+		huh.NewConfirm().
+			Title("Enable Code Signing?").
+			Description("Sign binaries for distribution").
+			Value(&formData.enableSigning),
 
-					return domain.ValidateProjectDescription(s)
-				}),
+		huh.NewConfirm().
+			Title("Generate SBOM?").
+			Description("Software Bill of Materials for security compliance").
+			Value(&formData.generateSBOM),
 
-			huh.NewInput().
-				Title("Binary Name").
-				Description("The name of the compiled binary").
-				Placeholder("myapp").
-				Value(&binaryName).
-				Validate(func(s string) error {
-					if s == "" {
-						return fmt.Errorf(
-							"binary name validation failed (input: %q): %w",
-							binaryName,
-							ErrBinaryNameRequired,
-						)
-					}
+		huh.NewConfirm().
+			Title("Generate Homebrew Formula?").
+			Description("Create a Homebrew formula for macOS users").
+			Value(&formData.generateHomebrew),
 
-					return domain.ValidateBinaryName(s)
-				}),
+		huh.NewConfirm().
+			Title("Generate Snap Package?").
+			Description("Create a Snap package for Ubuntu/Debian").
+			Value(&formData.generateSnap),
 
-			huh.NewInput().
-				Title("Main Package Path").
-				Description("Path to your main.go file (e.g., ./cmd/myapp)").
-				Placeholder("./cmd/myapp").
-				Value(&mainPath).
-				Validate(func(s string) error {
-					if s == "" {
-						return fmt.Errorf(
-							"main path validation failed (input: %q): %w",
-							mainPath,
-							ErrMainPathRequired,
-						)
-					}
+		huh.NewConfirm().
+			Title("Generate GitHub Actions?").
+			Description("Create a CI/CD workflow for automated releases").
+			Value(&formData.generateActions),
+	)
+}
 
-					return domain.ValidateMainPath(s)
-				}),
+func buildConfirmationGroup(formData *tuiFormData) *huh.Group {
+	return huh.NewGroup(
+		huh.NewNote().
+			Title("Configuration Summary").
+			DescriptionFunc(func() string {
+				return fmt.Sprintf(
+					"Project: %s (%s)\nBinary: %s\nPlatforms: %v\nArchitectures: %v\nDocker: %s\nGitHub Actions: %v",
+					formData.projectName,
+					formData.projectType,
+					formData.binaryName,
+					formData.selectedPlatforms,
+					formData.selectedArchitects,
+					formData.dockerSupport,
+					formData.generateActions,
+				)
+			}, nil),
+	).WithHide(true)
+}
 
-			huh.NewSelect[domain.ProjectType]().
-				Title("Project Type").
-				Description("What type of project is this?").
-				Options(projectTypes...).
-				Value(&projectType),
-		),
+func updateConfigFromForm(config *domain.SafeProjectConfig, formData *tuiFormData) {
+	config.ProjectName = formData.projectName
+	config.ProjectDescription = formData.projectDesc
+	config.BinaryName = formData.binaryName
+	config.MainPath = formData.mainPath
+	config.ProjectType = formData.projectType
 
-		// Group 2: Target Platforms
-		huh.NewGroup(
-			huh.NewNote().
-				Title("Target Platforms").
-				Description("Select the platforms you want to build for."),
+	convertPlatformSelections(config, formData.selectedPlatforms)
+	convertArchitectureSelections(config, formData.selectedArchitects)
 
-			huh.NewMultiSelect[string]().
-				Title("Platforms").
-				Description("Select target operating systems").
-				Options(platformOptions...).
-				Value(&selectedPlatforms).
-				Validate(func(s []string) error {
-					if len(s) == 0 {
-						return fmt.Errorf(
-							"platforms validation failed (selected: %v): %w",
-							selectedPlatforms,
-							ErrPlatformRequired,
-						)
-					}
+	config.CGOStatus = formData.cgoStatus
+	config.DockerSupport = formData.dockerSupport
+	config.GitProvider = formData.gitProvider
+	config.LDFlags = formData.includeLDFlags
 
-					return nil
-				}),
-
-			huh.NewMultiSelect[string]().
-				Title("Architectures").
-				Description("Select target CPU architectures").
-				Options(archOptions...).
-				Value(&selectedArchitectures).
-				Validate(func(s []string) error {
-					if len(s) == 0 {
-						return fmt.Errorf(
-							"architectures validation failed: %w",
-							ErrArchitectureRequired,
-						)
-					}
-
-					return nil
-				}),
-		),
-
-		// Group 3: Build Configuration
-		huh.NewGroup(
-			huh.NewNote().
-				Title("Build Configuration").
-				Description("Configure build options for your project."),
-
-			huh.NewSelect[domain.CGOStatus]().
-				Title("CGO Configuration").
-				Description("Should CGO be enabled for builds?").
-				Options(cgoOptions...).
-				Value(&cgoStatus),
-
-			huh.NewSelect[domain.DockerSupport]().
-				Title("Docker Support").
-				Description("Configure Docker image building and publishing").
-				Options(dockerOptions...).
-				Value(&dockerSupport),
-
-			huh.NewSelect[domain.GitProvider]().
-				Title("Git Provider").
-				Description("Which Git hosting service do you use?").
-				Options(gitProviderOptions...).
-				Value(&gitProvider),
-		),
-
-		// Group 4: Advanced Options
-		huh.NewGroup(
-			huh.NewNote().
-				Title("Advanced Options").
-				Description("Additional features and integrations (optional)."),
-
-			huh.NewConfirm().
-				Title("Include LDFlags?").
-				Description("Inject version information into the binary at build time").
-				Value(&includeLDFlags),
-
-			huh.NewConfirm().
-				Title("Enable Code Signing?").
-				Description("Sign binaries for distribution").
-				Value(&enableSigning),
-
-			huh.NewConfirm().
-				Title("Generate SBOM?").
-				Description("Software Bill of Materials for security compliance").
-				Value(&generateSBOM),
-
-			huh.NewConfirm().
-				Title("Generate Homebrew Formula?").
-				Description("Create a Homebrew formula for macOS users").
-				Value(&generateHomebrew),
-
-			huh.NewConfirm().
-				Title("Generate Snap Package?").
-				Description("Create a Snap package for Ubuntu/Debian").
-				Value(&generateSnap),
-
-			huh.NewConfirm().
-				Title("Generate GitHub Actions?").
-				Description("Create a CI/CD workflow for automated releases").
-				Value(&generateActions),
-		),
-
-		// Group 5: Confirmation
-		huh.NewGroup(
-			huh.NewNote().
-				Title("Configuration Summary").
-				DescriptionFunc(func() string {
-					return fmt.Sprintf(
-						"Project: %s (%s)\nBinary: %s\nPlatforms: %v\nArchitectures: %v\nDocker: %s\nGitHub Actions: %v",
-						projectName,
-						projectType,
-						binaryName,
-						selectedPlatforms,
-						selectedArchitectures,
-						dockerSupport,
-						generateActions,
-					)
-				}, nil),
-		).WithHide(true),
-	).WithTheme(theme)
-
-	// Run the form
-	err := form.Run()
-	if err != nil {
-		return fmt.Errorf("form cancelled: %w", err)
-	}
-
-	// Update config with form values
-	config.ProjectName = projectName
-	config.ProjectDescription = projectDesc
-	config.BinaryName = binaryName
-	config.MainPath = mainPath
-	config.ProjectType = projectType
-
-	// Convert platform selections
-	config.Platforms = nil
-
-	for _, p := range selectedPlatforms {
-		if slices.Contains(
-			[]string{
-				string(domain.PlatformLinux),
-				string(domain.PlatformDarwin),
-				string(domain.PlatformWindows),
-				string(domain.PlatformFreeBSD),
-			},
-			p,
-		) {
-			config.Platforms = append(config.Platforms, domain.Platform(p))
-		}
-	}
-
-	// Convert architecture selections
-	config.Architectures = nil
-
-	for _, a := range selectedArchitectures {
-		if slices.Contains(
-			[]string{string(domain.ArchitectureAMD64), string(domain.ArchitectureARM64)},
-			a,
-		) {
-			config.Architectures = append(config.Architectures, domain.Architecture(a))
-		}
-	}
-
-	config.CGOStatus = cgoStatus
-	config.DockerSupport = dockerSupport
-	config.GitProvider = gitProvider
-	config.LDFlags = includeLDFlags
-
-	if enableSigning {
+	if formData.enableSigning {
 		config.SigningLevel = domain.SigningLevelBasic
 	} else {
 		config.SigningLevel = domain.SigningLevelNone
 	}
 
-	config.SBOM = generateSBOM
-	config.Homebrew = generateHomebrew
-	config.Snap = generateSnap
+	config.SBOM = formData.generateSBOM
+	config.Homebrew = formData.generateHomebrew
+	config.Snap = formData.generateSnap
 
-	if generateActions {
+	if formData.generateActions {
 		config.ActionLevel = domain.ActionLevelBasic
 	} else {
 		config.ActionLevel = domain.ActionLevelNone
 	}
+}
 
-	// Apply any needed defaults based on selections
-	config.ApplyDefaults()
+func convertPlatformSelections(config *domain.SafeProjectConfig, selected []string) {
+	config.Platforms = nil
 
-	return nil
+	validPlatforms := []string{
+		string(domain.PlatformLinux),
+		string(domain.PlatformDarwin),
+		string(domain.PlatformWindows),
+		string(domain.PlatformFreeBSD),
+	}
+
+	for _, p := range selected {
+		if slices.Contains(validPlatforms, p) {
+			config.Platforms = append(config.Platforms, domain.Platform(p))
+		}
+	}
+}
+
+func convertArchitectureSelections(config *domain.SafeProjectConfig, selected []string) {
+	config.Architectures = nil
+
+	validArchs := []string{string(domain.ArchitectureAMD64), string(domain.ArchitectureARM64)}
+
+	for _, a := range selected {
+		if slices.Contains(validArchs, a) {
+			config.Architectures = append(config.Architectures, domain.Architecture(a))
+		}
+	}
 }

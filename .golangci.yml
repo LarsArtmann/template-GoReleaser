@@ -184,6 +184,9 @@ linters:
           - noctx
           - contextcheck
           - gochecknoglobals
+          - gocognit
+          - nestif
+          - maintidx
       # CLI tools commonly use globals for version info and Cobra commands
       - path: cmd/goreleaser-wizard/main\.go
         linters:

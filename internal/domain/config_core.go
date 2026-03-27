@@ -386,12 +386,12 @@ func (spc *SafeProjectConfig) ToYAML() (string, error) {
 
 // FromJSON loads configuration from JSON string.
 func (spc *SafeProjectConfig) FromJSON(jsonStr string) error {
-	return json.Unmarshal([]byte(jsonStr), spc)
+	return fmt.Errorf("failed to unmarshal JSON: %w", json.Unmarshal([]byte(jsonStr), spc))
 }
 
 // FromYAML loads configuration from YAML string.
 func (spc *SafeProjectConfig) FromYAML(yamlStr string) error {
-	return yaml.Unmarshal([]byte(yamlStr), spc)
+	return fmt.Errorf("failed to unmarshal YAML: %w", yaml.Unmarshal([]byte(yamlStr), spc))
 }
 
 // GetSummary returns a summary of the configuration.

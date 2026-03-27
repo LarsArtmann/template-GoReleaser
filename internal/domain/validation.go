@@ -467,10 +467,7 @@ func (vu *ValidationUseCase) analyzeProjectStructure(
 	}
 
 	// Find main.go file
-	mainPath, err := vu.findMainFile(ctx, projectPath)
-	if err != nil {
-		vu.logger.WarnContext(ctx, "Failed to find main.go", "error", err)
-	}
+	mainPath := vu.findMainFile(ctx, projectPath)
 
 	if mainPath != "" {
 		info.HasMainFile = true
@@ -513,7 +510,7 @@ func (vu *ValidationUseCase) parseGoMod(
 }
 
 // findMainFile searches for main.go in common locations.
-func (vu *ValidationUseCase) findMainFile(ctx context.Context, projectPath string) (string, error) {
+func (vu *ValidationUseCase) findMainFile(ctx context.Context, projectPath string) string {
 	commonPaths := []string{
 		"main.go",
 		"cmd/main.go",
@@ -530,11 +527,11 @@ func (vu *ValidationUseCase) findMainFile(ctx context.Context, projectPath strin
 		}
 
 		if exists {
-			return path, nil
+			return path
 		}
 	}
 
-	return "", nil
+	return ""
 }
 
 // inferProjectType infers project type and binary name from structure.

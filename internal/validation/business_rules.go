@@ -19,34 +19,22 @@ func ValidateConfiguration(config *domain.SafeProjectConfig) (*types.ValidationR
 	}
 
 	// Step 1: Basic field validation
-	err := validateBasicFields(config, result)
-	if err != nil {
-		return nil, err
-	}
+	validateBasicFields(config, result)
 
 	// Step 2: Type validation
-	err = validateTypes(config, result)
-	if err != nil {
-		return nil, err
-	}
+	validateTypes(config, result)
 
 	// Step 3: Platform-architecture compatibility
-	err = validatePlatformArchCompatibility(config, result)
-	if err != nil {
-		return nil, err
-	}
+	validatePlatformArchCompatibility(config, result)
 
 	// Step 4: Business rule validation
-	err = validateBusinessRules(config, result)
+	err := validateBusinessRules(config, result)
 	if err != nil {
 		return nil, err
 	}
 
 	// Step 5: Security validation
-	err = validateSecurity(config, result)
-	if err != nil {
-		return nil, err
-	}
+	validateSecurity(config, result)
 
 	// Step 6: Generate warnings
 	generateWarnings(config, result)
@@ -58,7 +46,7 @@ func ValidateConfiguration(config *domain.SafeProjectConfig) (*types.ValidationR
 }
 
 // validateBasicFields validates basic required fields.
-func validateBasicFields(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateBasicFields(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Project name validation
 	err := ValidateProjectName(config.ProjectName)
 	if err != nil {
@@ -108,12 +96,10 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 			})
 		}
 	}
-
-	return nil
 }
 
 // validateTypes validates enum types.
-func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Project type validation
 	if !config.ProjectType.IsValid() {
 		result.AddError(&types.ValidationError{
@@ -212,15 +198,14 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 			Suggestion: "Choose a valid config state (draft, processing, generated, etc.)",
 		})
 	}
-
-	return nil
 }
 
+// validatePlatformArchCompatibility validates platform-architecture combinations.
 // validatePlatformArchCompatibility validates platform-architecture combinations.
 func validatePlatformArchCompatibility(
 	config *domain.SafeProjectConfig,
 	result *types.ValidationResult,
-) error {
+) {
 	// Validate platforms
 	for i, platform := range config.Platforms {
 		if !platform.IsValid() {
@@ -294,8 +279,6 @@ func validatePlatformArchCompatibility(
 			})
 		}
 	}
-
-	return nil
 }
 
 // validateBusinessRules validates business logic rules.
@@ -345,49 +328,65 @@ func validateDockerBusinessRules(
 
 	// Docker registry must be compatible with Git provider
 	if config.DockerSupport.IsDeployEnabled() {
-		if config.GitProvider != "" && config.DockerRegistry != "" {
-			compatibleRegistry := config.GitProvider.DefaultRegistry()
-			if config.DockerRegistry != compatibleRegistry {
-				result.AddWarning(&types.ValidationWarning{
-					Code:  "DOCKER_GIT_COMPATIBILITY",
-					Field: "docker_registry",
-					Message: fmt.Sprintf(
-						"Docker registry (%s) may not be optimal for Git provider (%s)",
-						config.DockerRegistry.String(),
-						config.GitProvider.String(),
-					),
-					Level: types.WarningLevelMedium,
-					Suggestion: fmt.Sprintf("Consider using %s registry for %s",
-						compatibleRegistry.String(), config.GitProvider.String()),
-				})
-			}
-		}
-
-		// Docker image name is required for deployment
-		if config.DockerImage == "" {
-			result.AddError(&types.ValidationError{
-				Code:       errors.ErrInvalidConfig,
-				Field:      "docker_image",
-				Message:    "Docker image name is required when deployment is enabled",
-				Level:      types.ErrorLevelHigh,
-				Suggestion: "Specify a Docker image name or disable deployment",
-			})
-		} else {
-			// Validate Docker image name
-			err := ValidateDockerImageName(config.DockerImage)
-			if err != nil {
-				result.AddError(&types.ValidationError{
-					Code:       errors.ErrInvalidDockerImage,
-					Field:      "docker_image",
-					Message:    err.Error(),
-					Level:      types.ErrorLevelHigh,
-					Suggestion: "Use a valid Docker image name (lowercase, alphanumeric with separators)",
-				})
-			}
-		}
+		validateDockerRegistryCompatibility(config, result)
+		validateDockerImage(config, result)
 	}
 
 	return nil
+}
+
+// validateDockerRegistryCompatibility checks Docker registry compatibility with Git provider.
+func validateDockerRegistryCompatibility(
+	config *domain.SafeProjectConfig,
+	result *types.ValidationResult,
+) {
+	if config.GitProvider == "" || config.DockerRegistry == "" {
+		return
+	}
+
+	compatibleRegistry := config.GitProvider.DefaultRegistry()
+	if config.DockerRegistry == compatibleRegistry {
+		return
+	}
+
+	result.AddWarning(&types.ValidationWarning{
+		Code:  "DOCKER_GIT_COMPATIBILITY",
+		Field: "docker_registry",
+		Message: fmt.Sprintf(
+			"Docker registry (%s) may not be optimal for Git provider (%s)",
+			config.DockerRegistry.String(),
+			config.GitProvider.String(),
+		),
+		Level: types.WarningLevelMedium,
+		Suggestion: fmt.Sprintf("Consider using %s registry for %s",
+			compatibleRegistry.String(), config.GitProvider.String()),
+	})
+}
+
+// validateDockerImage validates the Docker image name.
+func validateDockerImage(config *domain.SafeProjectConfig, result *types.ValidationResult) {
+	if config.DockerImage == "" {
+		result.AddError(&types.ValidationError{
+			Code:       errors.ErrInvalidConfig,
+			Field:      "docker_image",
+			Message:    "Docker image name is required when deployment is enabled",
+			Level:      types.ErrorLevelHigh,
+			Suggestion: "Specify a Docker image name or disable deployment",
+		})
+
+		return
+	}
+
+	err := ValidateDockerImageName(config.DockerImage)
+	if err != nil {
+		result.AddError(&types.ValidationError{
+			Code:       errors.ErrInvalidDockerImage,
+			Field:      "docker_image",
+			Message:    err.Error(),
+			Level:      types.ErrorLevelHigh,
+			Suggestion: "Use a valid Docker image name (lowercase, alphanumeric with separators)",
+		})
+	}
 }
 
 // validateSigningBusinessRules validates signing business rules.
@@ -508,7 +507,7 @@ func validateProjectTypeBusinessRules(
 }
 
 // validateSecurity validates security-related configurations.
-func validateSecurity(config *domain.SafeProjectConfig, result *types.ValidationResult) error {
+func validateSecurity(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Security level consistency
 	if config.FeatureLevel.IncludesAdvanced() && config.SigningLevel == domain.SigningLevelNone {
 		result.AddWarning(&types.ValidationWarning{
@@ -544,8 +543,6 @@ func validateSecurity(config *domain.SafeProjectConfig, result *types.Validation
 			})
 		}
 	}
-
-	return nil
 }
 
 // generateWarnings generates helpful warnings based on configuration.

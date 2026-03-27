@@ -363,31 +363,48 @@ func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 		return fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
-	// Remove generated config
-	if _, err := os.Stat(".goreleaser.yaml"); err == nil {
-		// Check if backup exists
-		if _, err := os.Stat(".goreleaser.yaml.backup"); err == nil {
-			// Restore backup
-			err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
-			if err != nil {
-				j.logger.Errorf("Failed to restore backup: %v", err)
-
-				return fmt.Errorf("failed to restore backup: %w", err)
-			}
-
-			j.logger.Info("Restored backup configuration")
-		} else {
-			// Remove generated file
-			err := os.Remove(".goreleaser.yaml")
-			if err != nil {
-				j.logger.Errorf("Failed to remove generated config: %v", err)
-
-				return fmt.Errorf("failed to remove generated config: %w", err)
-			}
-
-			j.logger.Info("Removed generated configuration")
-		}
+	// Check if config file exists
+	if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
+		return nil // File doesn't exist, nothing to rollback
 	}
+
+	return j.rollbackConfigFile()
+}
+
+// rollbackConfigFile handles the rollback of the config file.
+func (j *ConfigGenerationJob) rollbackConfigFile() error {
+	// Check if backup exists
+	if _, err := os.Stat(".goreleaser.yaml.backup"); err == nil {
+		return j.restoreBackup()
+	}
+
+	return j.removeGeneratedConfig()
+}
+
+// restoreBackup restores the backup configuration file.
+func (j *ConfigGenerationJob) restoreBackup() error {
+	err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
+	if err != nil {
+		j.logger.Errorf("Failed to restore backup: %v", err)
+
+		return fmt.Errorf("failed to restore backup: %w", err)
+	}
+
+	j.logger.Info("Restored backup configuration")
+
+	return nil
+}
+
+// removeGeneratedConfig removes the generated configuration file.
+func (j *ConfigGenerationJob) removeGeneratedConfig() error {
+	err := os.Remove(".goreleaser.yaml")
+	if err != nil {
+		j.logger.Errorf("Failed to remove generated config: %v", err)
+
+		return fmt.Errorf("failed to remove generated config: %w", err)
+	}
+
+	j.logger.Info("Removed generated configuration")
 
 	return nil
 }

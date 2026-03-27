@@ -6,7 +6,7 @@ import (
 )
 
 // attemptFixes attempts to fix common issues.
-func attemptFixes(results *ValidationResults) error {
+func attemptFixes(results *ValidationResults) {
 	fmt.Println("🔧 Attempting to fix common issues...")
 	fmt.Println()
 
@@ -41,8 +41,6 @@ func attemptFixes(results *ValidationResults) error {
 	} else {
 		fmt.Println(infoStyle.Render("ℹ️  No auto-fixable issues found"))
 	}
-
-	return nil
 }
 
 // generateBasicConfig generates a basic GoReleaser configuration.
