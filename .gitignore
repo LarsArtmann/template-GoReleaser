@@ -186,3 +186,5 @@ config.local.yml
 .claude/settings.local.json
 # Dependencies
 node_modules/
+# Build artifacts
+/GoReleaser-Wizard
