@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-| Aspect | Status | Rating |
-|--------|--------|--------|
-| BDD Framework | Not using Ginkgo | Critical |
-| End-User Perspective | Mostly technical tests | Poor |
-| Test Coverage | 50.8% (cmd), 57.1% (validation), 0.7% (domain) | Below Target |
-| Behavioral Scenarios | Missing | Critical |
-| Given-When-Then Style | Absent | Critical |
+| Aspect                | Status                                         | Rating       |
+| --------------------- | ---------------------------------------------- | ------------ |
+| BDD Framework         | Not using Ginkgo                               | Critical     |
+| End-User Perspective  | Mostly technical tests                         | Poor         |
+| Test Coverage         | 50.8% (cmd), 57.1% (validation), 0.7% (domain) | Below Target |
+| Behavioral Scenarios  | Missing                                        | Critical     |
+| Given-When-Then Style | Absent                                         | Critical     |
 
 **Overall Assessment**: The project has solid unit tests but lacks true BDD-style tests written from the end-user perspective. Tests focus on technical implementation details rather than user behaviors and outcomes.
 
@@ -24,20 +24,20 @@
 
 ### Test Files Found (12 files)
 
-| File | Type | Lines | Focus |
-|------|------|-------|-------|
-| `cmd/goreleaser-wizard/init_test.go` | Unit | 352 | Command execution |
-| `cmd/goreleaser-wizard/generate_test.go` | Unit | 423 | Config generation |
-| `cmd/goreleaser-wizard/validate_test.go` | Unit | 562 | Validation logic |
-| `cmd/goreleaser-wizard/integration_test.go` | Integration | 464 | E2E flows |
-| `cmd/goreleaser-wizard/generate_extended_test.go` | Unit | ~600 | Extended generation |
-| `cmd/goreleaser-wizard/performance_test.go` | Benchmark | - | Performance |
-| `cmd/goreleaser-wizard/architecture_test.go` | Architecture | - | Arch validation |
-| `internal/domain/ids_test.go` | Unit | 277 | ID types |
-| `internal/validation/validators_test.go` | Unit | 265 | Validation functions |
-| `internal/validation/form_validator_test.go` | Unit | - | Form validation |
-| `internal/validation/template_escaping_test.go` | Unit | - | Template escaping |
-| `internal/types/validation_clone_test.go` | Unit | - | Clone operations |
+| File                                              | Type         | Lines | Focus                |
+| ------------------------------------------------- | ------------ | ----- | -------------------- |
+| `cmd/goreleaser-wizard/init_test.go`              | Unit         | 352   | Command execution    |
+| `cmd/goreleaser-wizard/generate_test.go`          | Unit         | 423   | Config generation    |
+| `cmd/goreleaser-wizard/validate_test.go`          | Unit         | 562   | Validation logic     |
+| `cmd/goreleaser-wizard/integration_test.go`       | Integration  | 464   | E2E flows            |
+| `cmd/goreleaser-wizard/generate_extended_test.go` | Unit         | ~600  | Extended generation  |
+| `cmd/goreleaser-wizard/performance_test.go`       | Benchmark    | -     | Performance          |
+| `cmd/goreleaser-wizard/architecture_test.go`      | Architecture | -     | Arch validation      |
+| `internal/domain/ids_test.go`                     | Unit         | 277   | ID types             |
+| `internal/validation/validators_test.go`          | Unit         | 265   | Validation functions |
+| `internal/validation/form_validator_test.go`      | Unit         | -     | Form validation      |
+| `internal/validation/template_escaping_test.go`   | Unit         | -     | Template escaping    |
+| `internal/types/validation_clone_test.go`         | Unit         | -     | Clone operations     |
 
 ### Test Coverage by Package
 
@@ -65,6 +65,7 @@ internal/validation       57.1%  (target: 80%)
 The project does **not** use Ginkgo, the de-facto standard BDD framework for Go.
 
 **Current style**:
+
 ```go
 func TestValidateProjectName(t *testing.T) {
     tests := []testCase[string]{
@@ -76,6 +77,7 @@ func TestValidateProjectName(t *testing.T) {
 ```
 
 **BDD style with Ginkgo**:
+
 ```go
 var _ = Describe("Project Name Validation", func() {
     When("a user enters a valid project name", func() {
@@ -98,11 +100,11 @@ var _ = Describe("Project Name Validation", func() {
 
 Current tests focus on **technical correctness**, not **user behaviors**:
 
-| What We Test | What We Should Test |
-|--------------|---------------------|
+| What We Test                                           | What We Should Test                                                                           |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------- |
 | `ValidateProjectName()` returns error for empty string | "As a developer, when I forget to enter a project name, I should see a helpful error message" |
-| `generateGoReleaserConfig()` creates a file | "As a user, when I run the wizard, I should get a working .goreleaser.yaml" |
-| Detection logic returns correct values | "As a new user, the wizard should automatically detect my project structure" |
+| `generateGoReleaserConfig()` creates a file            | "As a user, when I run the wizard, I should get a working .goreleaser.yaml"                   |
+| Detection logic returns correct values                 | "As a new user, the wizard should automatically detect my project structure"                  |
 
 ### 3. No Given-When-Then Documentation
 
@@ -127,16 +129,16 @@ Feature: Interactive Configuration Wizard
 
 ### 4. Missing Critical User Journeys
 
-| User Journey | Current Test Coverage |
-|--------------|----------------------|
-| New project setup from scratch | Partial (integration_test.go) |
-| Existing project migration | None |
-| Docker support configuration | Partial |
-| GitHub Actions setup | Partial |
-| Homebrew formula generation | Minimal |
-| Error recovery and guidance | None |
-| Interactive vs non-interactive modes | Minimal |
-| Configuration validation feedback | Partial |
+| User Journey                         | Current Test Coverage         |
+| ------------------------------------ | ----------------------------- |
+| New project setup from scratch       | Partial (integration_test.go) |
+| Existing project migration           | None                          |
+| Docker support configuration         | Partial                       |
+| GitHub Actions setup                 | Partial                       |
+| Homebrew formula generation          | Minimal                       |
+| Error recovery and guidance          | None                          |
+| Interactive vs non-interactive modes | Minimal                       |
+| Configuration validation feedback    | Partial                       |
 
 ---
 
@@ -145,6 +147,7 @@ Feature: Interactive Configuration Wizard
 ### Phase 1: Add Ginkgo (Priority: High)
 
 1. **Install Ginkgo**
+
    ```bash
    go install github.com/onsi/ginkgo/v2/ginkgo@latest
    go get github.com/onsi/ginkgo/v2
@@ -228,6 +231,7 @@ var _ = Describe("Interactive Wizard", Label("user-journey"), func() {
 Create comprehensive BDD tests for:
 
 1. **New Project Journey**
+
    ```go
    Describe("New project setup", func() {
        When("I have a fresh Go project", func() {
@@ -239,6 +243,7 @@ Create comprehensive BDD tests for:
    ```
 
 2. **Docker Integration Journey**
+
    ```go
    Describe("Docker support configuration", func() {
        When("I enable Docker support", func() {
@@ -264,11 +269,11 @@ Create comprehensive BDD tests for:
 
 Focus areas for coverage improvement:
 
-| Package | Current | Target | Gap |
-|---------|---------|--------|-----|
-| cmd/goreleaser-wizard | 50.8% | 80% | +29.2% |
-| internal/domain | 0.7% | 80% | +79.3% |
-| internal/validation | 57.1% | 80% | +22.9% |
+| Package               | Current | Target | Gap    |
+| --------------------- | ------- | ------ | ------ |
+| cmd/goreleaser-wizard | 50.8%   | 80%    | +29.2% |
+| internal/domain       | 0.7%    | 80%    | +79.3% |
+| internal/validation   | 57.1%   | 80%    | +22.9% |
 
 ---
 
@@ -333,6 +338,7 @@ After implementing BDD tests, track these metrics:
 **Key Gap**: No Ginkgo framework, no Given-When-Then style tests, coverage below target.
 
 **Recommendation**:
+
 1. Add Ginkgo immediately
 2. Write 5-10 key user journey BDD tests
 3. Gradually convert existing integration tests to BDD style
@@ -369,4 +375,4 @@ ginkgo watch
 
 ---
 
-*Generated by AI Assistant on 2026-03-28*
+_Generated by AI Assistant on 2026-03-28_
