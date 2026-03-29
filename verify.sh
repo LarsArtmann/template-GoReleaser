@@ -18,7 +18,7 @@ done
 
 # Check project structure
 echo "Checking project structure:"
-for file in go.mod cmd/goreleaser-cli/main.go; do
+for file in go.mod cmd/goreleaser-wizard/main.go; do
     if [ -f "$file" ]; then
         echo "✓ $file exists"
     else
@@ -29,7 +29,7 @@ done
 
 # Test build
 echo "Testing build:"
-if go build -o /tmp/test-build ./cmd/goreleaser-cli; then
+if go build -o /tmp/test-build ./cmd/goreleaser-wizard; then
     echo "✓ Project builds successfully"
     rm -f /tmp/test-build
 else

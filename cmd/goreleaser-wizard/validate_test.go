@@ -425,9 +425,9 @@ func TestValidateDependencies(t *testing.T) {
 		expectMissing []string
 	}{
 		{
-			name:          "check_goreleaser",
-			dependencies:  []string{"goreleaser"},
-			expectMissing: []string{"goreleaser"},
+			name:         "check_goreleaser",
+			dependencies: []string{"goreleaser"},
+			expectFound:  []string{"goreleaser"},
 		},
 		{
 			name:         "check_go_command",
