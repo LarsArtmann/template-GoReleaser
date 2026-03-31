@@ -605,32 +605,10 @@ func (vu *ValidationUseCase) generateProjectRecommendations(
 		)
 	}
 
-	// Recommendation for missing README
-	if _, err := vu.repo.FileExists(ctx, vu.repo.JoinPath(info.Path, "README.md")); err != nil {
-		result.Recommendations = append(
-			result.Recommendations,
-			"Add README.md with project documentation",
-		)
-	}
-
-	// Recommendation for missing GoReleaser config
-	if _, err := vu.repo.FileExists(
-		ctx,
-		vu.repo.JoinPath(info.Path, ".goreleaser.yaml"),
-	); err != nil {
-		result.Recommendations = append(
-			result.Recommendations,
-			"Add .goreleaser.yaml configuration for automated releases",
-		)
-	}
-
-	// Recommendation for missing Dockerfile
-	if _, err := vu.repo.FileExists(ctx, vu.repo.JoinPath(info.Path, "Dockerfile")); err != nil {
-		result.Recommendations = append(
-			result.Recommendations,
-			"Add Dockerfile for containerized builds",
-		)
-	}
+	// Check for missing files and add recommendations
+	checkMissingFileAndRecommend(ctx, vu.repo, info.Path, "README.md", "Add README.md with project documentation", &result.Recommendations)
+	checkMissingFileAndRecommend(ctx, vu.repo, info.Path, ".goreleaser.yaml", "Add .goreleaser.yaml configuration for automated releases", &result.Recommendations)
+	checkMissingFileAndRecommend(ctx, vu.repo, info.Path, "Dockerfile", "Add Dockerfile for containerized builds", &result.Recommendations)
 }
 
 // Utility functions for security validation.
@@ -652,4 +630,11 @@ func containsShellMetacharacters(value string) bool {
 func containsURLInjection(url string) bool {
 	return strings.Contains(url, "javascript:") || strings.Contains(url, "data:") ||
 		strings.Contains(url, "vbscript:")
+}
+
+// checkMissingFileAndRecommend checks if a file exists and adds a recommendation if it's missing.
+func checkMissingFileAndRecommend(ctx context.Context, repo FileSystemRepository, basePath, filename, recommendation string, recommendations *[]string) {
+	if _, err := repo.FileExists(ctx, repo.JoinPath(basePath, filename)); err != nil {
+		*recommendations = append(*recommendations, recommendation)
+	}
 }

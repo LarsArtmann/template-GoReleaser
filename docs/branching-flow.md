@@ -8,14 +8,14 @@ This document defines the Git branching and workflow strategy for GoReleaser-Wiz
 
 ## Branch Types
 
-| Prefix | Purpose | Example |
-|--------|---------|---------|
-| `feature/` | New features | `feature/docker-multi-stage` |
-| `fix/` | Bug fixes | `fix/validation-timeout` |
-| `refactor/` | Code refactoring | `refactor/workflow-split` |
-| `docs/` | Documentation | `docs/api-reference` |
-| `chore/` | Maintenance | `chore/update-deps` |
-| `test/` | Test improvements | `test/add-integration` |
+| Prefix      | Purpose           | Example                      |
+| ----------- | ----------------- | ---------------------------- |
+| `feature/`  | New features      | `feature/docker-multi-stage` |
+| `fix/`      | Bug fixes         | `fix/validation-timeout`     |
+| `refactor/` | Code refactoring  | `refactor/workflow-split`    |
+| `docs/`     | Documentation     | `docs/api-reference`         |
+| `chore/`    | Maintenance       | `chore/update-deps`          |
+| `test/`     | Test improvements | `test/add-integration`       |
 
 ---
 
