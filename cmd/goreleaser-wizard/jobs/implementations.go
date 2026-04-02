@@ -173,36 +173,43 @@ func (j *ConfigGenerationJob) rollbackConfigFile() error {
 
 // restoreBackup restores the backup configuration file.
 func (j *ConfigGenerationJob) restoreBackup() error {
-	err := os.Rename(".goreleaser.yaml.backup", ".goreleaser.yaml")
-	if err != nil {
-		j.logger.Error("Failed to restore backup", "error", err)
-
-		return errors.NewFileError(
-			errors.ErrFileOperation,
-			"Failed to restore backup",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	j.logger.Info("Restored backup configuration")
-
-	return nil
+	return j.handleFileOperation(
+		".goreleaser.yaml.backup",
+		".goreleaser.yaml",
+		"restore backup",
+		os.Rename,
+	)
 }
 
 // removeGeneratedConfig removes the generated configuration file.
 func (j *ConfigGenerationJob) removeGeneratedConfig() error {
-	err := os.Remove(".goreleaser.yaml")
+	return j.handleFileOperation(
+		".goreleaser.yaml",
+		"",
+		"remove generated config",
+		func(src, dst string) error { return os.Remove(src) },
+	)
+}
+
+// handleFileOperation is a helper for file operations with consistent error handling.
+func (j *ConfigGenerationJob) handleFileOperation(
+	src string,
+	dst string,
+	action string,
+	operation func(src, dst string) error,
+) error {
+	err := operation(src, dst)
 	if err != nil {
-		j.logger.Error("Failed to remove generated config", "error", err)
+		j.logger.Error("Failed to "+action, "error", err)
 
 		return errors.NewFileError(
 			errors.ErrFileOperation,
-			"Failed to remove generated config",
+			"Failed to "+action,
 			err.Error(),
 		).WithCause(err)
 	}
 
-	j.logger.Info("Removed generated configuration")
+	j.logger.Info("Successfully " + action)
 
 	return nil
 }
@@ -416,12 +423,17 @@ func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
+// GenerationJobMixin provides common fields for generation jobs.
+type GenerationJobMixin struct {
+	id     string
+	config *domain.SafeProjectConfig
+	force  bool
+	logger Logger
+}
+
 // DockerfileGenerationJob generates Dockerfile.
 type DockerfileGenerationJob struct {
-	id        string
-	config    *domain.SafeProjectConfig
-	force     bool
-	logger    Logger
+	GenerationJobMixin
 	generator *generators.DockerfileGenerator
 }
 
@@ -432,10 +444,12 @@ func NewDockerfileGenerationJob(
 	logger Logger,
 ) *DockerfileGenerationJob {
 	return &DockerfileGenerationJob{
-		id:        "dockerfile-generation",
-		config:    config,
-		force:     force,
-		logger:    logger,
+		GenerationJobMixin: GenerationJobMixin{
+			id:     "dockerfile-generation",
+			config: config,
+			force:  force,
+			logger: logger,
+		},
 		generator: generators.NewDockerfileGenerator(config, logger),
 	}
 }
@@ -491,10 +505,7 @@ func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
 
 // HomebrewGenerationJob generates Homebrew formula.
 type HomebrewGenerationJob struct {
-	id        string
-	config    *domain.SafeProjectConfig
-	force     bool
-	logger    Logger
+	GenerationJobMixin
 	generator *generators.HomebrewGenerator
 }
 
@@ -505,10 +516,12 @@ func NewHomebrewGenerationJob(
 	logger Logger,
 ) *HomebrewGenerationJob {
 	return &HomebrewGenerationJob{
-		id:        "homebrew-generation",
-		config:    config,
-		force:     force,
-		logger:    logger,
+		GenerationJobMixin: GenerationJobMixin{
+			id:     "homebrew-generation",
+			config: config,
+			force:  force,
+			logger: logger,
+		},
 		generator: generators.NewHomebrewGenerator(config, logger),
 	}
 }

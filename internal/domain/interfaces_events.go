@@ -105,8 +105,8 @@ type EventBus interface {
 	Close() error
 }
 
-// BaseEvent provides a base implementation for domain events.
-type BaseEvent struct {
+// EventBase provides a base implementation for domain events.
+type EventBase struct {
 	id          IdID
 	eventType   EventType
 	data        any
@@ -115,9 +115,9 @@ type BaseEvent struct {
 	version     int
 }
 
-// NewBaseEvent creates a new base event.
-func NewBaseEvent(eventType EventType, data any, aggregateID AggregateID) *BaseEvent {
-	return &BaseEvent{
+// NewEventBase creates a new base event.
+func NewEventBase(eventType EventType, data any, aggregateID AggregateID) *EventBase {
+	return &EventBase{
 		id:          NewIdID(generateEventID()),
 		eventType:   eventType,
 		data:        data,
@@ -127,39 +127,39 @@ func NewBaseEvent(eventType EventType, data any, aggregateID AggregateID) *BaseE
 	}
 }
 
-func (e *BaseEvent) ID() string {
+func (e *EventBase) ID() string {
 	return e.id.Get()
 }
 
-func (e *BaseEvent) Type() EventType {
+func (e *EventBase) Type() EventType {
 	return e.eventType
 }
 
-func (e *BaseEvent) Data() any {
+func (e *EventBase) Data() any {
 	return e.data
 }
 
-func (e *BaseEvent) OccurredAt() time.Time {
+func (e *EventBase) OccurredAt() time.Time {
 	return e.occurredAt
 }
 
-func (e *BaseEvent) AggregateID() string {
+func (e *EventBase) AggregateID() string {
 	return e.aggregateID.Get()
 }
 
-func (e *BaseEvent) Version() int {
+func (e *EventBase) Version() int {
 	return e.version
 }
 
 // WithData updates event data.
-func (e *BaseEvent) WithData(data any) *BaseEvent {
+func (e *EventBase) WithData(data any) *EventBase {
 	e.data = data
 
 	return e
 }
 
 // WithVersion updates event version.
-func (e *BaseEvent) WithVersion(version int) *BaseEvent {
+func (e *EventBase) WithVersion(version int) *EventBase {
 	e.version = version
 
 	return e
@@ -172,7 +172,7 @@ func generateEventID() string {
 
 // ConfigCreatedEvent represents a configuration creation event.
 type ConfigCreatedEvent struct {
-	*BaseEvent
+	*EventBase
 
 	ConfigID    ConfigID `json:"config_id"`
 	ConfigType  string   `json:"config_type"`
@@ -185,7 +185,7 @@ func NewConfigCreatedEvent(
 	configID ConfigID, configType, createdBy, projectName string,
 ) *ConfigCreatedEvent {
 	return &ConfigCreatedEvent{
-		BaseEvent: NewBaseEvent(EventTypeConfigCreated, map[string]any{
+		EventBase: NewEventBase(EventTypeConfigCreated, map[string]any{
 			"config_id":    configID,
 			"config_type":  configType,
 			"created_by":   createdBy,
@@ -200,7 +200,7 @@ func NewConfigCreatedEvent(
 
 // JobStartedEvent represents a job started event.
 type JobStartedEvent struct {
-	*BaseEvent
+	*EventBase
 
 	JobID     JobID     `json:"job_id"`
 	JobName   string    `json:"job_name"`
@@ -213,7 +213,7 @@ func NewJobStartedEvent(jobID JobID, jobName, startedBy string) *JobStartedEvent
 	startTime := time.Now()
 
 	return &JobStartedEvent{
-		BaseEvent: NewBaseEvent(EventTypeJobStarted, map[string]any{
+		EventBase: NewEventBase(EventTypeJobStarted, map[string]any{
 			"job_id":     jobID,
 			"job_name":   jobName,
 			"started_by": startedBy,
@@ -228,7 +228,7 @@ func NewJobStartedEvent(jobID JobID, jobName, startedBy string) *JobStartedEvent
 
 // WorkflowCompletedEvent represents a workflow completed event.
 type WorkflowCompletedEvent struct {
-	*BaseEvent
+	*EventBase
 
 	WorkflowID     WorkflowID    `json:"workflow_id"`
 	WorkflowName   string        `json:"workflow_name"`
@@ -249,7 +249,7 @@ func NewWorkflowCompletedEvent(
 	duration := endTime.Sub(startTime)
 
 	return &WorkflowCompletedEvent{
-		BaseEvent: NewBaseEvent(EventTypeWorkflowCompleted, map[string]any{
+		EventBase: NewEventBase(EventTypeWorkflowCompleted, map[string]any{
 			"workflow_id":     workflowID,
 			"workflow_name":   workflowName,
 			"start_time":      startTime,

@@ -74,6 +74,16 @@ type SigningConfig struct {
 	Certificate string `json:"certificate,omitempty"`
 }
 
+// ValidationMixin provides common fields for validation results.
+type ValidationMixin struct {
+	Code       string `json:"code"`
+	Field      string `json:"field"`
+	Message    string `json:"message"`
+	Details    string `json:"details,omitempty"`
+	Context    string `json:"context,omitempty"`
+	Suggestion string `json:"suggestion,omitempty"`
+}
+
 // ValidationResult represents structured validation results.
 type ValidationResult struct {
 	IsValid  bool                 `json:"is_valid"`
@@ -84,22 +94,12 @@ type ValidationResult struct {
 
 // ValidationError represents a structured validation error.
 type ValidationError struct {
-	Code       string `json:"code"`
-	Field      string `json:"field"`
-	Message    string `json:"message"`
-	Details    string `json:"details,omitempty"`
-	Context    string `json:"context,omitempty"`
-	Suggestion string `json:"suggestion,omitempty"`
+	ValidationMixin
 }
 
 // ValidationWarning represents a structured validation warning.
 type ValidationWarning struct {
-	Code       string `json:"code"`
-	Field      string `json:"field"`
-	Message    string `json:"message"`
-	Details    string `json:"details,omitempty"`
-	Context    string `json:"context,omitempty"`
-	Suggestion string `json:"suggestion,omitempty"`
+	ValidationMixin
 }
 
 // ValidationSummary provides a summary of validation results.
