@@ -1,105 +1,132 @@
 version: "2"
 run:
   timeout: 5m
-  go: "1.25"
-  build-tags: []
+  go: 1.26.1
+  build-tags:
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.simd
   modules-download-mode: readonly
   allow-parallel-runners: true
-  allow-serial-runners: false
+  allow-serial-runners: true
   tests: true
 output:
   formats: {}
 linters:
   enable:
-    - dupl
-    - goconst
-    - wastedassign
-    - errorlint
-    - nlreturn
-    - protogetter
-    - funlen
+    - arangolint
+    - asasalint
     - asciicheck
+    - bidichk
     - bodyclose
-    - loggercheck
-    - thelper
-    - cyclop
-    - durationcheck
-    - gochecknoglobals
-    - interfacebloat
-    - recvcheck
-    - gochecksumtype
-    - maintidx
-    - paralleltest
-    - unparam
-    - usetesting
-    - unused
-    - gocritic
-    - reassign
-    - errcheck
-    - gosec
-    - prealloc
-    - nilnesserr
-    - govet
-    - misspell
-    - copyloopvar
-    - usestdlibvars
-    - exhaustive
-    - mirror
-    - dogsled
-    - errchkjson
-    - exhaustruct
-    - makezero
-    - staticcheck
-    - intrange
-    - nolintlint
-    - nakedret
-    - noctx
-    - gochecknoinits
-    - nilnil
-    - sqlclosecheck
-    - revive
+    - canonicalheader
+    - containedctx
     - contextcheck
-    - forcetypeassert
-    - gosmopolitan
-    - zerologlint
-    - gocyclo
-    - sloglint
-    - testifylint
-    - gocognit
-    - musttag
-    - godot
-    - wrapcheck
-    - ginkgolinter
-    - nestif
-    - perfsprint
-    - rowserrcheck
-    - nilerr
-    - ineffassign
-    - predeclared
-    - unconvert
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
     - errname
-    - whitespace
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godoclint
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
     - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
   default: none
   settings:
     cyclop:
       max-complexity: 25
-    funlen:
-      lines: 350
-      statements: 150
-    goconst:
-      min-len: 5
-      min-occurrences: 6
-    gocritic:
-      disabled-checks:
-        - ifElseChain
-    gosec:
-      excludes:
-        - G304
-        - G306
-        - G301
-        - G117
-        - G204
     exhaustive:
       default-signifies-exhaustive: true
     exhaustruct:
@@ -131,9 +158,22 @@ linters:
         - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.DomainError$
         - ^github.com/knadh/koanf/v2/providers/env\.Opt$
         - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators\.GoReleaserGenerator$
-    wrapcheck:
-      ignore-package-globs:
-        - github.com/LarsArtmann/GoReleaser-Wizard/internal/*
+    funlen:
+      lines: 350
+      statements: 150
+    goconst:
+      min-len: 5
+      min-occurrences: 6
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+    gosec:
+      excludes:
+        - G304
+        - G306
+        - G301
+        - G117
+        - G204
     revive:
       rules:
         - disabled: true
@@ -160,6 +200,9 @@ linters:
           name: early-return
         - disabled: true
           name: identical-ifelseif-branches
+    wrapcheck:
+      ignore-package-globs:
+        - github.com/LarsArtmann/GoReleaser-Wizard/internal/*
   exclusions:
     generated: lax
     rules:
@@ -187,7 +230,6 @@ linters:
           - gocognit
           - nestif
           - maintidx
-      # CLI tools commonly use globals for version info and Cobra commands
       - path: cmd/goreleaser-wizard/main\.go
         linters:
           - gochecknoglobals
@@ -202,7 +244,6 @@ linters:
       - path: cmd/goreleaser-wizard/init\.go
         linters:
           - gochecknoinits
-      # CLI tools don't need context propagation through entire call chain
       - path: cmd/goreleaser-wizard/.*\.go
         linters:
           - contextcheck
@@ -212,16 +253,13 @@ linters:
       - path: cmd/goreleaser-wizard/types/template_data\.go
         linters:
           - exhaustruct
-      # Config package uses globals for singleton pattern
       - path: internal/config/.*\.go
         linters:
           - gochecknoglobals
           - exhaustruct
-      # Domain enums use maps for metadata lookup
       - path: internal/domain/(enums|validators|action_trigger|architecture|config_state|docker_registry|git_provider)\.go
         linters:
           - gochecknoglobals
-      # Repository interfaces following Clean Architecture are intentionally large
       - path: internal/domain/interfaces\.go
         linters:
           - interfacebloat
@@ -241,5 +279,8 @@ linters:
       - .*\.gen\.go$
 formatters:
   enable:
+    - gci
+    - goimports
+    - gofumpt
     - golines
 issues: {}

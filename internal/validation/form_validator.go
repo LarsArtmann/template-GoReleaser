@@ -20,7 +20,11 @@ func NewFormValidator() *FormValidator {
 
 // createValidator is a generic helper for creating validation closures.
 // It handles error tracking and clearing for any value type.
-func createValidator[T any](fv *FormValidator, fieldName string, validateFunc func(T) error) func(T) error {
+func createValidator[T any](
+	fv *FormValidator,
+	fieldName string,
+	validateFunc func(T) error,
+) func(T) error {
 	return func(value T) error {
 		err := validateFunc(value)
 		if err != nil {

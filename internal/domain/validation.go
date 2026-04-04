@@ -606,9 +606,30 @@ func (vu *ValidationUseCase) generateProjectRecommendations(
 	}
 
 	// Check for missing files and add recommendations
-	checkMissingFileAndRecommend(ctx, vu.repo, info.Path, "README.md", "Add README.md with project documentation", &result.Recommendations)
-	checkMissingFileAndRecommend(ctx, vu.repo, info.Path, ".goreleaser.yaml", "Add .goreleaser.yaml configuration for automated releases", &result.Recommendations)
-	checkMissingFileAndRecommend(ctx, vu.repo, info.Path, "Dockerfile", "Add Dockerfile for containerized builds", &result.Recommendations)
+	checkMissingFileAndRecommend(
+		ctx,
+		vu.repo,
+		info.Path,
+		"README.md",
+		"Add README.md with project documentation",
+		&result.Recommendations,
+	)
+	checkMissingFileAndRecommend(
+		ctx,
+		vu.repo,
+		info.Path,
+		".goreleaser.yaml",
+		"Add .goreleaser.yaml configuration for automated releases",
+		&result.Recommendations,
+	)
+	checkMissingFileAndRecommend(
+		ctx,
+		vu.repo,
+		info.Path,
+		"Dockerfile",
+		"Add Dockerfile for containerized builds",
+		&result.Recommendations,
+	)
 }
 
 // Utility functions for security validation.
@@ -633,7 +654,12 @@ func containsURLInjection(url string) bool {
 }
 
 // checkMissingFileAndRecommend checks if a file exists and adds a recommendation if it's missing.
-func checkMissingFileAndRecommend(ctx context.Context, repo FileSystemRepository, basePath, filename, recommendation string, recommendations *[]string) {
+func checkMissingFileAndRecommend(
+	ctx context.Context,
+	repo FileSystemRepository,
+	basePath, filename, recommendation string,
+	recommendations *[]string,
+) {
 	if _, err := repo.FileExists(ctx, repo.JoinPath(basePath, filename)); err != nil {
 		*recommendations = append(*recommendations, recommendation)
 	}
