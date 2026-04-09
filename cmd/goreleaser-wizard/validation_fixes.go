@@ -5,6 +5,11 @@ import (
 	"os"
 )
 
+// File permissions
+const (
+	configFilePermission = 0o644 // rw-r--r-- for files
+)
+
 // attemptFixes attempts to fix common issues.
 func attemptFixes(results *ValidationResults) {
 	fmt.Println("🔧 Attempting to fix common issues...")
@@ -14,7 +19,7 @@ func attemptFixes(results *ValidationResults) {
 
 	// Fix missing configuration directory
 	if !results.ConfigExists {
-		err := os.MkdirAll(".github/workflows", 0o755)
+		err := os.MkdirAll(".github/workflows", workflowDirPermission)
 		if err == nil {
 			fmt.Println(successStyle.Render("✅ Created .github/workflows directory"))
 
@@ -26,7 +31,7 @@ func attemptFixes(results *ValidationResults) {
 	if !results.ConfigExists {
 		configContent := generateBasicConfig()
 
-		err := os.WriteFile(".goreleaser.yaml", []byte(configContent), 0o644)
+		err := os.WriteFile(".goreleaser.yaml", []byte(configContent), configFilePermission)
 		if err == nil {
 			fmt.Println(successStyle.Render("✅ Created basic .goreleaser.yaml"))
 

@@ -24,6 +24,12 @@ import (
 	"charm.land/log/v2"
 )
 
+// Workflow job capacity constants for slice preallocation
+const (
+	migrationJobCount = 3 // backup + validation + migration jobs
+	updateJobCount    = 2 // validation + update jobs
+)
+
 // Workflow represents a sequence of jobs.
 type Workflow struct {
 	Name        string
@@ -243,7 +249,7 @@ func (wb *WorkflowBuilder) createMigrationJobs(
 	fromVersion, toVersion string,
 	config *ProjectConfig,
 ) []Job {
-	jobs := make([]Job, 0, 3)
+	jobs := make([]Job, 0, migrationJobCount)
 
 	// Backup current configuration
 	backupJob := &ConfigBackupJob{
@@ -276,7 +282,7 @@ func (wb *WorkflowBuilder) createMigrationJobs(
 
 // createUpdateJobs creates jobs for update workflow.
 func (wb *WorkflowBuilder) createUpdateJobs(config *ProjectConfig, dryRun bool) []Job {
-	jobs := make([]Job, 0, 2)
+	jobs := make([]Job, 0, updateJobCount)
 
 	// Validate project structure
 	validationJob := NewProjectValidationJob(".", wb.logger)

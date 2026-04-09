@@ -188,3 +188,5 @@ config.local.yml
 node_modules/
 # Build artifacts
 /GoReleaser-Wizard
+# Test coverage
+/coverage
