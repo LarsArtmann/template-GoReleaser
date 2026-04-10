@@ -26,7 +26,8 @@ func (r *SimpleFileSystemRepository) WriteFile(
 	data []byte,
 	perm os.FileMode,
 ) error {
-	if err := os.WriteFile(path, data, perm); err != nil {
+	err := os.WriteFile(path, data, perm)
+	if err != nil {
 		return fmt.Errorf("failed to write file %q: %w", path, err)
 	}
 
@@ -46,7 +47,8 @@ func (r *SimpleFileSystemRepository) CreateFile(
 }
 
 func (r *SimpleFileSystemRepository) DeleteFile(ctx context.Context, path string) error {
-	if err := os.Remove(path); err != nil {
+	err := os.Remove(path)
+	if err != nil {
 		return fmt.Errorf("failed to delete file %q: %w", path, err)
 	}
 
@@ -71,7 +73,8 @@ func (r *SimpleFileSystemRepository) CreateDir(
 	path string,
 	perm os.FileMode,
 ) error {
-	if err := os.Mkdir(path, perm); err != nil {
+	err := os.Mkdir(path, perm)
+	if err != nil {
 		return fmt.Errorf("failed to create directory %q: %w", path, err)
 	}
 
@@ -83,7 +86,8 @@ func (r *SimpleFileSystemRepository) CreateDirAll(
 	path string,
 	perm os.FileMode,
 ) error {
-	if err := os.MkdirAll(path, perm); err != nil {
+	err := os.MkdirAll(path, perm)
+	if err != nil {
 		return fmt.Errorf("failed to create directories %q: %w", path, err)
 	}
 

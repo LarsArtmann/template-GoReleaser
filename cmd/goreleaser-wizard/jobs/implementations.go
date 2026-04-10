@@ -434,6 +434,7 @@ type GenerationJobMixin struct {
 // DockerfileGenerationJob generates Dockerfile.
 type DockerfileGenerationJob struct {
 	GenerationJobMixin
+
 	generator *generators.DockerfileGenerator
 }
 
@@ -506,6 +507,7 @@ func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
 // HomebrewGenerationJob generates Homebrew formula.
 type HomebrewGenerationJob struct {
 	GenerationJobMixin
+
 	generator *generators.HomebrewGenerator
 }
 

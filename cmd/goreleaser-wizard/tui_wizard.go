@@ -68,7 +68,8 @@ func RunTUIWizard(config *domain.SafeProjectConfig) error {
 
 	form := buildTUIForm(&formData, platformOpts, archOpts)
 
-	if err := form.Run(); err != nil {
+	err := form.Run()
+	if err != nil {
 		return fmt.Errorf("form cancelled: %w", err)
 	}
 

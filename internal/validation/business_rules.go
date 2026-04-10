@@ -413,13 +413,13 @@ func validateSigningBusinessRules(
 	// Enterprise signing requires project to be ready
 	if config.SigningLevel == domain.SigningLevelEnterprise {
 		if config.FeatureLevel != domain.FeatureLevelEnterprise {
-			result.AddWarning(&types.ValidationWarning{
-				Code:       "SIGNING_FEATURE_LEVEL",
-				Field:      "signing_level",
-				Message:    "Enterprise signing requires enterprise feature level for optimal security",
-				Level:      types.WarningLevelHigh,
-				Suggestion: "Upgrade to enterprise feature level or lower signing level",
-			})
+			addWarning(result,
+				"SIGNING_FEATURE_LEVEL",
+				"signing_level",
+				"Enterprise signing requires enterprise feature level for optimal security",
+				types.WarningLevelHigh,
+				"Upgrade to enterprise feature level or lower signing level",
+			)
 		}
 	}
 
@@ -510,37 +510,37 @@ func validateProjectTypeBusinessRules(
 func validateSecurity(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Security level consistency
 	if config.FeatureLevel.IncludesAdvanced() && config.SigningLevel == domain.SigningLevelNone {
-		result.AddWarning(&types.ValidationWarning{
-			Code:       "SECURITY_SIGNING",
-			Field:      "signing_level",
-			Message:    "Advanced features should include code signing for security",
-			Level:      types.WarningLevelHigh,
-			Suggestion: "Enable code signing or lower feature level",
-		})
+		addWarning(result,
+			"SECURITY_SIGNING",
+			"signing_level",
+			"Advanced features should include code signing for security",
+			types.WarningLevelHigh,
+			"Enable code signing or lower feature level",
+		)
 	}
 
 	// Docker security
 	if config.DockerSupport.IsEnabled() && !config.DockerRegistry.RequiresAuthentication() {
-		result.AddWarning(&types.ValidationWarning{
-			Code:       "DOCKER_SECURITY",
-			Field:      "docker_registry",
-			Message:    "Consider using a registry that requires authentication for better security",
-			Level:      types.WarningLevelMedium,
-			Suggestion: "Use GitHub Container Registry, GitLab Registry, or other authenticated registries",
-		})
+		addWarning(result,
+			"DOCKER_SECURITY",
+			"docker_registry",
+			"Consider using a registry that requires authentication for better security",
+			types.WarningLevelMedium,
+			"Use GitHub Container Registry, GitLab Registry, or other authenticated registries",
+		)
 	}
 
 	// Actions security
 	if config.ActionLevel.IsEnabled() {
 		requiredPerms := config.ActionLevel.GetRequiredPermissions()
 		if len(requiredPerms) > 2 {
-			result.AddWarning(&types.ValidationWarning{
-				Code:       "ACTIONS_PERMISSIONS",
-				Field:      "action_level",
-				Message:    "High permission levels increase security risks in GitHub Actions",
-				Level:      types.WarningLevelMedium,
-				Suggestion: "Review and minimize required permissions for security",
-			})
+			addWarning(result,
+				"ACTIONS_PERMISSIONS",
+				"action_level",
+				"High permission levels increase security risks in GitHub Actions",
+				types.WarningLevelMedium,
+				"Review and minimize required permissions for security",
+			)
 		}
 	}
 }
@@ -549,49 +549,49 @@ func validateSecurity(config *domain.SafeProjectConfig, result *types.Validation
 func generateWarnings(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Performance warnings
 	if len(config.Platforms)*len(config.Architectures) > 8 {
-		result.AddWarning(&types.ValidationWarning{
-			Code:  "BUILD_PERFORMANCE",
-			Field: "platform_arch_count",
-			Message: fmt.Sprintf(
+		addWarning(result,
+			"BUILD_PERFORMANCE",
+			"platform_arch_count",
+			fmt.Sprintf(
 				"Large build matrix (%d combos) may significantly increase build time",
 				len(config.Platforms)*len(config.Architectures),
 			),
-			Level:      types.WarningLevelLow,
-			Suggestion: "Consider reducing platform/architecture combinations for faster builds",
-		})
+			types.WarningLevelLow,
+			"Consider reducing platform/architecture combinations for faster builds",
+		)
 	}
 
 	// Best practice warnings
 	if config.ProjectDescription == "" {
-		result.AddWarning(&types.ValidationWarning{
-			Code:       "PROJECT_DESCRIPTION",
-			Field:      "project_description",
-			Message:    "Project description is recommended for better documentation",
-			Level:      types.WarningLevelLow,
-			Suggestion: "Add a clear project description to improve documentation",
-		})
+		addWarning(result,
+			"PROJECT_DESCRIPTION",
+			"project_description",
+			"Project description is recommended for better documentation",
+			types.WarningLevelLow,
+			"Add a clear project description to improve documentation",
+		)
 	}
 
 	// Feature utilization warnings
 	if config.FeatureLevel == domain.FeatureLevelNone {
-		result.AddWarning(&types.ValidationWarning{
-			Code:       "FEATURE_UTILIZATION",
-			Field:      "feature_level",
-			Message:    "No advanced features enabled - consider enabling for better functionality",
-			Level:      types.WarningLevelLow,
-			Suggestion: "Enable basic features like Docker support or Actions if appropriate",
-		})
+		addWarning(result,
+			"FEATURE_UTILIZATION",
+			"feature_level",
+			"No advanced features enabled - consider enabling for better functionality",
+			types.WarningLevelLow,
+			"Enable basic features like Docker support or Actions if appropriate",
+		)
 	}
 
 	// Maintenance warnings
 	if config.SigningLevel == domain.SigningLevelNone && config.DockerSupport.IsEnabled() {
-		result.AddWarning(&types.ValidationWarning{
-			Code:       "SECURITY_MAINTENANCE",
-			Field:      "signing_level",
-			Message:    "Docker images should be signed for security and trust",
-			Level:      types.WarningLevelMedium,
-			Suggestion: "Enable code signing for Docker images",
-		})
+		addWarning(result,
+			"SECURITY_MAINTENANCE",
+			"signing_level",
+			"Docker images should be signed for security and trust",
+			types.WarningLevelMedium,
+			"Enable code signing for Docker images",
+		)
 	}
 }
 
@@ -612,6 +612,24 @@ func validateFeatureSupport(
 			Suggestion: suggestion,
 		})
 	}
+}
+
+// addWarning is a helper to create and add a validation warning.
+func addWarning(
+	result *types.ValidationResult,
+	code string,
+	field string,
+	message string,
+	level types.WarningLevel,
+	suggestion string,
+) {
+	result.AddWarning(&types.ValidationWarning{
+		Code:       code,
+		Field:      field,
+		Message:    message,
+		Level:      level,
+		Suggestion: suggestion,
+	})
 }
 
 func containsPlatform(platforms []domain.Platform, target domain.Platform) bool {

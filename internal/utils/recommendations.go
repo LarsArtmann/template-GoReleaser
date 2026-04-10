@@ -129,18 +129,21 @@ func GetGitHubRepo() string {
 	return "repo"
 }
 
+// checkEnvValue checks if any of the common environment variables matches the given value.
+func checkEnvValue(value string) bool {
+	return os.Getenv("GO_ENV") == value ||
+		os.Getenv("ENV") == value ||
+		os.Getenv("NODE_ENV") == value
+}
+
 // IsDevelopmentEnvironment returns true if running in development environment.
 func IsDevelopmentEnvironment() bool {
-	return os.Getenv("GO_ENV") == "development" ||
-		os.Getenv("ENV") == "development" ||
-		os.Getenv("NODE_ENV") == "development"
+	return checkEnvValue("development")
 }
 
 // IsProductionEnvironment returns true if running in production environment.
 func IsProductionEnvironment() bool {
-	return os.Getenv("GO_ENV") == "production" ||
-		os.Getenv("ENV") == "production" ||
-		os.Getenv("NODE_ENV") == "production"
+	return checkEnvValue("production")
 }
 
 // GetEnvironment returns current environment name.

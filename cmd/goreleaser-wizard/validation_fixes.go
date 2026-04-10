@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-// File permissions
+// File permissions.
 const (
 	configFilePermission = 0o644 // rw-r--r-- for files
 )

@@ -184,121 +184,67 @@ func (de *DomainError) WithSuggestion(suggestion string) *DomainError {
 	return de
 }
 
-// NewValidationError creates a new validation error.
-func NewValidationError(code ErrorCode, message, details string) *DomainError {
+// newDomainError creates a domain error with the given properties.
+func newDomainError(
+	code ErrorCode,
+	message, details string,
+	level ErrorLevel,
+	retryable bool,
+) *DomainError {
 	err := &DomainError{
 		Code:      code,
 		Message:   message,
 		Details:   details,
-		Level:     ErrorLevelMedium,
-		Retryable: false,
+		Level:     level,
+		Retryable: retryable,
 	}
 
 	return err.WithCaller()
+}
+
+// NewValidationError creates a new validation error.
+func NewValidationError(code ErrorCode, message, details string) *DomainError {
+	return newDomainError(code, message, details, ErrorLevelMedium, false)
 }
 
 // NewConfigError creates a new configuration error.
 func NewConfigError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelHigh,
-		Retryable: false,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelHigh, false)
 }
 
 // NewFileError creates a new file system error.
 func NewFileError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelMedium,
-		Retryable: true,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelMedium, true)
 }
 
 // NewGitError creates a new git error.
 func NewGitError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelMedium,
-		Retryable: true,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelMedium, true)
 }
 
 // NewJobError creates a new job execution error.
 func NewJobError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelHigh,
-		Retryable: false,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelHigh, false)
 }
 
 // NewWorkflowError creates a new workflow error.
 func NewWorkflowError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelHigh,
-		Retryable: false,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelHigh, false)
 }
 
 // NewNetworkError creates a new network error.
 func NewNetworkError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelMedium,
-		Retryable: true,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelMedium, true)
 }
 
 // NewPermissionError creates a new permission error.
 func NewPermissionError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelHigh,
-		Retryable: false,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelHigh, false)
 }
 
 // NewSystemError creates a new system error.
 func NewSystemError(code ErrorCode, message, details string) *DomainError {
-	err := &DomainError{
-		Code:      code,
-		Message:   message,
-		Details:   details,
-		Level:     ErrorLevelCritical,
-		Retryable: false,
-	}
-
-	return err.WithCaller()
+	return newDomainError(code, message, details, ErrorLevelCritical, false)
 }
 
 // WrapError wraps an existing error with domain context.

@@ -24,7 +24,7 @@ import (
 	"charm.land/log/v2"
 )
 
-// Workflow job capacity constants for slice preallocation
+// Workflow job capacity constants for slice preallocation.
 const (
 	migrationJobCount = 3 // backup + validation + migration jobs
 	updateJobCount    = 2 // validation + update jobs

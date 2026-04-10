@@ -786,6 +786,7 @@ func (f *ValidationFilter) matchesError(err *ValidationError) bool {
 		f.Codes,
 		func(levels, level any) bool {
 			levelsSlice, ok1 := levels.([]ErrorLevel)
+
 			levelVal, ok2 := level.(ErrorLevel)
 			if !ok1 || !ok2 {
 				return false
@@ -795,6 +796,7 @@ func (f *ValidationFilter) matchesError(err *ValidationError) bool {
 		},
 		func(codes, code any) bool {
 			codesSlice, ok1 := codes.([]errors.ErrorCode)
+
 			codeVal, ok2 := code.(errors.ErrorCode)
 			if !ok1 || !ok2 {
 				return false
@@ -814,6 +816,7 @@ func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
 		f.WarningCodes,
 		func(levels, level any) bool {
 			levelsSlice, ok1 := levels.([]WarningLevel)
+
 			levelVal, ok2 := level.(WarningLevel)
 			if !ok1 || !ok2 {
 				return false
@@ -823,6 +826,7 @@ func (f *ValidationFilter) matchesWarning(warn *ValidationWarning) bool {
 		},
 		func(codes, code any) bool {
 			codesSlice, ok1 := codes.([]string)
+
 			codeVal, ok2 := code.(string)
 			if !ok1 || !ok2 {
 				return false

@@ -355,6 +355,19 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	return nil
 }
 
+func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
+	j.logger.Info("Rollback: removing generated .goreleaser.yaml")
+
+	err := os.Remove(".goreleaser.yaml")
+	if err != nil && !os.IsNotExist(err) {
+		return fmt.Errorf("failed to remove .goreleaser.yaml: %w", err)
+	}
+
+	j.logger.Info("Rollback: .goreleaser.yaml removed")
+
+	return nil
+}
+
 // GitHubActionsGenerationJob generates GitHub Actions workflow.
 type GitHubActionsGenerationJob struct {
 	id     string
@@ -444,6 +457,7 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	if err == nil && len(workflowFiles) == 0 {
 		_ = os.Remove(workflowDir)
 		_ = os.Remove(".github")
+
 		j.logger.Info("Removed empty .github directory")
 	}
 
