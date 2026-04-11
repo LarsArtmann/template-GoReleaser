@@ -553,6 +553,24 @@ const (
 	ValidationStatusFailed   ValidationStatus = "failed"
 )
 
+// ValidationStatusInfo holds display information for a ValidationStatus.
+type ValidationStatusInfo struct {
+	Icon  string
+	Color string
+}
+
+// validationStatusInfo is a map of ValidationStatus to its display information.
+var validationStatusInfo = map[ValidationStatus]ValidationStatusInfo{
+	ValidationStatusPassed:   {Icon: "✅", Color: "green"},
+	ValidationStatusNotice:   {Icon: "ℹ️", Color: "blue"},
+	ValidationStatusWarning:  {Icon: "⚠️", Color: "yellow"},
+	ValidationStatusCritical: {Icon: "🚨", Color: "red"},
+	ValidationStatusFailed:   {Icon: "❌", Color: "red"},
+}
+
+const validationStatusDefaultIcon = "❓"
+const validationStatusDefaultColor = "gray"
+
 // String returns string representation.
 func (vs ValidationStatus) String() string {
 	return string(vs)
@@ -560,38 +578,18 @@ func (vs ValidationStatus) String() string {
 
 // GetIcon returns an icon for the status.
 func (vs ValidationStatus) GetIcon() string {
-	switch vs {
-	case ValidationStatusPassed:
-		return "✅"
-	case ValidationStatusNotice:
-		return "ℹ️"
-	case ValidationStatusWarning:
-		return "⚠️"
-	case ValidationStatusCritical:
-		return "🚨"
-	case ValidationStatusFailed:
-		return "❌"
-	default:
-		return "❓"
+	if info, ok := validationStatusInfo[vs]; ok {
+		return info.Icon
 	}
+	return validationStatusDefaultIcon
 }
 
 // GetColor returns a color for the status.
 func (vs ValidationStatus) GetColor() string {
-	switch vs {
-	case ValidationStatusPassed:
-		return "green"
-	case ValidationStatusNotice:
-		return "blue"
-	case ValidationStatusWarning:
-		return "yellow"
-	case ValidationStatusCritical:
-		return "red"
-	case ValidationStatusFailed:
-		return "red"
-	default:
-		return "gray"
+	if info, ok := validationStatusInfo[vs]; ok {
+		return info.Color
 	}
+	return validationStatusDefaultColor
 }
 
 // ErrorLevel represents error severity levels.

@@ -9,6 +9,44 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
+// baseTestProjectConfig returns a base ProjectConfig for testing with common defaults.
+func baseTestProjectConfig() ProjectConfig {
+	return ProjectConfig{
+		ProjectType:    domain.ProjectTypeCLI,
+		GitProvider:    domain.GitProviderGitHub,
+		CGOStatus:      domain.CGOStatusDisabled,
+		DockerSupport:  domain.DockerSupportNone,
+		DockerRegistry: domain.DockerRegistryDockerHub,
+		SigningLevel:   domain.SigningLevelNone,
+		ActionLevel:    domain.ActionLevelBasic,
+		FeatureLevel:   domain.FeatureLevelStandard,
+		State:          domain.ConfigStateValid,
+		ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
+	}
+}
+
+// testProjectConfigWithOverrides creates a ProjectConfig with field overrides applied.
+func testProjectConfigWithOverrides(overrides map[string]any) ProjectConfig {
+	cfg := baseTestProjectConfig()
+	for key, value := range overrides {
+		switch key {
+		case "ProjectName":
+			cfg.ProjectName = value.(string)
+		case "BinaryName":
+			cfg.BinaryName = value.(string)
+		case "MainPath":
+			cfg.MainPath = value.(string)
+		case "ProjectDescription":
+			cfg.ProjectDescription = value.(string)
+		case "Platforms":
+			cfg.Platforms = value.([]domain.Platform)
+		case "Architectures":
+			cfg.Architectures = value.([]domain.Architecture)
+		}
+	}
+	return cfg
+}
+
 func TestRunGenerate(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -119,21 +157,11 @@ func TestTemplateGeneration(t *testing.T) {
 		},
 		{
 			name: "generate_minimal_config",
-			config: ProjectConfig{
-				ProjectName:    "minimal-test",
-				BinaryName:     "minimal-test",
-				MainPath:       ".",
-				ProjectType:    domain.ProjectTypeCLI,
-				GitProvider:    domain.GitProviderGitHub,
-				CGOStatus:      domain.CGOStatusDisabled,
-				DockerSupport:  domain.DockerSupportNone,
-				DockerRegistry: domain.DockerRegistryDockerHub,
-				SigningLevel:   domain.SigningLevelNone,
-				ActionLevel:    domain.ActionLevelBasic,
-				FeatureLevel:   domain.FeatureLevelStandard,
-				State:          domain.ConfigStateValid,
-				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
-			},
+			config: testProjectConfigWithOverrides(map[string]any{
+				"ProjectName": "minimal-test",
+				"BinaryName":  "minimal-test",
+				"MainPath":    ".",
+			}),
 			expectError: false,
 			checks: []string{
 				"project_name: minimal-test",
@@ -293,59 +321,29 @@ func TestConfigValidation(t *testing.T) {
 		},
 		{
 			name: "invalid_empty_project_name",
-			config: ProjectConfig{
-				ProjectName:    "",
-				BinaryName:     "myapp",
-				MainPath:       ".",
-				ProjectType:    domain.ProjectTypeCLI,
-				GitProvider:    domain.GitProviderGitHub,
-				CGOStatus:      domain.CGOStatusDisabled,
-				DockerSupport:  domain.DockerSupportNone,
-				DockerRegistry: domain.DockerRegistryDockerHub,
-				SigningLevel:   domain.SigningLevelNone,
-				ActionLevel:    domain.ActionLevelBasic,
-				FeatureLevel:   domain.FeatureLevelStandard,
-				State:          domain.ConfigStateValid,
-				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
-			},
+			config: testProjectConfigWithOverrides(map[string]any{
+				"ProjectName": "",
+				"BinaryName":  "myapp",
+				"MainPath":    ".",
+			}),
 			wantErr: true,
 		},
 		{
 			name: "invalid_empty_binary_name",
-			config: ProjectConfig{
-				ProjectName:    "myapp",
-				BinaryName:     "",
-				MainPath:       ".",
-				ProjectType:    domain.ProjectTypeCLI,
-				GitProvider:    domain.GitProviderGitHub,
-				CGOStatus:      domain.CGOStatusDisabled,
-				DockerSupport:  domain.DockerSupportNone,
-				DockerRegistry: domain.DockerRegistryDockerHub,
-				SigningLevel:   domain.SigningLevelNone,
-				ActionLevel:    domain.ActionLevelBasic,
-				FeatureLevel:   domain.FeatureLevelStandard,
-				State:          domain.ConfigStateValid,
-				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
-			},
+			config: testProjectConfigWithOverrides(map[string]any{
+				"ProjectName": "myapp",
+				"BinaryName":  "",
+				"MainPath":    ".",
+			}),
 			wantErr: true,
 		},
 		{
 			name: "invalid_empty_main_path",
-			config: ProjectConfig{
-				ProjectName:    "myapp",
-				BinaryName:     "myapp",
-				MainPath:       "",
-				ProjectType:    domain.ProjectTypeCLI,
-				GitProvider:    domain.GitProviderGitHub,
-				CGOStatus:      domain.CGOStatusDisabled,
-				DockerSupport:  domain.DockerSupportNone,
-				DockerRegistry: domain.DockerRegistryDockerHub,
-				SigningLevel:   domain.SigningLevelNone,
-				ActionLevel:    domain.ActionLevelBasic,
-				FeatureLevel:   domain.FeatureLevelStandard,
-				State:          domain.ConfigStateValid,
-				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
-			},
+			config: testProjectConfigWithOverrides(map[string]any{
+				"ProjectName": "myapp",
+				"BinaryName":  "myapp",
+				"MainPath":    "",
+			}),
 			wantErr: true, // Empty main path is now validated
 		},
 	}

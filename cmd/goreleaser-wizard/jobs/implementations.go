@@ -39,6 +39,14 @@ type Logger interface {
 	Error(msg string, args ...any)
 }
 
+// noOpRollback returns a no-op rollback function for jobs that don't modify state.
+func noOpRollback(logger Logger, jobName string) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
+		logger.Info(jobName + " rollback is a no-op")
+		return nil
+	}
+}
+
 // Rollbacker interface for types that can be rolled back.
 type Rollbacker interface {
 	Rollback(ctx context.Context) error
@@ -342,10 +350,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 }
 
 func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
-	// Validation job doesn't create any files, so rollback is a no-op
-	j.logger.Info("Project validation rollback is a no-op")
-
-	return nil
+	return noOpRollback(j.logger, "Project validation")(ctx)
 }
 
 // DependencyCheckJob checks for required dependencies.
@@ -417,10 +422,7 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 }
 
 func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
-	// Dependency check doesn't modify state, so rollback is a no-op
-	j.logger.Info("Dependency check rollback is a no-op")
-
-	return nil
+	return noOpRollback(j.logger, "Dependency check")(ctx)
 }
 
 // GenerationJobMixin provides common fields for generation jobs.

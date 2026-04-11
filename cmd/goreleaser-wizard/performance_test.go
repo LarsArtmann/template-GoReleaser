@@ -201,26 +201,15 @@ func TestPerformanceCharacteristics(t *testing.T) {
 			os.Chdir(tmpDir)
 
 			// Run full wizard workflow
-			config := &ProjectConfig{
-				GitProvider:    domain.GitProviderGitHub,
-				ProjectType:    domain.ProjectTypeCLI,
-				CGOStatus:      domain.CGOStatusDisabled,
-				DockerSupport:  domain.DockerSupportNone,
-				DockerRegistry: domain.DockerRegistryDockerHub,
-				SigningLevel:   domain.SigningLevelNone,
-				ActionLevel:    domain.ActionLevelBasic,
-				FeatureLevel:   domain.FeatureLevelStandard,
-				State:          domain.ConfigStateValid,
-				ActionsOn:      []domain.ActionTrigger{domain.ActionTriggerVersionTags},
-			}
-			detectProjectInfo(config)
+			config := baseTestProjectConfig()
+			detectProjectInfo(&config)
 
-			err := generateGoReleaserConfig(config)
+			err := generateGoReleaserConfig(&config)
 			if err != nil {
 				t.Errorf("Config generation failed: %v", err)
 			}
 
-			err = generateGitHubActions(config)
+			err = generateGitHubActions(&config)
 			if err != nil {
 				t.Errorf("GitHub Actions generation failed: %v", err)
 			}

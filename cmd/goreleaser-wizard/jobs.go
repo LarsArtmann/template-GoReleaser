@@ -29,6 +29,22 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
 
+// addDockerConfig adds Docker configuration to template data if Docker is enabled.
+func addDockerConfig(data map[string]any, config *domain.SafeProjectConfig) {
+	if config.DockerSupport.IsEnabled() {
+		data["DockerRegistry"] = config.DockerRegistry.GetURL()
+		data["DockerImage"] = config.GetDockerImageName()
+	}
+}
+
+// noOpRollback returns a no-op rollback function for jobs that don't modify state.
+func noOpRollback(logger *log.Logger, jobName string) func(ctx context.Context) error {
+	return func(ctx context.Context) error {
+		logger.Info(jobName + " rollback is a no-op")
+		return nil
+	}
+}
+
 const workflowDirPermission = 0o755
 
 // Templates embedded at build time.
@@ -534,10 +550,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 }
 
 func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
-	// Validation job doesn't create any files, so rollback is a no-op
-	j.logger.Info("Project validation rollback is a no-op")
-
-	return nil
+	return noOpRollback(j.logger, "Project validation")(ctx)
 }
 
 // DependencyCheckJob checks for required dependencies.
@@ -594,10 +607,7 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 }
 
 func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
-	// Dependency check doesn't modify state, so rollback is a no-op
-	j.logger.Info("Dependency check rollback is a no-op")
-
-	return nil
+	return noOpRollback(j.logger, "Dependency check")(ctx)
 }
 
 // JobFactory creates jobs for common wizard operations.
@@ -722,11 +732,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 		{"GoOS": "windows", "GoArch": "arm64"},
 	}
 
-	// Add Docker configuration if enabled
-	if config.DockerSupport.IsEnabled() {
-		data["DockerRegistry"] = config.DockerRegistry.GetURL()
-		data["DockerImage"] = config.GetDockerImageName()
-	}
+	addDockerConfig(data, config)
 
 	return data
 }
@@ -752,11 +758,7 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 		data["Triggers"] = triggers
 	}
 
-	// Add Docker configuration if enabled
-	if config.DockerSupport.IsEnabled() {
-		data["DockerRegistry"] = config.DockerRegistry.GetURL()
-		data["DockerImage"] = config.GetDockerImageName()
-	}
+	addDockerConfig(data, config)
 
 	return data
 }

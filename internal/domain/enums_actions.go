@@ -25,22 +25,27 @@ func (al ActionLevel) IsValid() bool {
 	}
 }
 
+// ActionLevelDisplayInfo holds display information for an ActionLevel.
+type ActionLevelDisplayInfo struct {
+	DisplayName        string
+	EnvironmentCount  int
+}
+
+// actionLevelInfo is a map of ActionLevel to its display information.
+var actionLevelInfo = map[ActionLevel]ActionLevelDisplayInfo{
+	ActionLevelNone:       {DisplayName: "None", EnvironmentCount: 0},
+	ActionLevelBasic:      {DisplayName: "Basic", EnvironmentCount: 1},
+	ActionLevelStandard:   {DisplayName: "Standard", EnvironmentCount: 2},
+	ActionLevelAdvanced:   {DisplayName: "Advanced", EnvironmentCount: 3},
+	ActionLevelEnterprise: {DisplayName: "Enterprise", EnvironmentCount: 4},
+}
+
 // String returns human-readable display name.
 func (al ActionLevel) String() string {
-	switch al {
-	case ActionLevelNone:
-		return "None"
-	case ActionLevelBasic:
-		return "Basic"
-	case ActionLevelStandard:
-		return "Standard"
-	case ActionLevelAdvanced:
-		return "Advanced"
-	case ActionLevelEnterprise:
-		return "Enterprise"
-	default:
-		return unknownValue
+	if info, ok := actionLevelInfo[al]; ok {
+		return info.DisplayName
 	}
+	return unknownValue
 }
 
 // IsEnabled returns true if actions are enabled.
@@ -123,20 +128,10 @@ func (al ActionLevel) GetRequiredPermissions() []string {
 
 // GetEnvironmentCount returns recommended number of environments.
 func (al ActionLevel) GetEnvironmentCount() int {
-	switch al {
-	case ActionLevelNone:
-		return 0
-	case ActionLevelBasic:
-		return 1
-	case ActionLevelStandard:
-		return 2
-	case ActionLevelAdvanced:
-		return 3
-	case ActionLevelEnterprise:
-		return 4
-	default:
-		return 0
+	if info, ok := actionLevelInfo[al]; ok {
+		return info.EnvironmentCount
 	}
+	return 0
 }
 
 // DockerSupport represents Docker build and deployment options
