@@ -94,13 +94,7 @@ go 1.21
 			defer os.Chdir(originalDir)
 
 			// Test runGenerate
-			defer func() {
-				if r := recover(); r != nil {
-					if !tt.expectError {
-						t.Errorf("runGenerate panicked: %v", r)
-					}
-				}
-			}()
+			defer expectNoPanic(t, tt.expectError)
 
 			// runGenerate is from generate.go, but we need to simulate it
 			// For testing purposes, we'll test the underlying functions

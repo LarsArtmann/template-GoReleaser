@@ -12,6 +12,29 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// setupBasicGoProject creates a basic Go project with go.mod and main.go.
+func setupBasicGoProject(t *testing.T, moduleName, pattern string) string {
+	t.Helper()
+	dir, err := os.MkdirTemp("", pattern)
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	goMod := "module " + moduleName + "\ngo 1.21\n"
+	os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
+	os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}\n"), 0o644)
+	return dir
+}
+
+// expectNoPanic sets up a deferred panic recovery that fails the test if a panic occurs.
+func expectNoPanic(t *testing.T, expectError bool) {
+	t.Helper()
+	if r := recover(); r != nil {
+		if !expectError {
+			t.Errorf("Command panicked: %v", r)
+		}
+	}
+}
+
 func TestInitCommand(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -25,14 +48,7 @@ func TestInitCommand(t *testing.T) {
 			args:  []string{},
 			flags: map[string]string{},
 			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-init-test")
-				goMod := `module github.com/user/myapp
-go 1.21
-`
-				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
-				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
-
-				return dir
+				return setupBasicGoProject(t, "github.com/user/myapp", "wizard-init-test")
 			},
 			expectError: false,
 		},
@@ -81,13 +97,7 @@ go 1.21
 			}
 
 			// Execute command (with panic recovery)
-			defer func() {
-				if r := recover(); r != nil {
-					if !tt.expectError {
-						t.Errorf("Init command panicked: %v", r)
-					}
-				}
-			}()
+			defer expectNoPanic(t, tt.expectError)
 
 			// Execute command
 			err := cmd.Execute()
@@ -108,14 +118,7 @@ func TestProjectDetection(t *testing.T) {
 		{
 			name: "detect_simple_project",
 			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-detect-test")
-				goMod := `module github.com/user/simpleapp
-go 1.21
-`
-				os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
-				os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}"), 0o644)
-
-				return dir
+				return setupBasicGoProject(t, "github.com/user/simpleapp", "wizard-detect-test")
 			},
 			expectedProject: ProjectConfig{
 				ProjectName: "simpleapp",

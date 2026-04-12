@@ -47,6 +47,16 @@ func noOpRollback(logger Logger, jobName string) func(ctx context.Context) error
 	}
 }
 
+// noOpRollbackHelper provides a no-op rollback implementation for validation jobs.
+type noOpRollbackHelper struct {
+	logger Logger
+	name   string
+}
+
+func (h *noOpRollbackHelper) Rollback(ctx context.Context) error {
+	return noOpRollback(h.logger, h.name)(ctx)
+}
+
 // Rollbacker interface for types that can be rolled back.
 type Rollbacker interface {
 	Rollback(ctx context.Context) error
@@ -291,17 +301,20 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 
 // ProjectValidationJob validates project structure.
 type ProjectValidationJob struct {
+	noOpRollbackHelper
 	id         string
 	projectDir string
-	logger     Logger
 }
 
 // NewProjectValidationJob creates a new project validation job.
 func NewProjectValidationJob(projectDir string, logger Logger) *ProjectValidationJob {
 	return &ProjectValidationJob{
+		noOpRollbackHelper: noOpRollbackHelper{
+			logger: logger,
+			name:   "Project validation",
+		},
 		id:         "project-validation",
 		projectDir: projectDir,
-		logger:     logger,
 	}
 }
 
@@ -349,23 +362,22 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
-	return noOpRollback(j.logger, "Project validation")(ctx)
-}
-
 // DependencyCheckJob checks for required dependencies.
 type DependencyCheckJob struct {
+	noOpRollbackHelper
 	id           string
 	dependencies []string
-	logger       Logger
 }
 
 // NewDependencyCheckJob creates a new dependency check job.
 func NewDependencyCheckJob(dependencies []string, logger Logger) *DependencyCheckJob {
 	return &DependencyCheckJob{
+		noOpRollbackHelper: noOpRollbackHelper{
+			logger: logger,
+			name:   "Dependency check",
+		},
 		id:           "dependency-check",
 		dependencies: dependencies,
-		logger:       logger,
 	}
 }
 
@@ -419,10 +431,6 @@ func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 	j.logger.Info("All dependencies are available")
 
 	return nil
-}
-
-func (j *DependencyCheckJob) Rollback(ctx context.Context) error {
-	return noOpRollback(j.logger, "Dependency check")(ctx)
 }
 
 // GenerationJobMixin provides common fields for generation jobs.

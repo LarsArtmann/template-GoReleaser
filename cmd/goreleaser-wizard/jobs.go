@@ -45,6 +45,16 @@ func noOpRollback(logger *log.Logger, jobName string) func(ctx context.Context) 
 	}
 }
 
+// noOpRollbackHelper provides a no-op rollback implementation for validation jobs.
+type noOpRollbackHelper struct {
+	logger *log.Logger
+	name   string
+}
+
+func (h *noOpRollbackHelper) Rollback(ctx context.Context) error {
+	return noOpRollback(h.logger, h.name)(ctx)
+}
+
 const workflowDirPermission = 0o755
 
 // Templates embedded at build time.
@@ -482,17 +492,20 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 
 // ProjectValidationJob validates project structure.
 type ProjectValidationJob struct {
+	noOpRollbackHelper
 	id         string
 	projectDir string
-	logger     *log.Logger
 }
 
 // NewProjectValidationJob creates a new project validation job.
 func NewProjectValidationJob(projectDir string, logger *log.Logger) *ProjectValidationJob {
 	return &ProjectValidationJob{
+		noOpRollbackHelper: noOpRollbackHelper{
+			logger: logger,
+			name:   "Project validation",
+		},
 		id:         "project-validation",
 		projectDir: projectDir,
-		logger:     logger,
 	}
 }
 
@@ -549,23 +562,22 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	return nil
 }
 
-func (j *ProjectValidationJob) Rollback(ctx context.Context) error {
-	return noOpRollback(j.logger, "Project validation")(ctx)
-}
-
 // DependencyCheckJob checks for required dependencies.
 type DependencyCheckJob struct {
+	noOpRollbackHelper
 	id           string
 	dependencies []string
-	logger       *log.Logger
 }
 
 // NewDependencyCheckJob creates a new dependency check job.
 func NewDependencyCheckJob(dependencies []string, logger *log.Logger) *DependencyCheckJob {
 	return &DependencyCheckJob{
+		noOpRollbackHelper: noOpRollbackHelper{
+			logger: logger,
+			name:   "Dependency check",
+		},
 		id:           "dependency-check",
 		dependencies: dependencies,
-		logger:       logger,
 	}
 }
 

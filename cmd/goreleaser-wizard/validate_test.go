@@ -55,6 +55,17 @@ project_name: test
 	}
 }
 
+// createTempFile creates a temporary file and returns its path.
+func createTempFile(tb testing.TB, pattern string) string {
+	tb.Helper()
+	file, err := os.CreateTemp(tb.TempDir(), pattern)
+	if err != nil {
+		tb.Fatalf("failed to create temp file: %v", err)
+	}
+	file.Close()
+	return file.Name()
+}
+
 func TestRunValidate(t *testing.T) {
 	tests := []struct {
 		name        string
@@ -198,12 +209,7 @@ func TestCheckFileExists(t *testing.T) {
 			name:       "existing_file",
 			requireDir: false,
 			wantErr:    false,
-			setupFunc: func() string {
-				file, _ := os.CreateTemp(t.TempDir(), "wizard-test-file")
-				file.Close()
-
-				return file.Name()
-			},
+			setupFunc:  func() string { return createTempFile(t, "wizard-test-file") },
 		},
 		{
 			name:       "existing_directory",
@@ -227,12 +233,7 @@ func TestCheckFileExists(t *testing.T) {
 			requireDir:  true,
 			wantErr:     true,
 			errContains: "Expected directory",
-			setupFunc: func() string {
-				file, _ := os.CreateTemp(t.TempDir(), "wizard-test-file")
-				file.Close()
-
-				return file.Name()
-			},
+			setupFunc:   func() string { return createTempFile(t, "wizard-test-file") },
 		},
 	}
 
