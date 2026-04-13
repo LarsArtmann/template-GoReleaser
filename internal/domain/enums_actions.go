@@ -27,8 +27,8 @@ func (al ActionLevel) IsValid() bool {
 
 // ActionLevelDisplayInfo holds display information for an ActionLevel.
 type ActionLevelDisplayInfo struct {
-	DisplayName        string
-	EnvironmentCount  int
+	DisplayName      string
+	EnvironmentCount int
 }
 
 // actionLevelInfo is a map of ActionLevel to its display information.

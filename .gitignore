@@ -190,3 +190,5 @@ node_modules/
 /GoReleaser-Wizard
 # Test coverage
 /coverage
+Copy/paste detection report
+/report/jscpd-report.json

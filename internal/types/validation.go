@@ -568,8 +568,10 @@ var validationStatusInfo = map[ValidationStatus]ValidationStatusInfo{
 	ValidationStatusFailed:   {Icon: "❌", Color: "red"},
 }
 
-const validationStatusDefaultIcon = "❓"
-const validationStatusDefaultColor = "gray"
+const (
+	validationStatusDefaultIcon  = "❓"
+	validationStatusDefaultColor = "gray"
+)
 
 // String returns string representation.
 func (vs ValidationStatus) String() string {
