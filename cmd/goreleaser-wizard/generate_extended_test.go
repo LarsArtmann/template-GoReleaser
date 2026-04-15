@@ -285,6 +285,43 @@ func TestGitHubActionsGeneration(t *testing.T) {
 	}
 }
 
+// invalidEmptyFieldTestCases returns test cases for validation of empty required fields.
+func invalidEmptyFieldTestCases() []struct {
+	name    string
+	config  ProjectConfig
+	wantErr bool
+} {
+	return []struct {
+		name    string
+		config  ProjectConfig
+		wantErr bool
+	}{
+		makeInvalidEmptyFieldTestCase("invalid_empty_project_name", "ProjectName", "", "BinaryName", "myapp", "MainPath", "."),
+		makeInvalidEmptyFieldTestCase("invalid_empty_binary_name", "ProjectName", "myapp", "BinaryName", "", "MainPath", "."),
+		makeInvalidEmptyFieldTestCase("invalid_empty_main_path", "ProjectName", "myapp", "BinaryName", "myapp", "MainPath", ""),
+	}
+}
+
+// makeInvalidEmptyFieldTestCase creates a test case for empty field validation.
+func makeInvalidEmptyFieldTestCase(
+	testName, field1Name, field1Val, field2Name, field2Val, field3Name, field3Val string,
+) struct {
+	name    string
+	config  ProjectConfig
+	wantErr bool
+} {
+	overrides := map[string]any{field1Name: field1Val, field2Name: field2Val, field3Name: field3Val}
+	return struct {
+		name    string
+		config  ProjectConfig
+		wantErr bool
+	}{
+		name:    testName,
+		config:  testProjectConfigWithOverrides(overrides),
+		wantErr: true,
+	}
+}
+
 func TestConfigValidation(t *testing.T) {
 	tests := []struct {
 		name    string
@@ -313,48 +350,19 @@ func TestConfigValidation(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{
-			name: "invalid_empty_project_name",
-			config: testProjectConfigWithOverrides(map[string]any{
-				"ProjectName": "",
-				"BinaryName":  "myapp",
-				"MainPath":    ".",
-			}),
-			wantErr: true,
-		},
-		{
-			name: "invalid_empty_binary_name",
-			config: testProjectConfigWithOverrides(map[string]any{
-				"ProjectName": "myapp",
-				"BinaryName":  "",
-				"MainPath":    ".",
-			}),
-			wantErr: true,
-		},
-		{
-			name: "invalid_empty_main_path",
-			config: testProjectConfigWithOverrides(map[string]any{
-				"ProjectName": "myapp",
-				"BinaryName":  "myapp",
-				"MainPath":    "",
-			}),
-			wantErr: true, // Empty main path is now validated
-		},
 	}
+	tests = append(tests, invalidEmptyFieldTestCases()...)
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create temp directory for test
 			tmpDir, _ := os.MkdirTemp("", "wizard-config-validation-test")
 			defer os.RemoveAll(tmpDir)
 
-			// Change to temp directory
 			originalDir, _ := os.Getwd()
 
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
-			// Test config generation
 			err := generateGoReleaserConfig(&tt.config)
 
 			if (err != nil) != tt.wantErr {

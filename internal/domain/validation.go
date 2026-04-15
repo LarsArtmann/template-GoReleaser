@@ -340,43 +340,44 @@ func (vu *ValidationUseCase) generateWarnings(
 ) {
 	// Warning for single platform
 	if len(config.Platforms) == 1 {
-		warning := NewBusinessRuleError(
+		vu.addWarning(result, NewBusinessRuleError(
 			ErrMissingRequiredField,
 			"Single platform configuration",
 			"Consider targeting multiple platforms for broader compatibility",
-		).WithContext("platforms")
-		result.Warnings = append(result.Warnings, warning)
+		).WithContext("platforms"))
 	}
 
 	// Warning for missing Docker image name
 	if config.GetDockerEnabled() && config.DockerImage == "" {
-		warning := NewConfigurationError(
+		vu.addWarning(result, NewConfigurationError(
 			ErrMissingRequiredField,
 			"Missing Docker image name",
 			"Docker is enabled but no image name is specified",
-		).WithContext("docker_image")
-		result.Warnings = append(result.Warnings, warning)
+		).WithContext("docker_image"))
 	}
 
 	// Warning for mismatched CGO setting
 	if config.CGOStatus.ToBool() != config.ProjectType.DefaultCGOEnabled() {
-		warning := NewConfigurationError(
+		vu.addWarning(result, NewConfigurationError(
 			ErrInvalidStateTransition,
 			"CGO setting mismatched",
 			"CGO setting differs from project type default",
-		).WithContext("cgo_enabled")
-		result.Warnings = append(result.Warnings, warning)
+		).WithContext("cgo_enabled"))
 	}
 
 	// Warning for missing version information
 	if !config.LDFlags {
-		warning := NewConfigurationError(
+		vu.addWarning(result, NewConfigurationError(
 			ErrMissingRequiredField,
 			"LD flags disabled",
 			"Version information injection is disabled",
-		).WithContext("ldflags")
-		result.Warnings = append(result.Warnings, warning)
+		).WithContext("ldflags"))
 	}
+}
+
+// addWarning adds a warning to the validation result.
+func (vu *ValidationUseCase) addWarning(result *ValidationResult, warning *DomainError) {
+	result.Warnings = append(result.Warnings, warning)
 }
 
 // ValidateProjectStructure validates project directory structure.

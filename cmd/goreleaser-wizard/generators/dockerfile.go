@@ -155,20 +155,12 @@ func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 	}
 
 	// Remove generated Dockerfile
-	if _, err := os.Stat("Dockerfile"); err == nil {
-		err := os.Remove("Dockerfile")
-		if err != nil {
-			return errors.NewFileError(
-				errors.ErrFileOperation,
-				"Failed to remove generated Dockerfile",
-				err.Error(),
-			).WithCause(err)
-		}
-
-		g.logger.Info("Removed generated Dockerfile")
-	}
-
-	return nil
+	return removeGeneratedFile(
+		g.logger,
+		"Dockerfile",
+		"Failed to remove generated Dockerfile",
+		"Removed generated Dockerfile",
+	)
 }
 
 // UpdateConfig updates generator configuration.

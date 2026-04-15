@@ -304,26 +304,33 @@ func TestCommandHelp(t *testing.T) {
 	}
 }
 
+// makeFlagTestCase creates a flag test case with the given flag name and expected boolean value.
+func makeFlagTestCase(name, flagName string, flagValue bool) struct {
+	name          string
+	flags         map[string]string
+	expectedViper map[string]any
+} {
+	return struct {
+		name          string
+		flags         map[string]string
+		expectedViper map[string]any
+	}{
+		name:  name,
+		flags: map[string]string{flagName: "true"},
+		expectedViper: map[string]any{
+			flagName: flagValue,
+		},
+	}
+}
+
 func TestFlagHandling(t *testing.T) {
 	tests := []struct {
 		name          string
 		flags         map[string]string
 		expectedViper map[string]any
 	}{
-		{
-			name:  "debug_flag",
-			flags: map[string]string{"debug": "true"},
-			expectedViper: map[string]any{
-				"debug": true,
-			},
-		},
-		{
-			name:  "force_flag",
-			flags: map[string]string{"force": "true"},
-			expectedViper: map[string]any{
-				"force": true,
-			},
-		},
+		makeFlagTestCase("debug_flag", "debug", true),
+		makeFlagTestCase("force_flag", "force", true),
 	}
 
 	for _, tt := range tests {

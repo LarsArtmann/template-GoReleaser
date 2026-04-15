@@ -46,30 +46,23 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Create template with custom functions
-	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
+	tmpl := newTemplateWithFuncs("goreleaser", template.FuncMap{
 		"incpatch": git.IncPatchVersion,
 	})
 
-	tmpl, err := tmpl.Parse(templates.GoReleaserTemplate)
+	// Parse template
+	tmpl, err := parseTemplateWithError(tmpl, templates.GoReleaserTemplate, "GoReleaser")
 	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse GoReleaser template",
-			err.Error(),
-		).WithCause(err)
+		return err
 	}
 
 	// Generate template data with git information
 	data := g.prepareTemplateData(ctx)
 
 	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, data); err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute GoReleaser template",
-			err.Error(),
-		).WithCause(err)
+	output, err := executeTemplateWithError(tmpl, data, "GoReleaser")
+	if err != nil {
+		return err
 	}
 
 	// Create backup if file exists
@@ -78,7 +71,7 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write configuration file
-	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(".goreleaser.yaml", output, 0o644); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write GoReleaser config",

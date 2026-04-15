@@ -9,6 +9,11 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
+// newValidationError creates a new validation error with field and suggestion.
+func newValidationError(code errors.ErrorCode, message, details, field, suggestion string) *errors.DomainError {
+	return errors.NewValidationError(code, message, details).WithField(field).WithSuggestion(suggestion)
+}
+
 // Validation patterns.
 var (
 	// Project name validation: alphanumeric, hyphens, underscores, dots, 1-50 chars.
@@ -236,21 +241,33 @@ func ValidateMainPath(path string) error {
 		}
 
 		lowerComponent := strings.ToLower(component)
-		if slices.Contains(invalidComponents, lowerComponent) {
-			return errors.NewValidationError(
-				errors.ErrInvalidMainPath,
-				"Invalid path component",
-				fmt.Sprintf("'%s' is not allowed in path", component),
-			).WithField("main_path").WithSuggestion("Remove invalid components from path")
+		if err := validatePathComponent(lowerComponent, component, invalidComponents, reservedDirs); err != nil {
+			return err
 		}
+	}
 
-		if slices.Contains(reservedDirs, lowerComponent) {
-			return errors.NewValidationError(
-				errors.ErrInvalidMainPath,
-				"Reserved directory",
-				fmt.Sprintf("'%s' is a reserved system directory", component),
-			).WithField("main_path").WithSuggestion("Use project directories instead")
-		}
+	return nil
+}
+
+func validatePathComponent(lowerComponent, component string, invalidComponents, reservedDirs []string) error {
+	if slices.Contains(invalidComponents, lowerComponent) {
+		return newValidationError(
+			errors.ErrInvalidMainPath,
+			"Invalid path component",
+			fmt.Sprintf("'%s' is not allowed in path", component),
+			"main_path",
+			"Remove invalid components from path",
+		)
+	}
+
+	if slices.Contains(reservedDirs, lowerComponent) {
+		return newValidationError(
+			errors.ErrInvalidMainPath,
+			"Reserved directory",
+			fmt.Sprintf("'%s' is a reserved system directory", component),
+			"main_path",
+			"Use project directories instead",
+		)
 	}
 
 	return nil
@@ -265,19 +282,23 @@ func ValidateProjectDescription(description string) error {
 	trimmed := strings.TrimSpace(description)
 
 	if len(trimmed) == 0 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Project description cannot be empty",
 			"Project description must contain text",
-		).WithField("project_description").WithSuggestion("Provide a meaningful description")
+			"project_description",
+			"Provide a meaningful description",
+		)
 	}
 
 	if len(trimmed) > 255 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Project description too long",
 			"Project description must be 255 characters or less",
-		).WithField("project_description").WithSuggestion("Use a shorter description")
+			"project_description",
+			"Use a shorter description",
+		)
 	}
 
 	if !projectDescriptionPattern.MatchString(trimmed) {
@@ -536,6 +557,9 @@ func ValidateGitTag(tag string) error {
 	return nil
 }
 
+// buildTagPattern validates build tag format (alphanumeric and underscores only, no hyphens).
+var buildTagPattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_]*$`)
+
 // ValidateBuildTags validates build tags.
 func ValidateBuildTags(tags []string) error {
 	if len(tags) == 0 {
@@ -543,30 +567,8 @@ func ValidateBuildTags(tags []string) error {
 	}
 
 	for i, tag := range tags {
-		if tag == "" {
-			return errors.NewValidationError(
-				errors.ErrInvalidBuildTag,
-				"Build tag cannot be empty",
-				fmt.Sprintf("Build tag at index %d is empty", i),
-			).WithField("build_tags").WithSuggestion("Remove empty build tags")
-		}
-
-		// Validate build tag format (alphanumeric and underscores only, no hyphens)
-		tagPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_]*$`)
-		if !tagPattern.MatchString(tag) {
-			return errors.NewValidationError(
-				errors.ErrInvalidBuildTag,
-				"Invalid build tag format",
-				fmt.Sprintf("Build tag '%s' is invalid", tag),
-			).WithField("build_tags").WithSuggestion("Use alphanumeric characters and underscores only")
-		}
-
-		if len(tag) > 50 {
-			return errors.NewValidationError(
-				errors.ErrInvalidBuildTag,
-				"Build tag too long",
-				fmt.Sprintf("Build tag '%s' exceeds 50 characters", tag),
-			).WithField("build_tags").WithSuggestion("Use shorter build tags")
+		if err := validateSingleBuildTag(tag, i); err != nil {
+			return err
 		}
 	}
 
@@ -574,17 +576,65 @@ func ValidateBuildTags(tags []string) error {
 	seen := make(map[string]bool)
 	for _, tag := range tags {
 		if seen[tag] {
-			return errors.NewValidationError(
-				errors.ErrInvalidBuildTag,
-				"Duplicate build tag",
+			return newBuildTagValidationError(
 				fmt.Sprintf("Build tag '%s' is specified multiple times", tag),
-			).WithField("build_tags").WithSuggestion("Remove duplicate build tags")
+				"Remove duplicate build tags",
+				tag,
+			)
 		}
 
 		seen[tag] = true
 	}
 
 	return nil
+}
+
+func validateSingleBuildTag(tag string, index int) error {
+	if tag == "" {
+		return newBuildTagValidationError(
+			fmt.Sprintf("Build tag at index %d is empty", index),
+			"Remove empty build tags",
+			tag,
+		)
+	}
+
+	if !buildTagPattern.MatchString(tag) {
+		return newBuildTagValidationError(
+			fmt.Sprintf("Build tag '%s' is invalid", tag),
+			"Use alphanumeric characters and underscores only",
+			tag,
+		)
+	}
+
+	if len(tag) > 50 {
+		return newBuildTagValidationError(
+			fmt.Sprintf("Build tag '%s' exceeds 50 characters", tag),
+			"Use shorter build tags",
+			tag,
+		)
+	}
+
+	return nil
+}
+
+func newBuildTagValidationError(details, suggestion, tag string) error {
+	return errors.NewValidationError(
+		errors.ErrInvalidBuildTag,
+		getBuildTagErrorTitle(tag),
+		details,
+	).WithField("build_tags").WithSuggestion(suggestion)
+}
+
+func getBuildTagErrorTitle(tag string) string {
+	if tag == "" {
+		return "Build tag cannot be empty"
+	}
+
+	if !buildTagPattern.MatchString(tag) {
+		return "Invalid build tag format"
+	}
+
+	return "Build tag too long"
 }
 
 // ValidatePort validates port number.

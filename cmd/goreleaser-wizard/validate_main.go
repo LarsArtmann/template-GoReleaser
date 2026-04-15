@@ -194,47 +194,40 @@ func validateProjectStructure(results *ValidationResults) {
 
 // validateYAML validates YAML file.
 func validateYAML(filePath string, results *ValidationResults) error {
-	// Simple YAML validation - try to read file content
 	content, err := fileSystemRepo.ReadFile(context.Background(), filePath)
 	if err != nil {
 		return err
 	}
 
-	// Basic YAML structure check
 	lines := strings.Split(string(content), "\n")
 	if len(lines) == 0 {
-		results.Errors = append(results.Errors,
-			NewValidationError(
-				"INVALID_FILE_FORMAT",
-				"Empty YAML file",
-				filePath+" is empty",
-			).WithContext(filePath))
-
-		return nil
+		return addValidationError(results, filePath, "Empty YAML file", filePath+" is empty")
 	}
 
-	// Check for common YAML structure indicators
-	hasYamlStructure := false
+	if !hasValidYAMLStructure(lines) {
+		return addValidationError(results, filePath, "Invalid YAML structure", filePath+" does not appear to be valid YAML")
+	}
 
+	return nil
+}
+
+func hasValidYAMLStructure(lines []string) bool {
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		if strings.Contains(trimmed, ":") && !strings.HasPrefix(trimmed, "#") {
-			hasYamlStructure = true
-
-			break
+			return true
 		}
 	}
+	return false
+}
 
-	if !hasYamlStructure {
-		results.Errors = append(results.Errors,
-			NewValidationError(
-				"INVALID_FILE_FORMAT",
-				"Invalid YAML structure",
-				filePath+" does not appear to be valid YAML",
-			).WithContext(filePath))
-
-		return nil
-	}
+func addValidationError(results *ValidationResults, filePath, title, details string) error {
+	results.Errors = append(results.Errors,
+		NewValidationError(
+			"INVALID_FILE_FORMAT",
+			title,
+			details,
+		).WithContext(filePath))
 
 	return nil
 }

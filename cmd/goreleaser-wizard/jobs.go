@@ -646,9 +646,7 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 	if config.GetDockerEnabled() {
 		dependencies = append(dependencies, "docker")
 	}
-	// Only require cosign for advanced signing levels (basic can work without installation)
-	if config.SigningLevel == domain.SigningLevelAdvanced ||
-		config.SigningLevel == domain.SigningLevelEnterprise {
+	if config.SigningLevel.RequiresCosign() {
 		dependencies = append(dependencies, "cosign")
 	}
 

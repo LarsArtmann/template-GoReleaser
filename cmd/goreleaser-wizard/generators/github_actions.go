@@ -102,57 +102,25 @@ func (g *GitHubActionsGenerator) shouldGenerate() bool {
 
 // ValidateTemplate validates GitHub Actions template.
 func (g *GitHubActionsGenerator) ValidateTemplate() error {
-	tmpl := template.New("github-actions").Delims("[[", "]]")
-
-	_, err := tmpl.Parse(templates.GitHubActionsTemplate)
-	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrInvalidTemplate,
-			"GitHub Actions template validation failed",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return nil
+	return ValidateTemplateWithDelims("github-actions", "[[", "]]", templates.GitHubActionsTemplate)
 }
 
 // GeneratePreview generates a preview without writing to file.
 func (g *GitHubActionsGenerator) GeneratePreview(ctx context.Context) (string, error) {
-	g.logger.Debug("Generating GitHub Actions workflow preview")
-
 	// Check if should generate
 	if !g.shouldGenerate() {
 		return "// GitHub Actions generation is disabled", nil
 	}
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
-	}
-
-	// Create template with custom delimiters
-	tmpl := template.New("github-actions").Delims("[[", "]]")
-
-	tmpl, err := tmpl.Parse(templates.GitHubActionsTemplate)
-	if err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse GitHub Actions template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, g.templateData); err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute GitHub Actions template preview",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return output.String(), nil
+	return GeneratePreviewWithDelims(
+		ctx,
+		g.logger,
+		"github-actions",
+		"[[", "]]",
+		templates.GitHubActionsTemplate,
+		"Generating GitHub Actions workflow preview",
+		g.templateData,
+	)
 }
 
 // Rollback removes generated GitHub Actions workflow.
