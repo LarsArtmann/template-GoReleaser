@@ -41,6 +41,7 @@ func addDockerConfig(data map[string]any, config *domain.SafeProjectConfig) {
 func noOpRollback(logger *log.Logger, jobName string) func(ctx context.Context) error {
 	return func(ctx context.Context) error {
 		logger.Info(jobName + " rollback is a no-op")
+
 		return nil
 	}
 }
@@ -493,6 +494,7 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 // ProjectValidationJob validates project structure.
 type ProjectValidationJob struct {
 	noOpRollbackHelper
+
 	id         string
 	projectDir string
 }
@@ -565,6 +567,7 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 // DependencyCheckJob checks for required dependencies.
 type DependencyCheckJob struct {
 	noOpRollbackHelper
+
 	id           string
 	dependencies []string
 }
@@ -646,6 +649,7 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 	if config.GetDockerEnabled() {
 		dependencies = append(dependencies, "docker")
 	}
+
 	if config.SigningLevel.RequiresCosign() {
 		dependencies = append(dependencies, "cosign")
 	}

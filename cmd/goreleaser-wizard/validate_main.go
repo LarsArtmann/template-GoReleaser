@@ -205,7 +205,12 @@ func validateYAML(filePath string, results *ValidationResults) error {
 	}
 
 	if !hasValidYAMLStructure(lines) {
-		return addValidationError(results, filePath, "Invalid YAML structure", filePath+" does not appear to be valid YAML")
+		return addValidationError(
+			results,
+			filePath,
+			"Invalid YAML structure",
+			filePath+" does not appear to be valid YAML",
+		)
 	}
 
 	return nil
@@ -218,6 +223,7 @@ func hasValidYAMLStructure(lines []string) bool {
 			return true
 		}
 	}
+
 	return false
 }
 

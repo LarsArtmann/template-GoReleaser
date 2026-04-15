@@ -10,8 +10,13 @@ import (
 )
 
 // newValidationError creates a new validation error with field and suggestion.
-func newValidationError(code errors.ErrorCode, message, details, field, suggestion string) *errors.DomainError {
-	return errors.NewValidationError(code, message, details).WithField(field).WithSuggestion(suggestion)
+func newValidationError(
+	code errors.ErrorCode,
+	message, details, field, suggestion string,
+) *errors.DomainError {
+	return errors.NewValidationError(code, message, details).
+		WithField(field).
+		WithSuggestion(suggestion)
 }
 
 // Validation patterns.
@@ -241,7 +246,13 @@ func ValidateMainPath(path string) error {
 		}
 
 		lowerComponent := strings.ToLower(component)
-		if err := validatePathComponent(lowerComponent, component, invalidComponents, reservedDirs); err != nil {
+		err := validatePathComponent(
+			lowerComponent,
+			component,
+			invalidComponents,
+			reservedDirs,
+		)
+		if err != nil {
 			return err
 		}
 	}
@@ -249,7 +260,10 @@ func ValidateMainPath(path string) error {
 	return nil
 }
 
-func validatePathComponent(lowerComponent, component string, invalidComponents, reservedDirs []string) error {
+func validatePathComponent(
+	lowerComponent, component string,
+	invalidComponents, reservedDirs []string,
+) error {
 	if slices.Contains(invalidComponents, lowerComponent) {
 		return newValidationError(
 			errors.ErrInvalidMainPath,
@@ -567,7 +581,8 @@ func ValidateBuildTags(tags []string) error {
 	}
 
 	for i, tag := range tags {
-		if err := validateSingleBuildTag(tag, i); err != nil {
+		err := validateSingleBuildTag(tag, i)
+		if err != nil {
 			return err
 		}
 	}

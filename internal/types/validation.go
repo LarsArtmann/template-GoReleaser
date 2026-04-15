@@ -583,6 +583,7 @@ func (vs ValidationStatus) GetIcon() string {
 	if info, ok := validationStatusInfo[vs]; ok {
 		return info.Icon
 	}
+
 	return validationStatusDefaultIcon
 }
 
@@ -591,6 +592,7 @@ func (vs ValidationStatus) GetColor() string {
 	if info, ok := validationStatusInfo[vs]; ok {
 		return info.Color
 	}
+
 	return validationStatusDefaultColor
 }
 

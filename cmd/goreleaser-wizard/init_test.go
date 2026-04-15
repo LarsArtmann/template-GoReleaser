@@ -15,19 +15,23 @@ import (
 // setupBasicGoProject creates a basic Go project with go.mod and main.go.
 func setupBasicGoProject(t *testing.T, moduleName, pattern string) string {
 	t.Helper()
+
 	dir, err := os.MkdirTemp("", pattern)
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
+
 	goMod := "module " + moduleName + "\ngo 1.21\n"
 	os.WriteFile(dir+"/go.mod", []byte(goMod), 0o644)
 	os.WriteFile(dir+"/main.go", []byte("package main\n\nfunc main() {}\n"), 0o644)
+
 	return dir
 }
 
 // expectNoPanic sets up a deferred panic recovery that fails the test if a panic occurs.
 func expectNoPanic(t *testing.T, expectError bool) {
 	t.Helper()
+
 	if r := recover(); r != nil {
 		if !expectError {
 			t.Errorf("Command panicked: %v", r)

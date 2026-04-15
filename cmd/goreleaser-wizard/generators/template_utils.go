@@ -16,7 +16,7 @@ func newTemplateWithFuncs(name string, funcs template.FuncMap) *template.Templat
 }
 
 // newTemplateWithDelims creates a template with custom delimiters.
-func newTemplateWithDelims(name string, left, right string) *template.Template {
+func newTemplateWithDelims(name, left, right string) *template.Template {
 	return template.New(name).Delims(left, right)
 }
 
@@ -40,7 +40,10 @@ func parseAndExecute(
 }
 
 // parseTemplateWithError parses a template and wraps errors with context.
-func parseTemplateWithError(tmpl *template.Template, content, templateType string) (*template.Template, error) {
+func parseTemplateWithError(
+	tmpl *template.Template,
+	content, templateType string,
+) (*template.Template, error) {
 	tmpl, err := tmpl.Parse(content)
 	if err != nil {
 		return nil, errors.NewConfigError(
@@ -49,19 +52,26 @@ func parseTemplateWithError(tmpl *template.Template, content, templateType strin
 			err.Error(),
 		).WithCause(err)
 	}
+
 	return tmpl, nil
 }
 
 // executeTemplateWithError executes a template and wraps errors with context.
-func executeTemplateWithError(tmpl *template.Template, data any, templateType string) ([]byte, error) {
+func executeTemplateWithError(
+	tmpl *template.Template,
+	data any,
+	templateType string,
+) ([]byte, error) {
 	var output bytes.Buffer
-	if err := tmpl.Execute(&output, data); err != nil {
+	err := tmpl.Execute(&output, data)
+	if err != nil {
 		return nil, errors.NewConfigError(
 			errors.ErrTemplateRendering,
 			"Failed to execute "+templateType+" template",
 			err.Error(),
 		).WithCause(err)
 	}
+
 	return output.Bytes(), nil
 }
 

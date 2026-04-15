@@ -45,6 +45,7 @@ func (al ActionLevel) String() string {
 	if info, ok := actionLevelInfo[al]; ok {
 		return info.DisplayName
 	}
+
 	return unknownValue
 }
 
@@ -131,6 +132,7 @@ func (al ActionLevel) GetEnvironmentCount() int {
 	if info, ok := actionLevelInfo[al]; ok {
 		return info.EnvironmentCount
 	}
+
 	return 0
 }
 

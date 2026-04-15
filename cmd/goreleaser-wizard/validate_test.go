@@ -58,11 +58,14 @@ project_name: test
 // createTempFile creates a temporary file and returns its path.
 func createTempFile(tb testing.TB, pattern string) string {
 	tb.Helper()
+
 	file, err := os.CreateTemp(tb.TempDir(), pattern)
 	if err != nil {
 		tb.Fatalf("failed to create temp file: %v", err)
 	}
+
 	file.Close()
+
 	return file.Name()
 }
 

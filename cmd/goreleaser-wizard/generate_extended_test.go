@@ -28,6 +28,7 @@ func baseTestProjectConfig() ProjectConfig {
 // testProjectConfigWithOverrides creates a ProjectConfig with field overrides applied.
 func testProjectConfigWithOverrides(overrides map[string]any) ProjectConfig {
 	cfg := baseTestProjectConfig()
+
 	for key, value := range overrides {
 		switch key {
 		case "ProjectName":
@@ -44,6 +45,7 @@ func testProjectConfigWithOverrides(overrides map[string]any) ProjectConfig {
 			cfg.Architectures = value.([]domain.Architecture)
 		}
 	}
+
 	return cfg
 }
 
@@ -296,9 +298,33 @@ func invalidEmptyFieldTestCases() []struct {
 		config  ProjectConfig
 		wantErr bool
 	}{
-		makeInvalidEmptyFieldTestCase("invalid_empty_project_name", "ProjectName", "", "BinaryName", "myapp", "MainPath", "."),
-		makeInvalidEmptyFieldTestCase("invalid_empty_binary_name", "ProjectName", "myapp", "BinaryName", "", "MainPath", "."),
-		makeInvalidEmptyFieldTestCase("invalid_empty_main_path", "ProjectName", "myapp", "BinaryName", "myapp", "MainPath", ""),
+		makeInvalidEmptyFieldTestCase(
+			"invalid_empty_project_name",
+			"ProjectName",
+			"",
+			"BinaryName",
+			"myapp",
+			"MainPath",
+			".",
+		),
+		makeInvalidEmptyFieldTestCase(
+			"invalid_empty_binary_name",
+			"ProjectName",
+			"myapp",
+			"BinaryName",
+			"",
+			"MainPath",
+			".",
+		),
+		makeInvalidEmptyFieldTestCase(
+			"invalid_empty_main_path",
+			"ProjectName",
+			"myapp",
+			"BinaryName",
+			"myapp",
+			"MainPath",
+			"",
+		),
 	}
 }
 
@@ -311,6 +337,7 @@ func makeInvalidEmptyFieldTestCase(
 	wantErr bool
 } {
 	overrides := map[string]any{field1Name: field1Val, field2Name: field2Val, field3Name: field3Val}
+
 	return struct {
 		name    string
 		config  ProjectConfig
