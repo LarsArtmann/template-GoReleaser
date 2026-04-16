@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -21,8 +20,9 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	fmt.Println()
 
 	// Detect project information
-	config := &domain.SafeProjectConfig{}
-	if err := detectProjectInfo(config); err != nil {
+	projectConfig := &domain.SafeProjectConfig{}
+	err := detectProjectInfo(projectConfig)
+	if err != nil {
 		displayError(err)
 
 		return
@@ -30,19 +30,19 @@ func runGenerate(cmd *cobra.Command, args []string) {
 
 	// Override with flags if provided
 	if name, _ := cmd.Flags().GetString("project-name"); name != "" {
-		config.ProjectName = name
+		projectConfig.ProjectName = name
 	}
 
 	if path, _ := cmd.Flags().GetString("main-path"); path != "" {
-		config.MainPath = path
+		projectConfig.MainPath = path
 	}
 
 	if binName, _ := cmd.Flags().GetString("binary-name"); binName != "" {
-		config.BinaryName = binName
+		projectConfig.BinaryName = binName
 	}
 
 	if projType, _ := cmd.Flags().GetString("project-type"); projType != "" {
-		config.ProjectType = domain.ProjectType(projType)
+		projectConfig.ProjectType = domain.ProjectType(projType)
 	}
 
 	// Create workflow based on options
@@ -54,25 +54,9 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	}
 
 	logger := log.New(os.Stderr)
-	builder := NewWorkflowBuilder(logger)
-
-	workflow, err := builder.BuildWorkflow(workflowType, config, force)
-	if err != nil {
-		displayError(err)
-
+	if !ExecuteWorkflow(workflowType, projectConfig, force, logger) {
 		return
 	}
-
-	// Execute workflow
-	ctx := context.Background()
-	if err := workflow.Execute(ctx); err != nil {
-		displayError(err)
-
-		return
-	}
-
-	// Display results
-	displayJobResults(workflow.GetResults())
 
 	fmt.Println()
 

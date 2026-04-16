@@ -246,6 +246,7 @@ func ValidateMainPath(path string) error {
 		}
 
 		lowerComponent := strings.ToLower(component)
+
 		err := validatePathComponent(
 			lowerComponent,
 			component,

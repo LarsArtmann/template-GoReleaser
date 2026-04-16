@@ -10,33 +10,32 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
+// CheckContext returns an error if the context is cancelled.
+func CheckContext(ctx context.Context) error {
+	if ctx.Err() != nil {
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	}
+
+	return nil
+}
+
+// WriteFile writes data to a file with proper error handling.
+func WriteFile(path string, data []byte, perm os.FileMode) error {
+	return os.WriteFile(path, data, perm)
+}
+
+// WrapFileError wraps a file operation error with context.
+func WrapFileError(err error, message string) error {
+	return errors.NewFileError(
+		errors.ErrFileOperation,
+		message,
+		err.Error(),
+	).WithCause(err)
+}
+
 // newTemplateWithFuncs creates a template with custom functions.
 func newTemplateWithFuncs(name string, funcs template.FuncMap) *template.Template {
 	return template.New(name).Funcs(funcs)
-}
-
-// newTemplateWithDelims creates a template with custom delimiters.
-func newTemplateWithDelims(name, left, right string) *template.Template {
-	return template.New(name).Delims(left, right)
-}
-
-// parseAndExecute parses a template and executes it with the given data.
-func parseAndExecute(
-	tmpl *template.Template,
-	content string,
-	data any,
-) ([]byte, error) {
-	tmpl, err := tmpl.Parse(content)
-	if err != nil {
-		return nil, err
-	}
-
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, data); err != nil {
-		return nil, err
-	}
-
-	return output.Bytes(), nil
 }
 
 // parseTemplateWithError parses a template and wraps errors with context.
@@ -63,6 +62,7 @@ func executeTemplateWithError(
 	templateType string,
 ) ([]byte, error) {
 	var output bytes.Buffer
+
 	err := tmpl.Execute(&output, data)
 	if err != nil {
 		return nil, errors.NewConfigError(
@@ -108,6 +108,33 @@ func GeneratePreview(
 	)
 }
 
+// parseAndExecuteTemplate parses and executes a template, wrapping errors with context.
+func parseAndExecuteTemplate(
+	tmpl *template.Template,
+	templateName, templateContent string,
+	templateData any,
+) ([]byte, error) {
+	tmpl, err := tmpl.Parse(templateContent)
+	if err != nil {
+		return nil, errors.NewConfigError(
+			errors.ErrTemplateParsing,
+			"Failed to parse "+templateName+" template",
+			err.Error(),
+		).WithCause(err)
+	}
+
+	var output bytes.Buffer
+	if err := tmpl.Execute(&output, templateData); err != nil {
+		return nil, errors.NewConfigError(
+			errors.ErrTemplateRendering,
+			"Failed to execute "+templateName+" template",
+			err.Error(),
+		).WithCause(err)
+	}
+
+	return output.Bytes(), nil
+}
+
 // GeneratePreviewWithDelims generates a preview with custom delimiters.
 func GeneratePreviewWithDelims(
 	ctx context.Context,
@@ -117,34 +144,18 @@ func GeneratePreviewWithDelims(
 ) (string, error) {
 	logger.Debug(logPrefix)
 
-	// Check context cancellation
 	if ctx.Err() != nil {
 		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
-	// Create and parse template with custom delimiters
 	tmpl := template.New(templateName).Delims(left, right)
 
-	tmpl, err := tmpl.Parse(templateContent)
+	result, err := parseAndExecuteTemplate(tmpl, templateName, templateContent, templateData)
 	if err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse "+templateName+" template",
-			err.Error(),
-		).WithCause(err)
+		return "", err
 	}
 
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, templateData); err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute "+templateName+" template preview",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return output.String(), nil
+	return string(result), nil
 }
 
 // GenerateTemplate generates and executes a template, returning the output.
@@ -156,34 +167,13 @@ func GenerateTemplate(
 ) ([]byte, error) {
 	logger.Info(logPrefix)
 
-	// Check context cancellation
 	if ctx.Err() != nil {
 		return nil, fmt.Errorf("context cancelled: %w", ctx.Err())
 	}
 
-	// Create and parse template
 	tmpl := template.New(templateName)
 
-	tmpl, err := tmpl.Parse(templateContent)
-	if err != nil {
-		return nil, errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse "+templateName+" template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, templateData); err != nil {
-		return nil, errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute "+templateName+" template",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return output.Bytes(), nil
+	return parseAndExecuteTemplate(tmpl, templateName, templateContent, templateData)
 }
 
 // removeGeneratedFile removes a generated file if it exists.

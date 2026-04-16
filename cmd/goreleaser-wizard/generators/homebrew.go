@@ -137,7 +137,7 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 
 	// Write formula file
 	formulaPath := fmt.Sprintf("%s/%s.rb", formulaDir, g.templateData.FormulaName)
-	if err := os.WriteFile(formulaPath, output, filePermission); err != nil {
+	if err := WriteFile(formulaPath, output, filePermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write Homebrew formula",
@@ -171,9 +171,8 @@ func (g *HomebrewGenerator) GeneratePreview(ctx context.Context) (string, error)
 func (g *HomebrewGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back Homebrew formula generation")
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := CheckContext(ctx); err != nil {
+		return err
 	}
 
 	// Remove generated formula

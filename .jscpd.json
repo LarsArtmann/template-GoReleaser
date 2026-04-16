@@ -21,7 +21,10 @@
     "**/*.yaml",
     "**/*.yml",
     "**/*.json",
-    "**/testdata/**"
+    "**/testdata/**",
+    "**/*_test.go",
+    "**/internal/domain/errors.go",
+    "**/internal/errors/domain_errors.go"
   ],
   "output": "./duplication-report",
   "silent": false,

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -38,7 +37,8 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 
 	// Detect project information
 	config := &domain.SafeProjectConfig{}
-	if err := detectProjectInfo(config); err != nil {
+	err := detectProjectInfo(config)
+	if err != nil {
 		displayError(err)
 
 		return
@@ -59,25 +59,9 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 
 	// Create and execute workflow
 	logger := log.New(os.Stderr)
-	builder := NewWorkflowBuilder(logger)
-
-	workflow, err := builder.BuildWorkflow(WorkflowTypeFullWizard, config, force)
-	if err != nil {
-		displayError(err)
-
+	if !ExecuteWorkflow(WorkflowTypeFullWizard, config, force, logger) {
 		return
 	}
-
-	// Execute workflow
-	ctx := context.Background()
-	if err := workflow.Execute(ctx); err != nil {
-		displayError(err)
-
-		return
-	}
-
-	// Display results
-	displayJobResults(workflow.GetResults())
 
 	fmt.Println()
 	fmt.Println(successStyle.Render("🎉 GoReleaser configuration initialized successfully!"))

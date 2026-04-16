@@ -432,6 +432,37 @@ func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
+// ExecuteWorkflow builds, executes a workflow, and displays results.
+// Returns true if successful, false on error.
+func ExecuteWorkflow(
+	workflowType WorkflowType,
+	config *ProjectConfig,
+	force bool,
+	logger *log.Logger,
+) bool {
+	builder := NewWorkflowBuilder(logger)
+
+	workflow, err := builder.BuildWorkflow(workflowType, config, force)
+	if err != nil {
+		displayError(err)
+
+		return false
+	}
+
+	// Execute workflow
+	ctx := context.Background()
+	if err := workflow.Execute(ctx); err != nil {
+		displayError(err)
+
+		return false
+	}
+
+	// Display results
+	displayJobResults(workflow.GetResults())
+
+	return true
+}
+
 // ConfigUpdateJob updates configuration.
 type ConfigUpdateJob struct {
 	id     string

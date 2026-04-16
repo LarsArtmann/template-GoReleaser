@@ -3,7 +3,6 @@ package generators
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"os"
 	"text/template"
 
@@ -40,9 +39,8 @@ func NewGoReleaserGenerator(config *domain.SafeProjectConfig, logger Logger) *Go
 func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	g.logger.Info("Generating GoReleaser configuration")
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := CheckContext(ctx); err != nil {
+		return err
 	}
 
 	// Create template with custom functions
@@ -71,12 +69,8 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write configuration file
-	if err := os.WriteFile(".goreleaser.yaml", output, 0o644); err != nil {
-		return errors.NewFileError(
-			errors.ErrFileOperation,
-			"Failed to write GoReleaser config",
-			err.Error(),
-		).WithCause(err)
+	if err := WriteFile(".goreleaser.yaml", output, 0o644); err != nil {
+		return WrapFileError(err, "Failed to write GoReleaser config")
 	}
 
 	g.logger.Info("GoReleaser configuration generated successfully")
@@ -91,11 +85,7 @@ func (g *GoReleaserGenerator) createBackup(filename string) error {
 
 		err := os.Rename(filename, backupPath)
 		if err != nil {
-			return errors.NewFileError(
-				errors.ErrFileOperation,
-				"Failed to create backup",
-				err.Error(),
-			).WithCause(err)
+			return WrapFileError(err, "Failed to create backup")
 		}
 
 		g.logger.Info("Created backup file", "backup", backupPath)
@@ -160,9 +150,8 @@ func (g *GoReleaserGenerator) ValidateTemplate() error {
 func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, error) {
 	g.logger.Debug("Generating GoReleaser configuration preview")
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := CheckContext(ctx); err != nil {
+		return "", err
 	}
 
 	// Create template

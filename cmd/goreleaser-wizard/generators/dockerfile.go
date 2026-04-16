@@ -2,12 +2,9 @@ package generators
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
 // DockerfileGenerator handles Dockerfile generation.
@@ -115,12 +112,8 @@ func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write Dockerfile
-	if err := os.WriteFile("Dockerfile", output, filePermission); err != nil {
-		return errors.NewFileError(
-			errors.ErrFileOperation,
-			"Failed to write Dockerfile",
-			err.Error(),
-		).WithCause(err)
+	if err := WriteFile("Dockerfile", output, filePermission); err != nil {
+		return WrapFileError(err, "Failed to write Dockerfile")
 	}
 
 	g.logger.Info("Dockerfile generated successfully")
@@ -149,9 +142,9 @@ func (g *DockerfileGenerator) GeneratePreview(ctx context.Context) (string, erro
 func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back Dockerfile generation")
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	err := CheckContext(ctx)
+	if err != nil {
+		return err
 	}
 
 	// Remove generated Dockerfile

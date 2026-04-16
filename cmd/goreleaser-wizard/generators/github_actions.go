@@ -3,7 +3,6 @@ package generators
 import (
 	"bytes"
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -42,9 +41,8 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 		return nil
 	}
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := CheckContext(ctx); err != nil {
+		return err
 	}
 
 	// Create template with custom delimiters to avoid GitHub Actions syntax conflict
@@ -81,7 +79,7 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 
 	// Write workflow file
 	workflowPath := filepath.Join(workflowDir, "release.yml")
-	if err := os.WriteFile(workflowPath, output.Bytes(), filePermission); err != nil {
+	if err := WriteFile(workflowPath, output.Bytes(), filePermission); err != nil {
 		return errors.NewFileError(
 			errors.ErrFileOperation,
 			"Failed to write GitHub Actions workflow",
@@ -127,9 +125,8 @@ func (g *GitHubActionsGenerator) GeneratePreview(ctx context.Context) (string, e
 func (g *GitHubActionsGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back GitHub Actions workflow generation")
 
-	// Check context cancellation
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := CheckContext(ctx); err != nil {
+		return err
 	}
 
 	// Remove generated workflow

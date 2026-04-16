@@ -115,8 +115,9 @@ func (jm *JobManager) ExecuteJobs(ctx context.Context) error {
 // executeSequential executes jobs one by one.
 func (jm *JobManager) executeSequential(ctx context.Context) error {
 	for _, job := range jm.jobs {
-		if ctx.Err() != nil {
-			return fmt.Errorf("context cancelled: %w", ctx.Err())
+		err := checkContext(ctx)
+		if err != nil {
+			return err
 		}
 
 		result := jm.executeJob(ctx, job)

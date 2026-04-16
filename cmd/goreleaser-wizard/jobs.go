@@ -29,6 +29,15 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
 
+// checkContext returns an error if the context is cancelled.
+func checkContext(ctx context.Context) error {
+	if ctx.Err() != nil {
+		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	}
+
+	return nil
+}
+
 // addDockerConfig adds Docker configuration to template data if Docker is enabled.
 func addDockerConfig(data map[string]any, config *domain.SafeProjectConfig) {
 	if config.DockerSupport.IsEnabled() {
@@ -339,9 +348,8 @@ func (j *ConfigGenerationJob) Name() string {
 func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Generating GoReleaser configuration")
 
-	// Check if context is cancelled
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := checkContext(ctx); err != nil {
+		return err
 	}
 
 	// Transition to Processing state
@@ -425,9 +433,8 @@ func (j *GitHubActionsGenerationJob) Name() string {
 func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Generating GitHub Actions workflow")
 
-	// Check if context is cancelled
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := checkContext(ctx); err != nil {
+		return err
 	}
 
 	// Check if GitHub Actions is enabled
@@ -459,9 +466,8 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back GitHub Actions workflow generation")
 
-	// Check if context is cancelled
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	if err := checkContext(ctx); err != nil {
+		return err
 	}
 
 	// Remove generated workflow
@@ -522,9 +528,9 @@ func (j *ProjectValidationJob) Name() string {
 func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Validating project structure")
 
-	// Check if context is cancelled
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	err := checkContext(ctx)
+	if err != nil {
+		return err
 	}
 
 	// Check if project directory exists
@@ -595,9 +601,9 @@ func (j *DependencyCheckJob) Name() string {
 func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 	j.logger.Info("Checking dependencies")
 
-	// Check if context is cancelled
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
+	err := checkContext(ctx)
+	if err != nil {
+		return err
 	}
 
 	var missingDeps []string
