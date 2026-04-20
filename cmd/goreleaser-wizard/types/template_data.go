@@ -74,44 +74,6 @@ type SigningConfig struct {
 	Certificate string `json:"certificate,omitempty"`
 }
 
-// ValidationMixin provides common fields for validation results.
-type ValidationMixin struct {
-	Code       string `json:"code"`
-	Field      string `json:"field"`
-	Message    string `json:"message"`
-	Details    string `json:"details,omitempty"`
-	Context    string `json:"context,omitempty"`
-	Suggestion string `json:"suggestion,omitempty"`
-}
-
-// ValidationResult represents structured validation results.
-type ValidationResult struct {
-	IsValid  bool                 `json:"is_valid"`
-	Errors   []*ValidationError   `json:"errors"`
-	Warnings []*ValidationWarning `json:"warnings"`
-	Summary  ValidationSummary    `json:"summary"`
-}
-
-// ValidationError represents a structured validation error.
-type ValidationError struct {
-	ValidationMixin
-}
-
-// ValidationWarning represents a structured validation warning.
-type ValidationWarning struct {
-	ValidationMixin
-}
-
-// ValidationSummary provides a summary of validation results.
-type ValidationSummary struct {
-	TotalErrors   int `json:"total_errors"`
-	TotalWarnings int `json:"total_warnings"`
-	Critical      int `json:"critical"`
-	High          int `json:"high"`
-	Medium        int `json:"medium"`
-	Low           int `json:"low"`
-}
-
 // JobExecutionResult represents the result of a job execution.
 type JobExecutionResult struct {
 	JobID    string      `json:"job_id"`

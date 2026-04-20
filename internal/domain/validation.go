@@ -33,6 +33,16 @@ func NewValidationUseCase(logger Logger, repo FileSystemRepository) *ValidationU
 	}
 }
 
+// addValidationError adds an error to the result if err is not nil.
+func addValidationError(result *ValidationResult, err error) {
+	if err != nil {
+		if domainErr, ok := err.(*DomainError); ok {
+			result.Errors = append(result.Errors, domainErr)
+		}
+		result.IsValid = false
+	}
+}
+
 // ValidateConfiguration performs comprehensive validation of project configuration.
 func (vu *ValidationUseCase) ValidateConfiguration(
 	ctx context.Context,
@@ -46,40 +56,11 @@ func (vu *ValidationUseCase) ValidateConfiguration(
 		Warnings: []*DomainError{},
 	}
 
-	// Step 1: Basic field validation
-	err := vu.validateBasicFields(config)
-	if err != nil {
-		result.Errors = append(result.Errors, err)
-		result.IsValid = false
-	}
-
-	// Step 2: Type validation
-	err = vu.validateTypes(config)
-	if err != nil {
-		result.Errors = append(result.Errors, err)
-		result.IsValid = false
-	}
-
-	// Step 3: Platform-architecture compatibility
-	err = vu.validatePlatformArchCompatibility(config)
-	if err != nil {
-		result.Errors = append(result.Errors, err)
-		result.IsValid = false
-	}
-
-	// Step 4: Business rule validation
-	err = vu.validateBusinessRules(config)
-	if err != nil {
-		result.Errors = append(result.Errors, err)
-		result.IsValid = false
-	}
-
-	// Step 5: Security validation
-	err = vu.validateSecurity(config)
-	if err != nil {
-		result.Errors = append(result.Errors, err)
-		result.IsValid = false
-	}
+	addValidationError(result, vu.validateBasicFields(config))
+	addValidationError(result, vu.validateTypes(config))
+	addValidationError(result, vu.validatePlatformArchCompatibility(config))
+	addValidationError(result, vu.validateBusinessRules(config))
+	addValidationError(result, vu.validateSecurity(config))
 
 	// Step 6: Generate warnings
 	vu.generateWarnings(config, result)

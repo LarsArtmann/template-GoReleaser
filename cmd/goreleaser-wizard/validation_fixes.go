@@ -10,6 +10,12 @@ const (
 	configFilePermission = 0o644 // rw-r--r-- for files
 )
 
+// printFix prints a success message and increments the fixed counter.
+func printFix(message string, fixed *int) {
+	fmt.Println(successStyle.Render(message))
+	*fixed++
+}
+
 // attemptFixes attempts to fix common issues.
 func attemptFixes(results *ValidationResults) {
 	fmt.Println("🔧 Attempting to fix common issues...")
@@ -21,9 +27,7 @@ func attemptFixes(results *ValidationResults) {
 	if !results.ConfigExists {
 		err := os.MkdirAll(".github/workflows", workflowDirPermission)
 		if err == nil {
-			fmt.Println(successStyle.Render("✅ Created .github/workflows directory"))
-
-			fixed++
+			printFix("✅ Created .github/workflows directory", &fixed)
 		}
 	}
 
@@ -33,9 +37,7 @@ func attemptFixes(results *ValidationResults) {
 
 		err := os.WriteFile(".goreleaser.yaml", []byte(configContent), configFilePermission)
 		if err == nil {
-			fmt.Println(successStyle.Render("✅ Created basic .goreleaser.yaml"))
-
-			fixed++
+			printFix("✅ Created basic .goreleaser.yaml", &fixed)
 		}
 	}
 

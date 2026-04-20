@@ -52,22 +52,14 @@ func testProjectConfigWithOverrides(overrides map[string]any) ProjectConfig {
 func TestRunGenerate(t *testing.T) {
 	tests := []struct {
 		name        string
-		setupFunc   func() string
+		setupFunc   func(t *testing.T) string
 		expectError bool
 	}{
 		{
 			name: "generate_valid_config",
-			setupFunc: func() string {
+			setupFunc: func(t *testing.T) string {
 				dir, _ := os.MkdirTemp("", "wizard-generate-test")
-				goMod := `module github.com/user/generate-test
-go 1.21
-`
-				os.WriteFile(filepath.Join(dir, "go.mod"), []byte(goMod), 0o644)
-				os.WriteFile(
-					filepath.Join(dir, "main.go"),
-					[]byte("package main\n\nfunc main() {}"),
-					0o644,
-				)
+				createBasicGoProject(t, dir, "github.com/user/generate-test")
 
 				return dir
 			},
@@ -75,7 +67,7 @@ go 1.21
 		},
 		{
 			name: "generate_in_non_go_project",
-			setupFunc: func() string {
+			setupFunc: func(t *testing.T) string {
 				dir, _ := os.MkdirTemp("", "wizard-generate-test")
 
 				return dir
@@ -86,26 +78,17 @@ go 1.21
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			testDir := tt.setupFunc()
+			testDir := tt.setupFunc(t)
 			defer os.RemoveAll(testDir)
 
-			// Change to test directory
-			originalDir, _ := os.Getwd()
+			inTestDir(t, testDir, func() {
+				config := &ProjectConfig{}
+				detectProjectInfo(config)
 
-			os.Chdir(testDir)
-			defer os.Chdir(originalDir)
-
-			// Test runGenerate
-			defer expectNoPanic(t, tt.expectError)
-
-			// runGenerate is from generate.go, but we need to simulate it
-			// For testing purposes, we'll test the underlying functions
-			config := &ProjectConfig{}
-			detectProjectInfo(config)
-
-			if config.ProjectName == "" && !tt.expectError {
-				t.Error("Expected project detection to work")
-			}
+				if config.ProjectName == "" && !tt.expectError {
+					t.Error("Expected project detection to work")
+				}
+			})
 		})
 	}
 }

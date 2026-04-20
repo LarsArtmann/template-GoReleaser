@@ -37,6 +37,7 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 
 	// Detect project information
 	config := &domain.SafeProjectConfig{}
+
 	err := detectProjectInfo(config)
 	if err != nil {
 		displayError(err)

@@ -13,7 +13,7 @@ import (
 func newValidationError(
 	code errors.ErrorCode,
 	message, details, field, suggestion string,
-) *errors.DomainError {
+) error {
 	return errors.NewValidationError(code, message, details).
 		WithField(field).
 		WithSuggestion(suggestion)
@@ -42,66 +42,87 @@ var (
 	)
 )
 
+// Reserved names shared across validators.
+var reservedWindowsDeviceNames = []string{
+	"con", "prn", "aux", "nul", "com1", "com2", "com3",
+	"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
+	"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
+}
+
+// reservedProjectNames includes Windows devices and common reserved words.
+var reservedProjectNames = []string{
+	"go", "test", "temp", "tmp", "default", "admin", "root", "system",
+	"null", "undefined", "none", "false", "true",
+}
+
+// reservedBinaryNames adds common commands to reserved names.
+var reservedBinaryNames = []string{
+	"test", "temp", "tmp", "debug", "release", "build", "install",
+	"setup", "config", "init", "run", "start", "stop", "restart",
+}
+
 // ValidateProjectName validates project name.
 func ValidateProjectName(name string) error {
 	if name == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProject,
 			"Project name is required",
 			"Project name cannot be empty",
-		).WithField("project_name").WithSuggestion("Choose a valid project name")
+			"project_name",
+			"Choose a valid project name",
+		)
 	}
 
 	if len(name) > 50 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProject,
 			"Project name too long",
 			"Project name must be 50 characters or less",
-		).WithField("project_name").WithSuggestion("Use a shorter project name")
+			"project_name",
+			"Use a shorter project name",
+		)
 	}
 
 	if !projectNamePattern.MatchString(name) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProject,
 			"Invalid project name format",
 			"Project name must contain only letters, numbers, hyphens, and underscores",
-		).WithField("project_name").WithSuggestion("Use alphanumeric characters with hyphens and underscores only")
+			"project_name",
+			"Use alphanumeric characters with hyphens and underscores only",
+		)
 	}
 
-	// Check for names ending with hyphen or dot
 	if strings.HasSuffix(name, "-") || strings.HasSuffix(name, ".") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProject,
 			"Invalid project name",
 			"Project name cannot end with hyphen or dot",
-		).WithField("project_name").WithSuggestion("Remove trailing hyphens or dots")
+			"project_name",
+			"Remove trailing hyphens or dots",
+		)
 	}
 
-	// Check for consecutive hyphens or dots
 	if strings.Contains(name, "--") || strings.Contains(name, "..") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProject,
 			"Invalid project name",
 			"Project name cannot contain consecutive hyphens or dots",
-		).WithField("project_name").WithSuggestion("Use single hyphens or dots")
-	}
-
-	// Check for reserved names (Windows device names and common reserved words)
-	reservedNames := []string{
-		"go", "test", "temp", "tmp", "default", "admin", "root", "system",
-		"null", "undefined", "none", "false", "true",
-		"con", "prn", "aux", "nul", "com1", "com2", "com3",
-		"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
-		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
+			"project_name",
+			"Use single hyphens or dots",
+		)
 	}
 
 	lowerName := strings.ToLower(name)
-	if slices.Contains(reservedNames, lowerName) {
-		return errors.NewValidationError(
+	if slices.Contains(reservedProjectNames, lowerName) ||
+		slices.Contains(reservedWindowsDeviceNames, lowerName) {
+		return newValidationError(
 			errors.ErrInvalidProject,
 			"Reserved project name",
 			fmt.Sprintf("'%s' is a reserved name", name),
-		).WithField("project_name").WithSuggestion("Choose a different project name")
+			"project_name",
+			"Choose a different project name",
+		)
 	}
 
 	return nil
@@ -110,45 +131,46 @@ func ValidateProjectName(name string) error {
 // ValidateBinaryName validates binary name.
 func ValidateBinaryName(name string) error {
 	if name == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidBinary,
 			"Binary name is required",
 			"Binary name cannot be empty",
-		).WithField("binary_name").WithSuggestion("Choose a valid binary name")
+			"binary_name",
+			"Choose a valid binary name",
+		)
 	}
 
 	if len(name) > 30 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidBinary,
 			"Binary name too long",
 			"Binary name must be 30 characters or less",
-		).WithField("binary_name").WithSuggestion("Use a shorter binary name")
+			"binary_name",
+			"Use a shorter binary name",
+		)
 	}
 
 	if !binaryNamePattern.MatchString(name) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidBinary,
 			"Invalid binary name format",
 			"Binary name must contain only letters, numbers, hyphens, and underscores",
-		).WithField("binary_name").WithSuggestion("Use alphanumeric characters with hyphens and underscores only")
-	}
-
-	// Check for system reserved names (Windows device names and common system commands)
-	reservedNames := []string{
-		"con", "prn", "aux", "nul", "com1", "com2", "com3",
-		"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
-		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
-		"test", "temp", "tmp", "debug", "release", "build", "install",
-		"setup", "config", "init", "run", "start", "stop", "restart",
+			"binary_name",
+			"Use alphanumeric characters with hyphens and underscores only",
+		)
 	}
 
 	lowerName := strings.ToLower(name)
+
+	reservedNames := append(reservedWindowsDeviceNames, reservedBinaryNames...)
 	if slices.Contains(reservedNames, lowerName) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidBinary,
 			"Reserved binary name",
 			fmt.Sprintf("'%s' is a reserved binary name", name),
-		).WithField("binary_name").WithSuggestion("Choose a different binary name")
+			"binary_name",
+			"Choose a different binary name",
+		)
 	}
 
 	return nil
@@ -157,132 +179,125 @@ func ValidateBinaryName(name string) error {
 // ValidateMainPath validates main path.
 func ValidateMainPath(path string) error {
 	if path == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidMainPath,
 			"Main path is required",
 			"Main path cannot be empty",
-		).WithField("main_path").WithSuggestion("Specify the main package path (e.g., '.', './cmd/app')")
+			"main_path",
+			"Specify the main package path (e.g., '.', './cmd/app')",
+		)
 	}
 
-	// Normalize path
 	normalizedPath := strings.ReplaceAll(path, "\\", "/")
 
-	// Check for absolute paths - reject them
 	if strings.HasPrefix(normalizedPath, "/") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidMainPath,
 			"Absolute paths not allowed",
 			"Main path must be a relative path, not an absolute path",
-		).WithField("main_path").WithSuggestion("Use relative paths like '.', './cmd/app', or './main'")
+			"main_path",
+			"Use relative paths like '.', './cmd/app', or './main'",
+		)
 	}
 
 	if len(normalizedPath) > 200 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidMainPath,
 			"Main path too long",
 			"Main path must be 200 characters or less",
-		).WithField("main_path").WithSuggestion("Use a shorter path")
+			"main_path",
+			"Use a shorter path",
+		)
 	}
 
 	if !mainPathPattern.MatchString(normalizedPath) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidMainPath,
 			"Invalid main path format",
 			"Main path must be a valid relative path",
-		).WithField("main_path").WithSuggestion("Use relative paths like '.', './cmd/app', or './main'")
+			"main_path",
+			"Use relative paths like '.', './cmd/app', or './main'",
+		)
 	}
 
-	// Check for shell metacharacters
-	shellMetachars := []string{
-		";",
-		"&",
-		"|",
-		"<",
-		">",
-		"`",
-		"$",
-		"(",
-		")",
-		"{",
-		"}",
-		"!",
-		"*",
-		"?",
-		"~",
-	}
-	for _, char := range shellMetachars {
-		if strings.Contains(normalizedPath, char) {
-			return errors.NewValidationError(
-				errors.ErrInvalidMainPath,
-				"Shell metacharacters not allowed",
-				fmt.Sprintf("Main path contains shell metacharacter '%s'", char),
-			).WithField("main_path").WithSuggestion("Use safe path characters only")
-		}
+	err := validatePathShellMetachars(normalizedPath)
+	if err != nil {
+		return err
 	}
 
-	// Check for path traversal
 	if strings.Contains(normalizedPath, "..") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidMainPath,
 			"Path traversal not allowed",
 			"Main path contains path traversal sequences",
-		).WithField("main_path").WithSuggestion("Use relative paths without '..'")
-	}
-
-	// Check for invalid path components (reserved Windows device names and path traversal)
-	invalidComponents := []string{
-		"con", "prn", "aux", "nul", "com1", "com2", "com3",
-		"com4", "com5", "com6", "com7", "com8", "com9", "lpt1",
-		"lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
-	}
-
-	// Check for reserved system directories
-	reservedDirs := []string{"etc", "bin", "usr", "sbin", "var", "sys", "proc", "dev"}
-
-	components := strings.SplitSeq(normalizedPath, "/")
-	for component := range components {
-		if component == "" {
-			continue
-		}
-
-		lowerComponent := strings.ToLower(component)
-
-		err := validatePathComponent(
-			lowerComponent,
-			component,
-			invalidComponents,
-			reservedDirs,
+			"main_path",
+			"Use relative paths without '..'",
 		)
-		if err != nil {
-			return err
+	}
+
+	return validatePathComponents(normalizedPath)
+}
+
+func validatePathShellMetachars(path string) error {
+	shellMetachars := []string{
+		";", "&", "|", "<", ">", "`", "$", "(", ")", "{", "}", "!", "*", "?", "~",
+	}
+	for _, char := range shellMetachars {
+		if strings.Contains(path, char) {
+			return newValidationError(
+				errors.ErrInvalidMainPath,
+				"Shell metacharacters not allowed",
+				fmt.Sprintf("Main path contains shell metacharacter '%s'", char),
+				"main_path",
+				"Use safe path characters only",
+			)
 		}
 	}
 
 	return nil
 }
 
-func validatePathComponent(
-	lowerComponent, component string,
-	invalidComponents, reservedDirs []string,
-) error {
-	if slices.Contains(invalidComponents, lowerComponent) {
-		return newValidationError(
-			errors.ErrInvalidMainPath,
-			"Invalid path component",
-			fmt.Sprintf("'%s' is not allowed in path", component),
-			"main_path",
-			"Remove invalid components from path",
-		)
-	}
+var reservedDirs = []string{"etc", "bin", "usr", "sbin", "var", "sys", "proc", "dev"}
 
-	if slices.Contains(reservedDirs, lowerComponent) {
+// checkReservedNames checks if a path component is in a reserved list.
+func checkReservedName(component string, reservedList []string, errorMsg, suggestion string) error {
+	lowerComponent := strings.ToLower(component)
+	if slices.Contains(reservedList, lowerComponent) {
 		return newValidationError(
 			errors.ErrInvalidMainPath,
 			"Reserved directory",
-			fmt.Sprintf("'%s' is a reserved system directory", component),
+			fmt.Sprintf("'%s' %s", component, errorMsg),
 			"main_path",
-			"Use project directories instead",
+			suggestion,
 		)
+	}
+	return nil
+}
+
+func validatePathComponents(path string) error {
+	components := strings.SplitSeq(path, "/")
+	for component := range components {
+		if component == "" {
+			continue
+		}
+
+		if err := checkReservedName(
+			component,
+			reservedWindowsDeviceNames,
+			"is not allowed in path",
+			"Remove invalid components from path",
+		); err != nil {
+			return err
+		}
+
+		if err := checkReservedName(
+			component,
+			reservedDirs,
+			"is a reserved system directory",
+			"Use project directories instead",
+		); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -317,123 +332,154 @@ func ValidateProjectDescription(description string) error {
 	}
 
 	if !projectDescriptionPattern.MatchString(trimmed) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Invalid characters in project description",
 			"Project description contains invalid characters",
-		).WithField("project_description").WithSuggestion("Use only printable characters")
+			"project_description",
+			"Use only printable characters",
+		)
 	}
 
-	// Check for script injection patterns
 	lowerDesc := strings.ToLower(trimmed)
 	if strings.Contains(lowerDesc, "<script") || strings.Contains(lowerDesc, "javascript:") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Invalid content in project description",
 			"Project description contains script injection patterns",
-		).WithField("project_description").WithSuggestion("Remove script tags and javascript: prefixes")
+			"project_description",
+			"Remove script tags and javascript: prefixes",
+		)
 	}
 
-	// Check for suspicious patterns
 	if strings.Contains(trimmed, "TODO") || strings.Contains(trimmed, "FIXME") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidProjectDescription,
 			"Incomplete project description",
 			"Project description contains TODO or FIXME markers",
-		).WithField("project_description").WithSuggestion("Complete the project description")
+			"project_description",
+			"Complete the project description",
+		)
 	}
 
-	// Check for suspicious whitespace patterns (mostly spaces)
-	if len(trimmed) > 10 {
-		spaceCount := 0
-
-		for _, r := range trimmed {
-			if r == ' ' {
-				spaceCount++
-			}
-		}
-
-		if spaceCount > len(trimmed)/2 {
-			return errors.NewValidationError(
-				errors.ErrInvalidProjectDescription,
-				"Suspicious whitespace pattern",
-				"Project description contains too much whitespace",
-			).WithField("project_description").WithSuggestion("Use normal spacing in description")
-		}
+	if len(trimmed) > 10 && hasExcessiveWhitespace(trimmed) {
+		return newValidationError(
+			errors.ErrInvalidProjectDescription,
+			"Suspicious whitespace pattern",
+			"Project description contains too much whitespace",
+			"project_description",
+			"Use normal spacing in description",
+		)
 	}
 
 	return nil
 }
 
+func hasExcessiveWhitespace(s string) bool {
+	spaceCount := 0
+
+	for _, r := range s {
+		if r == ' ' {
+			spaceCount++
+		}
+	}
+
+	return spaceCount > len(s)/2
+}
+
 // ValidateDockerImageName validates Docker image name.
 func ValidateDockerImageName(name string) error {
 	if name == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidDockerImage,
 			"Docker image name is required",
 			"Docker image name cannot be empty",
-		).WithField("docker_image").WithSuggestion("Specify a Docker image name")
+			"docker_image",
+			"Specify a Docker image name",
+		)
 	}
 
-	// Split name and tag
 	parts := strings.SplitN(name, ":", 2)
 	imageName := parts[0]
 
 	if len(imageName) > 255 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidDockerImage,
 			"Docker image name too long",
 			"Docker image name must be 255 characters or less",
-		).WithField("docker_image").WithSuggestion("Use a shorter image name")
+			"docker_image",
+			"Use a shorter image name",
+		)
 	}
 
 	if !dockerImagePattern.MatchString(imageName) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidDockerImage,
 			"Invalid Docker image name format",
 			"Docker image name must contain only lowercase letters, numbers, dots, hyphens, and underscores",
-		).WithField("docker_image").WithSuggestion("Use lowercase alphanumeric characters with valid separators")
+			"docker_image",
+			"Use lowercase alphanumeric characters with valid separators",
+		)
 	}
 
-	// Validate tag if present
 	if len(parts) == 2 {
 		tag := parts[1]
-		if len(tag) > 128 {
-			return errors.NewValidationError(
-				errors.ErrInvalidDockerImage,
-				"Docker image tag too long",
-				"Docker image tag must be 128 characters or less",
-			).WithField("docker_image").WithSuggestion("Use a shorter tag")
-		}
 
-		if !strings.HasPrefix(tag, "v") &&
-			!regexp.MustCompile(`^[a-zA-Z0-9._-]+$`).MatchString(tag) {
-			return errors.NewValidationError(
-				errors.ErrInvalidDockerImage,
-				"Invalid Docker image tag format",
-				"Docker image tag must start with 'v' for version tags or contain only valid characters",
-			).WithField("docker_image").WithSuggestion("Use semantic versioning (e.g., v1.0.0)")
+		err := validateDockerTag(tag)
+		if err != nil {
+			return err
 		}
 	}
 
-	// Check for reserved image names
-	reservedNames := []string{
-		"latest", "stable", "production", "master", "main", "develop",
-		"test", "temp", "debug", "dev", "staging",
+	return validateReservedDockerImageName(imageName, name)
+}
+
+var dockerTagPattern = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
+
+func validateDockerTag(tag string) error {
+	if len(tag) > 128 {
+		return newValidationError(
+			errors.ErrInvalidDockerImage,
+			"Docker image tag too long",
+			"Docker image tag must be 128 characters or less",
+			"docker_image",
+			"Use a shorter tag",
+		)
 	}
 
+	if !strings.HasPrefix(tag, "v") && !dockerTagPattern.MatchString(tag) {
+		return newValidationError(
+			errors.ErrInvalidDockerImage,
+			"Invalid Docker image tag format",
+			"Docker image tag must start with 'v' for version tags or contain only valid characters",
+			"docker_image",
+			"Use semantic versioning (e.g., v1.0.0)",
+		)
+	}
+
+	return nil
+}
+
+var reservedDockerImageNames = []string{
+	"latest", "stable", "production", "master", "main", "develop",
+	"test", "temp", "debug", "dev", "staging",
+}
+
+func validateReservedDockerImageName(imageName, fullName string) error {
 	imageNameLower := strings.ToLower(imageName)
-	for _, reserved := range reservedNames {
+	for _, reserved := range reservedDockerImageNames {
 		if strings.Contains(imageNameLower, reserved) && imageNameLower != reserved {
-			continue // Allow containing but not equal to reserved names
+			continue
 		}
 
 		if imageNameLower == reserved {
-			return errors.NewValidationError(
+			return newValidationError(
 				errors.ErrInvalidDockerImage,
 				"Reserved Docker image name",
-				fmt.Sprintf("'%s' is a reserved Docker image name", name),
-			).WithField("docker_image").WithSuggestion("Choose a different image name")
+				fmt.Sprintf("'%s' is a reserved Docker image name", fullName),
+				"docker_image",
+				"Choose a different image name",
+			)
 		}
 	}
 
@@ -447,31 +493,35 @@ func ValidateDockerRegistry(registry string) error {
 	}
 
 	if len(registry) > 253 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidDockerRegistry,
 			"Docker registry URL too long",
 			"Docker registry URL must be 253 characters or less",
-		).WithField("docker_registry").WithSuggestion("Use a shorter registry URL")
+			"docker_registry",
+			"Use a shorter registry URL",
+		)
 	}
 
 	if !dockerRegistryPattern.MatchString(registry) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidDockerRegistry,
 			"Invalid Docker registry URL format",
 			"Docker registry URL must be a valid domain name",
-		).WithField("docker_registry").WithSuggestion("Use a valid domain name (e.g., registry.example.com)")
+			"docker_registry",
+			"Use a valid domain name (e.g., registry.example.com)",
+		)
 	}
 
-	// Check for consecutive dots (invalid in domain names)
 	if strings.Contains(registry, "..") {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidDockerRegistry,
 			"Invalid Docker registry URL format",
 			"Docker registry URL cannot contain consecutive dots",
-		).WithField("docker_registry").WithSuggestion("Use a valid domain name (e.g., registry.example.com)")
+			"docker_registry",
+			"Use a valid domain name (e.g., registry.example.com)",
+		)
 	}
 
-	// Check for common registry domains
 	knownRegistries := []string{
 		"docker.io", "ghcr.io", "registry.gitlab.com", "gcr.io",
 		"azurecr.io", "quay.io", "mcr.microsoft.com",
@@ -479,35 +529,36 @@ func ValidateDockerRegistry(registry string) error {
 
 	for _, known := range knownRegistries {
 		if strings.EqualFold(registry, known) {
-			return nil // Known registry is valid
+			return nil
 		}
 	}
 
-	// For unknown registries, provide a warning
-	// In production, you might want to validate the registry exists
 	return nil
 }
 
 // ValidateVersion validates version string.
 func ValidateVersion(version string) error {
 	if version == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidVersion,
 			"Version is required",
 			"Version cannot be empty",
-		).WithField("version").WithSuggestion("Specify a version (e.g., v1.0.0)")
+			"version",
+			"Specify a version (e.g., v1.0.0)",
+		)
 	}
 
-	// Accept semantic versioning or git describe format
 	semverPattern := regexp.MustCompile(`^v?\d+\.\d+\.\d+(-[a-zA-Z0-9.-]+)?(\+[a-zA-Z0-9.-]+)?$`)
 	gitDescribePattern := regexp.MustCompile(`^[a-f0-9]{7,40}(-dirty)?$`)
 
 	if !semverPattern.MatchString(version) && !gitDescribePattern.MatchString(version) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidVersion,
 			"Invalid version format",
 			"Version must follow semantic versioning (e.g., v1.0.0) or be a git commit hash",
-		).WithField("version").WithSuggestion("Use semantic versioning (e.g., v1.0.0, v1.0.0-alpha.1)")
+			"version",
+			"Use semantic versioning (e.g., v1.0.0, v1.0.0-alpha.1)",
+		)
 	}
 
 	return nil
@@ -516,35 +567,40 @@ func ValidateVersion(version string) error {
 // ValidateGitBranch validates Git branch name.
 func ValidateGitBranch(branch string) error {
 	if branch == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidGitBranch,
 			"Git branch name is required",
 			"Git branch name cannot be empty",
-		).WithField("git_branch").WithSuggestion("Specify a Git branch name")
+			"git_branch",
+			"Specify a Git branch name",
+		)
 	}
 
 	branchPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9/_-]{0,252}$`)
 	if !branchPattern.MatchString(branch) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidGitBranch,
 			"Invalid Git branch name format",
 			"Git branch name must contain only letters, numbers, hyphens, underscores, and forward slashes",
-		).WithField("git_branch").WithSuggestion("Use valid Git branch naming conventions")
+			"git_branch",
+			"Use valid Git branch naming conventions",
+		)
 	}
 
-	// Check for invalid branch names
-	invalidNames := []string{
+	invalidBranchNames := []string{
 		"HEAD", "master", "main", "develop", "feature", "release", "hotfix",
 		"MERGE_HEAD", "ORIG_HEAD", "FETCH_HEAD",
 	}
 
 	lowerBranch := strings.ToLower(branch)
-	if slices.Contains(invalidNames, lowerBranch) {
-		return errors.NewValidationError(
+	if slices.Contains(invalidBranchNames, lowerBranch) {
+		return newValidationError(
 			errors.ErrInvalidGitBranch,
 			"Reserved Git branch name",
 			fmt.Sprintf("'%s' is a reserved branch name", branch),
-		).WithField("git_branch").WithSuggestion("Use a descriptive branch name")
+			"git_branch",
+			"Use a descriptive branch name",
+		)
 	}
 
 	return nil
@@ -553,26 +609,29 @@ func ValidateGitBranch(branch string) error {
 // ValidateGitTag validates Git tag name.
 func ValidateGitTag(tag string) error {
 	if tag == "" {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidGitTag,
 			"Git tag name is required",
 			"Git tag name cannot be empty",
-		).WithField("git_tag").WithSuggestion("Specify a Git tag name")
+			"git_tag",
+			"Specify a Git tag name",
+		)
 	}
 
 	tagPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$`)
 	if !tagPattern.MatchString(tag) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidGitTag,
 			"Invalid Git tag format",
 			"Git tag name must contain only letters, numbers, dots, hyphens, and underscores",
-		).WithField("git_tag").WithSuggestion("Use valid Git tag naming conventions")
+			"git_tag",
+			"Use valid Git tag naming conventions",
+		)
 	}
 
 	return nil
 }
 
-// buildTagPattern validates build tag format (alphanumeric and underscores only, no hyphens).
 var buildTagPattern = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_]*$`)
 
 // ValidateBuildTags validates build tags.
@@ -588,21 +647,7 @@ func ValidateBuildTags(tags []string) error {
 		}
 	}
 
-	// Check for duplicate build tags
-	seen := make(map[string]bool)
-	for _, tag := range tags {
-		if seen[tag] {
-			return newBuildTagValidationError(
-				fmt.Sprintf("Build tag '%s' is specified multiple times", tag),
-				"Remove duplicate build tags",
-				tag,
-			)
-		}
-
-		seen[tag] = true
-	}
-
-	return nil
+	return checkDuplicateBuildTags(tags)
 }
 
 func validateSingleBuildTag(tag string, index int) error {
@@ -633,6 +678,23 @@ func validateSingleBuildTag(tag string, index int) error {
 	return nil
 }
 
+func checkDuplicateBuildTags(tags []string) error {
+	seen := make(map[string]bool)
+	for _, tag := range tags {
+		if seen[tag] {
+			return newBuildTagValidationError(
+				fmt.Sprintf("Build tag '%s' is specified multiple times", tag),
+				"Remove duplicate build tags",
+				tag,
+			)
+		}
+
+		seen[tag] = true
+	}
+
+	return nil
+}
+
 func newBuildTagValidationError(details, suggestion, tag string) error {
 	return errors.NewValidationError(
 		errors.ErrInvalidBuildTag,
@@ -656,41 +718,44 @@ func getBuildTagErrorTitle(tag string) string {
 // ValidatePort validates port number.
 func ValidatePort(port int) error {
 	if port < 1 || port > 65535 {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidPort,
 			"Invalid port number",
 			"Port number must be between 1 and 65535",
-		).WithField("port").WithSuggestion("Use a valid port number (1-65535)")
-	}
-
-	// Check for well-known ports that shouldn't be used by applications
-	restrictedPorts := []int{
-		1, 7, 9, 11, 13, 17, 19, 20, 21, 22, 23, 25,
-		53, 67, 68, 69, 80, 110, 123, 135, 137, 138, 139,
-		143, 161, 162, 179, 389, 443, 445, 512, 513, 514,
-		515, 520, 521, 522, 523, 524, 525, 526, 527, 528,
-		529, 530, 531, 532, 533, 534, 535, 536, 537, 538,
-		539, 540, 541, 542, 543, 544, 545, 546, 547, 548,
-		549, 550, 551, 552, 553, 554, 555, 556, 557, 558,
-		559, 560, 561, 562, 563, 564, 565, 566, 567, 568,
-		569, 570, 571, 572, 573, 574, 575, 576, 577, 578,
-		579, 580, 581, 582, 583, 584, 585, 586, 587, 588,
-		589, 590, 591, 592, 593, 594, 595, 596, 597, 598,
-		599, 600, 601, 602, 603, 604, 605, 606, 607, 608,
-		609, 610, 611, 612, 613, 614, 615, 616, 617, 618,
-		619, 620, 621, 622, 623, 624, 625, 626, 627, 628,
-		629, 630, 631, 632, 633, 634, 635, 636, 637, 638,
-		639, 640, 641, 642, 643, 644, 645, 646, 647, 648,
-		649, 650, 651, 652, 653, 654, 655,
+			"port",
+			"Use a valid port number (1-65535)",
+		)
 	}
 
 	if slices.Contains(restrictedPorts, port) {
-		return errors.NewValidationError(
+		return newValidationError(
 			errors.ErrInvalidPort,
 			"Restricted port number",
 			fmt.Sprintf("Port %d is restricted and shouldn't be used by applications", port),
-		).WithField("port").WithSuggestion("Use a non-privileged port (1024-65535)")
+			"port",
+			"Use a non-privileged port (1024-65535)",
+		)
 	}
 
 	return nil
+}
+
+var restrictedPorts = []int{
+	1, 7, 9, 11, 13, 17, 19, 20, 21, 22, 23, 25,
+	53, 67, 68, 69, 80, 110, 123, 135, 137, 138, 139,
+	143, 161, 162, 179, 389, 443, 445, 512, 513, 514,
+	515, 520, 521, 522, 523, 524, 525, 526, 527, 528,
+	529, 530, 531, 532, 533, 534, 535, 536, 537, 538,
+	539, 540, 541, 542, 543, 544, 545, 546, 547, 548,
+	549, 550, 551, 552, 553, 554, 555, 556, 557, 558,
+	559, 560, 561, 562, 563, 564, 565, 566, 567, 568,
+	569, 570, 571, 572, 573, 574, 575, 576, 577, 578,
+	579, 580, 581, 582, 583, 584, 585, 586, 587, 588,
+	589, 590, 591, 592, 593, 594, 595, 596, 597, 598,
+	599, 600, 601, 602, 603, 604, 605, 606, 607, 608,
+	609, 610, 611, 612, 613, 614, 615, 616, 617, 618,
+	619, 620, 621, 622, 623, 624, 625, 626, 627, 628,
+	629, 630, 631, 632, 633, 634, 635, 636, 637, 638,
+	639, 640, 641, 642, 643, 644, 645, 646, 647, 648,
+	649, 650, 651, 652, 653, 654, 655,
 }

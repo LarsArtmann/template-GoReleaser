@@ -356,13 +356,16 @@ func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 	return &clone
 }
 
-// ToJSON converts configuration to JSON string.
-func (spc *SafeProjectConfig) ToJSON() (string, error) {
-	data, err := json.MarshalIndent(spc, "", "  ")
+// serializeToFormat serializes the config using the provided marshal function.
+func (spc *SafeProjectConfig) serializeToFormat(
+	marshalFunc func(any) ([]byte, error),
+	formatName string,
+) (string, error) {
+	data, err := marshalFunc(spc)
 	if err != nil {
 		return "", NewValidationError(
 			ErrInvalidProjectName,
-			"Failed to serialize configuration to JSON",
+			fmt.Sprintf("Failed to serialize configuration to %s", formatName),
 			err.Error(),
 		)
 	}
@@ -370,18 +373,16 @@ func (spc *SafeProjectConfig) ToJSON() (string, error) {
 	return string(data), nil
 }
 
+// ToJSON converts configuration to JSON string.
+func (spc *SafeProjectConfig) ToJSON() (string, error) {
+	return spc.serializeToFormat(func(v any) ([]byte, error) {
+		return json.MarshalIndent(v, "", "  ")
+	}, "JSON")
+}
+
 // ToYAML converts configuration to YAML string.
 func (spc *SafeProjectConfig) ToYAML() (string, error) {
-	data, err := yaml.Marshal(spc)
-	if err != nil {
-		return "", NewValidationError(
-			ErrInvalidProjectName,
-			"Failed to serialize configuration to YAML",
-			err.Error(),
-		)
-	}
-
-	return string(data), nil
+	return spc.serializeToFormat(yaml.Marshal, "YAML")
 }
 
 // FromJSON loads configuration from JSON string.

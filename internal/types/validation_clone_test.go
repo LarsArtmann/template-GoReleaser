@@ -6,127 +6,77 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
-// verifyValidationErrorCloneFields verifies all fields match between original and clone.
-func verifyValidationErrorCloneFields(t *testing.T, original, clone *ValidationError) {
-	if clone.Code != original.Code {
-		t.Errorf("Code mismatch: got %v, want %v", clone.Code, original.Code)
+// validationItemEx extends validationItem with Code, Details, and Context accessors.
+type validationItemEx interface {
+	validationItem
+	GetCode() string
+	GetDetails() string
+	GetContext() string
+}
+
+// GetCode for ValidationError.
+func (ve *ValidationError) GetCode() string { return string(ve.Code) }
+
+// GetDetails for ValidationError.
+func (ve *ValidationError) GetDetails() string { return ve.Details }
+
+// GetContext for ValidationError.
+func (ve *ValidationError) GetContext() string { return ve.Context }
+
+// GetCode for ValidationWarning.
+func (vw *ValidationWarning) GetCode() string { return vw.Code }
+
+// GetDetails for ValidationWarning.
+func (vw *ValidationWarning) GetDetails() string { return vw.Details }
+
+// GetContext for ValidationWarning.
+func (vw *ValidationWarning) GetContext() string { return vw.Context }
+
+// verifyCloneFields verifies all fields match between original and clone.
+func verifyCloneFields(t *testing.T, name string, original, clone validationItemEx) {
+	checkField(t, name, "Code", clone.GetCode(), original.GetCode())
+	checkField(t, name, "Field", clone.GetField(), original.GetField())
+	checkField(t, name, "Message", clone.GetMessage(), original.GetMessage())
+	checkField(t, name, "Details", clone.GetDetails(), original.GetDetails())
+	checkField(t, name, "Context", clone.GetContext(), original.GetContext())
+	checkField(t, name, "Level", clone.GetLevel(), original.GetLevel())
+	checkField(t, name, "Suggestion", clone.GetSuggestion(), original.GetSuggestion())
+}
+
+// verifyIndependence verifies modifying clone doesn't affect original.
+func verifyIndependence(t *testing.T, name string, original, clone validationItemEx) {
+	if original.GetCode() == clone.GetCode() {
+		t.Errorf("%s: Clone modification affected original Code", name)
 	}
 
-	if clone.Field != original.Field {
-		t.Errorf("Field mismatch: got %v, want %v", clone.Field, original.Field)
+	if original.GetField() == clone.GetField() {
+		t.Errorf("%s: Clone modification affected original Field", name)
 	}
 
-	if clone.Message != original.Message {
-		t.Errorf("Message mismatch: got %v, want %v", clone.Message, original.Message)
+	if original.GetMessage() == clone.GetMessage() {
+		t.Errorf("%s: Clone modification affected original Message", name)
 	}
 
-	if clone.Details != original.Details {
-		t.Errorf("Details mismatch: got %v, want %v", clone.Details, original.Details)
+	if original.GetDetails() == clone.GetDetails() {
+		t.Errorf("%s: Clone modification affected original Details", name)
 	}
 
-	if clone.Context != original.Context {
-		t.Errorf("Context mismatch: got %v, want %v", clone.Context, original.Context)
+	if original.GetContext() == clone.GetContext() {
+		t.Errorf("%s: Clone modification affected original Context", name)
 	}
 
-	if clone.Level != original.Level {
-		t.Errorf("Level mismatch: got %v, want %v", clone.Level, original.Level)
+	if original.GetLevel() == clone.GetLevel() {
+		t.Errorf("%s: Clone modification affected original Level", name)
 	}
 
-	if clone.Suggestion != original.Suggestion {
-		t.Errorf("Suggestion mismatch: got %v, want %v", clone.Suggestion, original.Suggestion)
+	if original.GetSuggestion() == clone.GetSuggestion() {
+		t.Errorf("%s: Clone modification affected original Suggestion", name)
 	}
 }
 
-// verifyValidationWarningCloneFields verifies all fields match between original and clone.
-func verifyValidationWarningCloneFields(t *testing.T, original, clone *ValidationWarning) {
-	if clone.Code != original.Code {
-		t.Errorf("Code mismatch: got %v, want %v", clone.Code, original.Code)
-	}
-
-	if clone.Field != original.Field {
-		t.Errorf("Field mismatch: got %v, want %v", clone.Field, original.Field)
-	}
-
-	if clone.Message != original.Message {
-		t.Errorf("Message mismatch: got %v, want %v", clone.Message, original.Message)
-	}
-
-	if clone.Details != original.Details {
-		t.Errorf("Details mismatch: got %v, want %v", clone.Details, original.Details)
-	}
-
-	if clone.Context != original.Context {
-		t.Errorf("Context mismatch: got %v, want %v", clone.Context, original.Context)
-	}
-
-	if clone.Level != original.Level {
-		t.Errorf("Level mismatch: got %v, want %v", clone.Level, original.Level)
-	}
-
-	if clone.Suggestion != original.Suggestion {
-		t.Errorf("Suggestion mismatch: got %v, want %v", clone.Suggestion, original.Suggestion)
-	}
-}
-
-// verifyValidationErrorIndependence verifies modifying clone doesn't affect original.
-func verifyValidationErrorIndependence(t *testing.T, original, clone *ValidationError) {
-	if original.Code == clone.Code {
-		t.Error("Clone modification affected original Code")
-	}
-
-	if original.Field == clone.Field {
-		t.Error("Clone modification affected original Field")
-	}
-
-	if original.Message == clone.Message {
-		t.Error("Clone modification affected original Message")
-	}
-
-	if original.Details == clone.Details {
-		t.Error("Clone modification affected original Details")
-	}
-
-	if original.Context == clone.Context {
-		t.Error("Clone modification affected original Context")
-	}
-
-	if original.Level == clone.Level {
-		t.Error("Clone modification affected original Level")
-	}
-
-	if original.Suggestion == clone.Suggestion {
-		t.Error("Clone modification affected original Suggestion")
-	}
-}
-
-// verifyValidationWarningIndependence verifies modifying clone doesn't affect original.
-func verifyValidationWarningIndependence(t *testing.T, original, clone *ValidationWarning) {
-	if original.Code == clone.Code {
-		t.Error("Clone modification affected original Code")
-	}
-
-	if original.Field == clone.Field {
-		t.Error("Clone modification affected original Field")
-	}
-
-	if original.Message == clone.Message {
-		t.Error("Clone modification affected original Message")
-	}
-
-	if original.Details == clone.Details {
-		t.Error("Clone modification affected original Details")
-	}
-
-	if original.Context == clone.Context {
-		t.Error("Clone modification affected original Context")
-	}
-
-	if original.Level == clone.Level {
-		t.Error("Clone modification affected original Level")
-	}
-
-	if original.Suggestion == clone.Suggestion {
-		t.Error("Clone modification affected original Suggestion")
+func checkField(t *testing.T, name, field, got, want string) {
+	if got != want {
+		t.Errorf("%s %s mismatch: got %v, want %v", name, field, got, want)
 	}
 }
 
@@ -143,7 +93,7 @@ func TestValidationError_Clone(t *testing.T) {
 
 	clone := original.Clone()
 
-	verifyValidationErrorCloneFields(t, original, clone)
+	verifyCloneFields(t, "ValidationError", original, clone)
 
 	// Modify clone
 	clone.Code = errors.ErrInvalidConfig
@@ -154,7 +104,7 @@ func TestValidationError_Clone(t *testing.T) {
 	clone.Level = ErrorLevelCritical
 	clone.Suggestion = "modified suggestion"
 
-	verifyValidationErrorIndependence(t, original, clone)
+	verifyIndependence(t, "ValidationError", original, clone)
 
 	// Verify they are different instances
 	if clone == original {
@@ -175,7 +125,7 @@ func TestValidationWarning_Clone(t *testing.T) {
 
 	clone := original.Clone()
 
-	verifyValidationWarningCloneFields(t, original, clone)
+	verifyCloneFields(t, "ValidationWarning", original, clone)
 
 	// Modify clone
 	clone.Code = "WARN_002"
@@ -186,7 +136,7 @@ func TestValidationWarning_Clone(t *testing.T) {
 	clone.Level = WarningLevelHigh
 	clone.Suggestion = "modified suggestion"
 
-	verifyValidationWarningIndependence(t, original, clone)
+	verifyIndependence(t, "ValidationWarning", original, clone)
 
 	// Verify they are different instances
 	if clone == original {

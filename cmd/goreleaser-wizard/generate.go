@@ -21,6 +21,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 
 	// Detect project information
 	projectConfig := &domain.SafeProjectConfig{}
+
 	err := detectProjectInfo(projectConfig)
 	if err != nil {
 		displayError(err)

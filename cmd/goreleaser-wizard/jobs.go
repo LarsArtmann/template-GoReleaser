@@ -24,6 +24,7 @@ import (
 	"time"
 
 	"charm.land/log/v2"
+	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators"
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
@@ -31,11 +32,7 @@ import (
 
 // checkContext returns an error if the context is cancelled.
 func checkContext(ctx context.Context) error {
-	if ctx.Err() != nil {
-		return fmt.Errorf("context cancelled: %w", ctx.Err())
-	}
-
-	return nil
+	return generators.CheckContext(ctx)
 }
 
 // addDockerConfig adds Docker configuration to template data if Docker is enabled.
@@ -798,25 +795,25 @@ func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) Job {
 
 // Helper functions for template data
 
-// getVersion gets the current version from git or fallback.
-func getVersion() string {
-	// Try to get version from git
+// runGitCommand runs a git command with a timeout and returns the trimmed output.
+func runGitCommand(args ...string) string {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	if cmd := exec.CommandContext(
-		ctx,
-		"git",
-		"describe",
-		"--tags",
-		"--always",
-		"--dirty",
-	); cmd != nil {
-		if output, err := cmd.Output(); err == nil {
-			if version := strings.TrimSpace(string(output)); version != "" {
-				return version
-			}
-		}
+	cmd := exec.CommandContext(ctx, "git", args...)
+	output, err := cmd.Output()
+	if err != nil {
+		return ""
+	}
+
+	return strings.TrimSpace(string(output))
+}
+
+// getVersion gets the current version from git or fallback.
+func getVersion() string {
+	// Try to get version from git
+	if version := runGitCommand("describe", "--tags", "--always", "--dirty"); version != "" {
+		return version
 	}
 
 	// Fallback to version from build-time variable
@@ -830,15 +827,8 @@ func getVersion() string {
 
 // getCommitHash gets the current git commit hash.
 func getCommitHash() string {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	if cmd := exec.CommandContext(ctx, "git", "rev-parse", "HEAD"); cmd != nil {
-		if output, err := cmd.Output(); err == nil {
-			if hash := strings.TrimSpace(string(output)); hash != "" {
-				return hash
-			}
-		}
+	if hash := runGitCommand("rev-parse", "HEAD"); hash != "" {
+		return hash
 	}
 
 	return "unknown"

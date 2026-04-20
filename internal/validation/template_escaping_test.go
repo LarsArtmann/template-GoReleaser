@@ -4,25 +4,8 @@ import (
 	"testing"
 )
 
-// Helper type for escape function tests.
-type escapeTestCase struct {
-	name     string
-	input    string
-	expected string
-}
-
-// Helper type for validation function tests.
-type validationTestCase struct {
-	name     string
-	input    string
-	expected bool
-}
-
 // escapeFunc represents a function that takes a string and returns an escaped string.
 type escapeFunc func(string) string
-
-// validationFunc represents a function that takes a string and returns a bool.
-type validationFunc func(string) bool
 
 // testFunc represents a generic test function.
 type testFunc[T any] func(string) T
@@ -64,74 +47,139 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	})
 }
 
+// stringTestCaseInput is the input type for String escape test case builders.
+type stringTestCaseInput struct {
+	Name     string
+	Input    string
+	Expected string
+}
+
+// boolTestCaseInput is the input type for boolean validation test case builders.
+type boolTestCaseInput struct {
+	Name     string
+	Input    string
+	Expected bool
+}
+
+// stringEscaperCase creates a stringTestCaseInput for escape function tests.
+func stringEscaperCase(name, input, expected string) stringTestCaseInput {
+	return stringTestCaseInput{Name: name, Input: input, Expected: expected}
+}
+
+// boolValidationCase creates a boolTestCaseInput for validation function tests.
+func boolValidationCase(name, input string, expected bool) boolTestCaseInput {
+	return boolTestCaseInput{Name: name, Input: input, Expected: expected}
+}
+
+// escapeStringTestCaseBuilder builds String escape test cases from variadic stringTestCaseInput.
+func escapeStringTestCaseBuilder(cases ...stringTestCaseInput) []valueTestCase[string] {
+	result := make([]valueTestCase[string], len(cases))
+	for i, c := range cases {
+		result[i] = valueTestCase[string]{name: c.Name, input: c.Input, expected: c.Expected}
+	}
+
+	return result
+}
+
+// escapeBoolTestCaseBuilder builds boolean validation test cases from variadic boolTestCaseInput.
+func escapeBoolTestCaseBuilder(cases ...boolTestCaseInput) []valueTestCase[bool] {
+	result := make([]valueTestCase[bool], len(cases))
+	for i, c := range cases {
+		result[i] = valueTestCase[bool]{name: c.Name, input: c.Input, expected: c.Expected}
+	}
+
+	return result
+}
+
 // Test case constants for escape functions.
 var (
-	shellEscapeTestCases = []valueTestCase[string]{
-		{"Simple text", "hello", "'hello'"},
-		{"Empty string", "", ""},
-		{"Single quotes", "don't panic", "'don''t panic'"},
-		{"Safe characters", "my-app_v1.0", "'my-app_v1.0'"},
-		{"Dangerous content", "rm -rf /", ""},     // Should be filtered
-		{"Script injection", "; echo hacked", ""}, // Should be filtered
-	}
+	shellEscapeTestCases = escapeStringTestCaseBuilder(
+		stringEscaperCase("Simple text", "hello", "'hello'"),
+		stringEscaperCase("Empty string", "", ""),
+		stringEscaperCase("Single quotes", "don't panic", "'don''t panic'"),
+		stringEscaperCase("Safe characters", "my-app_v1.0", "'my-app_v1.0'"),
+		stringEscaperCase("Dangerous content", "rm -rf /", ""),
+		stringEscaperCase("Script injection", "; echo hacked", ""),
+	)
 
-	jsonEscapeTestCases = []valueTestCase[string]{
-		{"Simple text", "hello", `"hello"`},
-		{"Empty string", "", `""`},
-		{"Quotes", "say \"hello\"", `"say \"hello\""`},
-		{"Backslash", "path\\to\\file", `"path\\to\\file"`},
-		{"Newline", "line1\nline2", `"line1\nline2"`},
-		{"Tab", "col1\tcol2", `"col1\tcol2"`},
-	}
+	jsonEscapeTestCases = escapeStringTestCaseBuilder(
+		stringEscaperCase("Simple text", "hello", `"hello"`),
+		stringEscaperCase("Empty string", "", `""`),
+		stringEscaperCase("Quotes", "say \"hello\"", `"say \"hello\""`),
+		stringEscaperCase("Backslash", "path\\to\\file", `"path\\to\\file"`),
+		stringEscaperCase("Newline", "line1\nline2", `"line1\nline2"`),
+		stringEscaperCase("Tab", "col1\tcol2", `"col1\tcol2"`),
+	)
 
-	yamlEscapeTestCases = []valueTestCase[string]{
-		{"Simple text", "hello", "hello"},
-		{"Empty string", "", ""},
-		{"String with colon", "name: value", "'name: value'"},
-		{"String with space", " leading space", "leading space"},
-		{"Number", "123", "'123'"},
-		{"Boolean-like", "true", "true"},
-		{"String starting with special", "!important", "'!important'"},
-		{"Multi-line", "line1\nline2", "|-\nline1\n  line2"},
-		{"Complex multi-line", "line1: value\nline2: value", "|-\nline1: value\n  line2: value"},
-	}
+	yamlEscapeTestCases = escapeStringTestCaseBuilder(
+		stringEscaperCase("Simple text", "hello", "hello"),
+		stringEscaperCase("Empty string", "", ""),
+		stringEscaperCase("String with colon", "name: value", "'name: value'"),
+		stringEscaperCase("String with space", " leading space", "leading space"),
+		stringEscaperCase("Number", "123", "'123'"),
+		stringEscaperCase("Boolean-like", "true", "true"),
+		stringEscaperCase("String starting with special", "!important", "'!important'"),
+		stringEscaperCase("Multi-line", "line1\nline2", "|-\nline1\n  line2"),
+		stringEscaperCase(
+			"Complex multi-line",
+			"line1: value\nline2: value",
+			"|-\nline1: value\n  line2: value",
+		),
+	)
 
-	githubActionsEscapeTestCases = []valueTestCase[string]{
-		{"Simple text", "hello", "hello"},
-		{"Expression syntax", "${{ github.repository }}", "'${{ '' }}${{ github.repository }}'"},
-		{"Empty string", "", ""},
-		{"Complex YAML", "name: value", "'name: value'"},
-	}
+	githubActionsEscapeTestCases = escapeStringTestCaseBuilder(
+		stringEscaperCase("Simple text", "hello", "hello"),
+		stringEscaperCase(
+			"Expression syntax",
+			"${{ github.repository }}",
+			"'${{ '' }}${{ github.repository }}'",
+		),
+		stringEscaperCase("Empty string", "", ""),
+		stringEscaperCase("Complex YAML", "name: value", "'name: value'"),
+	)
 
-	dockerLabelEscapeTestCases = []valueTestCase[string]{
-		{"Simple text", "hello", "hello"},
-		{"Empty string", "", ""},
-		{"Valid characters", "my-app_v1.0", "my-app_v1.0"},
-		{"Invalid characters", "my@app$", "my-app-"},
-		{"Starts with number", "123label", "label-123label"},
-		{"Starts with dot", ".hidden", "label-.hidden"},
-		{"Starts with dash", "-dash", "label--dash"},
-	}
+	dockerLabelEscapeTestCases = escapeStringTestCaseBuilder(
+		stringEscaperCase("Simple text", "hello", "hello"),
+		stringEscaperCase("Empty string", "", ""),
+		stringEscaperCase("Valid characters", "my-app_v1.0", "my-app_v1.0"),
+		stringEscaperCase("Invalid characters", "my@app$", "my-app-"),
+		stringEscaperCase("Starts with number", "123label", "label-123label"),
+		stringEscaperCase("Starts with dot", ".hidden", "label-.hidden"),
+		stringEscaperCase("Starts with dash", "-dash", "label--dash"),
+	)
 
-	// Test case constants for validation functions.
-	shellInjectionTestCases = []valueTestCase[bool]{
-		{"echo hello", "echo hello", false},
-		{"rm -rf /", "rm -rf /", true},
-		{"cat file | grep pattern", "cat file | grep pattern", true},
-		{"command && rm file", "command && rm file", true},
-		{"script.sh", "script.sh", false},
-		{"$(rm file)", "$(rm file)", true},
-		{"`rm file`", "`rm file`", true},
-	}
+	shellInjectionTestCases = escapeBoolTestCaseBuilder(
+		boolValidationCase("echo hello", "echo hello", false),
+		boolValidationCase("rm -rf /", "rm -rf /", true),
+		boolValidationCase("cat file | grep pattern", "cat file | grep pattern", true),
+		boolValidationCase("command && rm file", "command && rm file", true),
+		boolValidationCase("script.sh", "script.sh", false),
+		boolValidationCase("$(rm file)", "$(rm file)", true),
+		boolValidationCase("`rm file`", "`rm file`", true),
+	)
 
-	dockerLabelTestCases = []valueTestCase[bool]{
-		{"label", "label", true},
-		{"my-label.v1", "my-label.v1", true},
-		{"my_label", "my_label", true},
+	dockerLabelTestCases = escapeBoolTestCaseBuilder(
+		boolValidationCase("label", "label", true),
+		boolValidationCase("my-label.v1", "my-label.v1", true),
+		boolValidationCase("my_label", "my_label", true),
+		boolValidationCase("empty", "", false),
+		boolValidationCase("invalid@label", "invalid@label", false),
+		boolValidationCase("label with spaces", "label with spaces", false),
+		boolValidationCase("label/with/slashes", "label/with/slashes", false),
+	)
+
+	// LooksLikeNumberTestCases shared across number detection tests.
+	looksLikeNumberTestCases = []valueTestCase[bool]{
+		{"123", "123", true},
+		{"123.45", "123.45", true},
+		{"-123", "-123", true},
+		{"+123", "+123", true},
+		{"1e10", "1e10", true},
+		{"123abc", "123abc", false},
+		{"abc123", "abc123", false},
 		{"empty", "", false},
-		{"invalid@label", "invalid@label", false},
-		{"label with spaces", "label with spaces", false},
-		{"label/with/slashes", "label/with/slashes", false},
+		{"-", "-", false},
+		{".", ".", false},
 	}
 )
 

@@ -9,6 +9,16 @@ import (
 	"charm.land/log/v2"
 )
 
+// checkContextCancellation checks if context is cancelled and returns an error if so.
+func checkContextCancellation(ctx context.Context, msg string) error {
+	select {
+	case <-ctx.Done():
+		return fmt.Errorf("%s: %w", msg, ctx.Err())
+	default:
+		return nil
+	}
+}
+
 // Job represents a wizard operation job.
 type Job interface {
 	ID() string
@@ -139,10 +149,8 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 	errChan := make(chan error, len(jm.jobs))
 
 	for _, job := range jm.jobs {
-		select {
-		case <-ctx.Done():
-			return fmt.Errorf("context cancelled: %w", ctx.Err())
-		default:
+		if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
+			return err
 		}
 
 		wg.Add(1)
@@ -275,10 +283,8 @@ func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 	for i := len(failed) - 1; i >= 0; i-- { // Rollback in reverse order
 		result := failed[i]
 
-		select {
-		case <-ctx.Done():
-			return fmt.Errorf("context cancelled during rollback: %w", ctx.Err())
-		default:
+		if err := checkContextCancellation(ctx, "context cancelled during rollback"); err != nil {
+			return err
 		}
 
 		jm.logger.Infof("Rolling back job: %s", result.Job.Name())
