@@ -14,6 +14,7 @@ package domain
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -36,9 +37,11 @@ func NewValidationUseCase(logger Logger, repo FileSystemRepository) *ValidationU
 // addValidationError adds an error to the result if err is not nil.
 func addValidationError(result *ValidationResult, err error) {
 	if err != nil {
-		if domainErr, ok := err.(*DomainError); ok {
+		domainErr := &DomainError{}
+		if errors.As(err, &domainErr) {
 			result.Errors = append(result.Errors, domainErr)
 		}
+
 		result.IsValid = false
 	}
 }

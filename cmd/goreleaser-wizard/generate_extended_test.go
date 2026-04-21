@@ -166,9 +166,9 @@ func TestTemplateGeneration(t *testing.T) {
 			err := generateGoReleaserConfig(&tt.config)
 
 			// Check error
-			if (err != nil) != tt.expectError {
-				t.Errorf("generateGoReleaserConfig() error = %v, wantErr %v", err, tt.expectError)
+			AssertErr(t, "generateGoReleaserConfig", err, tt.expectError)
 
+			if err != nil {
 				return
 			}
 
@@ -256,9 +256,9 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			err := generateGitHubActions(config)
 
 			// Check error
-			if (err != nil) != tt.expectError {
-				t.Errorf("generateGitHubActions() error = %v, wantErr %v", err, tt.expectError)
+			AssertErr(t, "generateGitHubActions", err, tt.expectError)
 
+			if err != nil {
 				return
 			}
 
@@ -375,9 +375,7 @@ func TestConfigValidation(t *testing.T) {
 
 			err := generateGoReleaserConfig(&tt.config)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("generateGoReleaserConfig() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			AssertErr(t, "generateGoReleaserConfig", err, tt.wantErr)
 		})
 	}
 }
@@ -450,9 +448,7 @@ func TestFileOperations(t *testing.T) {
 			// Test file operation
 			err := tt.operation()
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("File operation error = %v, wantErr %v", err, tt.wantErr)
-			}
+			AssertErr(t, "File operation", err, tt.wantErr)
 		})
 	}
 }

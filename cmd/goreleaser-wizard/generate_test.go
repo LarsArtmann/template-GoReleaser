@@ -178,9 +178,9 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 			err = generateGoReleaserConfig(config)
 
 			// Check error
-			if (err != nil) != tt.wantErr {
-				t.Errorf("generateGoReleaserConfig() error = %v, wantErr %v", err, tt.wantErr)
+			AssertErr(t, "generateGoReleaserConfig", err, tt.wantErr)
 
+			if err != nil {
 				return
 			}
 
@@ -304,9 +304,9 @@ func TestGenerateGitHubActions(t *testing.T) {
 			err = generateGitHubActions(config)
 
 			// Check error
-			if (err != nil) != tt.wantErr {
-				t.Errorf("generateGitHubActions() error = %v, wantErr %v", err, tt.wantErr)
+			AssertErr(t, "generateGitHubActions", err, tt.wantErr)
 
+			if err != nil {
 				return
 			}
 

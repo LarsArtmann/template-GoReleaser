@@ -108,3 +108,30 @@ func setupMinimalProject(pattern string) (string, func()) {
 
 	return dir, cleanup
 }
+
+// AssertErr checks if an error matches the expected error state.
+// This deduplicates the common pattern: if (err != nil) != tt.wantErr.
+func AssertErr(t *testing.T, fnName string, err error, wantErr bool) {
+	t.Helper()
+
+	if (err != nil) != wantErr {
+		t.Errorf("%s() error = %v, wantErr %v", fnName, err, wantErr)
+	}
+}
+
+// AssertFileExists checks if a file exists at the given path.
+func AssertFileExists(t *testing.T, path, msg string) {
+	t.Helper()
+
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		t.Error(msg)
+	}
+}
+
+// CreateTempDir creates a temporary directory with the given prefix.
+// It returns the directory path and a cleanup function.
+func CreateTempDir(prefix string) (string, func()) {
+	dir, _ := os.MkdirTemp("", prefix)
+
+	return dir, func() { os.RemoveAll(dir) }
+}

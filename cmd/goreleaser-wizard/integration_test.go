@@ -84,9 +84,7 @@ require github.com/charmbracelet/bubbletea v0.25.0
 			}
 
 			// Verify .goreleaser.yaml was created
-			if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
-				t.Error(".goreleaser.yaml should be created")
-			}
+			AssertFileExists(t, ".goreleaser.yaml", ".goreleaser.yaml should be created")
 
 			// Test GitHub Actions generation
 			config.ActionLevel = domain.ActionLevelBasic
@@ -225,9 +223,11 @@ func TestConfigurationValidation(t *testing.T) {
 				}
 			} else {
 				// Verify generated file exists and has expected content
-				if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
-					t.Error(".goreleaser.yaml should be created for valid config")
-				}
+				AssertFileExists(
+					t,
+					".goreleaser.yaml",
+					".goreleaser.yaml should be created for valid config",
+				)
 
 				// Read and validate basic structure
 				content, err := os.ReadFile(".goreleaser.yaml")
@@ -371,9 +371,7 @@ go 1.21
 			}
 
 			// Verify config file was created
-			if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
-				t.Error(".goreleaser.yaml should be created")
-			}
+			AssertFileExists(t, ".goreleaser.yaml", ".goreleaser.yaml should be created")
 		})
 	}
 }

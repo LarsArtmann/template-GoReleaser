@@ -365,7 +365,7 @@ func (spc *SafeProjectConfig) serializeToFormat(
 	if err != nil {
 		return "", NewValidationError(
 			ErrInvalidProjectName,
-			fmt.Sprintf("Failed to serialize configuration to %s", formatName),
+			"Failed to serialize configuration to "+formatName,
 			err.Error(),
 		)
 	}

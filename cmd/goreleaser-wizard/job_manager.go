@@ -149,7 +149,8 @@ func (jm *JobManager) executeParallel(ctx context.Context) error {
 	errChan := make(chan error, len(jm.jobs))
 
 	for _, job := range jm.jobs {
-		if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
+		err := checkContextCancellation(ctx, "context cancelled")
+		if err != nil {
 			return err
 		}
 

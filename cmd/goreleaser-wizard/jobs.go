@@ -244,9 +244,9 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 	data := prepareGoReleaserData(config)
 
 	// Generate output
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, data); err != nil {
-		return fmt.Errorf("failed to execute GoReleaser template: %w", err)
+	output, err := executeTemplate(tmpl, data, "failed to execute GoReleaser template")
+	if err != nil {
+		return err
 	}
 
 	// Create backup if file exists
@@ -260,7 +260,7 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 	}
 
 	// Write generated file
-	if err := os.WriteFile(".goreleaser.yaml", output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(".goreleaser.yaml", output, 0o644); err != nil {
 		return fmt.Errorf("failed to write GoReleaser config: %w", err)
 	}
 
@@ -292,9 +292,9 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 	data := prepareGitHubActionsData(config)
 
 	// Generate output
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, data); err != nil {
-		return fmt.Errorf("failed to execute GitHub Actions template: %w", err)
+	output, err := executeTemplate(tmpl, data, "failed to execute GitHub Actions template")
+	if err != nil {
+		return err
 	}
 
 	// Ensure .github/workflows directory exists
@@ -305,7 +305,7 @@ func generateGitHubActions(config *domain.SafeProjectConfig) error {
 
 	// Write generated file
 	workflowPath := filepath.Join(workflowDir, "release.yml")
-	if err := os.WriteFile(workflowPath, output.Bytes(), 0o644); err != nil {
+	if err := os.WriteFile(workflowPath, output, 0o644); err != nil {
 		return fmt.Errorf("failed to write GitHub Actions workflow: %w", err)
 	}
 
@@ -801,6 +801,7 @@ func runGitCommand(args ...string) string {
 	defer cancel()
 
 	cmd := exec.CommandContext(ctx, "git", args...)
+
 	output, err := cmd.Output()
 	if err != nil {
 		return ""
@@ -832,4 +833,16 @@ func getCommitHash() string {
 	}
 
 	return "unknown"
+}
+
+// executeTemplate executes a template with the given data and returns the output.
+// This deduplicates the common pattern of template execution with error handling.
+func executeTemplate(tmpl *template.Template, data any, errMsg string) ([]byte, error) {
+	var output bytes.Buffer
+	err := tmpl.Execute(&output, data)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", errMsg, err)
+	}
+
+	return output.Bytes(), nil
 }

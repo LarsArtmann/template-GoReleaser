@@ -271,6 +271,7 @@ func checkReservedName(component string, reservedList []string, errorMsg, sugges
 			suggestion,
 		)
 	}
+
 	return nil
 }
 
@@ -281,21 +282,23 @@ func validatePathComponents(path string) error {
 			continue
 		}
 
-		if err := checkReservedName(
+		err := checkReservedName(
 			component,
 			reservedWindowsDeviceNames,
 			"is not allowed in path",
 			"Remove invalid components from path",
-		); err != nil {
+		)
+		if err != nil {
 			return err
 		}
 
-		if err := checkReservedName(
+		err := checkReservedName(
 			component,
 			reservedDirs,
 			"is a reserved system directory",
 			"Use project directories instead",
-		); err != nil {
+		)
+		if err != nil {
 			return err
 		}
 	}

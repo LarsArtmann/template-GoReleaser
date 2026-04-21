@@ -254,9 +254,9 @@ func TestCheckFileExists(t *testing.T) {
 
 			err := validateFileExists(tt.path, tt.requireDir)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("CheckFileExists() error = %v, wantErr %v", err, tt.wantErr)
+			AssertErr(t, "CheckFileExists", err, tt.wantErr)
 
+			if err != nil {
 				return
 			}
 

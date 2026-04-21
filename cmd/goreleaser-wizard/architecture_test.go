@@ -105,9 +105,7 @@ go 1.21
 			ctx := context.Background()
 			err := jm.ExecuteJobs(ctx)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ExecuteJobs() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			AssertErr(t, "ExecuteJobs", err, tt.wantErr)
 
 			// Check results
 			results := jm.GetResults()
@@ -299,9 +297,7 @@ go 1.21
 			ctx := context.Background()
 			err := tt.workflow.Execute(ctx)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Workflow.Execute() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			AssertErr(t, "Workflow.Execute", err, tt.wantErr)
 
 			// Check results
 			results := tt.workflow.GetResults()
@@ -379,9 +375,9 @@ go 1.21
 		t.Run(tt.name, func(t *testing.T) {
 			workflow, err := wb.BuildWorkflow(tt.workflowType, config, tt.force)
 
-			if (err != nil) != tt.wantErr {
-				t.Errorf("BuildWorkflow() error = %v, wantErr %v", err, tt.wantErr)
+			AssertErr(t, "BuildWorkflow", err, tt.wantErr)
 
+			if err != nil {
 				return
 			}
 

@@ -47,6 +47,15 @@ func runFuzzTest(f *testing.F, seed []string, escaper escapeFunc) {
 	})
 }
 
+// assertErr checks if an error matches the expected error state.
+func assertErr(t *testing.T, fnName string, err error, wantErr bool) {
+	t.Helper()
+
+	if (err != nil) != wantErr {
+		t.Errorf("%s() error = %v, wantErr %v", fnName, err, wantErr)
+	}
+}
+
 // stringTestCaseInput is the input type for String escape test case builders.
 type stringTestCaseInput struct {
 	Name     string
@@ -261,9 +270,7 @@ func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			err := te.ValidateTemplateContent(tt.content, tt.templateType)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("ValidateTemplateContent() error = %v, wantErr %v", err, tt.wantErr)
-			}
+			assertErr(t, "ValidateTemplateContent", err, tt.wantErr)
 		})
 	}
 }

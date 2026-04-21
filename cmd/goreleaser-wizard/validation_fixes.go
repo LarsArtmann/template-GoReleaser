@@ -13,6 +13,7 @@ const (
 // printFix prints a success message and increments the fixed counter.
 func printFix(message string, fixed *int) {
 	fmt.Println(successStyle.Render(message))
+
 	*fixed++
 }
 
