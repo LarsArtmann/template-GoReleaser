@@ -269,20 +269,7 @@ func TestTemplateEscaper_ValidateTemplateContent(t *testing.T) {
 }
 
 func TestLooksLikeNumber(t *testing.T) {
-	tests := []valueTestCase[bool]{
-		{"123", "123", true},
-		{"123.45", "123.45", true},
-		{"-123", "-123", true},
-		{"+123", "+123", true},
-		{"1e10", "1e10", true},
-		{"123abc", "123abc", false},
-		{"abc123", "abc123", false},
-		{"empty", "", false},
-		{"-", "-", false},
-		{".", ".", false},
-	}
-
-	runTests(t, "looksLikeNumber", looksLikeNumber, tests)
+	runTests(t, "looksLikeNumber", looksLikeNumber, looksLikeNumberTestCases)
 }
 
 func TestContainsShellInjection(t *testing.T) {
