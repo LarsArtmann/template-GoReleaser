@@ -73,17 +73,23 @@ func runInitWizard(cmd *cobra.Command, _ []string) {
 	fmt.Println("  • Commit the configuration to your repository")
 }
 
+// fileReadError creates a standardized file read error.
+func fileReadError(context, message, details string, originalErr error) error {
+	return domain.NewSystemError(
+		domain.ErrFileReadFailed,
+		message,
+		details,
+		originalErr,
+	).WithContext(context)
+}
+
 // detectProjectInfo detects project information from the current directory.
 func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	// Get current working directory
 	wd, err := os.Getwd()
 	if err != nil {
-		return domain.NewSystemError(
-			domain.ErrFileReadFailed,
-			"Failed to get working directory",
-			"Could not determine current directory",
-			err,
-		).WithContext("detect_project")
+		return fileReadError("detect_project", "Failed to get working directory",
+			"Could not determine current directory", err)
 	}
 
 	// Check for go.mod file
@@ -99,12 +105,8 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	// Read go.mod to get module name
 	content, err := os.ReadFile(goModPath)
 	if err != nil {
-		return domain.NewSystemError(
-			domain.ErrFileReadFailed,
-			"Failed to read go.mod",
-			"Could not read go.mod file",
-			err,
-		).WithContext(goModPath)
+		return fileReadError(goModPath, "Failed to read go.mod",
+			"Could not read go.mod file", err)
 	}
 
 	// Parse module name from go.mod

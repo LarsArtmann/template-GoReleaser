@@ -292,7 +292,7 @@ func validatePathComponents(path string) error {
 			return err
 		}
 
-		err := checkReservedName(
+		err = checkReservedName(
 			component,
 			reservedDirs,
 			"is a reserved system directory",

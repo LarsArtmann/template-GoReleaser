@@ -219,8 +219,7 @@ func TestCheckFileExists(t *testing.T) {
 			requireDir: true,
 			wantErr:    false,
 			setupFunc: func() string {
-				dir, _ := os.MkdirTemp("", "wizard-test-dir")
-
+				dir, _ := CreateTempDir("wizard-test-dir")
 				return dir
 			},
 		},
