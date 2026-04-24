@@ -62,6 +62,7 @@ func TestInitCommand(t *testing.T) {
 			flags: map[string]string{},
 			setupFunc: func() string {
 				dir, _ := CreateTempDir("wizard-init-test")
+
 				return dir
 			},
 			// Note: The command uses Run (not RunE), so it displays errors but doesn't return them

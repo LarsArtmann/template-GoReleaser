@@ -839,6 +839,7 @@ func getCommitHash() string {
 // This deduplicates the common pattern of template execution with error handling.
 func executeTemplate(tmpl *template.Template, data any, errMsg string) ([]byte, error) {
 	var output bytes.Buffer
+
 	err := tmpl.Execute(&output, data)
 	if err != nil {
 		return nil, fmt.Errorf("%s: %w", errMsg, err)

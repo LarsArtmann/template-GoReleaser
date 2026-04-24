@@ -220,6 +220,7 @@ func TestCheckFileExists(t *testing.T) {
 			wantErr:    false,
 			setupFunc: func() string {
 				dir, _ := CreateTempDir("wizard-test-dir")
+
 				return dir
 			},
 		},
