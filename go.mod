@@ -1,6 +1,6 @@
 module github.com/LarsArtmann/GoReleaser-Wizard
 
-go 1.26.1
+go 1.26.2
 
 require (
 	charm.land/huh/v2 v2.0.3
@@ -14,7 +14,7 @@ require (
 	github.com/knadh/koanf/providers/file v1.2.1
 	github.com/knadh/koanf/providers/posflag v1.0.1
 	github.com/knadh/koanf/v2 v2.3.4
-	github.com/larsartmann/go-composable-business-types v0.0.0-00010101000000-000000000000
+	github.com/larsartmann/go-branded-id v0.0.0
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
 	github.com/stretchr/testify v1.11.1
@@ -69,4 +69,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/larsartmann/go-composable-business-types => /Users/larsartmann/projects/go-composable-business-types
+replace github.com/larsartmann/go-branded-id => /home/lars/projects/go-branded-id

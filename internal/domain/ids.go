@@ -1,7 +1,7 @@
 // Package domain provides branded, strongly-typed identifiers for domain entities.
 //
 // This file implements compile-time type safety for entity IDs using the
-// go-composable-business-types/id package. This prevents accidental mixing
+// go-branded-id package. This prevents accidental mixing
 // of different entity IDs (e.g., using a JobID where a WorkflowID is expected).
 //
 // # Usage
@@ -29,7 +29,7 @@
 package domain
 
 import (
-	"github.com/larsartmann/go-composable-business-types/id"
+	"github.com/larsartmann/go-branded-id"
 )
 
 // Brand types for compile-time distinctness.
