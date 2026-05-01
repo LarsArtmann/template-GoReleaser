@@ -29,7 +29,7 @@
 package domain
 
 import (
-	"github.com/larsartmann/go-branded-id"
+	id "github.com/larsartmann/go-branded-id"
 )
 
 // Brand types for compile-time distinctness.

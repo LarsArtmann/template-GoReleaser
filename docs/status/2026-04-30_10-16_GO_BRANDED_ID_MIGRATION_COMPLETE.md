@@ -17,28 +17,28 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 
 ### a) FULLY DONE ✅
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Import path update | ✅ | Changed to `github.com/larsartmann/go-branded-id` |
-| Comment/documentation update | ✅ | Updated doc comment in ids.go |
-| go.mod dependency swap | ✅ | Replaced old dep with new |
-| Replace directive | ✅ | Points to local `/home/lars/projects/go-branded-id` |
-| go mod tidy | ✅ | Successfully tidied |
-| Build verification | ✅ | `go build ./...` passes |
-| Domain tests | ✅ | `internal/domain` tests pass |
+| Task                         | Status | Notes                                               |
+| ---------------------------- | ------ | --------------------------------------------------- |
+| Import path update           | ✅     | Changed to `github.com/larsartmann/go-branded-id`   |
+| Comment/documentation update | ✅     | Updated doc comment in ids.go                       |
+| go.mod dependency swap       | ✅     | Replaced old dep with new                           |
+| Replace directive            | ✅     | Points to local `/home/lars/projects/go-branded-id` |
+| go mod tidy                  | ✅     | Successfully tidied                                 |
+| Build verification           | ✅     | `go build ./...` passes                             |
+| Domain tests                 | ✅     | `internal/domain` tests pass                        |
 
 ### b) PARTIALLY DONE 🔄
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Pre-existing test failures | 🔄 | 3 test failures unrelated to migration |
+| Task                       | Status | Notes                                  |
+| -------------------------- | ------ | -------------------------------------- |
+| Pre-existing test failures | 🔄     | 3 test failures unrelated to migration |
 
 ### c) NOT STARTED ⬜
 
-| Task | Status | Notes |
-|------|--------|-------|
-| Push to remote | ⬜ | User instructed not to push |
-| Final CI run | ⬜ | Would need `just ci` before commit |
+| Task           | Status | Notes                              |
+| -------------- | ------ | ---------------------------------- |
+| Push to remote | ⬜     | User instructed not to push        |
+| Final CI run   | ⬜     | Would need `just ci` before commit |
 
 ### d) TOTALLY FUCKED UP ❌
 
@@ -51,6 +51,7 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 ### Files Modified
 
 #### 1. `go.mod`
+
 ```diff
 -go 1.26.1
 +go 1.26.2
@@ -63,6 +64,7 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 ```
 
 #### 2. `internal/domain/ids.go`
+
 ```diff
 -// go-composable-business-types/id package.
 +// go-branded-id package.
@@ -79,21 +81,21 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 
 ## Verification Results
 
-| Check | Result | Command |
-|-------|--------|---------|
-| Build | ✅ PASS | `GOWORK=off go build ./...` |
-| Module Tidy | ✅ PASS | `go mod tidy` |
-| Domain Tests | ✅ PASS | `go test ./internal/domain/...` |
-| Domain Package | ✅ PASS | Tests completed in 0.002s |
+| Check          | Result  | Command                         |
+| -------------- | ------- | ------------------------------- |
+| Build          | ✅ PASS | `GOWORK=off go build ./...`     |
+| Module Tidy    | ✅ PASS | `go mod tidy`                   |
+| Domain Tests   | ✅ PASS | `go test ./internal/domain/...` |
+| Domain Package | ✅ PASS | Tests completed in 0.002s       |
 
 ---
 
 ## Pre-Existing Test Failures (Unrelated to Migration)
 
-| Test | File | Issue |
-|------|------|-------|
-| `TestCheckFileExists` | validate_test.go:257 | File existence check logic issue |
-| `TestValidateDependencies` | validate_test.go:459 | goreleaser binary not found |
+| Test                       | File                 | Issue                            |
+| -------------------------- | -------------------- | -------------------------------- |
+| `TestCheckFileExists`      | validate_test.go:257 | File existence check logic issue |
+| `TestValidateDependencies` | validate_test.go:459 | goreleaser binary not found      |
 
 **Impact:** These failures existed before migration. Not caused by dependency change.
 
@@ -152,6 +154,7 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 **Question:** Why does `go build ./...` fail with "directory prefix . does not contain modules listed in go.work or their selected dependencies" when a parent `go.work` file exists, even though the current project has no `go.work` file?
 
 **Details:**
+
 - Parent workspace at `/home/lars/projects/go.work` contains references to multiple projects
 - GoReleaser-Wizard has no own `go.work` file
 - Running with `GOWORK=off` works around the issue
@@ -161,21 +164,22 @@ Successfully migrated the `id/` package from `github.com/larsartmann/go-composab
 
 ## Files Changed Summary
 
-| File | Lines Added | Lines Removed | Net Change |
-|------|-------------|---------------|------------|
-| go.mod | +2 | -2 | 0 |
-| internal/domain/ids.go | +2 | -2 | 0 |
-| **TOTAL** | **4** | **4** | **0** |
+| File                   | Lines Added | Lines Removed | Net Change |
+| ---------------------- | ----------- | ------------- | ---------- |
+| go.mod                 | +2          | -2            | 0          |
+| internal/domain/ids.go | +2          | -2            | 0          |
+| **TOTAL**              | **4**       | **4**         | **0**      |
 
 ---
 
 ## Next Action Required
 
 **User needs to:**
+
 1. Review the changes
 2. Provide instruction to commit (or not)
 3. Decide on `go.work` handling strategy
 
 ---
 
-*Report generated: 2026-04-30 10:16 AM CEST*
+_Report generated: 2026-04-30 10:16 AM CEST_
