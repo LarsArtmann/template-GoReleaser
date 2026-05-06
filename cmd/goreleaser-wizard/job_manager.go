@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 
@@ -281,8 +282,8 @@ func (jm *JobManager) RollbackFailedJobs(ctx context.Context) error {
 
 	jm.logger.Infof("Rolling back %d failed jobs", len(failed))
 
-	for i := len(failed) - 1; i >= 0; i-- { // Rollback in reverse order
-		result := failed[i]
+	for _, v := range slices.Backward(failed) { // Rollback in reverse order
+		result := v
 
 		if err := checkContextCancellation(ctx, "context cancelled during rollback"); err != nil {
 			return err
