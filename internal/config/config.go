@@ -102,11 +102,14 @@ func (m *Manager) Load(cfgFile string) error {
 
 // loadFile loads configuration from a specific file.
 func (m *Manager) loadFile(path string) error {
-	if _, err := os.Stat(path); os.IsNotExist(err) {
+	info, err := os.Stat(path)
+	if err != nil {
 		return fmt.Errorf("config file not found: %s", path)
 	}
 
-	err := m.k.Load(file.Provider(path), yaml.Parser())
+	_ = info
+
+	err = m.k.Load(file.Provider(path), yaml.Parser())
 	if err != nil {
 		return fmt.Errorf("failed to load config file: %w", err)
 	}
@@ -122,7 +125,9 @@ func (m *Manager) tryLoadHomeConfig() {
 	}
 
 	configPath := filepath.Join(home, ".goreleaser-wizard.yaml")
-	if _, err := os.Stat(configPath); err != nil {
+
+	_, err = os.Stat(configPath)
+	if err != nil {
 		return
 	}
 

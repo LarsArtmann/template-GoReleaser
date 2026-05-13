@@ -61,7 +61,7 @@ func TestInitCommand(t *testing.T) {
 			args:  []string{},
 			flags: map[string]string{},
 			setupFunc: func() string {
-				dir, _ := CreateTempDir("wizard-init-test")
+				dir := CreateTempDir("wizard-init-test")
 
 				return dir
 			},

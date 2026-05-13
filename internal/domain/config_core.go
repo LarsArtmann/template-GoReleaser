@@ -290,13 +290,16 @@ func (spc *SafeProjectConfig) validateSigningConfiguration() error {
 		// Check if required tools are available
 		requiredTools := spc.SigningLevel.GetRequiredTools()
 		for _, tool := range requiredTools {
-			if _, err := exec.LookPath(tool); err != nil {
+			path, err := exec.LookPath(tool)
+			if err != nil {
 				return NewValidationError(
 					ErrExternalToolNotFound,
 					"Required signing tool not found",
 					tool,
 				).WithField("signing_tools")
 			}
+
+			_ = path // Tool found, use path if needed
 		}
 	}
 

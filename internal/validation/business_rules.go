@@ -398,7 +398,8 @@ func validateSigningBusinessRules(
 	if config.SigningLevel.IsEnabled() {
 		requiredTools := config.SigningLevel.GetRequiredTools()
 		for _, tool := range requiredTools {
-			if _, err := exec.LookPath(tool); err != nil {
+			_, err := exec.LookPath(tool)
+			if err != nil {
 				result.AddError(&types.ValidationError{
 					Code:       errors.ErrDependencyMissing,
 					Field:      "signing_tools",

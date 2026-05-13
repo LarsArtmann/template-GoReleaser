@@ -219,7 +219,7 @@ func TestCheckFileExists(t *testing.T) {
 			requireDir: true,
 			wantErr:    false,
 			setupFunc: func() string {
-				dir, _ := CreateTempDir("wizard-test-dir")
+				dir := CreateTempDir("wizard-test-dir")
 
 				return dir
 			},
@@ -255,29 +255,6 @@ func TestCheckFileExists(t *testing.T) {
 			err := validateFileExists(tt.path, tt.requireDir)
 
 			AssertErr(t, "CheckFileExists", err, tt.wantErr)
-
-			if err != nil {
-				return
-			}
-
-			if tt.wantErr && tt.errContains != "" {
-				if err == nil {
-					t.Errorf(
-						"CheckFileExists() expected error containing %q, got nil",
-						tt.errContains,
-					)
-
-					return
-				}
-
-				if !strings.Contains(err.Error(), tt.errContains) {
-					t.Errorf(
-						"CheckFileExists() error = %v, want to contain %q",
-						err,
-						tt.errContains,
-					)
-				}
-			}
 		})
 	}
 }
@@ -427,11 +404,13 @@ func TestValidateDependencies(t *testing.T) {
 		dependencies  []string
 		expectFound   []string
 		expectMissing []string
+		skipIfMissing []string
 	}{
 		{
-			name:         "check_goreleaser",
-			dependencies: []string{"goreleaser"},
-			expectFound:  []string{"goreleaser"},
+			name:          "check_goreleaser",
+			dependencies:  []string{"goreleaser"},
+			expectFound:   []string{"goreleaser"},
+			skipIfMissing: []string{"goreleaser"},
 		},
 		{
 			name:         "check_go_command",
@@ -450,6 +429,10 @@ func TestValidateDependencies(t *testing.T) {
 			for _, dep := range tt.dependencies {
 				path, err := exec.LookPath(dep)
 				found := err == nil
+
+				if !found && slices.Contains(tt.skipIfMissing, dep) {
+					t.Skipf("Skipping %s - not installed", dep)
+				}
 
 				expectedFound := slices.Contains(tt.expectFound, dep)
 

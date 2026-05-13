@@ -162,7 +162,10 @@ func ValidateBinaryName(name string) error {
 
 	lowerName := strings.ToLower(name)
 
-	reservedNames := append(reservedWindowsDeviceNames, reservedBinaryNames...)
+	reservedNames := make([]string, 0, len(reservedWindowsDeviceNames)+len(reservedBinaryNames))
+	reservedNames = append(reservedNames, reservedWindowsDeviceNames...)
+
+	reservedNames = append(reservedNames, reservedBinaryNames...)
 	if slices.Contains(reservedNames, lowerName) {
 		return newValidationError(
 			errors.ErrInvalidBinary,

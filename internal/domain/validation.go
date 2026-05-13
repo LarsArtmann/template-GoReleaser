@@ -401,8 +401,9 @@ func (vu *ValidationUseCase) ValidateProjectStructure(
 	result.Info = info
 
 	// Validate project structure
-	if err := vu.validateProjectRequirements(info); err != nil {
-		result.Issues = append(result.Issues, err)
+	validationErr := vu.validateProjectRequirements(info)
+	if validationErr != nil {
+		result.Issues = append(result.Issues, validationErr)
 		result.IsValid = false
 	}
 

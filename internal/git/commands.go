@@ -164,30 +164,35 @@ func (c *Command) GetRepositoryInfo() (*RepositoryInfo, error) {
 	info := &RepositoryInfo{}
 
 	// Get commit hash
-	if commitHash, err := c.GetCommitHash(); err == nil {
+	commitHash, err := c.GetCommitHash()
+	if err == nil {
 		info.CommitHash = commitHash
 	}
 
 	// Get description
-	if describe, err := c.GetDescribe(); err == nil {
+	describe, err := c.GetDescribe()
+	if err == nil {
 		info.Description = describe
 	}
 
 	// Get remote info
 	if c.HasRemote("origin") {
-		if remoteURL, err := c.GetRemoteURL("origin"); err == nil {
+		remoteURL, err := c.GetRemoteURL("origin")
+		if err == nil {
 			info.RemoteURL = remoteURL
 			info.Owner, info.Repo = ParseGitHubURL(remoteURL)
 		}
 	}
 
 	// Get branches
-	if branches, err := c.GetBranches(); err == nil {
+	branches, err := c.GetBranches()
+	if err == nil {
 		info.Branches = branches
 	}
 
 	// Get tags
-	if tags, err := c.GetTags(); err == nil {
+	tags, err := c.GetTags()
+	if err == nil {
 		info.Tags = tags
 	}
 
@@ -234,17 +239,20 @@ func GetVersionInfo(ctx context.Context) (*VersionInfo, error) {
 	}
 
 	// Get version from git describe
-	if version, err := cmd.GetDescribe(); err == nil {
+	version, err := cmd.GetDescribe()
+	if err == nil {
 		info.Version = version
 	}
 
 	// Get commit hash
-	if commitHash, err := cmd.GetCommitHash(); err == nil {
+	commitHash, err := cmd.GetCommitHash()
+	if err == nil {
 		info.CommitHash = commitHash
 	}
 
 	// Get repository info
-	if repoInfo, err := cmd.GetRepositoryInfo(); err == nil {
+	repoInfo, err := cmd.GetRepositoryInfo()
+	if err == nil {
 		info.Owner = repoInfo.Owner
 		info.Repo = repoInfo.Repo
 	}
@@ -314,7 +322,8 @@ func IncPatchVersion(v string) string {
 	if len(parts) == 3 {
 		patch := 0
 		if len(parts) > 2 {
-			if p, err := fmt.Sscanf(parts[2], "%d", &patch); err == nil && p == 1 {
+			n, err := fmt.Sscanf(parts[2], "%d", &patch)
+			if err == nil && n == 1 {
 				return fmt.Sprintf("v%s.%s.%d-next", parts[0], parts[1], patch+1)
 			}
 		}

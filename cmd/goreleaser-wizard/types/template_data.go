@@ -13,29 +13,29 @@ import (
 // Eliminates map[string]any usage for type safety.
 type GoReleaserTemplateData struct {
 	// Project Information
-	ProjectName string `json:"project_name"`
-	BinaryName  string `json:"binary_name"`
-	MainPath    string `json:"main_path"`
+	ProjectName string `json:"projectName"`
+	BinaryName  string `json:"binaryName"`
+	MainPath    string `json:"mainPath"`
 
 	// Version Information
 	Version    string `json:"version"`
 	Tag        string `json:"tag"`
 	Major      string `json:"major"`
 	Date       string `json:"date"`
-	FullCommit string `json:"full_commit"`
+	FullCommit string `json:"fullCommit"`
 
 	// Build Configuration
-	CGOEnabled         string            `json:"cgo_enabled"`
+	CGOEnabled         string            `json:"cgoEnabled"`
 	Platforms          []string          `json:"platforms"`
 	Architectures      []string          `json:"architectures"`
-	BuildTags          []string          `json:"build_tags,omitempty"`
-	IgnoreCombinations []PlatformIgnored `json:"ignore_combinations,omitempty"`
+	BuildTags          []string          `json:"buildTags,omitempty"`
+	IgnoreCombinations []PlatformIgnored `json:"ignoreCombinations,omitempty"`
 
 	// Release Configuration
-	DockerEnabled  bool   `json:"docker_enabled"`
-	SigningEnabled bool   `json:"signing_enabled"`
-	DockerRegistry string `json:"docker_registry,omitempty"`
-	DockerImage    string `json:"docker_image,omitempty"`
+	DockerEnabled  bool   `json:"dockerEnabled"`
+	SigningEnabled bool   `json:"signingEnabled"`
+	DockerRegistry string `json:"dockerRegistry,omitempty"`
+	DockerImage    string `json:"dockerImage,omitempty"`
 
 	// Environment Variables
 	Env map[string]string `json:"env"`
@@ -43,12 +43,12 @@ type GoReleaserTemplateData struct {
 
 // GitHubActionsTemplateData represents strongly typed template data for GitHub Actions.
 type GitHubActionsTemplateData struct {
-	ProjectName    string   `json:"project_name"`
+	ProjectName    string   `json:"projectName"`
 	Triggers       []string `json:"triggers"`
-	DockerEnabled  bool     `json:"docker_enabled"`
-	SigningEnabled bool     `json:"signing_enabled"`
-	DockerRegistry string   `json:"docker_registry,omitempty"`
-	DockerImage    string   `json:"docker_image,omitempty"`
+	DockerEnabled  bool     `json:"dockerEnabled"`
+	SigningEnabled bool     `json:"signingEnabled"`
+	DockerRegistry string   `json:"dockerRegistry,omitempty"`
+	DockerImage    string   `json:"dockerImage,omitempty"`
 }
 
 // PlatformIgnored represents platform/architecture combinations to ignore.
@@ -70,14 +70,14 @@ type DockerConfig struct {
 type SigningConfig struct {
 	Enabled     bool   `json:"enabled"`
 	Level       string `json:"level"`
-	KeyID       string `json:"key_id,omitempty"`
+	KeyID       string `json:"keyId,omitempty"`
 	Certificate string `json:"certificate,omitempty"`
 }
 
 // JobExecutionResult represents the result of a job execution.
 type JobExecutionResult struct {
-	JobID    string      `json:"job_id"`
-	JobName  string      `json:"job_name"`
+	JobID    string      `json:"jobId"`
+	JobName  string      `json:"jobName"`
 	Status   JobStatus   `json:"status"`
 	Duration string      `json:"duration"`
 	Error    *JobError   `json:"error,omitempty"`
@@ -107,21 +107,21 @@ type JobError struct {
 
 // JobMetadata represents job execution metadata.
 type JobMetadata struct {
-	StartedAt   string            `json:"started_at"`
-	CompletedAt string            `json:"completed_at,omitempty"`
+	StartedAt   string            `json:"startedAt"`
+	CompletedAt string            `json:"completedAt,omitempty"`
 	Retries     int               `json:"retries"`
 	Tags        map[string]string `json:"tags,omitempty"`
 }
 
 // WorkflowState represents the state of a workflow.
 type WorkflowState struct {
-	WorkflowID   string                `json:"workflow_id"`
-	WorkflowName string                `json:"workflow_name"`
+	WorkflowID   string                `json:"workflowId"`
+	WorkflowName string                `json:"workflowName"`
 	Status       WorkflowStatus        `json:"status"`
-	CurrentStep  string                `json:"current_step"`
-	TotalSteps   int                   `json:"total_steps"`
+	CurrentStep  string                `json:"currentStep"`
+	TotalSteps   int                   `json:"totalSteps"`
 	Progress     float64               `json:"progress"`
-	StartedAt    string                `json:"started_at"`
+	StartedAt    string                `json:"startedAt"`
 	Results      []*JobExecutionResult `json:"results"`
 	Metadata     WorkflowMetadata      `json:"metadata"`
 }
@@ -139,7 +139,7 @@ const (
 
 // WorkflowMetadata represents workflow metadata.
 type WorkflowMetadata struct {
-	CreatedBy   string            `json:"created_by"`
+	CreatedBy   string            `json:"createdBy"`
 	Timeout     string            `json:"timeout"`
 	Parallel    bool              `json:"parallel"`
 	Environment string            `json:"environment"`
@@ -233,10 +233,13 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 }
 
 // parseGitHubRemote tries to get GitHub owner and repo from git remote.
-func parseGitHubRemote() (owner, repo string) {
+func parseGitHubRemote() (string, string) {
 	ctx := context.Background()
-	if cmd := exec.CommandContext(ctx, "git", "remote", "get-url", "origin"); cmd != nil {
-		if output, err := cmd.Output(); err == nil {
+
+	cmd := exec.CommandContext(ctx, "git", "remote", "get-url", "origin")
+	if cmd != nil {
+		output, err := cmd.Output()
+		if err == nil {
 			remote := strings.TrimSpace(string(output))
 
 			return git.ParseGitHubURL(remote)

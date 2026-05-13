@@ -171,9 +171,12 @@ func ValidateDockerRegistryURL(registry DockerRegistry, url string) error {
 	// Validate against registry pattern if available
 	pattern := registry.URLPattern()
 	if pattern != "" {
-		if matched, err := regexp.MatchString(pattern, url); err != nil {
+		matched, err := regexp.MatchString(pattern, url)
+		if err != nil {
 			return fmt.Errorf("invalid URL pattern for registry %s: %w", registry, err)
-		} else if !matched {
+		}
+
+		if !matched {
 			return fmt.Errorf(
 				"URL '%s' does not match expected pattern for registry %s",
 				url,

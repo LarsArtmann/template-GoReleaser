@@ -32,17 +32,29 @@ func testProjectConfigWithOverrides(overrides map[string]any) ProjectConfig {
 	for key, value := range overrides {
 		switch key {
 		case "ProjectName":
-			cfg.ProjectName = value.(string)
+			if s, ok := value.(string); ok {
+				cfg.ProjectName = s
+			}
 		case "BinaryName":
-			cfg.BinaryName = value.(string)
+			if s, ok := value.(string); ok {
+				cfg.BinaryName = s
+			}
 		case "MainPath":
-			cfg.MainPath = value.(string)
+			if s, ok := value.(string); ok {
+				cfg.MainPath = s
+			}
 		case "ProjectDescription":
-			cfg.ProjectDescription = value.(string)
+			if s, ok := value.(string); ok {
+				cfg.ProjectDescription = s
+			}
 		case "Platforms":
-			cfg.Platforms = value.([]domain.Platform)
+			if p, ok := value.([]domain.Platform); ok {
+				cfg.Platforms = p
+			}
 		case "Architectures":
-			cfg.Architectures = value.([]domain.Architecture)
+			if a, ok := value.([]domain.Architecture); ok {
+				cfg.Architectures = a
+			}
 		}
 	}
 
@@ -549,10 +561,8 @@ func TestErrorRecovery(t *testing.T) {
 			name:        "panic_recovery_works",
 			shouldPanic: true,
 			testFunc: func() {
-				// This should panic
-				var nilPointer *string = nil
-
-				_ = *nilPointer // This will panic
+				// Intentional panic for testing recovery
+				panic("intentional panic for test")
 			},
 		},
 	}

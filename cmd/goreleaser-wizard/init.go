@@ -158,7 +158,7 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 }
 
 // detectMainStructure detects the main.go structure and determines project type.
-func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
+func detectMainStructure(wd string) (string, string, string) {
 	const cli = "cli"
 
 	// Check for main.go in root
@@ -176,7 +176,7 @@ func detectMainStructure(wd string) (mainPath, binaryName, projectType string) {
 }
 
 // detectCmdStructure checks for cmd/*/main.go pattern and returns the best match.
-func detectCmdStructure(wd string) (mainPath, binaryName string, ok bool) {
+func detectCmdStructure(wd string) (string, string, bool) {
 	cmdDir := filepath.Join(wd, "cmd")
 
 	entries, err := os.ReadDir(cmdDir)
@@ -208,9 +208,9 @@ func detectCmdStructure(wd string) (mainPath, binaryName string, ok bool) {
 	}
 
 	// Multiple binaries: prefer the one matching project name or first alphabetically
-	binaryName = selectBestBinary(cmdDirs, filepath.Base(wd))
+	selectedBinary := selectBestBinary(cmdDirs, filepath.Base(wd))
 
-	return "./cmd/" + binaryName, binaryName, true
+	return "./cmd/" + selectedBinary, selectedBinary, true
 }
 
 // selectBestBinary chooses the best binary from multiple cmd directories.
@@ -231,7 +231,7 @@ func selectBestBinary(cmdDirs []string, projectName string) string {
 }
 
 // detectAlternativeStructure checks for alternative project structures.
-func detectAlternativeStructure(wd string) (mainPath, binaryName, projectType string) {
+func detectAlternativeStructure(wd string) (string, string, string) {
 	const cli = "cli"
 
 	patterns := []struct {
@@ -252,9 +252,9 @@ func detectAlternativeStructure(wd string) (mainPath, binaryName, projectType st
 
 		if pattern.binName == "" {
 			// Extract binary name from path
-			binaryName = extractBinaryFromPath(matches[0])
+			selectedBinary := extractBinaryFromPath(matches[0])
 
-			return pattern.path, binaryName, pattern.projType
+			return pattern.path, selectedBinary, pattern.projType
 		}
 
 		return pattern.path, pattern.binName, pattern.projType

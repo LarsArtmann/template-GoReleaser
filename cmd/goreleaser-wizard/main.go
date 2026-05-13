@@ -249,7 +249,7 @@ func initConfig() {
 }
 
 // validateFileExists validates file existence using domain error types.
-func validateFileExists(path string, requireDir bool) *domain.DomainError {
+func validateFileExists(path string, requireDir bool) error {
 	info, err := os.Stat(path)
 	if err != nil {
 		if os.IsNotExist(err) {

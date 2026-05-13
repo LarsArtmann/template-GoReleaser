@@ -386,7 +386,7 @@ func TestEdgeCaseScenarios(t *testing.T) {
 		{
 			name: "empty_project_directory",
 			setupFunc: func() string {
-				dir, _ := CreateTempDir("wizard-empty-test")
+				dir := CreateTempDir("wizard-empty-test")
 
 				return dir
 			},

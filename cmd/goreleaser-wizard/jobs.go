@@ -32,7 +32,12 @@ import (
 
 // checkContext returns an error if the context is cancelled.
 func checkContext(ctx context.Context) error {
-	return generators.CheckContext(ctx)
+	err := generators.CheckContext(ctx)
+	if err != nil {
+		return fmt.Errorf("context check failed: %w", err)
+	}
+
+	return nil
 }
 
 // addDockerConfig adds Docker configuration to template data if Docker is enabled.
@@ -789,7 +794,7 @@ func (jf *JobFactory) CreateConfigOnlyJobs(config *ProjectConfig, force bool) []
 }
 
 // CreateValidationOnlyJob creates a validation-only job.
-func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) Job {
+func (jf *JobFactory) CreateValidationOnlyJob(projectDir string) *ProjectValidationJob {
 	return NewProjectValidationJob(projectDir, jf.logger)
 }
 

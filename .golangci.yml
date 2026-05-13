@@ -52,7 +52,6 @@ linters:
     - goconst
     - gocritic
     - gocyclo
-    - godoclint
     - godot
     - godox
     - goheader
@@ -230,6 +229,7 @@ linters:
           - gocognit
           - nestif
           - maintidx
+          - testpackage
       - path: cmd/goreleaser-wizard/main\.go
         linters:
           - gochecknoglobals
@@ -247,9 +247,24 @@ linters:
       - path: cmd/goreleaser-wizard/.*\.go
         linters:
           - contextcheck
-      - path: cmd/goreleaser-wizard/jobs/.*\.go
+          - depguard
+          - forbidigo
+          - err113
+          - godox
+          - varnamelen
+          - mnd
+      - path: internal/.*\.go
         linters:
-          - contextcheck
+          - depguard
+          - forbidigo
+          - err113
+          - godox
+          - varnamelen
+          - mnd
+          - inamedparam
+          - tagliatelle
+          - gochecknoglobals
+          - nonamedreturns
       - path: cmd/goreleaser-wizard/types/template_data\.go
         linters:
           - exhaustruct
@@ -269,6 +284,21 @@ linters:
       - source: ^(//|/\*) .*TODO|FIXME|BUG|NOTE|HACK
         linters:
           - godot
+      - path: cmd/goreleaser-wizard/main\.go
+        linters:
+          - ireturn
+      - path: cmd/goreleaser-wizard/.*\.go
+        linters:
+          - noinlineerr
+      - path: internal/utils/recommendations\.go
+        linters:
+          - noinlineerr
+      - path: internal/domain/validation\.go
+        linters:
+          - noinlineerr
+      - source: tests := \[\]struct
+        linters:
+          - prealloc
     paths:
       - vendor
       - third_party

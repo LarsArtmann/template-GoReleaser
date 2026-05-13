@@ -21,7 +21,12 @@ func CheckContext(ctx context.Context) error {
 
 // WriteFile writes data to a file with proper error handling.
 func WriteFile(path string, data []byte, perm os.FileMode) error {
-	return os.WriteFile(path, data, perm)
+	err := os.WriteFile(path, data, perm)
+	if err != nil {
+		return WrapFileError(err, "failed to write file")
+	}
+
+	return nil
 }
 
 // WrapFileError wraps a file operation error with context.

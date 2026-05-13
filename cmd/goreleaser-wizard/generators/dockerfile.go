@@ -112,7 +112,8 @@ func (g *DockerfileGenerator) Generate(ctx context.Context) error {
 	}
 
 	// Write Dockerfile
-	if err := WriteFile("Dockerfile", output, filePermission); err != nil {
+	err = WriteFile("Dockerfile", output, filePermission)
+	if err != nil {
 		return WrapFileError(err, "Failed to write Dockerfile")
 	}
 

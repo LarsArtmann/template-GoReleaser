@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
-	"strings"
+	"reflect"
 	"testing"
 )
 
@@ -33,88 +33,28 @@ func createBasicGoProject(t *testing.T, dir, moduleName string) {
 	}
 }
 
-// createGoProjectWithFiles creates a Go project with custom files.
-func createGoProjectWithFiles(t *testing.T, dir, moduleName string, files map[string]string) {
-	t.Helper()
-
-	writeGoModFile(t, dir, moduleName)
-
-	for path, content := range files {
-		fullPath := filepath.Join(dir, path)
-
-		err := os.MkdirAll(filepath.Dir(fullPath), 0o755)
-		if err != nil {
-			t.Fatalf("failed to create directory for %s: %v", path, err)
-		}
-
-		err = os.WriteFile(fullPath, []byte(content), 0o644)
-		if err != nil {
-			t.Fatalf("failed to create %s: %v", path, err)
-		}
-	}
-}
-
 // inTestDir executes the test function after changing to the test directory.
 // It automatically restores the original directory after the test completes.
 func inTestDir(t *testing.T, testDir string, testFunc func()) {
 	t.Helper()
 
-	originalDir, err := os.Getwd()
-	if err != nil {
-		t.Fatalf("failed to get current directory: %v", err)
-	}
-
-	if err := os.Chdir(testDir); err != nil {
-		t.Fatalf("failed to change directory: %v", err)
-	}
-
-	defer func() {
-		chdirErr := os.Chdir(originalDir)
-		if chdirErr != nil {
-			t.Logf("failed to restore directory: %v", chdirErr)
-		}
-	}()
+	t.Chdir(testDir)
 
 	testFunc()
 }
 
-// verifyFileContains checks if a file contains expected strings.
-func verifyFileContains(t *testing.T, filePath string, checks []string) {
-	t.Helper()
-
-	content, err := os.ReadFile(filePath)
-	if err != nil {
-		t.Fatalf("failed to read file %s: %v", filePath, err)
-	}
-
-	contentStr := string(content)
-	for _, check := range checks {
-		if !strings.Contains(contentStr, check) {
-			t.Errorf("file %s missing expected string: %q", filePath, check)
-		}
-	}
-}
-
-// setupMinimalProject creates a minimal project for testing.
-func setupMinimalProject(pattern string) (string, func()) {
-	dir, err := os.MkdirTemp("", pattern)
-	if err != nil {
-		return "", func() {}
-	}
-
-	cleanup := func() {
-		os.RemoveAll(dir)
-	}
-
-	return dir, cleanup
-}
-
 // AssertErr checks if an error matches the expected error state.
 // This deduplicates the common pattern: if (err != nil) != tt.wantErr.
+// Handles typed nil errors properly (a nil *DomainError stored as error interface is not == nil).
 func AssertErr(t *testing.T, fnName string, err error, wantErr bool) {
 	t.Helper()
 
-	if (err != nil) != wantErr {
+	// Properly check for nil - a typed nil interface is not equal to nil
+	isNil := err == nil || reflect.ValueOf(err).IsNil()
+	// hasError is true when we have an actual error (isNil=false)
+	hasError := !isNil
+
+	if hasError != wantErr {
 		t.Errorf("%s() error = %v, wantErr %v", fnName, err, wantErr)
 	}
 }
@@ -129,9 +69,12 @@ func AssertFileExists(t *testing.T, path, msg string) {
 }
 
 // CreateTempDir creates a temporary directory with the given prefix.
-// It returns the directory path and a cleanup function.
-func CreateTempDir(prefix string) (string, func()) {
-	dir, _ := os.MkdirTemp("", prefix)
+// It returns the directory path.
+func CreateTempDir(prefix string) string {
+	dir, err := os.MkdirTemp("", prefix)
+	if err != nil {
+		return ""
+	}
 
-	return dir, func() { os.RemoveAll(dir) }
+	return dir
 }
