@@ -53,37 +53,37 @@
 
 ## Internal Dependency Matrix
 
-| Package | Depends On |
-|---|---|
-| `internal/domain` | *(none — pure)* |
-| `internal/errors` | *(none — stdlib only)* |
-| `internal/config` | *(none — koanf/pflag only)* |
-| `internal/git` | `internal/errors` |
-| `internal/types` | `internal/errors` |
-| `internal/utils` | `internal/domain`, `internal/git` |
-| `internal/validation` | `internal/domain`, `internal/errors`, `internal/types` |
-| `cmd/.../generators` | `cmd/.../templates`, `cmd/.../types`, `internal/domain`, `internal/errors`, `internal/git` |
-| `cmd/.../types` | `internal/domain`, `internal/git` |
-| `cmd/.../templates` | *(none — string constants)* |
-| `cmd/...` (main) | `internal/config`, `internal/domain`, `internal/git` |
+| Package               | Depends On                                                                                 |
+| --------------------- | ------------------------------------------------------------------------------------------ |
+| `internal/domain`     | _(none — pure)_                                                                            |
+| `internal/errors`     | _(none — stdlib only)_                                                                     |
+| `internal/config`     | _(none — koanf/pflag only)_                                                                |
+| `internal/git`        | `internal/errors`                                                                          |
+| `internal/types`      | `internal/errors`                                                                          |
+| `internal/utils`      | `internal/domain`, `internal/git`                                                          |
+| `internal/validation` | `internal/domain`, `internal/errors`, `internal/types`                                     |
+| `cmd/.../generators`  | `cmd/.../templates`, `cmd/.../types`, `internal/domain`, `internal/errors`, `internal/git` |
+| `cmd/.../types`       | `internal/domain`, `internal/git`                                                          |
+| `cmd/.../templates`   | _(none — string constants)_                                                                |
+| `cmd/...` (main)      | `internal/config`, `internal/domain`, `internal/git`                                       |
 
 ---
 
 ## External Dependency Usage by Package
 
-| Package | External Dependencies |
-|---|---|
-| `internal/domain` | `github.com/go-faster/yaml`, `github.com/larsartmann/go-branded-id` |
-| `internal/config` | `github.com/knadh/koanf/v2`, `github.com/spf13/pflag` |
-| `internal/errors` | *(none — stdlib only)* |
-| `internal/git` | *(none — stdlib `os/exec` only)* |
-| `internal/types` | *(none — stdlib only)* |
-| `internal/utils` | *(none — stdlib only)* |
-| `internal/validation` | *(none — stdlib only)* |
-| `cmd/...` (main) | `charm.land/lipgloss/v2`, `charm.land/log/v2`, `github.com/charmbracelet/fang`, `github.com/spf13/cobra` |
-| `cmd/.../generators` | *(none beyond internal)* |
-| `cmd/.../types` | *(none beyond internal)* |
-| `cmd/.../templates` | *(none)* |
+| Package               | External Dependencies                                                                                    |
+| --------------------- | -------------------------------------------------------------------------------------------------------- |
+| `internal/domain`     | `github.com/go-faster/yaml`, `github.com/larsartmann/go-branded-id`                                      |
+| `internal/config`     | `github.com/knadh/koanf/v2`, `github.com/spf13/pflag`                                                    |
+| `internal/errors`     | _(none — stdlib only)_                                                                                   |
+| `internal/git`        | _(none — stdlib `os/exec` only)_                                                                         |
+| `internal/types`      | _(none — stdlib only)_                                                                                   |
+| `internal/utils`      | _(none — stdlib only)_                                                                                   |
+| `internal/validation` | _(none — stdlib only)_                                                                                   |
+| `cmd/...` (main)      | `charm.land/lipgloss/v2`, `charm.land/log/v2`, `github.com/charmbracelet/fang`, `github.com/spf13/cobra` |
+| `cmd/.../generators`  | _(none beyond internal)_                                                                                 |
+| `cmd/.../types`       | _(none beyond internal)_                                                                                 |
+| `cmd/.../templates`   | _(none)_                                                                                                 |
 
 ---
 
@@ -93,33 +93,33 @@
 
 Two packages define nearly identical error infrastructure:
 
-| Aspect | `internal/errors/domain_errors.go` | `internal/domain/errors.go` |
-|---|---|---|
-| `ErrorCode` type | ✅ | ✅ |
+| Aspect               | `internal/errors/domain_errors.go`     | `internal/domain/errors.go`            |
+| -------------------- | -------------------------------------- | -------------------------------------- |
+| `ErrorCode` type     | ✅                                     | ✅                                     |
 | `DomainError` struct | ✅ (with Level, Retryable, File, Line) | ✅ (with Severity, RecoverySuggestion) |
-| `WithContext()` | Mutates receiver | Returns new copy |
-| Error codes | ~40 codes (infra-focused) | ~35 codes (domain-focused) |
-| Used by | generators, git, validation, types | main, init, validate |
+| `WithContext()`      | Mutates receiver                       | Returns new copy                       |
+| Error codes          | ~40 codes (infra-focused)              | ~35 codes (domain-focused)             |
+| Used by              | generators, git, validation, types     | main, init, validate                   |
 
 **Impact:** Callers must know which `DomainError` they're dealing with. Type aliases in `cmd/...` (`type DomainError = domain.DomainError`) bridge the gap, but the split creates confusion.
 
 ### 2. Split Brain: Two ValidationResult Types
 
-| `internal/types/validation.go` | `internal/domain/interfaces.go` |
-|---|---|
+| `internal/types/validation.go`                                                            | `internal/domain/interfaces.go`                                               |
+| ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `ValidationResult` with `[]*ValidationError`, `[]*ValidationWarning`, `ValidationSummary` | `ValidationResult` with `[]*DomainError`, `[]*DomainError`, `ValidationRules` |
-| Rich grading/score system | Simple error list |
-| Used by `internal/validation` | Used by `internal/domain` |
+| Rich grading/score system                                                                 | Simple error list                                                             |
+| Used by `internal/validation`                                                             | Used by `internal/domain`                                                     |
 
 ### 3. Duplicate Validation Logic
 
 Same validation functions exist in two places with **different rules**:
 
-| Function | `internal/domain/validators.go` | `internal/validation/basic.go` |
-|---|---|---|
-| `ValidateProjectName` | Max 63 chars, regex `^[a-zA-Z0-9][a-zA-Z0-9\-._]*[a-zA-Z0-9]$` | Max 50 chars, regex `^[a-zA-Z0-9][a-zA-Z0-9._-]{0,49}$` |
-| `ValidateBinaryName` | Max 255 chars | Max 30 chars |
-| `ValidateConfiguration` | In `domain/validation.go` | In `validation/business_rules.go` |
+| Function                | `internal/domain/validators.go`                                | `internal/validation/basic.go`                          |
+| ----------------------- | -------------------------------------------------------------- | ------------------------------------------------------- |
+| `ValidateProjectName`   | Max 63 chars, regex `^[a-zA-Z0-9][a-zA-Z0-9\-._]*[a-zA-Z0-9]$` | Max 50 chars, regex `^[a-zA-Z0-9][a-zA-Z0-9._-]{0,49}$` |
+| `ValidateBinaryName`    | Max 255 chars                                                  | Max 30 chars                                            |
+| `ValidateConfiguration` | In `domain/validation.go`                                      | In `validation/business_rules.go`                       |
 
 ### 4. `internal/utils` Depends on Two Packages
 

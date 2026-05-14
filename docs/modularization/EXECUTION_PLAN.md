@@ -8,12 +8,12 @@
 
 ## Pareto Impact Tiers
 
-| Tier | Impact | Tasks | Description |
-|---|---|---|---|
-| 1% → 51% | Foundational | Phase 0 (1-7) | Eliminate split brains and dead code — enables everything else |
-| 4% → 64% | High leverage | Phase 1 (8-14) | Create core module — enables independent domain testing |
-| 16% → 80% | Broad value | Phase 2-3 (15-25) | gitutil module + go.work — enables parallel CI |
-| Remaining | Polish | Phase 4 (26-29) | Cleanup and documentation |
+| Tier      | Impact        | Tasks             | Description                                                    |
+| --------- | ------------- | ----------------- | -------------------------------------------------------------- |
+| 1% → 51%  | Foundational  | Phase 0 (1-7)     | Eliminate split brains and dead code — enables everything else |
+| 4% → 64%  | High leverage | Phase 1 (8-14)    | Create core module — enables independent domain testing        |
+| 16% → 80% | Broad value   | Phase 2-3 (15-25) | gitutil module + go.work — enables parallel CI                 |
+| Remaining | Polish        | Phase 4 (26-29)   | Cleanup and documentation                                      |
 
 ---
 
@@ -22,6 +22,7 @@
 **Goal:** Eliminate all split brains and dead code. Project must build and test cleanly after each step.
 
 ### Task 1: Delete dead `pkg/errors/`
+
 - **Action:** Remove `pkg/errors/errors.go` and `pkg/errors/` directory
 - **Why:** Zero imports, deprecated
 - **Verification:** `go build ./...` passes
@@ -29,6 +30,7 @@
 - **Effort:** 5 min
 
 ### Task 2: Delete dead `internal/domain/enums_release_temp.go`
+
 - **Action:** Remove empty file
 - **Why:** Contains only `package domain` — no code
 - **Verification:** `go build ./...` passes
@@ -36,6 +38,7 @@
 - **Effort:** 2 min
 
 ### Task 3: Delete dead `internal/validation/`
+
 - **Action:** Remove entire `internal/validation/` directory (6 files)
 - **Why:** Zero non-test imports. Only `cmd/goreleaser-wizard/init_test.go` imports it
 - **Pre-step:** Fix `init_test.go` to remove `internal/validation` import (the test likely uses `ValidateConfiguration` from domain instead)
@@ -45,6 +48,7 @@
 - **Impact:** Eliminates Split Brain #3 (duplicate validation functions)
 
 ### Task 4: Consolidate error systems — expand `internal/domain/errors.go`
+
 - **Action:** Add features from `internal/errors/domain_errors.go` into `internal/domain/errors.go`:
   - `WithCaller()` method (runtime caller info)
   - `WithSuggestion()` method
@@ -59,6 +63,7 @@
 - **Effort:** 30 min
 
 ### Task 5: Consolidate error systems — migrate `internal/errors/` consumers
+
 - **Action:** Update all files importing `internal/errors` to import `internal/domain` instead:
   - `cmd/goreleaser-wizard/generators/goreleaser.go`
   - `cmd/goreleaser-wizard/generators/github_actions.go`
@@ -73,6 +78,7 @@
 - **Impact:** Eliminates Split Brain #1 (two DomainError systems)
 
 ### Task 6: Consolidate `ValidationResult` — remove duplicate from domain
+
 - **Action:** Remove `ValidationResult` type from `internal/domain/interfaces.go` (keep the richer version in `internal/types/validation.go`)
 - **Action:** Update `internal/domain/validation.go`'s `ValidationUseCase.ValidateConfiguration()` to return `*types.ValidationResult` instead of domain's `ValidationResult`
 - **Action:** Add `internal/types` import to `internal/domain/validation.go`
@@ -82,6 +88,7 @@
 - **Impact:** Eliminates Split Brain #2 (two ValidationResult types)
 
 ### Task 7: Remove `generators.Logger` duplicate interface
+
 - **Action:** Update `cmd/goreleaser-wizard/generators/` to use `domain.Logger` instead of local `Logger` interface
 - **Action:** Update generators to use full `domain.Logger` signature (DebugContext, InfoContext, etc.)
 - **Action:** Remove `Logger` interface from generators
@@ -96,21 +103,25 @@
 **Goal:** Extract pure domain logic into independently buildable `core` module.
 
 ### Task 8: Create `core/` directory structure
+
 - **Action:** `mkdir -p core/domain core/types core/utils`
 - **Verification:** Directory exists
 - **Effort:** 2 min
 
 ### Task 9: Move `internal/domain/` → `core/domain/`
+
 - **Action:** `git mv internal/domain/ core/domain/`
 - **Verification:** Files moved
 - **Effort:** 5 min
 
 ### Task 10: Move `internal/types/` → `core/types/`
+
 - **Action:** `git mv internal/types/ core/types/`
 - **Verification:** Files moved
 - **Effort:** 5 min
 
 ### Task 11: Split `internal/utils/recommendations.go`
+
 - **Action:** Extract git-dependent functions (`GetGitHubOwner`, `GetGitHubRepo`) into a temporary file
 - **Action:** Keep domain-only functions (`GetRecommendedProjectType`, `GetRecommendedPlatforms`, `GetRecommendedArchitectures`, `GetRecommendedGitProvider`, `GetRecommendedDockerRegistry`, `IsDevelopmentEnvironment`, `IsProductionEnvironment`, `GetEnvironment`) in utils
 - **Action:** `git mv internal/utils/ core/utils/`
@@ -118,7 +129,9 @@
 - **Effort:** 15 min
 
 ### Task 12: Create `core/go.mod`
+
 - **Action:** Create `core/go.mod`:
+
   ```
   module github.com/LarsArtmann/GoReleaser-Wizard/core
 
@@ -129,11 +142,13 @@
       github.com/larsartmann/go-branded-id v0.1.0
   )
   ```
+
 - **Action:** Run `cd core && go mod tidy`
 - **Verification:** `cd core && go build ./...` passes
 - **Effort:** 10 min
 
 ### Task 13: Update all import paths — `internal/` → `core/`
+
 - **Action:** Find and replace across all files:
   - `github.com/LarsArtmann/GoReleaser-Wizard/internal/domain` → `github.com/LarsArtmann/GoReleaser-Wizard/core/domain`
   - `github.com/LarsArtmann/GoReleaser-Wizard/internal/types` → `github.com/LarsArtmann/GoReleaser-Wizard/core/types`
@@ -144,6 +159,7 @@
 - **Effort:** 30 min
 
 ### Task 14: Verify core module independence
+
 - **Action:** `cd core && go build ./...` and `cd core && go test ./...`
 - **Action:** Verify `core/` has zero imports from `internal/`
 - **Verification:** `cd core && go vet ./...` passes; `grep -r "github.com/LarsArtmann/GoReleaser-Wizard/internal" core/` returns nothing
@@ -157,11 +173,13 @@
 **Goal:** Extract git operations into independently buildable module.
 
 ### Task 15: Create `gitutil/` directory
+
 - **Action:** `mkdir -p gitutil`
 - **Verification:** Directory exists
 - **Effort:** 2 min
 
 ### Task 16: Move `internal/git/` → `gitutil/`
+
 - **Action:** Rename package from `git` to `gitutil`
 - **Action:** `git mv internal/git/commands.go gitutil/commands.go`
 - **Action:** Update package declaration and any internal references
@@ -169,13 +187,16 @@
 - **Effort:** 10 min
 
 ### Task 17: Add git-dependent recommendation functions to `gitutil`
+
 - **Action:** Move `GetGitHubOwner()`, `GetGitHubRepo()` from `core/utils/` (or original `internal/utils/`) into `gitutil/`
 - **Action:** Update import paths in these functions
 - **Verification:** `go build ./...` passes
 - **Effort:** 10 min
 
 ### Task 18: Create `gitutil/go.mod`
+
 - **Action:** Create `gitutil/go.mod`:
+
   ```
   module github.com/LarsArtmann/GoReleaser-Wizard/gitutil
 
@@ -185,11 +206,13 @@
 
   replace github.com/LarsArtmann/GoReleaser-Wizard/core => ../core
   ```
+
 - **Action:** Run `cd gitutil && go mod tidy`
 - **Verification:** `cd gitutil && go build ./...` passes
 - **Effort:** 10 min
 
 ### Task 19: Update all import paths — `internal/git` → `gitutil`
+
 - **Action:** Find and replace:
   - `github.com/LarsArtmann/GoReleaser-Wizard/internal/git` → `github.com/LarsArtmann/GoReleaser-Wizard/gitutil`
 - **Affected files:**
@@ -203,6 +226,7 @@
 - **Effort:** 20 min
 
 ### Task 20: Verify gitutil module independence
+
 - **Action:** `cd gitutil && go build ./...` and `cd gitutil && go vet ./...`
 - **Action:** Verify `gitutil/` only imports `core/`, not `internal/`
 - **Verification:** `cd gitutil && go vet ./...` passes
@@ -216,7 +240,9 @@
 **Goal:** Wire everything together with `go.work`.
 
 ### Task 21: Create `go.work`
+
 - **Action:** Create `go.work`:
+
   ```
   go 1.26.2
 
@@ -226,10 +252,12 @@
       .
   )
   ```
+
 - **Verification:** `go work sync` runs without errors
 - **Effort:** 5 min
 
 ### Task 22: Update root `go.mod` for workspace
+
 - **Action:** Add `core` and `gitutil` as `require` dependencies in root `go.mod`
 - **Action:** Remove temporary `replace` directives (go.work handles local dev)
 - **Action:** Run `go mod tidy`
@@ -237,6 +265,7 @@
 - **Effort:** 15 min
 
 ### Task 23: Remove remaining `internal/` references
+
 - **Action:** Verify no files import `github.com/LarsArtmann/GoReleaser-Wizard/internal/` anymore
 - **Action:** If `internal/config/` still exists, decide: keep as `internal/config/` in root module or move to top-level
 - **Action:** Clean up empty `internal/` directories
@@ -245,6 +274,7 @@
 - **Effort:** 15 min
 
 ### Task 24: Full build verification
+
 - **Action:** Run complete verification:
   - `go work sync`
   - `cd core && go build ./... && go test ./... && go vet ./...`
@@ -256,6 +286,7 @@
 - **Effort:** 10 min
 
 ### Task 25: Verify without workspace (published consumer experience)
+
 - **Action:** Temporarily rename `go.work` to `go.work.bak`
 - **Action:** Add `replace` directives in root `go.mod` for `core` and `gitutil`
 - **Action:** Run `go build ./...`
@@ -270,18 +301,21 @@
 **Goal:** Update all tooling and documentation to reflect new structure.
 
 ### Task 26: Update `.go-arch-lint.yml`
+
 - **Action:** Update component paths to reflect new module structure
 - **Action:** Add `core/` and `gitutil/` as components with proper dependency rules
 - **Verification:** `go-arch-lint` passes
 - **Effort:** 20 min
 
 ### Task 27: Update `.golangci.yml`
+
 - **Action:** Update path-specific rules for new directory layout
 - **Action:** Add `core/` and `gitutil/` specific rules if needed
 - **Verification:** `golangci-lint run` passes
 - **Effort:** 15 min
 
 ### Task 28: Update documentation
+
 - **Action:** Update `AGENTS.md`:
   - New module structure
   - Build/test commands per module (`cd core && go test ./...`, etc.)
@@ -292,6 +326,7 @@
 - **Effort:** 30 min
 
 ### Task 29: Update build system
+
 - **Action:** Update `justfile` commands for multi-module:
   - `just test-core` → `cd core && go test ./...`
   - `just test-gitutil` → `cd gitutil && go test ./...`
@@ -347,14 +382,14 @@ Task 29 ─┘
 
 ## Estimated Total Effort
 
-| Phase | Tasks | Time | Cumulative |
-|---|---|---|---|
-| Phase 0: Dead Code + Split Brains | 1-7 | ~2 hours | 2h |
-| Phase 1: Core Module | 8-14 | ~1.5 hours | 3.5h |
-| Phase 2: Gitutil Module | 15-20 | ~1 hour | 4.5h |
-| Phase 3: Workspace Setup | 21-25 | ~1 hour | 5.5h |
-| Phase 4: Cleanup + Docs | 26-29 | ~1.5 hours | 7h |
-| **Total** | **29 tasks** | **~7 hours** | |
+| Phase                             | Tasks        | Time         | Cumulative |
+| --------------------------------- | ------------ | ------------ | ---------- |
+| Phase 0: Dead Code + Split Brains | 1-7          | ~2 hours     | 2h         |
+| Phase 1: Core Module              | 8-14         | ~1.5 hours   | 3.5h       |
+| Phase 2: Gitutil Module           | 15-20        | ~1 hour      | 4.5h       |
+| Phase 3: Workspace Setup          | 21-25        | ~1 hour      | 5.5h       |
+| Phase 4: Cleanup + Docs           | 26-29        | ~1.5 hours   | 7h         |
+| **Total**                         | **29 tasks** | **~7 hours** |            |
 
 ---
 
