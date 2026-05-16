@@ -80,22 +80,113 @@ release:
   
   footer: |
     ## Installation
-    Download the appropriate archive for your platform from the assets below.
+
+    **Homebrew:**
+    ```bash
+    brew tap LarsArtmann/tap
+    brew install {{"{{"}}.ProjectName{{"}}"}}
+    ```
+
+    **Nix:**
+    ```bash
+    nix run github:LarsArtmann/nur-packages#{{"{{"}}.ProjectName{{"}}"}}
+    ```
+{{if .DockerEnabled}}
+
+    **Docker:**
+    ```bash
+    docker pull {{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Version{{"}}"}}
+    ```
+
+    Download the appropriate binary for your platform from the assets below.
+
+signs:
+  - cmd: cosign
+    certificate: "${artifact}.pem"
+    args:
+      - sign-blob
+      - "--oidc-issuer=https://token.actions.githubusercontent.com"
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+    artifacts: all
+    output: true
+
+sboms:
+  - artifacts: archive
+
+brews:
+  - name: {{"{{"}}.ProjectName{{"}}"}}
+    homepage: https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}
+    description: "{{.ProjectDescription}}"
+    license: MIT
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    folder: Formula
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    install: |
+      bin.install "{{"{{"}}.ProjectName{{"}}"}}"
+    test: |
+      system "#{bin}/{{"{{"}}.ProjectName{{"}}"}} --version"
+
+nix:
+  - name: {{"{{"}}.ProjectName{{"}}"}}
+    repository:
+      owner: LarsArtmann
+      name: nur-packages
+    homepage: https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}
+    description: "{{.ProjectDescription}}"
+    license: mit
+    path: pkgs/{{"{{"}}.ProjectName{{"}}"}}/default.nix
+    install: |
+      mkdir -p $out/bin
+      cp -vr ./{binary} $out/bin/{{"{{"}}.ProjectName{{"}}"}}
 
 {{if .DockerEnabled}}
 dockers:
   - image_templates:
-      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}"
-      - "{{.DockerRegistry}}/{{.DockerImage}}:v{{"{{"}}.Major{{"}}"}}"
-      - "{{.DockerRegistry}}/{{.DockerImage}}:latest"
-    
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-amd64"
     dockerfile: Dockerfile
-    
+    goarch: amd64
     build_flag_templates:
       - "--pull"
       - "--label=org.opencontainers.image.created={{"{{"}}.Date{{"}}"}}"
       - "--label=org.opencontainers.image.title={{"{{"}}.ProjectName{{"}}"}}"
       - "--label=org.opencontainers.image.revision={{"{{"}}.FullCommit{{"}}"}}"
       - "--label=org.opencontainers.image.version={{"{{"}}.Version{{"}}"}}"
+      - "--label=org.opencontainers.image.source={{"{{"}}.GitURL{{"}}"}}"
       - "--platform=linux/amd64"
+  - image_templates:
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-arm64"
+    dockerfile: Dockerfile
+    goarch: arm64
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{"{{"}}.Date{{"}}"}}"
+      - "--label=org.opencontainers.image.title={{"{{"}}.ProjectName{{"}}"}}"
+      - "--label=org.opencontainers.image.revision={{"{{"}}.FullCommit{{"}}"}}"
+      - "--label=org.opencontainers.image.version={{"{{"}}.Version{{"}}"}}"
+      - "--label=org.opencontainers.image.source={{"{{"}}.GitURL{{"}}"}}"
+      - "--platform=linux/arm64"
+
+docker_manifests:
+  - name_template: "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}"
+    image_templates:
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-amd64"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-arm64"
+  - name_template: "{{.DockerRegistry}}/{{.DockerImage}}:v{{"{{"}}.Major{{"}}"}}"
+    image_templates:
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-amd64"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-arm64"
+  - name_template: "{{.DockerRegistry}}/{{.DockerImage}}:v{{"{{"}}.Major{{"}}"}}.{{"{{"}}.Minor{{""}}}}"
+    image_templates:
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-amd64"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-arm64"
+  - name_template: "{{.DockerRegistry}}/{{.DockerImage}}:latest"
+    image_templates:
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-amd64"
+      - "{{.DockerRegistry}}/{{.DockerImage}}:{{"{{"}}.Tag{{"}}"}}-arm64"
 {{end}}
