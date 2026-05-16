@@ -149,6 +149,27 @@ docker_manifests:
       - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
       - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
 
+
+nfpms:
+  - id: default
+    package_name: goreleaser-wizard
+    file_name_template: "{"{"} .ConventionalFileName {"}"}"
+    homepage: https://github.com/LarsArtmann/GoReleaser-Wizard
+    description: "Interactive setup wizard for GoReleaser configurations"
+    license: MIT
+    maintainer: "Lars Artmann <lars@larsartmann.com>"
+    formats:
+      - deb
+      - rpm
+      - apk
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/goreleaser-wizard/LICENSE
+      - src: README.md
+        dst: /usr/share/doc/goreleaser-wizard/README.md
+    deb:
+      fields:
+        Bugs: https://github.com/LarsArtmann/GoReleaser-Wizard/issues
 nix:
   - name: goreleaser-wizard
     repository:
@@ -157,10 +178,25 @@ nix:
     homepage: https://github.com/LarsArtmann/GoReleaser-Wizard
     description: "Interactive setup wizard for GoReleaser configurations"
     license: mit
+    formatter: nixfmt
     path: pkgs/goreleaser-wizard/default.nix
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/goreleaser-wizard
+
+
+scoops:
+  - name: goreleaser-wizard
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    folder: Scoop
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    homepage: "https://github.com/LarsArtmann/GoReleaser-Wizard"
+    description: "Interactive setup wizard for GoReleaser configurations"
+    license: MIT
 
 release:
   github:
