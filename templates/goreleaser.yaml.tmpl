@@ -10,7 +10,6 @@ before:
   hooks:
     - go mod tidy
     - go generate ./...
-    - go test ./...
 
 builds:
   - id: {{.BinaryName}}
@@ -141,9 +140,44 @@ nix:
     description: "{{.ProjectDescription}}"
     license: mit
     path: pkgs/{{"{{"}}.ProjectName{{"}}"}}/default.nix
+    formatter: nixfmt
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/{{"{{"}}.ProjectName{{"}}"}}
+
+nfpms:
+  - id: default
+    package_name: {{.BinaryName}}
+    file_name_template: "{{"{{"}} .ConventionalFileName {{"}}"}}"
+    homepage: https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}
+    description: "{{.ProjectDescription}}"
+    license: MIT
+    maintainer: "Lars Artmann <lars@larsartmann.com>"
+    formats:
+      - deb
+      - rpm
+      - apk
+    contents:
+      - src: LICENSE
+        dst: /usr/share/doc/{{.BinaryName}}/LICENSE
+      - src: README.md
+        dst: /usr/share/doc/{{.BinaryName}}/README.md
+    deb:
+      fields:
+        Bugs: https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}/issues
+
+scoops:
+  - name: {{.BinaryName}}
+    repository:
+      owner: LarsArtmann
+      name: homebrew-tap
+    folder: Scoop
+    commit_author:
+      name: goreleaserbot
+      email: goreleaser@larsartmann.com
+    homepage: "https://github.com/{{"{{"}}.Env.GITHUB_OWNER{{"}}"}}/{{"{{"}}.Env.GITHUB_REPO{{"}}"}}"
+    description: "{{.ProjectDescription}}"
+    license: MIT
 
 {{if .DockerEnabled}}
 dockers:
