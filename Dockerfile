@@ -1,60 +1,31 @@
-# Multi-stage Dockerfile for GoReleaser builds
-# Optimized for minimal size and security
+FROM --platform=$BUILDPLATFORM golang:1.26-alpine AS builder
 
-# Build stage
-FROM golang:1.24-alpine AS builder
+RUN apk add --no-cache git ca-certificates
 
-# Install build dependencies with specific versions for security
-RUN apk add --no-cache \
-    git=~2.45 \
-    ca-certificates=~20240226 \
-    tzdata=~2024a && \
-    adduser -D -g '' appuser
+ARG TARGETOS
+ARG TARGETARCH
+ARG VERSION=dev
+ARG COMMIT=unknown
+ARG BUILD_DATE=unknown
 
-# Set working directory
 WORKDIR /build
 
-# Copy go mod files
-COPY go.mod go.sum* ./
-
-# Download dependencies
+COPY go.mod go.sum ./
 RUN go mod download
 
-# Copy source code
 COPY . .
 
-# Build the binary
-# Note: GoReleaser will override this in its build process
-RUN CGO_ENABLED=0 GOOS=linux go build \
-    -ldflags="-s -w -extldflags '-static'" \
-    -o app \
-    ./cmd/*/
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
+    -tags netgo \
+    -ldflags="-s -w -X main.version=${VERSION} -X main.commit=${COMMIT} -X main.date=${BUILD_DATE}" \
+    -trimpath \
+    -o goreleaser-wizard \
+    ./cmd/goreleaser-wizard
 
-# Final stage
-FROM scratch
+FROM gcr.io/distroless/static-debian13:nonroot
 
-# Copy timezone data
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /build/goreleaser-wizard /goreleaser-wizard
 
-# Copy CA certificates
-COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
+USER 65532:65532
 
-# Copy user
-COPY --from=builder /etc/passwd /etc/passwd
-
-# Copy the binary from GoReleaser build (when used with GoReleaser)
-# Otherwise copy from builder stage
-COPY app /app
-
-# Use non-root user
-USER appuser
-
-# Expose port (adjust as needed)
-EXPOSE 8080
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD ["/app", "--health"]
-
-# Run the binary
-ENTRYPOINT ["/app"]
+ENTRYPOINT ["/goreleaser-wizard"]
