@@ -90,6 +90,7 @@ sboms:
 
 brews:
   - name: goreleaser-wizard
+    skip_upload: auto
     homepage: https://github.com/LarsArtmann/GoReleaser-Wizard
     description: "Interactive setup wizard that creates perfect GoReleaser configurations"
     license: MIT
@@ -172,6 +173,7 @@ nfpms:
         Bugs: https://github.com/LarsArtmann/GoReleaser-Wizard/issues
 nix:
   - name: goreleaser-wizard
+    skip_upload: auto
     repository:
       owner: LarsArtmann
       name: nur-packages
@@ -187,6 +189,7 @@ nix:
 
 scoops:
   - name: goreleaser-wizard
+    skip_upload: auto
     repository:
       owner: LarsArtmann
       name: homebrew-tap
