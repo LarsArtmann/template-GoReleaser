@@ -150,7 +150,6 @@ docker_manifests:
       - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
       - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
 
-
 nfpms:
   - id: default
     package_name: goreleaser-wizard
@@ -185,7 +184,6 @@ nix:
     install: |
       mkdir -p $out/bin
       cp -vr ./{binary} $out/bin/goreleaser-wizard
-
 
 scoops:
   - name: goreleaser-wizard
