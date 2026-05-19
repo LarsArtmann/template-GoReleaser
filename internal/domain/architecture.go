@@ -19,6 +19,9 @@ const (
 	ArchitectureS390X   Architecture = "s390x"   // IBM System z
 	ArchitectureMIPS    Architecture = "mips"    // 32-bit MIPS (big endian)
 	ArchitectureMIPSLE  Architecture = "mipsle"  // 32-bit MIPS (little endian)
+
+	// GoSupport levels.
+	GoSupportStable = "stable"
 )
 
 // Architecture metadata - generated from TypeSpec invariants.
@@ -32,47 +35,47 @@ var architectureMetaMap = map[Architecture]architectureMeta{
 	ArchitectureAMD64: {
 		supportedByAllPlatforms: true,
 		is64Bit:                 true,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitectureARM64: {
 		supportedByAllPlatforms: true,
 		is64Bit:                 true,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	Architecture386: {
 		supportedByAllPlatforms: true,
 		is64Bit:                 false,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitectureARM: {
 		supportedByAllPlatforms: true,
 		is64Bit:                 false,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitecturePPC64: {
 		supportedByAllPlatforms: false,
 		is64Bit:                 true,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitecturePPC64LE: {
 		supportedByAllPlatforms: false,
 		is64Bit:                 true,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitectureS390X: {
 		supportedByAllPlatforms: false,
 		is64Bit:                 true,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitectureMIPS: {
 		supportedByAllPlatforms: false,
 		is64Bit:                 false,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 	ArchitectureMIPSLE: {
 		supportedByAllPlatforms: false,
 		is64Bit:                 false,
-		goSupport:               "stable",
+		goSupport:               GoSupportStable,
 	},
 }
 
