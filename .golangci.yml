@@ -1,333 +1,333 @@
 version: "2"
 run:
-    timeout: 5m
-    go: 1.26.2
-    build-tags:
-        - goexperiment.arenas
-        - goexperiment.goroutineleakprofile
-        - goexperiment.jsonv2
-        - goexperiment.runtimesecret
-        - goexperiment.simd
-    modules-download-mode: readonly
-    allow-parallel-runners: true
-    allow-serial-runners: true
-    tests: true
+  timeout: 5m
+  go: 1.26.2
+  build-tags:
+    - goexperiment.arenas
+    - goexperiment.goroutineleakprofile
+    - goexperiment.jsonv2
+    - goexperiment.runtimesecret
+    - goexperiment.simd
+  modules-download-mode: readonly
+  allow-parallel-runners: true
+  allow-serial-runners: true
+  tests: true
 output:
-    formats: {}
+  formats: {}
 linters:
-    enable:
-        - arangolint
-        - asasalint
-        - asciicheck
-        - bidichk
-        - bodyclose
-        - canonicalheader
-        - containedctx
-        - contextcheck
-        - copyloopvar
-        - cyclop
-        - decorder
-        - depguard
-        - dogsled
-        - dupl
-        - dupword
-        - durationcheck
-        - embeddedstructfieldcheck
-        - err113
-        - errcheck
-        - errchkjson
-        - errname
-        - errorlint
-        - exhaustive
-        - exhaustruct
-        - exptostd
-        - fatcontext
-        - forbidigo
-        - forcetypeassert
-        - funlen
-        - ginkgolinter
-        - gocheckcompilerdirectives
-        - gochecknoglobals
-        - gochecknoinits
-        - gochecksumtype
-        - gocognit
-        - goconst
-        - gocritic
-        - gocyclo
-        - godot
-        - godox
-        - goheader
-        - gomoddirectives
-        - gomodguard_v2
-        - goprintffuncname
-        - gosec
-        - gosmopolitan
-        - govet
-        - grouper
-        - iface
-        - importas
-        - inamedparam
-        - ineffassign
-        - interfacebloat
-        - intrange
-        - iotamixing
-        - ireturn
-        - loggercheck
-        - maintidx
-        - makezero
-        - mirror
-        - misspell
-        - mnd
-        - modernize
-        - musttag
-        - nakedret
-        - nestif
-        - nilerr
-        - nilnesserr
-        - nilnil
-        - nlreturn
-        - noctx
-        - noinlineerr
-        - nolintlint
-        - nonamedreturns
-        - nosprintfhostport
-        - paralleltest
-        - perfsprint
-        - prealloc
-        - predeclared
-        - promlinter
-        - protogetter
-        - reassign
-        - recvcheck
-        - revive
-        - rowserrcheck
-        - sloglint
-        - spancheck
-        - sqlclosecheck
-        - staticcheck
-        - tagalign
-        - tagliatelle
-        - testableexamples
-        - testifylint
-        - testpackage
-        - thelper
-        - tparallel
-        - unconvert
-        - unparam
-        - unqueryvet
-        - unused
-        - usestdlibvars
-        - usetesting
-        - varnamelen
-        - wastedassign
-        - whitespace
-        - wrapcheck
-        - wsl_v5
-        - zerologlint
-    default: none
-    settings:
-        cyclop:
-            max-complexity: 25
-        depguard:
-            rules:
-                main:
-                    allow:
-                        - $gostd
-                        - $module
-        exhaustive:
-            default-signifies-exhaustive: true
-        exhaustruct:
-            exclude:
-                - ^cobra\.Command$
-                - ^github.com/spf13/cobra\.Command$
-                - ^omain\.DomainError$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/errors\.DomainError$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.SafeProjectConfig$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.DomainError$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ValidationResult$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ProjectValidationResult$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ProjectInfo$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.VersionInfo$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationResult$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationError$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationWarning$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.GoReleaserTemplateData$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.GitHubActionsTemplateData$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types\.GoReleaserTemplateData$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types\.GitHubActionsTemplateData$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/config\.Config$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/config\.Manager$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.Command$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.RepositoryInfo$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.VersionInfo$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.JobManager$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.ValidationResults$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.DomainError$
-                - ^github.com/knadh/koanf/v2/providers/env\.Opt$
-                - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators\.GoReleaserGenerator$
-        funlen:
-            lines: 350
-            statements: 150
-        goconst:
-            min-len: 5
-            min-occurrences: 6
-        gocritic:
-            disabled-checks:
-                - ifElseChain
-        gosec:
-            excludes:
-                - G304
-                - G306
-                - G301
-                - G117
-                - G204
-        ireturn:
-            allow:
-                - error
-                - empty
-                - anon
-                - stdlib
-                - generic
-        revive:
-            rules:
-                - disabled: true
-                  name: exported
-                - disabled: true
-                  name: package-comments
-                - disabled: true
-                  name: unused-parameter
-                - disabled: true
-                  name: var-naming
-                - disabled: true
-                  name: increment-decrement
-                - disabled: true
-                  name: indent-error-flow
-                - disabled: true
-                  name: empty-block
-                - disabled: true
-                  name: redefines-builtin-id
-                - disabled: true
-                  name: context-as-argument
-                - disabled: true
-                  name: receiver-naming
-                - disabled: true
-                  name: early-return
-                - disabled: true
-                  name: identical-ifelseif-branches
-        wrapcheck:
-            ignore-package-globs:
-                - github.com/LarsArtmann/GoReleaser-Wizard/internal/*
-    exclusions:
-        generated: lax
-        rules:
-            - path: _test\.go
-              linters:
-                - dupl
-                - gosec
-                - goconst
-                - funlen
-                - gocyclo
-                - cyclop
-                - gocritic
-                - revive
-                - errcheck
-                - thelper
-                - unconvert
-                - unused
-                - exhaustruct
-                - wrapcheck
-                - paralleltest
-                - usetesting
-                - noctx
-                - contextcheck
-                - gochecknoglobals
-                - gocognit
-                - nestif
-                - maintidx
-                - testpackage
-            - path: cmd/goreleaser-wizard/main\.go
-              linters:
-                - gochecknoglobals
-                - gochecknoinits
-            - path: cmd/goreleaser-wizard/validate\.go
-              linters:
-                - gochecknoglobals
-                - gochecknoinits
-            - path: cmd/goreleaser-wizard/generate\.go
-              linters:
-                - gochecknoinits
-            - path: cmd/goreleaser-wizard/init\.go
-              linters:
-                - gochecknoinits
-            - path: cmd/goreleaser-wizard/.*\.go
-              linters:
-                - contextcheck
-                - depguard
-                - forbidigo
-                - err113
-                - godox
-                - varnamelen
-                - mnd
-            - path: internal/.*\.go
-              linters:
-                - depguard
-                - forbidigo
-                - err113
-                - godox
-                - varnamelen
-                - mnd
-                - inamedparam
-                - tagliatelle
-                - gochecknoglobals
-                - nonamedreturns
-            - path: cmd/goreleaser-wizard/types/template_data\.go
-              linters:
-                - exhaustruct
-            - path: internal/config/.*\.go
-              linters:
-                - gochecknoglobals
-                - exhaustruct
-            - path: internal/domain/(enums|validators|action_trigger|architecture|config_state|docker_registry|git_provider)\.go
-              linters:
-                - gochecknoglobals
-            - path: internal/domain/interfaces\.go
-              linters:
-                - interfacebloat
-            - path: .*\.generated\.go$
-              linters:
-                - all
-            - source: ^(//|/\*) .*TODO|FIXME|BUG|NOTE|HACK
-              linters:
-                - godot
-            - path: cmd/goreleaser-wizard/main\.go
-              linters:
-                - ireturn
-            - path: cmd/goreleaser-wizard/.*\.go
-              linters:
-                - noinlineerr
-            - path: internal/utils/recommendations\.go
-              linters:
-                - noinlineerr
-            - path: internal/domain/validation\.go
-              linters:
-                - noinlineerr
-            - source: tests := \[\]struct
-              linters:
-                - prealloc
-        paths:
-            - vendor
-            - third_party
-            - testdata
-            - examples
-            - internal/mock
-            - .*\.pb\.go$
-            - .*\.gen\.go$
+  enable:
+    - arangolint
+    - asasalint
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - canonicalheader
+    - containedctx
+    - contextcheck
+    - copyloopvar
+    - cyclop
+    - decorder
+    - depguard
+    - dogsled
+    - dupl
+    - dupword
+    - durationcheck
+    - embeddedstructfieldcheck
+    - err113
+    - errcheck
+    - errchkjson
+    - errname
+    - errorlint
+    - exhaustive
+    - exhaustruct
+    - exptostd
+    - fatcontext
+    - forbidigo
+    - forcetypeassert
+    - funlen
+    - ginkgolinter
+    - gocheckcompilerdirectives
+    - gochecknoglobals
+    - gochecknoinits
+    - gochecksumtype
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - godox
+    - goheader
+    - gomoddirectives
+    - gomodguard_v2
+    - goprintffuncname
+    - gosec
+    - gosmopolitan
+    - govet
+    - grouper
+    - iface
+    - importas
+    - inamedparam
+    - ineffassign
+    - interfacebloat
+    - intrange
+    - iotamixing
+    - ireturn
+    - loggercheck
+    - maintidx
+    - makezero
+    - mirror
+    - misspell
+    - mnd
+    - modernize
+    - musttag
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnesserr
+    - nilnil
+    - nlreturn
+    - noctx
+    - noinlineerr
+    - nolintlint
+    - nonamedreturns
+    - nosprintfhostport
+    - paralleltest
+    - perfsprint
+    - prealloc
+    - predeclared
+    - promlinter
+    - protogetter
+    - reassign
+    - recvcheck
+    - revive
+    - rowserrcheck
+    - sloglint
+    - spancheck
+    - sqlclosecheck
+    - staticcheck
+    - tagalign
+    - tagliatelle
+    - testableexamples
+    - testifylint
+    - testpackage
+    - thelper
+    - tparallel
+    - unconvert
+    - unparam
+    - unqueryvet
+    - unused
+    - usestdlibvars
+    - usetesting
+    - varnamelen
+    - wastedassign
+    - whitespace
+    - wrapcheck
+    - wsl_v5
+    - zerologlint
+  default: none
+  settings:
+    cyclop:
+      max-complexity: 25
+    depguard:
+      rules:
+        main:
+          allow:
+            - $gostd
+            - $module
+    exhaustive:
+      default-signifies-exhaustive: true
+    exhaustruct:
+      exclude:
+        - ^cobra\.Command$
+        - ^github.com/spf13/cobra\.Command$
+        - ^omain\.DomainError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/errors\.DomainError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.SafeProjectConfig$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.DomainError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ValidationResult$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ProjectValidationResult$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.ProjectInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/domain\.VersionInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationResult$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationError$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.ValidationWarning$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.GoReleaserTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/types\.GitHubActionsTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types\.GoReleaserTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types\.GitHubActionsTemplateData$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/config\.Config$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/config\.Manager$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.Command$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.RepositoryInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/internal/git\.VersionInfo$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.JobManager$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.ValidationResults$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard\.DomainError$
+        - ^github.com/knadh/koanf/v2/providers/env\.Opt$
+        - ^github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators\.GoReleaserGenerator$
+    funlen:
+      lines: 350
+      statements: 150
+    goconst:
+      min-len: 5
+      min-occurrences: 6
+    gocritic:
+      disabled-checks:
+        - ifElseChain
+    gosec:
+      excludes:
+        - G304
+        - G306
+        - G301
+        - G117
+        - G204
+    ireturn:
+      allow:
+        - error
+        - empty
+        - anon
+        - stdlib
+        - generic
+    revive:
+      rules:
+        - disabled: true
+          name: exported
+        - disabled: true
+          name: package-comments
+        - disabled: true
+          name: unused-parameter
+        - disabled: true
+          name: var-naming
+        - disabled: true
+          name: increment-decrement
+        - disabled: true
+          name: indent-error-flow
+        - disabled: true
+          name: empty-block
+        - disabled: true
+          name: redefines-builtin-id
+        - disabled: true
+          name: context-as-argument
+        - disabled: true
+          name: receiver-naming
+        - disabled: true
+          name: early-return
+        - disabled: true
+          name: identical-ifelseif-branches
+    wrapcheck:
+      ignore-package-globs:
+        - github.com/LarsArtmann/GoReleaser-Wizard/internal/*
+  exclusions:
+    generated: lax
+    rules:
+      - path: _test\.go
+        linters:
+          - dupl
+          - gosec
+          - goconst
+          - funlen
+          - gocyclo
+          - cyclop
+          - gocritic
+          - revive
+          - errcheck
+          - thelper
+          - unconvert
+          - unused
+          - exhaustruct
+          - wrapcheck
+          - paralleltest
+          - usetesting
+          - noctx
+          - contextcheck
+          - gochecknoglobals
+          - gocognit
+          - nestif
+          - maintidx
+          - testpackage
+      - path: cmd/goreleaser-wizard/main\.go
+        linters:
+          - gochecknoglobals
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/validate\.go
+        linters:
+          - gochecknoglobals
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/generate\.go
+        linters:
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/init\.go
+        linters:
+          - gochecknoinits
+      - path: cmd/goreleaser-wizard/.*\.go
+        linters:
+          - contextcheck
+          - depguard
+          - forbidigo
+          - err113
+          - godox
+          - varnamelen
+          - mnd
+      - path: internal/.*\.go
+        linters:
+          - depguard
+          - forbidigo
+          - err113
+          - godox
+          - varnamelen
+          - mnd
+          - inamedparam
+          - tagliatelle
+          - gochecknoglobals
+          - nonamedreturns
+      - path: cmd/goreleaser-wizard/types/template_data\.go
+        linters:
+          - exhaustruct
+      - path: internal/config/.*\.go
+        linters:
+          - gochecknoglobals
+          - exhaustruct
+      - path: internal/domain/(enums|validators|action_trigger|architecture|config_state|docker_registry|git_provider)\.go
+        linters:
+          - gochecknoglobals
+      - path: internal/domain/interfaces\.go
+        linters:
+          - interfacebloat
+      - path: .*\.generated\.go$
+        linters:
+          - all
+      - source: ^(//|/\*) .*TODO|FIXME|BUG|NOTE|HACK
+        linters:
+          - godot
+      - path: cmd/goreleaser-wizard/main\.go
+        linters:
+          - ireturn
+      - path: cmd/goreleaser-wizard/.*\.go
+        linters:
+          - noinlineerr
+      - path: internal/utils/recommendations\.go
+        linters:
+          - noinlineerr
+      - path: internal/domain/validation\.go
+        linters:
+          - noinlineerr
+      - source: tests := \[\]struct
+        linters:
+          - prealloc
+    paths:
+      - vendor
+      - third_party
+      - testdata
+      - examples
+      - internal/mock
+      - .*\.pb\.go$
+      - .*\.gen\.go$
 formatters:
-    enable:
-        - gci
-        - goimports
-        - gofumpt
-        - golines
-    exclusions:
-        generated: lax
+  enable:
+    - gci
+    - goimports
+    - gofumpt
+    - golines
+  exclusions:
+    generated: lax
 issues: {}
