@@ -3,6 +3,7 @@ package generators
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"text/template"
 
@@ -85,7 +86,7 @@ func (g *GoReleaserGenerator) createBackup(filename string) error {
 
 		err := os.Rename(filename, backupPath)
 		if err != nil {
-			return WrapFileError(err, "Failed to create backup")
+			return fmt.Errorf("failed to create backup for filename=%q: %w", filename, err)
 		}
 
 		g.logger.Info("Created backup file", "backup", backupPath)

@@ -129,7 +129,7 @@ func detectProjectInfo(config *domain.SafeProjectConfig) error {
 	if moduleName == "" {
 		return domain.NewValidationError(
 			domain.ErrInvalidFileFormat,
-			"Invalid go.mod format",
+			fmt.Sprintf("Invalid go.mod format (moduleName=%q)", moduleName),
 			"Could not find module declaration in go.mod",
 		).WithContext(goModPath)
 	}

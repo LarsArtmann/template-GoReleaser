@@ -180,17 +180,30 @@ func ValidateMainPath(path string) error {
 // ValidateProjectDescription validates project description.
 func ValidateProjectDescription(desc string) error {
 	if len(desc) > maxDescriptionLength {
-		return errors.New("project description must be 255 characters or less")
+		return fmt.Errorf(
+			"project description too long: %d characters (max %d): %w",
+			len(desc),
+			maxDescriptionLength,
+			errors.New("validation failed"),
+		)
 	}
 
 	// Check for HTML/markdown injection attempts
 	if strings.Contains(desc, "<script") || strings.Contains(desc, "javascript:") {
-		return errors.New("description contains potentially dangerous content")
+		return fmt.Errorf(
+			"description contains dangerous HTML/script tags for desc=%q: %w",
+			desc,
+			errors.New("validation failed"),
+		)
 	}
 
 	// Check for excessive length that might indicate injection
 	if len(strings.TrimSpace(desc)) == 0 && len(desc) > 100 {
-		return errors.New("description contains suspicious content")
+		return fmt.Errorf(
+			"description has suspicious whitespace pattern len=%d: %w",
+			len(desc),
+			errors.New("validation failed"),
+		)
 	}
 
 	return nil

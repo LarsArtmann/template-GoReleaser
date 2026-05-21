@@ -50,11 +50,12 @@ func parseTemplateWithError(
 ) (*template.Template, error) {
 	tmpl, err := tmpl.Parse(content)
 	if err != nil {
-		return nil, errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse "+templateType+" template",
-			err.Error(),
-		).WithCause(err)
+		return nil, fmt.Errorf(
+			"failed to parse %s template (content length %d): %w",
+			templateType,
+			len(content),
+			err,
+		)
 	}
 
 	return tmpl, nil
@@ -91,11 +92,14 @@ func ValidateTemplateWithDelims(templateName, left, right, templateContent strin
 
 	_, err := tmpl.Parse(templateContent)
 	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrInvalidTemplate,
-			templateName+" template validation failed",
-			err.Error(),
-		).WithCause(err)
+		return fmt.Errorf(
+			"templateName=%s validation failed (left=%q, right=%q, content length %d): %w",
+			templateName,
+			left,
+			right,
+			len(templateContent),
+			err,
+		)
 	}
 
 	return nil
@@ -121,20 +125,22 @@ func parseAndExecuteTemplate(
 ) ([]byte, error) {
 	tmpl, err := tmpl.Parse(templateContent)
 	if err != nil {
-		return nil, errors.NewConfigError(
-			errors.ErrTemplateParsing,
-			"Failed to parse "+templateName+" template",
-			err.Error(),
-		).WithCause(err)
+		return nil, fmt.Errorf(
+			"failed to parse %s template (content length %d): %w",
+			templateName,
+			len(templateContent),
+			err,
+		)
 	}
 
 	var output bytes.Buffer
 	if err := tmpl.Execute(&output, templateData); err != nil {
-		return nil, errors.NewConfigError(
-			errors.ErrTemplateRendering,
-			"Failed to execute "+templateName+" template",
-			err.Error(),
-		).WithCause(err)
+		return nil, fmt.Errorf(
+			"failed to execute %s template (content length %d): %w",
+			templateName,
+			len(templateContent),
+			err,
+		)
 	}
 
 	return output.Bytes(), nil
@@ -150,14 +156,30 @@ func GeneratePreviewWithDelims(
 	logger.Debug(logPrefix)
 
 	if ctx.Err() != nil {
-		return "", fmt.Errorf("context cancelled: %w", ctx.Err())
+		return "", fmt.Errorf(
+			"context cancelled for templateName=%s (left=%q, right=%q, logPrefix=%q, content length %d): %w",
+			templateName,
+			left,
+			right,
+			logPrefix,
+			len(templateContent),
+			ctx.Err(),
+		)
 	}
 
 	tmpl := template.New(templateName).Delims(left, right)
 
 	result, err := parseAndExecuteTemplate(tmpl, templateName, templateContent, templateData)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf(
+			"failed for templateName=%s (left=%q, right=%q, logPrefix=%q, content length %d): %w",
+			templateName,
+			left,
+			right,
+			logPrefix,
+			len(templateContent),
+			err,
+		)
 	}
 
 	return string(result), nil
@@ -173,7 +195,13 @@ func GenerateTemplate(
 	logger.Info(logPrefix)
 
 	if ctx.Err() != nil {
-		return nil, fmt.Errorf("context cancelled: %w", ctx.Err())
+		return nil, fmt.Errorf(
+			"context cancelled for templateName=%s (logPrefix=%q, content length %d): %w",
+			templateName,
+			logPrefix,
+			len(templateContent),
+			ctx.Err(),
+		)
 	}
 
 	tmpl := template.New(templateName)
@@ -188,7 +216,7 @@ func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) e
 		if err != nil {
 			return errors.NewFileError(
 				errors.ErrFileOperation,
-				errorMsg,
+				fmt.Sprintf("%s (successMsg=%q)", errorMsg, successMsg),
 				err.Error(),
 			).WithCause(err)
 		}

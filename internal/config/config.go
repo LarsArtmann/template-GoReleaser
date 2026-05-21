@@ -165,7 +165,7 @@ func (m *Manager) Set(key string, value any) error {
 
 	err := m.k.Load(confmap.Provider(values, "."), nil)
 	if err != nil {
-		return fmt.Errorf("failed to load configuration value: %w", err)
+		return fmt.Errorf("failed to load configuration value (key=%q): %w", key, err)
 	}
 
 	return fmt.Errorf("failed to unmarshal configuration: %w", m.k.Unmarshal("", &m.cfg))

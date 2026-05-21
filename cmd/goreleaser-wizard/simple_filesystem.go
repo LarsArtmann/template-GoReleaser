@@ -172,7 +172,12 @@ func (r *SimpleFileSystemRepository) JoinPath(elem ...string) string {
 func (r *SimpleFileSystemRepository) TempDir(dir, pattern string) (string, error) {
 	tempDir, err := os.MkdirTemp(dir, pattern)
 	if err != nil {
-		return "", fmt.Errorf("failed to create temp directory: %w", err)
+		return "", fmt.Errorf(
+			"failed to create temp directory (dir=%q, pattern=%q): %w",
+			dir,
+			pattern,
+			err,
+		)
 	}
 
 	return tempDir, nil

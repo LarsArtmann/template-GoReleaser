@@ -196,7 +196,13 @@ func (te *TemplateEscaper) ValidateTemplateContent(content, templateType string)
 	lowerContent := strings.ToLower(content)
 	for _, pattern := range dangerousPatterns {
 		if strings.Contains(lowerContent, pattern) {
-			return fmt.Errorf("template contains potentially dangerous content: %s", pattern)
+			return fmt.Errorf(
+				"templateType=%s contains dangerous pattern %q in content len=%d: %w",
+				templateType,
+				pattern,
+				len(content),
+				errors.New("validation failed"),
+			)
 		}
 	}
 
@@ -204,15 +210,30 @@ func (te *TemplateEscaper) ValidateTemplateContent(content, templateType string)
 	switch templateType {
 	case "yaml":
 		if te.containsYAMLInjection(content) {
-			return errors.New("YAML template contains potential injection")
+			return fmt.Errorf(
+				"templateType=%s contains YAML injection in content len=%d: %w",
+				templateType,
+				len(content),
+				errors.New("validation failed"),
+			)
 		}
 	case "shell":
 		if containsShellInjection(content) {
-			return errors.New("shell script contains potential injection")
+			return fmt.Errorf(
+				"templateType=%s contains shell injection in content len=%d: %w",
+				templateType,
+				len(content),
+				errors.New("validation failed"),
+			)
 		}
 	case "github-actions":
 		if te.containsGitHubActionsInjection(content) {
-			return errors.New("GitHub Actions workflow contains potential injection")
+			return fmt.Errorf(
+				"templateType=%s contains GitHub Actions injection in content len=%d: %w",
+				templateType,
+				len(content),
+				errors.New("validation failed"),
+			)
 		}
 	}
 
