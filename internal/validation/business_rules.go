@@ -414,7 +414,8 @@ func validateSigningBusinessRules(
 	// Enterprise signing requires project to be ready
 	if config.SigningLevel == domain.SigningLevelEnterprise {
 		if config.FeatureLevel != domain.FeatureLevelEnterprise {
-			addWarning(result,
+			addWarning(
+				result,
 				"SIGNING_FEATURE_LEVEL",
 				"signing_level",
 				"Enterprise signing requires enterprise feature level for optimal security",
@@ -511,7 +512,8 @@ func validateProjectTypeBusinessRules(
 func validateSecurity(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Security level consistency
 	if config.FeatureLevel.IncludesAdvanced() && config.SigningLevel == domain.SigningLevelNone {
-		addWarning(result,
+		addWarning(
+			result,
 			"SECURITY_SIGNING",
 			"signing_level",
 			"Advanced features should include code signing for security",
@@ -522,7 +524,8 @@ func validateSecurity(config *domain.SafeProjectConfig, result *types.Validation
 
 	// Docker security
 	if config.DockerSupport.IsEnabled() && !config.DockerRegistry.RequiresAuthentication() {
-		addWarning(result,
+		addWarning(
+			result,
 			"DOCKER_SECURITY",
 			"docker_registry",
 			"Consider using a registry that requires authentication for better security",
@@ -535,7 +538,8 @@ func validateSecurity(config *domain.SafeProjectConfig, result *types.Validation
 	if config.ActionLevel.IsEnabled() {
 		requiredPerms := config.ActionLevel.GetRequiredPermissions()
 		if len(requiredPerms) > 2 {
-			addWarning(result,
+			addWarning(
+				result,
 				"ACTIONS_PERMISSIONS",
 				"action_level",
 				"High permission levels increase security risks in GitHub Actions",
@@ -550,7 +554,8 @@ func validateSecurity(config *domain.SafeProjectConfig, result *types.Validation
 func generateWarnings(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	// Performance warnings
 	if len(config.Platforms)*len(config.Architectures) > 8 {
-		addWarning(result,
+		addWarning(
+			result,
 			"BUILD_PERFORMANCE",
 			"platform_arch_count",
 			fmt.Sprintf(
@@ -564,7 +569,8 @@ func generateWarnings(config *domain.SafeProjectConfig, result *types.Validation
 
 	// Best practice warnings
 	if config.ProjectDescription == "" {
-		addWarning(result,
+		addWarning(
+			result,
 			"PROJECT_DESCRIPTION",
 			"project_description",
 			"Project description is recommended for better documentation",
@@ -575,7 +581,8 @@ func generateWarnings(config *domain.SafeProjectConfig, result *types.Validation
 
 	// Feature utilization warnings
 	if config.FeatureLevel == domain.FeatureLevelNone {
-		addWarning(result,
+		addWarning(
+			result,
 			"FEATURE_UTILIZATION",
 			"feature_level",
 			"No advanced features enabled - consider enabling for better functionality",
@@ -586,7 +593,8 @@ func generateWarnings(config *domain.SafeProjectConfig, result *types.Validation
 
 	// Maintenance warnings
 	if config.SigningLevel == domain.SigningLevelNone && config.DockerSupport.IsEnabled() {
-		addWarning(result,
+		addWarning(
+			result,
 			"SECURITY_MAINTENANCE",
 			"signing_level",
 			"Docker images should be signed for security and trust",

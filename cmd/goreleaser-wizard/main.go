@@ -198,7 +198,8 @@ func displayError(err error) {
 	}
 
 	// Log the full error for debugging
-	log.Error("Domain error",
+	log.Error(
+		"Domain error",
 		"code", domainErr.Code,
 		"message", domainErr.Message,
 		"details", domainErr.Details,
