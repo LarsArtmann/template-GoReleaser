@@ -1,70 +1,54 @@
-# GoReleaser Wizard 🚀
+# GoReleaser Wizard
 
-An interactive CLI tool that generates production-ready GoReleaser configurations for Go projects.
+**Stop copy-pasting GoReleaser configs. Get a production-ready setup with one command.**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-1.25+-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.26+-blue.svg)](https://golang.org)
 [![GoReleaser](https://img.shields.io/badge/powered%20by-GoReleaser-blue.svg)](https://goreleaser.com)
 
-Stop copy-pasting configs. Stop guessing at YAML. Get a production-ready GoReleaser setup with one command.
+An interactive CLI tool that generates production-ready GoReleaser configurations for Go projects. It auto-detects your project structure, guides you through options with a rich TUI, and outputs `.goreleaser.yaml`, GitHub Actions workflows, Dockerfiles, and Homebrew formulas -- all following best practices.
 
-## ✨ Features
-
-- 🎯 **Interactive wizard** - Rich CLI prompts guide you through every option
-- 🧠 **Smart defaults** - Detects your project structure automatically
-- 🚀 **GitHub Actions included** - Complete CI/CD pipeline ready to go
-- 📦 **Multi-platform builds** - Linux, macOS, Windows, ARM, and more
-- 🐳 **Docker support** - Multi-stage container builds with security best practices
-- 🍺 **Homebrew formulas** - Automatic package manager formula generation
-- 🔒 **Security built-in** - Code signing, SBOM generation, non-root containers
-- ✅ **Validation** - Comprehensive configuration checking with detailed reporting
-- 📋 **Preview mode** - See generated configurations before writing files
-- 🔄 **Rollback support** - Automatic cleanup if generation fails
-
-## 🎬 Quick Start
+## Quick Start
 
 ```bash
-# Install
 go install github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest
-
-# Run the wizard
 goreleaser-wizard init
-
-# That's it! Your .goreleaser.yaml is ready
 ```
 
-## 📸 Demo
+That's it. Your `.goreleaser.yaml` is ready.
 
-```bash
+## Demo
+
+```
 $ goreleaser-wizard init
-🚀 GoReleaser Configuration Wizard
-Let's create the perfect GoReleaser config for your project!
+
+  GoReleaser Wizard
+  Let's configure your GoReleaser setup!
 
 ? Project Name › my-awesome-cli
-? Project Description › A fantastic CLI tool
-? Project Type › CLI Application
 ? Binary Name › my-awesome-cli
 ? Main Package Path › ./cmd/my-awesome-cli
-
-? Target Platforms › ✓ linux ✓ darwin ✓ windows
-? Target Architectures › ✓ amd64 ✓ arm64
-? Enable CGO? › No (recommended)
-? Embed Version Info? › Yes (recommended)
-
+? Project Type › CLI Application
+? Platforms › ✓ Linux  ✓ macOS  ✓ Windows  ✓ FreeBSD
+? Architectures › ✓ amd64  ✓ arm64
+? CGO Configuration › Disabled (recommended)
+? Docker Support › Build and publish
 ? Git Provider › GitHub
-? Docker Images? › Yes
-? Code Signing? › Yes
+? Include LDFlags? › Yes
+? Enable Code Signing? › Yes
 ? Generate SBOM? › Yes
+? Generate Homebrew Formula? › Yes
+? Generate GitHub Actions? › Yes
 
-✓ Created .goreleaser.yaml
-✓ Created .github/workflows/release.yml
+Created  .goreleaser.yaml
+Created  .github/workflows/release.yml
 
-✨ Setup Complete!
+GoReleaser configuration initialized successfully!
 ```
 
-## 🛠️ Installation
+## Installation
 
-### Using Go
+### Go Install
 
 ```bash
 go install github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest
@@ -78,193 +62,181 @@ cd GoReleaser-Wizard
 go build -o goreleaser-wizard ./cmd/goreleaser-wizard
 ```
 
-### Download Binary
+### Pre-built Binary
 
 Download the latest release from the [releases page](https://github.com/LarsArtmann/GoReleaser-Wizard/releases).
 
-## 📖 Usage
+### Homebrew
 
-### Interactive Mode (Recommended)
+```bash
+brew tap LarsArtmann/tap
+brew install goreleaser-wizard
+```
 
-The wizard will guide you through creating a perfect configuration:
+### Docker
+
+```bash
+docker pull ghcr.io/larsartmann/goreleaser-wizard:latest
+```
+
+## Commands
+
+### `init` -- Interactive Wizard
+
+Guides you through creating a complete configuration with a rich terminal UI:
 
 ```bash
 goreleaser-wizard init
 ```
 
-Options:
+| Flag             | Default       | Description                                   |
+| ---------------- | ------------- | --------------------------------------------- |
+| `--force`        | `false`       | Overwrite existing configuration              |
+| `--interactive`  | `true`        | Run the TUI wizard (set `false` for headless) |
+| `--project-name` | auto-detected | Override project name                         |
+| `--binary-name`  | auto-detected | Override binary name                          |
+| `--main-path`    | auto-detected | Override main package path                    |
+| `--project-type` | auto-detected | Override project type                         |
 
-- `--force` - Overwrite existing configuration
-- `--minimal` - Create minimal configuration
-- `--pro` - Include GoReleaser Pro features
+When stdout is not a terminal, `init` prints a helpful message with the non-interactive flag.
 
-### Non-Interactive Mode
+### `generate` -- Non-Interactive Generation
 
-Perfect for CI/CD pipelines:
+For CI pipelines and scripting:
 
 ```bash
 goreleaser-wizard generate \
-  --name my-project \
-  --binary my-app \
-  --platforms linux,darwin,windows \
-  --docker \
-  --github-action
+  --project-name my-project \
+  --binary-name my-app \
+  --project-type cli \
+  --config-only=false
 ```
 
-### Validate Configuration
+| Flag             | Default       | Description                                          |
+| ---------------- | ------------- | ---------------------------------------------------- |
+| `--force`        | `false`       | Overwrite existing configuration                     |
+| `--config-only`  | `false`       | Generate only `.goreleaser.yaml` (no GitHub Actions) |
+| `--project-name` | auto-detected | Override project name                                |
+| `--binary-name`  | auto-detected | Override binary name                                 |
+| `--main-path`    | auto-detected | Override main package path                           |
+| `--project-type` | auto-detected | Override project type                                |
 
-Check your existing GoReleaser configuration:
+### `validate` -- Check Configuration
+
+Validates your existing GoReleaser configuration:
 
 ```bash
 goreleaser-wizard validate
-
-# With fixes
-goreleaser-wizard validate --fix
-
-# Verbose output
 goreleaser-wizard validate --verbose
+goreleaser-wizard validate --fix
+goreleaser-wizard validate --project-only
 ```
 
-## 🎯 What It Creates
+| Flag             | Default | Description                                |
+| ---------------- | ------- | ------------------------------------------ |
+| `--verbose`      | `false` | Show detailed validation output            |
+| `--fix`          | `false` | Attempt to fix common issues automatically |
+| `--project-only` | `false` | Validate project structure only            |
+
+### `version` -- Version Info
+
+```bash
+goreleaser-wizard version
+```
+
+## What It Generates
 
 ### `.goreleaser.yaml`
 
-- Optimized build configuration
-- Multi-platform support
-- Archive generation
-- Checksums and signatures
-- Changelog generation
-- Release configuration
+Optimized build configuration with multi-platform support, archive generation, checksums, changelog, code signing (cosign), SBOM, Homebrew, Docker images, nFPM packages, Nix, and Scoop.
 
 ### `.github/workflows/release.yml`
 
-- Automated releases on tags
-- Docker image building
-- Code signing with cosign
-- SBOM generation
-- Multi-platform builds
+Automated release pipeline triggered on tags -- multi-platform builds, Docker image publishing, code signing, and SBOM generation.
 
-## 🏗️ Project Types
+### `Dockerfile`
 
-The wizard adapts to your project:
+Multi-stage production Docker build with non-root user, health checks, and minimal final image.
 
-- **CLI Application** - Single binary with version info
-- **Web Service** - Includes Docker configuration
-- **Library with CLI** - Focuses on the CLI component
-- **Multiple Binaries** - Configures multiple build targets
+### Homebrew Formula
 
-## 🔧 Advanced Features
+Package manager formula with automatic CamelCase naming and proper install/test directives.
 
-### GoReleaser Pro Support
+## Supported Project Types
 
-Enable Pro features during setup:
+The wizard adapts configuration to your project:
 
-```bash
-goreleaser-wizard init --pro
+| Type                    | Description                                    |
+| ----------------------- | ---------------------------------------------- |
+| **CLI Application**     | Single binary with version info via ldflags    |
+| **Web API**             | Includes Docker and health check configuration |
+| **Library**             | Focuses on the CLI component if present        |
+| **gRPC Service**        | Docker with multi-platform images              |
+| **Microservice**        | Docker publishing, minimal cross-compilation   |
+| **Desktop Application** | Platform-specific builds (Linux, macOS)        |
+| **Daemon/Service**      | System service with nFPM packages              |
+| **Command Line Tool**   | Lightweight single-binary distribution         |
+
+## Platforms and Architectures
+
+| Platform | Architectures |
+| -------- | ------------- |
+| Linux    | amd64, arm64  |
+| macOS    | amd64, arm64  |
+| Windows  | amd64, arm64  |
+| FreeBSD  | amd64         |
+
+## Docker Support
+
+Four levels of Docker integration:
+
+| Level             | Behavior                                              |
+| ----------------- | ----------------------------------------------------- |
+| None              | No Docker configuration                               |
+| Build only        | Generates Dockerfile, builds images locally           |
+| Publish only      | Pushes pre-built images to registry                   |
+| Build and Publish | Full pipeline: build + push with multi-arch manifests |
+
+Supported registries: GitHub Container Registry (ghcr.io), Docker Hub, GitLab Registry, Quay.io, and custom registries.
+
+## Git Providers
+
+| Provider    | CI/CD Support       |
+| ----------- | ------------------- |
+| GitHub      | GitHub Actions      |
+| GitLab      | GitLab CI           |
+| Bitbucket   | Bitbucket Pipelines |
+| Gitea       | Manual              |
+| Self-hosted | Manual              |
+
+## Architecture
+
+GoReleaser Wizard follows Domain-Driven Design with Clean Architecture:
+
+```
+internal/domain/       Pure business logic, zero external dependencies
+internal/validation/   Field-level and business rule validation
+internal/errors/       Typed error codes with recovery suggestions
+internal/git/          Git operations
+internal/config/       Configuration management (koanf)
+cmd/goreleaser-wizard/ CLI layer (Cobra), TUI (huh), generators, workflows
+templates/             Go templates for all generated files
 ```
 
-Adds support for:
+The domain layer uses type-safe enums for all configuration options (platforms, architectures, project types, Docker support levels, signing levels, etc.) and enforces validation through a centralized error system with structured diagnostics.
 
-- Custom publishers
-- Advanced templating
-- Nightlies
-- Docker manifests
-- And more!
-
-### Docker Integration
-
-When Docker is enabled, the wizard:
-
-- Detects your registry (ghcr.io, Docker Hub, etc.)
-- Configures multi-platform images
-- Sets up proper labels
-- Handles authentication in CI/CD
-
-### Package Managers
-
-Built-in support for:
-
-- **Homebrew** - macOS/Linux formula with automatic naming
-- **Snap** - Linux snap packages (planned)
-- **Scoop** - Windows package manager (planned)
-- **AUR** - Arch Linux (planned)
-
-## 🧪 Testing Your Configuration
-
-After generating your configuration:
+## Development
 
 ```bash
-# 1. Validate the configuration
-goreleaser-wizard validate
-
-# 2. Test build locally
-goreleaser build --snapshot --clean
-
-# 3. Create a tag
-git tag -a v0.1.0 -m 'First release'
-
-# 4. Push to trigger release
-git push origin v0.1.0
+just build          # Build the binary
+just test           # Run tests
+just fmt            # Format code
+just ci             # Full CI pipeline (fmt + test + build + verify + check)
+just clean          # Remove build artifacts
 ```
 
-## 📚 Examples
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
-### Minimal CLI Tool
+## License
 
-```bash
-goreleaser-wizard generate \
-  --name simple-cli \
-  --binary simple \
-  --platforms linux,darwin
-```
-
-### Full-Featured Web Service
-
-```bash
-goreleaser-wizard generate \
-  --name api-server \
-  --binary server \
-  --docker \
-  --signing \
-  --github-action \
-  --platforms linux,darwin,windows \
-  --architectures amd64,arm64
-```
-
-### Library with CLI
-
-```bash
-goreleaser-wizard init --minimal
-# Then select "Library with CLI" in the wizard
-```
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- [GoReleaser](https://goreleaser.com) - The amazing release automation tool
-- [Charm](https://charm.sh) - Beautiful terminal UI components
-- [Cobra](https://github.com/spf13/cobra) - CLI framework
-- [Viper](https://github.com/spf13/viper) - Configuration management
-
-## 🔗 Links
-
-- [GoReleaser Documentation](https://goreleaser.com)
-- [GitHub Actions](https://docs.github.com/en/actions)
-- [Report Issues](https://github.com/LarsArtmann/GoReleaser-Wizard/issues)
-
----
-
-**Made with ❤️ to simplify Go releases**
+[MIT](LICENSE) -- Lars Artmann
