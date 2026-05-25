@@ -7,7 +7,7 @@ import (
 	"os"
 	"text/template"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // CheckContext returns an error if the context is cancelled.
@@ -31,8 +31,8 @@ func WriteFile(path string, data []byte, perm os.FileMode) error {
 
 // WrapFileError wraps a file operation error with context.
 func WrapFileError(err error, message string) error {
-	return errors.NewFileError(
-		errors.ErrFileOperation,
+	return domain.NewFileError(
+		domain.ErrFileOperation,
 		message,
 		err.Error(),
 	).WithCause(err)
@@ -71,8 +71,8 @@ func executeTemplateWithError(
 
 	err := tmpl.Execute(&output, data)
 	if err != nil {
-		return nil, errors.NewConfigError(
-			errors.ErrTemplateRendering,
+		return nil, domain.NewConfigError(
+			domain.ErrTemplateRendering,
 			"Failed to execute "+templateType+" template",
 			err.Error(),
 		).WithCause(err)
@@ -214,8 +214,8 @@ func removeGeneratedFile(logger Logger, filePath, errorMsg, successMsg string) e
 	if _, err := os.Stat(filePath); err == nil {
 		err := os.Remove(filePath)
 		if err != nil {
-			return errors.NewFileError(
-				errors.ErrFileOperation,
+			return domain.NewFileError(
+				domain.ErrFileOperation,
 				fmt.Sprintf("%s (successMsg=%q)", errorMsg, successMsg),
 				err.Error(),
 			).WithCause(err)

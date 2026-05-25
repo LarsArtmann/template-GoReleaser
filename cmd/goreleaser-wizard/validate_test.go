@@ -199,66 +199,6 @@ go 1.21
 	}
 }
 
-func TestCheckFileExists(t *testing.T) {
-	tests := []struct {
-		name        string
-		path        string
-		requireDir  bool
-		setupFunc   func() string
-		wantErr     bool
-		errContains string
-	}{
-		{
-			name:       "existing_file",
-			requireDir: false,
-			wantErr:    false,
-			setupFunc:  func() string { return createTempFile(t, "wizard-test-file") },
-		},
-		{
-			name:       "existing_directory",
-			requireDir: true,
-			wantErr:    false,
-			setupFunc: func() string {
-				dir := CreateTempDir("wizard-test-dir")
-
-				return dir
-			},
-		},
-		{
-			name:        "nonexistent_file",
-			path:        "/nonexistent/file.txt",
-			requireDir:  false,
-			wantErr:     true,
-			errContains: "File not found",
-		},
-		{
-			name:        "file_when_directory_required",
-			requireDir:  true,
-			wantErr:     true,
-			errContains: "Expected directory",
-			setupFunc:   func() string { return createTempFile(t, "wizard-test-file") },
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.setupFunc != nil {
-				tt.path = tt.setupFunc()
-
-				defer func() {
-					if tt.path != "" {
-						os.Remove(tt.path)
-					}
-				}()
-			}
-
-			err := validateFileExists(tt.path, tt.requireDir)
-
-			AssertErr(t, "CheckFileExists", err, tt.wantErr)
-		})
-	}
-}
-
 func TestValidateProjectStructure(t *testing.T) {
 	tests := []struct {
 		name           string

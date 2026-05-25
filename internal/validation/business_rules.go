@@ -6,7 +6,6 @@ import (
 	"slices"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/types"
 )
 
@@ -51,7 +50,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	err := ValidateProjectName(config.ProjectName)
 	if err != nil {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidProject,
+			Code:       domain.ErrInvalidProject,
 			Field:      "project_name",
 			Message:    err.Error(),
 			Level:      types.ErrorLevelMedium,
@@ -63,7 +62,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	err = ValidateBinaryName(config.BinaryName)
 	if err != nil {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidBinary,
+			Code:       domain.ErrInvalidBinary,
 			Field:      "binary_name",
 			Message:    err.Error(),
 			Level:      types.ErrorLevelMedium,
@@ -75,7 +74,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 	err = ValidateMainPath(config.MainPath)
 	if err != nil {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidMainPath,
+			Code:       domain.ErrInvalidMainPath,
 			Field:      "main_path",
 			Message:    err.Error(),
 			Level:      types.ErrorLevelMedium,
@@ -88,7 +87,7 @@ func validateBasicFields(config *domain.SafeProjectConfig, result *types.Validat
 		err = ValidateProjectDescription(config.ProjectDescription)
 		if err != nil {
 			result.AddError(&types.ValidationError{
-				Code:       errors.ErrInvalidProjectDescription,
+				Code:       domain.ErrInvalidProjectDescription,
 				Field:      "project_description",
 				Message:    err.Error(),
 				Level:      types.ErrorLevelLow,
@@ -103,7 +102,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Project type validation
 	if !config.ProjectType.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidProject,
+			Code:       domain.ErrInvalidProject,
 			Field:      "project_type",
 			Message:    fmt.Sprintf("Invalid project type: %s", config.ProjectType),
 			Level:      types.ErrorLevelHigh,
@@ -114,7 +113,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Git provider validation
 	if !config.GitProvider.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "git_provider",
 			Message:    fmt.Sprintf("Invalid Git provider: %s", config.GitProvider),
 			Level:      types.ErrorLevelHigh,
@@ -125,7 +124,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// CGO status validation
 	if !config.CGOStatus.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "cgo_status",
 			Message:    fmt.Sprintf("Invalid CGO status: %s", config.CGOStatus),
 			Level:      types.ErrorLevelMedium,
@@ -136,7 +135,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Docker support validation
 	if !config.DockerSupport.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "docker_support",
 			Message:    fmt.Sprintf("Invalid Docker support: %s", config.DockerSupport),
 			Level:      types.ErrorLevelMedium,
@@ -147,7 +146,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Docker registry validation
 	if !config.DockerRegistry.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "docker_registry",
 			Message:    fmt.Sprintf("Invalid Docker registry: %s", config.DockerRegistry),
 			Level:      types.ErrorLevelMedium,
@@ -158,7 +157,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Signing level validation
 	if !config.SigningLevel.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "signing_level",
 			Message:    fmt.Sprintf("Invalid signing level: %s", config.SigningLevel),
 			Level:      types.ErrorLevelMedium,
@@ -169,7 +168,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Action level validation
 	if !config.ActionLevel.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "action_level",
 			Message:    fmt.Sprintf("Invalid action level: %s", config.ActionLevel),
 			Level:      types.ErrorLevelMedium,
@@ -180,7 +179,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Feature level validation
 	if !config.FeatureLevel.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "feature_level",
 			Message:    fmt.Sprintf("Invalid feature level: %s", config.FeatureLevel),
 			Level:      types.ErrorLevelMedium,
@@ -191,7 +190,7 @@ func validateTypes(config *domain.SafeProjectConfig, result *types.ValidationRes
 	// Config state validation
 	if !config.State.IsValid() {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "state",
 			Message:    fmt.Sprintf("Invalid config state: %s", config.State),
 			Level:      types.ErrorLevelMedium,
@@ -210,7 +209,7 @@ func validatePlatformArchCompatibility(
 	for i, platform := range config.Platforms {
 		if !platform.IsValid() {
 			result.AddError(&types.ValidationError{
-				Code:       errors.ErrInvalidConfig,
+				Code:       domain.ErrInvalidConfig,
 				Field:      "platforms",
 				Message:    fmt.Sprintf("Invalid platform at index %d: %s", i, platform),
 				Level:      types.ErrorLevelHigh,
@@ -223,7 +222,7 @@ func validatePlatformArchCompatibility(
 	for i, arch := range config.Architectures {
 		if !arch.IsValid() {
 			result.AddError(&types.ValidationError{
-				Code:       errors.ErrInvalidConfig,
+				Code:       domain.ErrInvalidConfig,
 				Field:      "architectures",
 				Message:    fmt.Sprintf("Invalid architecture at index %d: %s", i, arch),
 				Level:      types.ErrorLevelHigh,
@@ -237,7 +236,7 @@ func validatePlatformArchCompatibility(
 		for _, arch := range config.Architectures {
 			if !arch.IsCompatibleWith(platform) {
 				result.AddError(&types.ValidationError{
-					Code:  errors.ErrInvalidConfig,
+					Code:  domain.ErrInvalidConfig,
 					Field: "platform_arch_compatibility",
 					Message: fmt.Sprintf(
 						"Incompatible platform/architecture: %s + %s",
@@ -367,7 +366,7 @@ func validateDockerRegistryCompatibility(
 func validateDockerImage(config *domain.SafeProjectConfig, result *types.ValidationResult) {
 	if config.DockerImage == "" {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "docker_image",
 			Message:    "Docker image name is required when deployment is enabled",
 			Level:      types.ErrorLevelHigh,
@@ -380,7 +379,7 @@ func validateDockerImage(config *domain.SafeProjectConfig, result *types.Validat
 	err := ValidateDockerImageName(config.DockerImage)
 	if err != nil {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidDockerImage,
+			Code:       domain.ErrInvalidDockerImage,
 			Field:      "docker_image",
 			Message:    err.Error(),
 			Level:      types.ErrorLevelHigh,
@@ -401,7 +400,7 @@ func validateSigningBusinessRules(
 			_, err := exec.LookPath(tool)
 			if err != nil {
 				result.AddError(&types.ValidationError{
-					Code:       errors.ErrDependencyMissing,
+					Code:       domain.ErrDependencyMissing,
 					Field:      "signing_tools",
 					Message:    "Required signing tool not found: " + tool,
 					Level:      types.ErrorLevelHigh,
@@ -447,7 +446,7 @@ func validateActionsBusinessRules(
 	// Action triggers are required when Actions are enabled
 	if config.ActionLevel.IsEnabled() && len(config.ActionsOn) == 0 {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      "actions_on",
 			Message:    "Action triggers are required when Actions are enabled",
 			Level:      types.ErrorLevelHigh,
@@ -459,7 +458,7 @@ func validateActionsBusinessRules(
 	for i, trigger := range config.ActionsOn {
 		if !trigger.IsValid() {
 			result.AddError(&types.ValidationError{
-				Code:       errors.ErrInvalidConfig,
+				Code:       domain.ErrInvalidConfig,
 				Field:      "actions_on",
 				Message:    fmt.Sprintf("Invalid action trigger at index %d: %s", i, trigger),
 				Level:      types.ErrorLevelMedium,
@@ -614,7 +613,7 @@ func validateFeatureSupport(
 ) {
 	if featureEnabled && !targetSupported {
 		result.AddError(&types.ValidationError{
-			Code:       errors.ErrInvalidConfig,
+			Code:       domain.ErrInvalidConfig,
 			Field:      field,
 			Message:    fmt.Sprintf("%s not supported %s", featureName, unsupportedTarget),
 			Level:      types.ErrorLevelHigh,

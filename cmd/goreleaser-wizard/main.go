@@ -14,8 +14,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Type alias for backward compatibility during migration
-// TODO: Remove after migration complete.
 type ProjectConfig = domain.SafeProjectConfig
 
 // LoggerAdapter adapts charmbracelet/log to domain.Logger interface.
@@ -60,15 +58,20 @@ func (la *LoggerAdapter) ErrorContext(ctx context.Context, msg string, args ...a
 }
 
 func (la *LoggerAdapter) WithField(key string, value any) domain.Logger {
-	return la // Simplified - doesn't add field
+	return &LoggerAdapter{logger: la.logger.With(key, value)}
 }
 
 func (la *LoggerAdapter) WithFields(fields map[string]any) domain.Logger {
-	return la // Simplified - doesn't add fields
+	args := make([]any, 0, len(fields)*2)
+	for k, v := range fields {
+		args = append(args, k, v)
+	}
+
+	return &LoggerAdapter{logger: la.logger.With(args...)}
 }
 
 func (la *LoggerAdapter) WithError(err error) domain.Logger {
-	return la // Simplified - doesn't add error
+	return &LoggerAdapter{logger: la.logger.With("error", err)}
 }
 
 var (
@@ -247,38 +250,6 @@ func initConfig() {
 	if config.GetManager().IsDebug() {
 		log.Info("Configuration loaded")
 	}
-}
-
-// validateFileExists validates file existence using domain error types.
-func validateFileExists(path string, requireDir bool) error {
-	info, err := os.Stat(path)
-	if err != nil {
-		if os.IsNotExist(err) {
-			return domain.NewSystemError(
-				domain.ErrFileNotFound,
-				"File not found",
-				fmt.Sprintf("File %s does not exist, require_dir=%t", path, requireDir),
-				err,
-			).WithContext(path)
-		}
-
-		return domain.NewSystemError(
-			domain.ErrFileReadFailed,
-			"File access error",
-			fmt.Sprintf("Cannot access %s, require_dir=%t", path, requireDir),
-			err,
-		).WithContext(path)
-	}
-
-	if requireDir && !info.IsDir() {
-		return domain.NewValidationError(
-			domain.ErrInvalidCharacters,
-			"Expected directory",
-			fmt.Sprintf("%s is not a directory, require_dir=%t", path, requireDir),
-		).WithContext(path)
-	}
-
-	return nil
 }
 
 var versionCmd = &cobra.Command{

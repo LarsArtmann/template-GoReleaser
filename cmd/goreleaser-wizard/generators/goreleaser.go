@@ -10,7 +10,6 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
 
@@ -137,8 +136,8 @@ func (g *GoReleaserGenerator) ValidateTemplate() error {
 
 	_, err := tmpl.Parse(templates.GoReleaserTemplate)
 	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrInvalidTemplate,
+		return domain.NewConfigError(
+			domain.ErrInvalidTemplate,
 			"GoReleaser template validation failed",
 			err.Error(),
 		).WithCause(err)
@@ -162,8 +161,8 @@ func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, erro
 
 	tmpl, err := tmpl.Parse(templates.GoReleaserTemplate)
 	if err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateParsing,
+		return "", domain.NewConfigError(
+			domain.ErrTemplateParsing,
 			"Failed to parse GoReleaser template",
 			err.Error(),
 		).WithCause(err)
@@ -175,8 +174,8 @@ func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, erro
 	// Execute template
 	var output bytes.Buffer
 	if err := tmpl.Execute(&output, data); err != nil {
-		return "", errors.NewConfigError(
-			errors.ErrTemplateRendering,
+		return "", domain.NewConfigError(
+			domain.ErrTemplateRendering,
 			"Failed to execute GoReleaser template preview",
 			err.Error(),
 		).WithCause(err)

@@ -6,7 +6,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // ValidationResult represents structured validation results.
@@ -166,8 +166,8 @@ func (vr *ValidationResult) GetWarningsByField() map[string][]*ValidationWarning
 }
 
 // GetErrorsByCode returns errors grouped by error code.
-func (vr *ValidationResult) GetErrorsByCode() map[errors.ErrorCode][]*ValidationError {
-	codeErrors := make(map[errors.ErrorCode][]*ValidationError)
+func (vr *ValidationResult) GetErrorsByCode() map[domain.ErrorCode][]*ValidationError {
+	codeErrors := make(map[domain.ErrorCode][]*ValidationError)
 	for _, err := range vr.Errors {
 		codeErrors[err.Code] = append(codeErrors[err.Code], err)
 	}
@@ -353,7 +353,7 @@ func (vr *ValidationResult) Clone() *ValidationResult {
 
 // ValidationError represents a structured validation error.
 type ValidationError struct {
-	Code       errors.ErrorCode `json:"code"`
+	Code       domain.ErrorCode `json:"code"`
 	Field      string           `json:"field"`
 	Message    string           `json:"message"`
 	Details    string           `json:"details,omitempty"`
@@ -659,7 +659,7 @@ func (wl WarningLevel) GetPriority() int {
 type ValidationFilter struct {
 	Fields        []string           `json:"fields,omitempty"`
 	Levels        []ErrorLevel       `json:"error_levels,omitempty"`
-	Codes         []errors.ErrorCode `json:"error_codes,omitempty"`
+	Codes         []domain.ErrorCode `json:"error_codes,omitempty"`
 	WarningLevels []WarningLevel     `json:"warning_levels,omitempty"`
 	WarningCodes  []string           `json:"warning_codes,omitempty"`
 	Context       string             `json:"context,omitempty"`
@@ -768,7 +768,7 @@ func isZero(v any) bool {
 	switch val := v.(type) {
 	case []ErrorLevel:
 		return len(val) == 0
-	case []errors.ErrorCode:
+	case []domain.ErrorCode:
 		return len(val) == 0
 	case []WarningLevel:
 		return len(val) == 0
@@ -797,9 +797,9 @@ func (f *ValidationFilter) matchesError(err *ValidationError) bool {
 			return containsErrorLevels(levelsSlice, levelVal)
 		},
 		func(codes, code any) bool {
-			codesSlice, ok1 := codes.([]errors.ErrorCode)
+			codesSlice, ok1 := codes.([]domain.ErrorCode)
 
-			codeVal, ok2 := code.(errors.ErrorCode)
+			codeVal, ok2 := code.(domain.ErrorCode)
 			if !ok1 || !ok2 {
 				return false
 			}
@@ -888,7 +888,7 @@ func containsErrorLevels(slice []ErrorLevel, item ErrorLevel) bool {
 	return slices.Contains(slice, item)
 }
 
-func containsErrorCodes(slice []errors.ErrorCode, item errors.ErrorCode) bool {
+func containsErrorCodes(slice []domain.ErrorCode, item domain.ErrorCode) bool {
 	return slices.Contains(slice, item)
 }
 

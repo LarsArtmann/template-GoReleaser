@@ -3,7 +3,7 @@ package types
 import (
 	"testing"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // validationItemEx extends validationItem with Code, Details, and Context accessors.
@@ -82,7 +82,7 @@ func checkField(t *testing.T, name, field, got, want string) {
 
 func TestValidationError_Clone(t *testing.T) {
 	original := &ValidationError{
-		Code:       errors.ErrInvalidField,
+		Code:       domain.ErrInvalidField,
 		Field:      "name",
 		Message:    "Invalid name",
 		Details:    "Name contains invalid characters",
@@ -96,7 +96,7 @@ func TestValidationError_Clone(t *testing.T) {
 	verifyCloneFields(t, "ValidationError", original, clone)
 
 	// Modify clone
-	clone.Code = errors.ErrInvalidConfig
+	clone.Code = domain.ErrInvalidConfig
 	clone.Field = "modified"
 	clone.Message = "modified message"
 	clone.Details = "modified details"

@@ -1,15 +1,3 @@
-// CRITICAL ARCHITECTURE TODO: This file is 434 lines - SPLIT IMMEDIATELY:
-// 1. validation_usecase.go - Main validation logic
-// 2. validation_basic.go - Basic field validation
-// 3. validation_business_rules.go - Business rule validation
-// 4. validation_security.go - Security validation
-// 5. validation_warnings.go - Warning generation
-//
-// TODO: Implement proper validation pipeline pattern
-// TODO: Create validation rule sets that are composable
-// TODO: Add proper error aggregation instead of single errors
-// TODO: Implement validation result builders with fluent interface
-// TODO: Create custom validation decorators for complex rules
 package domain
 
 import (

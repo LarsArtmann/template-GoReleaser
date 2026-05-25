@@ -1,14 +1,3 @@
-// CRITICAL ARCHITECTURE TODO: This file is 848 lines - SPLIT IMMEDIATELY into:
-// 1. template_generator.go - Template generation logic
-// 2. job_implementations.go - Job execution logic
-// 3. git_utilities.go - Git helper functions
-// 4. template_data_preparation.go - Data preparation logic
-//
-// TODO: Extract embedded templates to separate files in templates/
-// TODO: Implement proper dependency injection instead of direct function calls
-// TODO: Create proper error types instead of fmt.Errorf everywhere
-// TODO: Implement repository pattern for file operations
-// TODO: Use command pattern for jobs instead of massive structs
 package main
 
 import (
@@ -24,21 +13,10 @@ import (
 	"time"
 
 	"charm.land/log/v2"
-	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/generators"
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/git"
 )
-
-// checkContext returns an error if the context is cancelled.
-func checkContext(ctx context.Context) error {
-	err := generators.CheckContext(ctx)
-	if err != nil {
-		return fmt.Errorf("context check failed: %w", err)
-	}
-
-	return nil
-}
 
 // addDockerConfig adds Docker configuration to template data if Docker is enabled.
 func addDockerConfig(data map[string]any, config *domain.SafeProjectConfig) {
@@ -353,7 +331,7 @@ func (j *ConfigGenerationJob) Name() string {
 func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Generating GoReleaser configuration")
 
-	if err := checkContext(ctx); err != nil {
+	if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
 		return err
 	}
 
@@ -438,7 +416,7 @@ func (j *GitHubActionsGenerationJob) Name() string {
 func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Generating GitHub Actions workflow")
 
-	if err := checkContext(ctx); err != nil {
+	if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
 		return err
 	}
 
@@ -471,7 +449,7 @@ func (j *GitHubActionsGenerationJob) Execute(ctx context.Context) error {
 func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rolling back GitHub Actions workflow generation")
 
-	if err := checkContext(ctx); err != nil {
+	if err := checkContextCancellation(ctx, "context cancelled"); err != nil {
 		return err
 	}
 
@@ -533,7 +511,7 @@ func (j *ProjectValidationJob) Name() string {
 func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	j.logger.Info("Validating project structure")
 
-	err := checkContext(ctx)
+	err := checkContextCancellation(ctx, "context cancelled")
 	if err != nil {
 		return err
 	}
@@ -606,7 +584,7 @@ func (j *DependencyCheckJob) Name() string {
 func (j *DependencyCheckJob) Execute(ctx context.Context) error {
 	j.logger.Info("Checking dependencies")
 
-	err := checkContext(ctx)
+	err := checkContextCancellation(ctx, "context cancelled")
 	if err != nil {
 		return err
 	}

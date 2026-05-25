@@ -8,11 +8,13 @@ import (
 // DomainError represents all domain-specific errors
 // Provides type safety and detailed error information.
 type DomainError struct {
-	Code    ErrorCode `json:"code"`
-	Message string    `json:"message"`
-	Details string    `json:"details,omitempty"`
-	Context string    `json:"context,omitempty"`
-	Cause   error     `json:"cause,omitempty"`
+	Code       ErrorCode `json:"code"`
+	Message    string    `json:"message"`
+	Details    string    `json:"details,omitempty"`
+	Context    string    `json:"context,omitempty"`
+	Field      string    `json:"field,omitempty"`
+	Suggestion string    `json:"suggestion,omitempty"`
+	Cause      error     `json:"cause,omitempty"`
 }
 
 // ErrorCode represents all possible error codes in the domain.
@@ -68,6 +70,36 @@ const (
 	ErrMissingDependency       ErrorCode = "MISSING_DEPENDENCY"
 	ErrExternalToolNotFound    ErrorCode = "EXTERNAL_TOOL_NOT_FOUND"
 
+	// Application Errors.
+	ErrInvalidProject    ErrorCode = "INVALID_PROJECT"
+	ErrInvalidBinary     ErrorCode = "INVALID_BINARY"
+	ErrInvalidConfig     ErrorCode = "INVALID_CONFIG"
+	ErrInvalidTemplate   ErrorCode = "INVALID_TEMPLATE"
+	ErrInvalidField      ErrorCode = "INVALID_FIELD"
+	ErrInvalidOperation  ErrorCode = "INVALID_OPERATION"
+	ErrConfigGeneration  ErrorCode = "CONFIG_GENERATION"
+	ErrDependencyMissing ErrorCode = "DEPENDENCY_MISSING"
+
+	// Template Errors.
+	ErrTemplateParsing   ErrorCode = "TEMPLATE_PARSING"
+	ErrTemplateRendering ErrorCode = "TEMPLATE_RENDERING"
+
+	// File Operation Errors.
+	ErrFileOperation  ErrorCode = "FILE_OPERATION"
+	ErrFilePermission ErrorCode = "FILE_PERMISSION"
+
+	// Git Errors.
+	ErrGitOperation ErrorCode = "GIT_OPERATION"
+	ErrGitNotFound  ErrorCode = "GIT_NOT_FOUND"
+	ErrGitCommand   ErrorCode = "GIT_COMMAND"
+
+	// Extended Validation Errors.
+	ErrInvalidDockerImage ErrorCode = "INVALID_DOCKER_IMAGE"
+	ErrInvalidVersion     ErrorCode = "INVALID_VERSION"
+	ErrInvalidGitBranch   ErrorCode = "INVALID_GIT_BRANCH"
+	ErrInvalidGitTag      ErrorCode = "INVALID_GIT_TAG"
+	ErrInvalidPort        ErrorCode = "INVALID_PORT"
+
 	// External Service Errors.
 	ErrGitOperationFailed   ErrorCode = "GIT_OPERATION_FAILED"
 	ErrRegistryAccessDenied ErrorCode = "REGISTRY_ACCESS_DENIED"
@@ -91,23 +123,35 @@ func (de *DomainError) Unwrap() error {
 // WithContext adds context to the error.
 func (de *DomainError) WithContext(context string) *DomainError {
 	return &DomainError{
-		Code:    de.Code,
-		Message: de.Message,
-		Details: de.Details,
-		Context: context,
-		Cause:   de.Cause,
+		Code:       de.Code,
+		Message:    de.Message,
+		Details:    de.Details,
+		Context:    context,
+		Field:      de.Field,
+		Suggestion: de.Suggestion,
+		Cause:      de.Cause,
 	}
+}
+
+// WithField adds field information to the error.
+func (de *DomainError) WithField(field string) *DomainError {
+	de.Field = field
+
+	return de
+}
+
+// WithSuggestion adds a suggestion to the error.
+func (de *DomainError) WithSuggestion(suggestion string) *DomainError {
+	de.Suggestion = suggestion
+
+	return de
 }
 
 // WithCause adds an underlying cause to the error.
 func (de *DomainError) WithCause(cause error) *DomainError {
-	return &DomainError{
-		Code:    de.Code,
-		Message: de.Message,
-		Details: de.Details,
-		Context: de.Context,
-		Cause:   cause,
-	}
+	de.Cause = cause
+
+	return de
 }
 
 // IsErrorCode checks if an error matches a specific error code.
@@ -169,6 +213,30 @@ func NewTemplateError(code ErrorCode, message, details string) *DomainError {
 }
 
 func NewExternalServiceError(code ErrorCode, message, details string) *DomainError {
+	return &DomainError{
+		Code:    code,
+		Message: message,
+		Details: details,
+	}
+}
+
+func NewFileError(code ErrorCode, message, details string) *DomainError {
+	return &DomainError{
+		Code:    code,
+		Message: message,
+		Details: details,
+	}
+}
+
+func NewConfigError(code ErrorCode, message, details string) *DomainError {
+	return &DomainError{
+		Code:    code,
+		Message: message,
+		Details: details,
+	}
+}
+
+func NewGitError(code ErrorCode, message, details string) *DomainError {
 	return &DomainError{
 		Code:    code,
 		Message: message,

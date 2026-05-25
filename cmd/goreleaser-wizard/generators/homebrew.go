@@ -8,7 +8,6 @@ import (
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
 // HomebrewGenerator handles Homebrew formula generation.
@@ -128,8 +127,8 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 	// Ensure homebrew directory exists
 	formulaDir := "homebrew"
 	if err := os.MkdirAll(formulaDir, directoryPermission); err != nil {
-		return errors.NewFileError(
-			errors.ErrFileOperation,
+		return domain.NewFileError(
+			domain.ErrFileOperation,
 			"Failed to create homebrew directory",
 			err.Error(),
 		).WithCause(err)
@@ -138,8 +137,8 @@ func (g *HomebrewGenerator) Generate(ctx context.Context) error {
 	// Write formula file
 	formulaPath := fmt.Sprintf("%s/%s.rb", formulaDir, g.templateData.FormulaName)
 	if err := WriteFile(formulaPath, output, filePermission); err != nil {
-		return errors.NewFileError(
-			errors.ErrFileOperation,
+		return domain.NewFileError(
+			domain.ErrFileOperation,
 			"Failed to write Homebrew formula",
 			err.Error(),
 		).WithCause(err)

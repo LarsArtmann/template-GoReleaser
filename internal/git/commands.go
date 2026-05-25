@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 const defaultGitCommandTimeout = 30 * time.Second
@@ -65,8 +65,8 @@ func (c *Command) execute(args ...string) (string, error) {
 
 	output, err := cmd.Output()
 	if err != nil {
-		return "", errors.NewGitError(
-			errors.ErrGitCommand,
+		return "", domain.NewGitError(
+			domain.ErrGitCommand,
 			"Git command failed: git "+strings.Join(args, " "),
 			err.Error(),
 		).WithCause(err)
@@ -154,8 +154,8 @@ func (c *Command) HasRemote(remote string) bool {
 // GetRepositoryInfo gets information about the repository.
 func (c *Command) GetRepositoryInfo() (*RepositoryInfo, error) {
 	if !c.IsRepository() {
-		return nil, errors.NewGitError(
-			errors.ErrGitNotFound,
+		return nil, domain.NewGitError(
+			domain.ErrGitNotFound,
 			"Not a git repository",
 			"Current directory is not a git repository",
 		)

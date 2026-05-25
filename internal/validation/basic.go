@@ -6,15 +6,15 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
+	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
 // newValidationError creates a new validation error with field and suggestion.
 func newValidationError(
-	code errors.ErrorCode,
+	code domain.ErrorCode,
 	message, details, field, suggestion string,
 ) error {
-	return errors.NewValidationError(code, message, details).
+	return domain.NewValidationError(code, message, details).
 		WithField(field).
 		WithSuggestion(suggestion)
 }
@@ -65,7 +65,7 @@ var reservedBinaryNames = []string{
 func ValidateProjectName(name string) error {
 	if name == "" {
 		return newValidationError(
-			errors.ErrInvalidProject,
+			domain.ErrInvalidProject,
 			"Project name is required",
 			"Project name cannot be empty",
 			"project_name",
@@ -75,7 +75,7 @@ func ValidateProjectName(name string) error {
 
 	if len(name) > 50 {
 		return newValidationError(
-			errors.ErrInvalidProject,
+			domain.ErrInvalidProject,
 			"Project name too long",
 			"Project name must be 50 characters or less",
 			"project_name",
@@ -85,7 +85,7 @@ func ValidateProjectName(name string) error {
 
 	if !projectNamePattern.MatchString(name) {
 		return newValidationError(
-			errors.ErrInvalidProject,
+			domain.ErrInvalidProject,
 			"Invalid project name format",
 			"Project name must contain only letters, numbers, hyphens, and underscores",
 			"project_name",
@@ -95,7 +95,7 @@ func ValidateProjectName(name string) error {
 
 	if strings.HasSuffix(name, "-") || strings.HasSuffix(name, ".") {
 		return newValidationError(
-			errors.ErrInvalidProject,
+			domain.ErrInvalidProject,
 			"Invalid project name",
 			"Project name cannot end with hyphen or dot",
 			"project_name",
@@ -105,7 +105,7 @@ func ValidateProjectName(name string) error {
 
 	if strings.Contains(name, "--") || strings.Contains(name, "..") {
 		return newValidationError(
-			errors.ErrInvalidProject,
+			domain.ErrInvalidProject,
 			"Invalid project name",
 			"Project name cannot contain consecutive hyphens or dots",
 			"project_name",
@@ -117,7 +117,7 @@ func ValidateProjectName(name string) error {
 	if slices.Contains(reservedProjectNames, lowerName) ||
 		slices.Contains(reservedWindowsDeviceNames, lowerName) {
 		return newValidationError(
-			errors.ErrInvalidProject,
+			domain.ErrInvalidProject,
 			"Reserved project name",
 			fmt.Sprintf("'%s' is a reserved name", name),
 			"project_name",
@@ -132,7 +132,7 @@ func ValidateProjectName(name string) error {
 func ValidateBinaryName(name string) error {
 	if name == "" {
 		return newValidationError(
-			errors.ErrInvalidBinary,
+			domain.ErrInvalidBinary,
 			"Binary name is required",
 			"Binary name cannot be empty",
 			"binary_name",
@@ -142,7 +142,7 @@ func ValidateBinaryName(name string) error {
 
 	if len(name) > 30 {
 		return newValidationError(
-			errors.ErrInvalidBinary,
+			domain.ErrInvalidBinary,
 			"Binary name too long",
 			"Binary name must be 30 characters or less",
 			"binary_name",
@@ -152,7 +152,7 @@ func ValidateBinaryName(name string) error {
 
 	if !binaryNamePattern.MatchString(name) {
 		return newValidationError(
-			errors.ErrInvalidBinary,
+			domain.ErrInvalidBinary,
 			"Invalid binary name format",
 			"Binary name must contain only letters, numbers, hyphens, and underscores",
 			"binary_name",
@@ -168,7 +168,7 @@ func ValidateBinaryName(name string) error {
 	reservedNames = append(reservedNames, reservedBinaryNames...)
 	if slices.Contains(reservedNames, lowerName) {
 		return newValidationError(
-			errors.ErrInvalidBinary,
+			domain.ErrInvalidBinary,
 			"Reserved binary name",
 			fmt.Sprintf("'%s' is a reserved binary name", name),
 			"binary_name",
@@ -183,7 +183,7 @@ func ValidateBinaryName(name string) error {
 func ValidateMainPath(path string) error {
 	if path == "" {
 		return newValidationError(
-			errors.ErrInvalidMainPath,
+			domain.ErrInvalidMainPath,
 			"Main path is required",
 			"Main path cannot be empty",
 			"main_path",
@@ -195,7 +195,7 @@ func ValidateMainPath(path string) error {
 
 	if strings.HasPrefix(normalizedPath, "/") {
 		return newValidationError(
-			errors.ErrInvalidMainPath,
+			domain.ErrInvalidMainPath,
 			"Absolute paths not allowed",
 			"Main path must be a relative path, not an absolute path",
 			"main_path",
@@ -205,7 +205,7 @@ func ValidateMainPath(path string) error {
 
 	if len(normalizedPath) > 200 {
 		return newValidationError(
-			errors.ErrInvalidMainPath,
+			domain.ErrInvalidMainPath,
 			"Main path too long",
 			"Main path must be 200 characters or less",
 			"main_path",
@@ -215,7 +215,7 @@ func ValidateMainPath(path string) error {
 
 	if !mainPathPattern.MatchString(normalizedPath) {
 		return newValidationError(
-			errors.ErrInvalidMainPath,
+			domain.ErrInvalidMainPath,
 			"Invalid main path format",
 			"Main path must be a valid relative path",
 			"main_path",
@@ -230,7 +230,7 @@ func ValidateMainPath(path string) error {
 
 	if strings.Contains(normalizedPath, "..") {
 		return newValidationError(
-			errors.ErrInvalidMainPath,
+			domain.ErrInvalidMainPath,
 			"Path traversal not allowed",
 			"Main path contains path traversal sequences",
 			"main_path",
@@ -248,7 +248,7 @@ func validatePathShellMetachars(path string) error {
 	for _, char := range shellMetachars {
 		if strings.Contains(path, char) {
 			return newValidationError(
-				errors.ErrInvalidMainPath,
+				domain.ErrInvalidMainPath,
 				"Shell metacharacters not allowed",
 				fmt.Sprintf("Main path contains shell metacharacter '%s'", char),
 				"main_path",
@@ -267,7 +267,7 @@ func checkReservedName(component string, reservedList []string, errorMsg, sugges
 	lowerComponent := strings.ToLower(component)
 	if slices.Contains(reservedList, lowerComponent) {
 		return newValidationError(
-			errors.ErrInvalidMainPath,
+			domain.ErrInvalidMainPath,
 			"Reserved directory",
 			fmt.Sprintf("'%s' %s", component, errorMsg),
 			"main_path",
@@ -319,7 +319,7 @@ func ValidateProjectDescription(description string) error {
 
 	if len(trimmed) == 0 {
 		return newValidationError(
-			errors.ErrInvalidProjectDescription,
+			domain.ErrInvalidProjectDescription,
 			"Project description cannot be empty",
 			"Project description must contain text",
 			"project_description",
@@ -329,7 +329,7 @@ func ValidateProjectDescription(description string) error {
 
 	if len(trimmed) > 255 {
 		return newValidationError(
-			errors.ErrInvalidProjectDescription,
+			domain.ErrInvalidProjectDescription,
 			"Project description too long",
 			"Project description must be 255 characters or less",
 			"project_description",
@@ -339,7 +339,7 @@ func ValidateProjectDescription(description string) error {
 
 	if !projectDescriptionPattern.MatchString(trimmed) {
 		return newValidationError(
-			errors.ErrInvalidProjectDescription,
+			domain.ErrInvalidProjectDescription,
 			"Invalid characters in project description",
 			"Project description contains invalid characters",
 			"project_description",
@@ -350,7 +350,7 @@ func ValidateProjectDescription(description string) error {
 	lowerDesc := strings.ToLower(trimmed)
 	if strings.Contains(lowerDesc, "<script") || strings.Contains(lowerDesc, "javascript:") {
 		return newValidationError(
-			errors.ErrInvalidProjectDescription,
+			domain.ErrInvalidProjectDescription,
 			"Invalid content in project description",
 			"Project description contains script injection patterns",
 			"project_description",
@@ -360,7 +360,7 @@ func ValidateProjectDescription(description string) error {
 
 	if strings.Contains(trimmed, "TODO") || strings.Contains(trimmed, "FIXME") {
 		return newValidationError(
-			errors.ErrInvalidProjectDescription,
+			domain.ErrInvalidProjectDescription,
 			"Incomplete project description",
 			"Project description contains TODO or FIXME markers",
 			"project_description",
@@ -370,7 +370,7 @@ func ValidateProjectDescription(description string) error {
 
 	if len(trimmed) > 10 && hasExcessiveWhitespace(trimmed) {
 		return newValidationError(
-			errors.ErrInvalidProjectDescription,
+			domain.ErrInvalidProjectDescription,
 			"Suspicious whitespace pattern",
 			"Project description contains too much whitespace",
 			"project_description",
@@ -397,7 +397,7 @@ func hasExcessiveWhitespace(s string) bool {
 func ValidateDockerImageName(name string) error {
 	if name == "" {
 		return newValidationError(
-			errors.ErrInvalidDockerImage,
+			domain.ErrInvalidDockerImage,
 			"Docker image name is required",
 			"Docker image name cannot be empty",
 			"docker_image",
@@ -410,7 +410,7 @@ func ValidateDockerImageName(name string) error {
 
 	if len(imageName) > 255 {
 		return newValidationError(
-			errors.ErrInvalidDockerImage,
+			domain.ErrInvalidDockerImage,
 			"Docker image name too long",
 			"Docker image name must be 255 characters or less",
 			"docker_image",
@@ -420,7 +420,7 @@ func ValidateDockerImageName(name string) error {
 
 	if !dockerImagePattern.MatchString(imageName) {
 		return newValidationError(
-			errors.ErrInvalidDockerImage,
+			domain.ErrInvalidDockerImage,
 			"Invalid Docker image name format",
 			"Docker image name must contain only lowercase letters, numbers, dots, hyphens, and underscores",
 			"docker_image",
@@ -445,7 +445,7 @@ var dockerTagPattern = regexp.MustCompile(`^[a-zA-Z0-9._-]+$`)
 func validateDockerTag(tag string) error {
 	if len(tag) > 128 {
 		return newValidationError(
-			errors.ErrInvalidDockerImage,
+			domain.ErrInvalidDockerImage,
 			"Docker image tag too long",
 			"Docker image tag must be 128 characters or less",
 			"docker_image",
@@ -455,7 +455,7 @@ func validateDockerTag(tag string) error {
 
 	if !strings.HasPrefix(tag, "v") && !dockerTagPattern.MatchString(tag) {
 		return newValidationError(
-			errors.ErrInvalidDockerImage,
+			domain.ErrInvalidDockerImage,
 			"Invalid Docker image tag format",
 			"Docker image tag must start with 'v' for version tags or contain only valid characters",
 			"docker_image",
@@ -480,7 +480,7 @@ func validateReservedDockerImageName(imageName, fullName string) error {
 
 		if imageNameLower == reserved {
 			return newValidationError(
-				errors.ErrInvalidDockerImage,
+				domain.ErrInvalidDockerImage,
 				"Reserved Docker image name",
 				fmt.Sprintf("'%s' is a reserved Docker image name", fullName),
 				"docker_image",
@@ -500,7 +500,7 @@ func ValidateDockerRegistry(registry string) error {
 
 	if len(registry) > 253 {
 		return newValidationError(
-			errors.ErrInvalidDockerRegistry,
+			domain.ErrInvalidDockerRegistry,
 			"Docker registry URL too long",
 			"Docker registry URL must be 253 characters or less",
 			"docker_registry",
@@ -510,7 +510,7 @@ func ValidateDockerRegistry(registry string) error {
 
 	if !dockerRegistryPattern.MatchString(registry) {
 		return newValidationError(
-			errors.ErrInvalidDockerRegistry,
+			domain.ErrInvalidDockerRegistry,
 			"Invalid Docker registry URL format",
 			"Docker registry URL must be a valid domain name",
 			"docker_registry",
@@ -520,7 +520,7 @@ func ValidateDockerRegistry(registry string) error {
 
 	if strings.Contains(registry, "..") {
 		return newValidationError(
-			errors.ErrInvalidDockerRegistry,
+			domain.ErrInvalidDockerRegistry,
 			"Invalid Docker registry URL format",
 			"Docker registry URL cannot contain consecutive dots",
 			"docker_registry",
@@ -546,7 +546,7 @@ func ValidateDockerRegistry(registry string) error {
 func ValidateVersion(version string) error {
 	if version == "" {
 		return newValidationError(
-			errors.ErrInvalidVersion,
+			domain.ErrInvalidVersion,
 			"Version is required",
 			"Version cannot be empty",
 			"version",
@@ -559,7 +559,7 @@ func ValidateVersion(version string) error {
 
 	if !semverPattern.MatchString(version) && !gitDescribePattern.MatchString(version) {
 		return newValidationError(
-			errors.ErrInvalidVersion,
+			domain.ErrInvalidVersion,
 			"Invalid version format",
 			"Version must follow semantic versioning (e.g., v1.0.0) or be a git commit hash",
 			"version",
@@ -574,7 +574,7 @@ func ValidateVersion(version string) error {
 func ValidateGitBranch(branch string) error {
 	if branch == "" {
 		return newValidationError(
-			errors.ErrInvalidGitBranch,
+			domain.ErrInvalidGitBranch,
 			"Git branch name is required",
 			"Git branch name cannot be empty",
 			"git_branch",
@@ -585,7 +585,7 @@ func ValidateGitBranch(branch string) error {
 	branchPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9/_-]{0,252}$`)
 	if !branchPattern.MatchString(branch) {
 		return newValidationError(
-			errors.ErrInvalidGitBranch,
+			domain.ErrInvalidGitBranch,
 			"Invalid Git branch name format",
 			"Git branch name must contain only letters, numbers, hyphens, underscores, and forward slashes",
 			"git_branch",
@@ -601,7 +601,7 @@ func ValidateGitBranch(branch string) error {
 	lowerBranch := strings.ToLower(branch)
 	if slices.Contains(invalidBranchNames, lowerBranch) {
 		return newValidationError(
-			errors.ErrInvalidGitBranch,
+			domain.ErrInvalidGitBranch,
 			"Reserved Git branch name",
 			fmt.Sprintf("'%s' is a reserved branch name", branch),
 			"git_branch",
@@ -616,7 +616,7 @@ func ValidateGitBranch(branch string) error {
 func ValidateGitTag(tag string) error {
 	if tag == "" {
 		return newValidationError(
-			errors.ErrInvalidGitTag,
+			domain.ErrInvalidGitTag,
 			"Git tag name is required",
 			"Git tag name cannot be empty",
 			"git_tag",
@@ -627,7 +627,7 @@ func ValidateGitTag(tag string) error {
 	tagPattern := regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9._-]{0,254}$`)
 	if !tagPattern.MatchString(tag) {
 		return newValidationError(
-			errors.ErrInvalidGitTag,
+			domain.ErrInvalidGitTag,
 			"Invalid Git tag format",
 			"Git tag name must contain only letters, numbers, dots, hyphens, and underscores",
 			"git_tag",
@@ -702,8 +702,8 @@ func checkDuplicateBuildTags(tags []string) error {
 }
 
 func newBuildTagValidationError(details, suggestion, tag string) error {
-	return errors.NewValidationError(
-		errors.ErrInvalidBuildTag,
+	return domain.NewValidationError(
+		domain.ErrInvalidBuildTag,
 		getBuildTagErrorTitle(tag),
 		details,
 	).WithField("build_tags").WithSuggestion(suggestion)
@@ -725,7 +725,7 @@ func getBuildTagErrorTitle(tag string) string {
 func ValidatePort(port int) error {
 	if port < 1 || port > 65535 {
 		return newValidationError(
-			errors.ErrInvalidPort,
+			domain.ErrInvalidPort,
 			"Invalid port number",
 			"Port number must be between 1 and 65535",
 			"port",
@@ -735,7 +735,7 @@ func ValidatePort(port int) error {
 
 	if slices.Contains(restrictedPorts, port) {
 		return newValidationError(
-			errors.ErrInvalidPort,
+			domain.ErrInvalidPort,
 			"Restricted port number",
 			fmt.Sprintf("Port %d is restricted and shouldn't be used by applications", port),
 			"port",

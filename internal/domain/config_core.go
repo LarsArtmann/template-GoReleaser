@@ -95,7 +95,7 @@ func (spc *SafeProjectConfig) Validate() error {
 	// Validate enums
 	if !spc.ProjectType.IsValid() {
 		return NewValidationError(
-			ErrInvalidProjectName,
+			ErrInvalidConfig,
 			"Invalid project type",
 			string(spc.ProjectType),
 		).WithField("project_type")
@@ -111,7 +111,7 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	if !spc.CGOStatus.IsValid() {
 		return NewValidationError(
-			ErrInvalidProjectName,
+			ErrInvalidConfig,
 			"Invalid CGO status",
 			string(spc.CGOStatus),
 		).WithField("cgo_status")
@@ -119,7 +119,7 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	if !spc.DockerSupport.IsValid() {
 		return NewValidationError(
-			ErrInvalidProjectName,
+			ErrInvalidConfig,
 			"Invalid Docker support",
 			string(spc.DockerSupport),
 		).WithField("docker_support")
@@ -135,7 +135,7 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	if !spc.SigningLevel.IsValid() {
 		return NewValidationError(
-			ErrInvalidProjectName,
+			ErrInvalidConfig,
 			"Invalid signing level",
 			string(spc.SigningLevel),
 		).WithField("signing_level")
@@ -143,7 +143,7 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	if !spc.ActionLevel.IsValid() {
 		return NewValidationError(
-			ErrInvalidProjectName,
+			ErrInvalidConfig,
 			"Invalid action level",
 			string(spc.ActionLevel),
 		).WithField("action_level")
@@ -151,7 +151,7 @@ func (spc *SafeProjectConfig) Validate() error {
 
 	if !spc.FeatureLevel.IsValid() {
 		return NewValidationError(
-			ErrInvalidProjectName,
+			ErrInvalidConfig,
 			"Invalid feature level",
 			string(spc.FeatureLevel),
 		).WithField("feature_level")
@@ -169,7 +169,7 @@ func (spc *SafeProjectConfig) Validate() error {
 	for _, platform := range spc.Platforms {
 		if !platform.IsValid() {
 			return NewValidationError(
-				ErrInvalidProjectName,
+				ErrInvalidPlatform,
 				"Invalid platform",
 				string(platform),
 			).WithField("platforms")
@@ -180,7 +180,7 @@ func (spc *SafeProjectConfig) Validate() error {
 	for _, arch := range spc.Architectures {
 		if !arch.IsValid() {
 			return NewValidationError(
-				ErrInvalidProjectName,
+				ErrInvalidArchitecture,
 				"Invalid architecture",
 				string(arch),
 			).WithField("architectures")
@@ -191,7 +191,7 @@ func (spc *SafeProjectConfig) Validate() error {
 	for _, tag := range spc.BuildTags {
 		if !tag.IsValid() {
 			return NewValidationError(
-				ErrInvalidProjectName,
+				ErrInvalidBuildTag,
 				"Invalid build tag",
 				tag.String(),
 			).WithField("build_tags")
@@ -202,7 +202,7 @@ func (spc *SafeProjectConfig) Validate() error {
 	for _, trigger := range spc.ActionsOn {
 		if !trigger.IsValid() {
 			return NewValidationError(
-				ErrInvalidProjectName,
+				ErrInvalidActionTrigger,
 				"Invalid action trigger",
 				string(trigger),
 			).WithField("actions_on")

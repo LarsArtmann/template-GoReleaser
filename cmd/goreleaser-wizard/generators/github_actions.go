@@ -10,7 +10,6 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/templates"
 	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
-	"github.com/LarsArtmann/GoReleaser-Wizard/internal/errors"
 )
 
 // GitHubActionsGenerator handles GitHub Actions workflow generation.
@@ -50,8 +49,8 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 
 	tmpl, err := tmpl.Parse(templates.GitHubActionsTemplate)
 	if err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateParsing,
+		return domain.NewConfigError(
+			domain.ErrTemplateParsing,
 			"Failed to parse GitHub Actions template",
 			err.Error(),
 		).WithCause(err)
@@ -60,8 +59,8 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	// Execute template
 	var output bytes.Buffer
 	if err := tmpl.Execute(&output, g.templateData); err != nil {
-		return errors.NewConfigError(
-			errors.ErrTemplateRendering,
+		return domain.NewConfigError(
+			domain.ErrTemplateRendering,
 			"Failed to execute GitHub Actions template",
 			err.Error(),
 		).WithCause(err)
@@ -70,8 +69,8 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	// Ensure .github/workflows directory exists
 	workflowDir := filepath.Join(".github", "workflows")
 	if err := os.MkdirAll(workflowDir, directoryPermission); err != nil {
-		return errors.NewFileError(
-			errors.ErrFileOperation,
+		return domain.NewFileError(
+			domain.ErrFileOperation,
 			"Failed to create workflow directory",
 			err.Error(),
 		).WithCause(err)
@@ -80,8 +79,8 @@ func (g *GitHubActionsGenerator) Generate(ctx context.Context) error {
 	// Write workflow file
 	workflowPath := filepath.Join(workflowDir, "release.yml")
 	if err := WriteFile(workflowPath, output.Bytes(), filePermission); err != nil {
-		return errors.NewFileError(
-			errors.ErrFileOperation,
+		return domain.NewFileError(
+			domain.ErrFileOperation,
 			"Failed to write GitHub Actions workflow",
 			err.Error(),
 		).WithCause(err)
