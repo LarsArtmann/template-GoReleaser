@@ -1,0 +1,141 @@
+{
+  description = "GoReleaser-Wizard — Interactive GoReleaser configuration wizard";
+
+  inputs = {
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+
+    systems.url = "github:nix-systems/default";
+
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+  };
+
+  outputs =
+    inputs@{ self, flake-parts, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = import inputs.systems;
+
+      imports = [ inputs.treefmt-nix.flakeModule ];
+
+      perSystem =
+        {
+          config,
+          pkgs,
+          lib,
+          ...
+        }:
+        let
+          version = self.rev or self.dirtyRev or "dev";
+
+          vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+
+          goreleaser-wizard = pkgs.buildGoModule {
+            pname = "goreleaser-wizard";
+            inherit version vendorHash;
+
+            src = lib.fileset.toSource {
+              root = ./.;
+              fileset = lib.fileset.unions [
+                ./cmd
+                ./internal
+                ./templates
+                ./assets
+                ./go.mod
+                ./go.sum
+              ];
+            };
+
+            subPackages = [ "cmd/goreleaser-wizard" ];
+
+            ldflags = [
+              "-s"
+              "-w"
+              "-X main.version=${version}"
+              "-X main.commit=${self.rev or "dirty"}"
+              "-X main.date=1970-01-01T00:00:00Z"
+            ];
+
+            meta = {
+              description = "Interactive GoReleaser configuration wizard";
+              homepage = "https://github.com/LarsArtmann/GoReleaser-Wizard";
+              license = lib.licenses.mit;
+              mainProgram = "goreleaser-wizard";
+              maintainers = [ lib.maintainers.larsartmann ];
+              platforms = lib.platforms.linux ++ lib.platforms.darwin;
+            };
+          };
+        in
+        {
+          packages = {
+            default = goreleaser-wizard;
+            inherit goreleaser-wizard;
+          };
+
+          devShells = {
+            default = pkgs.mkShell {
+              inputsFrom = [ config.packages.default ];
+
+              packages = with pkgs; [
+                go
+                gotools
+                golangci-lint
+                gofumpt
+                govulncheck
+                goreleaser
+                just
+                jq
+                yq-go
+                git
+                gh
+              ];
+
+              GOFLAGS = "-mod=mod";
+            };
+
+            ci = pkgs.mkShell {
+              inputsFrom = [ config.packages.default ];
+
+              packages = with pkgs; [
+                go
+                gotools
+                golangci-lint
+                gofumpt
+                govulncheck
+                just
+                jq
+              ];
+            };
+          };
+
+          apps.default = {
+            type = "app";
+            program = lib.getExe config.packages.default;
+          };
+
+          checks = {
+            build = config.packages.default;
+
+            test = config.packages.default.overrideAttrs (_: {
+              doCheck = true;
+            });
+          };
+
+          treefmt.config = {
+            projectRootFile = "flake.nix";
+            programs.nixfmt.enable = true;
+            programs.gofmt.enable = true;
+          };
+        };
+
+      flake.overlays.default = final: _prev: {
+        goreleaser-wizard = final.callPackage ./nix/package.nix { };
+      };
+    };
+}
