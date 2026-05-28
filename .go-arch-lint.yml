@@ -23,12 +23,6 @@ components:
   validation:
     in: internal/validation/**
 
-  # Error Management
-  errors:
-    in: internal/errors/**
-  pkg-errors:
-    in: pkg/errors/**
-
   # Types
   types:
     in: internal/types/**
@@ -56,8 +50,6 @@ deps:
   domain:
     anyVendorDeps: true
     mayDependOn:
-      - errors
-      - pkg-errors
       - types
 
   # Validation can depend on domain
@@ -65,54 +57,33 @@ deps:
     anyVendorDeps: true
     mayDependOn:
       - domain
-      - errors
-      - pkg-errors
       - types
-
-  # Errors - standalone
-  errors:
-    anyVendorDeps: true
-    mayDependOn: []
-
-  # pkg-errors available everywhere
-  pkg-errors:
-    anyVendorDeps: true
-    mayDependOn: []
 
   # Types - pure data structures
   types:
     anyVendorDeps: true
     mayDependOn:
-      - errors
-      - pkg-errors
+      - domain
 
   # Configuration
   config:
     anyVendorDeps: true
-    mayDependOn:
-      - errors
-      - pkg-errors
+    mayDependOn: []
 
   # Git operations
   git:
     anyVendorDeps: true
     mayDependOn:
-      - errors
-      - pkg-errors
+      - domain
 
   # Utilities
   utils:
     anyVendorDeps: true
     mayDependOn:
       - domain
-      - errors
-      - pkg-errors
       - git
 
-# Common components
-commonComponents:
-  - pkg-errors
-  - errors
+
 
 # Exclusion Patterns
 exclude:
