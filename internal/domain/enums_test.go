@@ -218,3 +218,132 @@ func TestGetAllConfigStates(t *testing.T) {
 	assert.Contains(t, states, ConfigStateProcessing)
 	assert.Contains(t, states, ConfigStateGenerated)
 }
+
+// GitProvider tests.
+
+func TestGitProvider_Validation(t *testing.T) {
+	tests := []struct {
+		name     string
+		provider GitProvider
+		valid    bool
+	}{
+		{"GitHub", GitProviderGitHub, true},
+		{"GitLab", GitProviderGitLab, true},
+		{"Bitbucket", GitProviderBitbucket, true},
+		{"Gitea", GitProviderGitea, true},
+		{"SelfHosted", GitProviderSelfHosted, true},
+		{"Unknown", GitProvider("unknown"), false},
+		{"Empty", GitProvider(""), false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.valid, tt.provider.IsValid())
+		})
+	}
+}
+
+func TestGitProvider_String(t *testing.T) {
+	tests := []struct {
+		provider GitProvider
+		expected string
+	}{
+		{GitProviderGitHub, "GitHub"},
+		{GitProviderGitLab, "GitLab"},
+		{GitProviderBitbucket, "Bitbucket"},
+		{GitProviderGitea, "Gitea"},
+		{GitProviderSelfHosted, "Self-hosted"},
+		{GitProvider("other"), "other"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.expected, func(t *testing.T) {
+			assert.Equal(t, tt.expected, tt.provider.String())
+		})
+	}
+}
+
+func TestGitProvider_Metadata(t *testing.T) {
+	t.Run("GitHub metadata", func(t *testing.T) {
+		assert.Equal(t, DockerRegistryGitHub, GitProviderGitHub.DefaultRegistry())
+		assert.True(t, GitProviderGitHub.ActionsSupported())
+		assert.Equal(t, "https://api.github.com", GitProviderGitHub.APIURL())
+		assert.Equal(t, "https://github.com", GitProviderGitHub.WebURL())
+		assert.False(t, GitProviderGitHub.RequiresPersonalAccessToken())
+	})
+
+	t.Run("GitLab metadata", func(t *testing.T) {
+		assert.Equal(t, DockerRegistryGitLab, GitProviderGitLab.DefaultRegistry())
+		assert.True(t, GitProviderGitLab.ActionsSupported())
+		assert.Equal(t, "https://gitlab.com/api/v4", GitProviderGitLab.APIURL())
+		assert.Equal(t, "https://gitlab.com", GitProviderGitLab.WebURL())
+		assert.True(t, GitProviderGitLab.RequiresPersonalAccessToken())
+	})
+
+	t.Run("SelfHosted metadata", func(t *testing.T) {
+		assert.Equal(t, DockerRegistryCustom, GitProviderSelfHosted.DefaultRegistry())
+		assert.False(t, GitProviderSelfHosted.ActionsSupported())
+		assert.Empty(t, GitProviderSelfHosted.APIURL())
+		assert.Empty(t, GitProviderSelfHosted.WebURL())
+		assert.True(t, GitProviderSelfHosted.RequiresPersonalAccessToken())
+	})
+
+	t.Run("invalid provider returns safe defaults", func(t *testing.T) {
+		invalid := GitProvider("bad")
+		assert.Equal(t, DockerRegistryCustom, invalid.DefaultRegistry())
+		assert.False(t, invalid.ActionsSupported())
+		assert.Empty(t, invalid.APIURL())
+		assert.Empty(t, invalid.WebURL())
+		assert.True(t, invalid.RequiresPersonalAccessToken())
+	})
+}
+
+func TestValidateGitProvider(t *testing.T) {
+	t.Run("valid provider", func(t *testing.T) {
+		assert.NoError(t, ValidateGitProvider(GitProviderGitHub))
+	})
+
+	t.Run("invalid provider", func(t *testing.T) {
+		err := ValidateGitProvider(GitProvider("bad"))
+		require.Error(t, err)
+		assert.Contains(t, err.Error(), "Invalid git provider")
+	})
+}
+
+func TestGetAllGitProviders(t *testing.T) {
+	providers := GetAllGitProviders()
+	assert.Len(t, providers, 5)
+	assert.Contains(t, providers, GitProviderGitHub)
+	assert.Contains(t, providers, GitProviderGitLab)
+	assert.Contains(t, providers, GitProviderBitbucket)
+	assert.Contains(t, providers, GitProviderGitea)
+	assert.Contains(t, providers, GitProviderSelfHosted)
+}
+
+func TestGetRecommendedGitProvider(t *testing.T) {
+	assert.Equal(t, GitProviderGitHub, GetRecommendedGitProvider())
+}
+
+func TestConvertToGitProvider(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected GitProvider
+	}{
+		{"github", GitProviderGitHub},
+		{"GitHub", GitProviderGitHub},
+		{"🐙  github", GitProviderGitHub},
+		{"gitlab", GitProviderGitLab},
+		{"🦊  gitlab", GitProviderGitLab},
+		{"bitbucket", GitProviderBitbucket},
+		{"gitea", GitProviderGitea},
+		{"self-hosted", GitProviderSelfHosted},
+		{"", GitProviderGitHub},
+		{"unknown", GitProviderGitHub},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			assert.Equal(t, tt.expected, ConvertToGitProvider(tt.input))
+		})
+	}
+}
