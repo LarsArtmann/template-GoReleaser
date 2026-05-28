@@ -83,8 +83,6 @@ deps:
       - domain
       - git
 
-
-
 # Exclusion Patterns
 exclude:
   - "**/*.pb.go"
