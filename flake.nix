@@ -89,7 +89,6 @@
                 gofumpt
                 govulncheck
                 goreleaser
-                just
                 jq
                 yq-go
                 git
@@ -99,7 +98,7 @@
               GOFLAGS = "-mod=mod";
             };
 
-            ci = pkgs.mkShell {
+            ci = pkgs.mkShellNoCC {
               inputsFrom = [ config.packages.default ];
 
               packages = with pkgs; [
@@ -108,7 +107,6 @@
                 golangci-lint
                 gofumpt
                 govulncheck
-                just
                 jq
               ];
             };
@@ -128,9 +126,13 @@
           };
 
           treefmt.config = {
-            projectRootFile = "flake.nix";
-            programs.nixfmt.enable = true;
+            projectRootFile = "go.mod";
+            nixfmt.enable = true;
+            templ.enable = true;
             programs.gofmt.enable = true;
+
+          checks.format = config.treefmt.build.check self;
+          checks.build = config.packages.default;
           };
         };
 
