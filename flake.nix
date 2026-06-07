@@ -2,7 +2,7 @@
   description = "GoReleaser-Wizard — Interactive GoReleaser configuration wizard";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     systems.url = "github:nix-systems/default";
 
