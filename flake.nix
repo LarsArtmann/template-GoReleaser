@@ -35,6 +35,7 @@
           version = self.rev or self.dirtyRev or "dev";
 
           vendorHash = "sha256-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=";
+          proxyVendor = true;
 
           goreleaser-wizard = pkgs.buildGoModule {
             pname = "goreleaser-wizard";
