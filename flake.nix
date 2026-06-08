@@ -118,6 +118,7 @@
           };
 
           checks = {
+            format = config.treefmt.build.check self;
             build = config.packages.default;
 
             test = config.packages.default.overrideAttrs (_: {
@@ -127,12 +128,9 @@
 
           treefmt.config = {
             projectRootFile = "go.mod";
-            nixfmt.enable = true;
-            templ.enable = true;
+            programs.nixfmt.enable = true;
+            programs.templ.enable = true;
             programs.gofmt.enable = true;
-
-          checks.format = config.treefmt.build.check self;
-          checks.build = config.packages.default;
           };
         };
 
