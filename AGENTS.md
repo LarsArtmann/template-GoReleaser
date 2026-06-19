@@ -25,21 +25,17 @@ GoReleaser-Wizard is an interactive CLI tool that generates production-ready GoR
 
 ### Primary Development Commands
 
-
 ### Advanced Commands (dev/arch-lint.just)
 
 The project uses an enterprise-grade linting justfile with comprehensive tooling:
 
-
 ### Project-Specific Commands
-
 
 ---
 
 ## Project Architecture
 
 ### Directory Structure
-
 
 ### Architectural Layers
 
@@ -136,12 +132,9 @@ func NewSafeProjectConfig() *SafeProjectConfig {
 
 All errors use typed error codes for structured error handling:
 
-
 **Error Usage Pattern**:
 
-
 **Recovery from Panics**:
-
 
 ### Workflow and Job System
 
@@ -149,31 +142,23 @@ The project uses a sophisticated workflow-based execution system:
 
 **Workflow Pattern**:
 
-
 **Job Factory Pattern**:
 
-
 **Job Implementation**:
-
 
 ### Validation Patterns
 
 **Multi-Level Validation**:
 
-
 ### Template Generation Pattern
-
 
 ### Testing Patterns
 
 **Table-Driven Tests**:
 
-
 **Test Setup Pattern**:
 
-
 ### CLI Pattern (Cobra)
-
 
 ---
 
@@ -229,11 +214,9 @@ workflow_validation.go    - Workflow validation logic
 
 ### Import Order
 
-
 ### Function Patterns
 
 **Early returns preferred** over nested conditionals:
-
 
 **Small, focused functions** - Prefer <30 lines
 
@@ -270,7 +253,6 @@ assert.Contains(t, str, substr)
 ```
 
 **Setup/Teardown**:
-
 
 ---
 
