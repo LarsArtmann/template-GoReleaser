@@ -93,23 +93,23 @@ func escapeBoolTestCaseBuilder(cases ...boolTestCaseInput) []valueTestCase[bool]
 
 // Test case constants for escape functions.
 var (
-	shellEscapeTestCases = escapeStringTestCaseBuilder(
-		stringEscaperCase("Simple text", "hello", "'hello'"),
-		stringEscaperCase("Empty string", "", ""),
-		stringEscaperCase("Single quotes", "don't panic", "'don''t panic'"),
-		stringEscaperCase("Safe characters", "my-app_v1.0", "'my-app_v1.0'"),
-		stringEscaperCase("Dangerous content", "rm -rf /", ""),
-		stringEscaperCase("Script injection", "; echo hacked", ""),
-	)
+	shellEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", "'hello'"},
+		{"Empty string", "", ""},
+		{"Single quotes", "don't panic", "'don''t panic'"},
+		{"Safe characters", "my-app_v1.0", "'my-app_v1.0'"},
+		{"Dangerous content", "rm -rf /", ""},
+		{"Script injection", "; echo hacked", ""},
+	}
 
-	jsonEscapeTestCases = escapeStringTestCaseBuilder(
-		stringEscaperCase("Simple text", "hello", `"hello"`),
-		stringEscaperCase("Empty string", "", `""`),
-		stringEscaperCase("Quotes", "say \"hello\"", `"say \"hello\""`),
-		stringEscaperCase("Backslash", "path\\to\\file", `"path\\to\\file"`),
-		stringEscaperCase("Newline", "line1\nline2", `"line1\nline2"`),
-		stringEscaperCase("Tab", "col1\tcol2", `"col1\tcol2"`),
-	)
+	jsonEscapeTestCases = []valueTestCase[string]{
+		{"Simple text", "hello", `"hello"`},
+		{"Empty string", "", `""`},
+		{"Quotes", "say \"hello\"", `"say \"hello\""`},
+		{"Backslash", "path\\to\\file", `"path\\to\\file"`},
+		{"Newline", "line1\nline2", `"line1\nline2"`},
+		{"Tab", "col1\tcol2", `"col1\tcol2"`},
+	}
 
 	yamlEscapeTestCases = escapeStringTestCaseBuilder(
 		stringEscaperCase("Simple text", "hello", "hello"),
