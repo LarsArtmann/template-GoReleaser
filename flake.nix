@@ -129,9 +129,11 @@
 
           treefmt.config = {
             projectRootFile = "go.mod";
-            programs.nixfmt.enable = true;
-            programs.templ.enable = true;
-            programs.gofmt.enable = true;
+            programs = {
+              nixfmt.enable = true;
+              templ.enable = true;
+              gofmt.enable = true;
+            };
           };
         };
 
