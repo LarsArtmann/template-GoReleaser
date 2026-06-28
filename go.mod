@@ -1,6 +1,6 @@
 module github.com/LarsArtmann/GoReleaser-Wizard
 
-go 1.26.3
+go 1.26.4
 
 require (
 	charm.land/huh/v2 v2.0.3
@@ -26,9 +26,9 @@ require (
 	github.com/atotto/clipboard v0.1.4 // indirect
 	github.com/catppuccin/go v0.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
-	github.com/charmbracelet/ultraviolet v0.0.0-20260615092913-2399af76d5b1 // indirect
+	github.com/charmbracelet/ultraviolet v0.0.0-20260622092850-f39628c8a989 // indirect
 	github.com/charmbracelet/x/ansi v0.11.7 // indirect
-	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260615092313-b57e5e6d29bb // indirect
+	github.com/charmbracelet/x/exp/charmtone v0.0.0-20260628005914-6eb80f72a239 // indirect
 	github.com/charmbracelet/x/exp/ordered v0.1.0 // indirect
 	github.com/charmbracelet/x/exp/strings v0.1.0 // indirect
 	github.com/charmbracelet/x/term v0.2.2 // indirect

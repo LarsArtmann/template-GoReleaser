@@ -1,7 +1,7 @@
 version: "2"
 run:
   timeout: 5m
-  go: 1.26.3
+  go: 1.26.4
   build-tags:
     - goexperiment.arenas
     - goexperiment.goroutineleakprofile
@@ -11,6 +11,7 @@ run:
   modules-download-mode: readonly
   allow-parallel-runners: true
   allow-serial-runners: true
+  issues-exit-code: 1
   tests: true
 output:
   formats: {}
@@ -168,6 +169,9 @@ linters:
     funlen:
       lines: 350
       statements: 150
+    ginkgolinter:
+      forbid-focus-container: true
+      forbid-spec-pollution: true
     goconst:
       min-len: 5
       min-occurrences: 6
@@ -190,6 +194,8 @@ linters:
         - anon
         - stdlib
         - generic
+    makezero:
+      always: true
     revive:
       rules:
         - disabled: true
@@ -216,6 +222,10 @@ linters:
           name: early-return
         - disabled: true
           name: identical-ifelseif-branches
+    testifylint:
+      disable:
+        - go-require
+      enable-all: true
     varnamelen:
       ignore-map-index-ok: true
       ignore-names:
@@ -359,4 +369,6 @@ formatters:
     generated: lax
     paths:
       - _templ\.go$
-issues: {}
+issues:
+  max-issues-per-linter: 50
+  max-same-issues: 10
