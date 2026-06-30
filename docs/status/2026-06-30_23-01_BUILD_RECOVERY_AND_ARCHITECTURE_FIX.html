@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Build Recovery &amp; Architecture Fix — Status Report</title>
+    <style>
+      :root {
+        --color-graphite: #0e0e10;
+        --color-graphite-2: #18181d;
+        --color-graphite-3: #16161a;
+        --color-bone: #f4f4f0;
+        --color-red: #ff6b6b;
+        --color-blue: #6eb5ff;
+        --color-yellow: #f4d35e;
+        --color-amber: #ffb347;
+        --color-hairline: rgba(244, 244, 240, 0.12);
+        --color-hairline-strong: rgba(244, 244, 240, 0.25);
+
+        --surface: var(--color-graphite);
+        --surface-raised: var(--color-graphite-2);
+        --surface-sunken: var(--color-graphite-3);
+        --text: var(--color-bone);
+        --text-muted: rgba(244, 244, 240, 0.72);
+        --text-faint: rgba(244, 244, 240, 0.45);
+        --border: var(--color-hairline);
+        --border-strong: var(--color-hairline-strong);
+        --accent: var(--color-amber);
+        --problem: var(--color-red);
+        --solution: var(--color-blue);
+        --warning: var(--color-yellow);
+
+        --bg: var(--surface);
+        --bg-elevated: var(--surface-raised);
+        --bg-sunken: var(--surface-sunken);
+        --bg-card: var(--surface-raised);
+        --ink: var(--text);
+        --ink-secondary: var(--text-muted);
+        --ink-muted: var(--text-faint);
+        --rose: var(--problem);
+        --emerald: var(--solution);
+        --amber-glow: color-mix(in srgb, var(--warning) 15%, transparent);
+        --coral: var(--problem);
+        --teal: var(--solution);
+
+        --radius: 0px;
+        --radius-sm: 0px;
+
+        --font-heading:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-body:
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        --font-mono:
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
+          monospace;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      section[id],
+      [id] {
+        scroll-margin-top: 60px;
+      }
+
+      body {
+        background: var(--surface);
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 15px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      :focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      a:focus-visible {
+        outline-offset: -1px;
+      }
+
+      .top-bar {
+        background: var(--text);
+        color: var(--surface);
+        padding: 0.6rem 2rem;
+        font-family: var(--font-mono);
+        font-size: 0.75rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .layout {
+        display: flex;
+        gap: 2.5rem;
+        padding: 2rem;
+      }
+      .sidebar {
+        width: 220px;
+        flex-shrink: 0;
+        position: sticky;
+        top: 1rem;
+        align-self: flex-start;
+        height: calc(100vh - 2rem);
+        overflow-y: auto;
+        display: none;
+      }
+      .sidebar nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+      }
+      .sidebar .label {
+        font-family: var(--font-mono);
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--accent);
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .sidebar a {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 0.45rem 0.75rem;
+        border-left: 2px solid transparent;
+        transition: all 0.15s ease;
+        line-height: 1.4;
+        font-weight: 500;
+      }
+      .sidebar a:hover,
+      .sidebar a.active {
+        color: var(--accent);
+        border-left-color: var(--accent);
+        background: color-mix(in srgb, var(--accent) 8%, transparent);
+      }
+      .main {
+        flex: 1;
+        min-width: 0;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: var(--font-heading);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+      }
+      h1 {
+        font-size: clamp(1.8rem, 4vw, 2.6rem);
+        line-height: 1.1;
+        margin: 0 0 0.6rem;
+      }
+      h2 {
+        font-size: 1.4rem;
+        margin: 2.5rem 0 1rem;
+        padding-bottom: 0.4rem;
+        border-bottom: 2px solid var(--border-strong);
+        display: flex;
+        align-items: baseline;
+        gap: 0.6rem;
+      }
+      h2 .num {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--accent);
+        font-weight: 700;
+        letter-spacing: 0.06em;
+      }
+      h3 {
+        font-size: 1.1rem;
+        margin: 0 0 0.4rem;
+        font-weight: 700;
+      }
+      h4 {
+        font-size: 0.98rem;
+        margin: 0 0 0.3rem;
+        font-weight: 700;
+      }
+      p {
+        margin: 0 0 1rem;
+      }
+      ul {
+        margin: 0 0 1rem;
+        padding-left: 1.3rem;
+      }
+      li {
+        margin: 0.3rem 0;
+      }
+
+      .hero {
+        padding: 1.5rem 0 1.5rem;
+        margin-bottom: 1.5rem;
+        border-bottom: 2px solid var(--border-strong);
+      }
+      .hero-badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--surface);
+        background: var(--accent);
+        padding: 0.3rem 0.7rem;
+        margin-bottom: 0.9rem;
+      }
+      .hero-subtitle {
+        font-size: 1.05rem;
+        color: var(--text-muted);
+        max-width: 70ch;
+        margin: 0;
+      }
+      .hero-shapes {
+        position: relative;
+        height: 80px;
+        margin-bottom: 1rem;
+      }
+      .hero-shapes .circle {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 56px;
+        height: 56px;
+        background: var(--problem);
+        border-radius: 50%;
+      }
+      .hero-shapes .square {
+        position: absolute;
+        top: 24px;
+        left: 72px;
+        width: 48px;
+        height: 48px;
+        background: var(--solution);
+      }
+      .hero-shapes .tri {
+        position: absolute;
+        top: 8px;
+        left: 140px;
+        width: 0;
+        height: 0;
+        border-left: 28px solid transparent;
+        border-right: 28px solid transparent;
+        border-bottom: 48px solid var(--warning);
+      }
+
+      .card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .card-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .card-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .card-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+
+      .issue {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1.3rem;
+        margin-bottom: 1rem;
+        border-left: 4px solid var(--border-strong);
+      }
+      .issue-critical {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+      }
+      .issue-important {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+      }
+      .issue-nice {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+      }
+      .issue h3 {
+        margin-bottom: 0.3rem;
+      }
+      .issue .where {
+        font-family: var(--font-mono);
+        font-size: 0.78rem;
+        color: var(--text-faint);
+        margin: 0.2rem 0 0.6rem;
+      }
+      .issue p:last-child {
+        margin-bottom: 0;
+      }
+
+      .severity {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        padding: 0.2rem 0.55rem;
+        margin-bottom: 0.6rem;
+        color: var(--surface);
+      }
+      .severity-critical {
+        background: var(--problem);
+      }
+      .severity-important {
+        background: var(--warning);
+      }
+      .severity-nice {
+        background: var(--solution);
+      }
+
+      .badge {
+        display: inline-block;
+        font-family: var(--font-mono);
+        font-size: 0.62rem;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 0.18rem 0.5rem;
+        border: 1px solid var(--border-strong);
+        color: var(--text-muted);
+      }
+      .badge-critical {
+        color: var(--problem);
+        border-color: var(--problem);
+      }
+      .badge-high {
+        color: var(--warning);
+        border-color: var(--warning);
+      }
+      .badge-medium {
+        color: var(--accent);
+        border-color: var(--accent);
+      }
+      .badge-low {
+        color: var(--text-muted);
+      }
+      .badge-fixed {
+        color: var(--solution);
+        border-color: var(--solution);
+      }
+
+      .callout {
+        margin: 0.8rem 0 0;
+        padding: 0.7rem 0.9rem;
+        border-left: 3px solid var(--border-strong);
+        background: color-mix(in srgb, var(--text) 5%, transparent);
+        font-size: 0.9rem;
+      }
+      .callout strong {
+        display: inline-block;
+        margin-right: 0.4rem;
+      }
+      .callout-solution {
+        border-left-color: var(--solution);
+        background: color-mix(in srgb, var(--solution) 10%, transparent);
+      }
+      .callout-warning {
+        border-left-color: var(--warning);
+        background: color-mix(in srgb, var(--warning) 10%, transparent);
+      }
+      .callout-problem {
+        border-left-color: var(--problem);
+        background: color-mix(in srgb, var(--problem) 10%, transparent);
+      }
+
+      .stat-grid,
+      .scorecard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 0.75rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .stat-card,
+      .score-card {
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        padding: 1.1rem 1rem;
+        position: relative;
+      }
+      .stat-card::before,
+      .score-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--border-strong);
+      }
+      .stat-bad::before,
+      .score-bad::before {
+        background: var(--problem);
+      }
+      .stat-good::before,
+      .score-good::before {
+        background: var(--solution);
+      }
+      .stat-warn::before,
+      .score-warn::before {
+        background: var(--warning);
+      }
+      .stat-value,
+      .score {
+        font-family: var(--font-heading);
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.03em;
+        color: var(--text);
+      }
+      .stat-bad .stat-value,
+      .score-bad .score {
+        color: var(--problem);
+      }
+      .stat-good .stat-value,
+      .score-good .score {
+        color: var(--solution);
+      }
+      .stat-warn .stat-value,
+      .score-warn .score {
+        color: var(--warning);
+      }
+      .stat-label,
+      .score-card .label {
+        font-family: var(--font-mono);
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: var(--text-faint);
+        margin-top: 0.5rem;
+      }
+
+      .strengths {
+        display: grid;
+        gap: 0.5rem;
+        margin: 1rem 0 1.5rem;
+      }
+      .strength {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 0.8rem;
+        padding: 0.7rem 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .strength .check {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        color: var(--solution);
+        font-size: 1.1rem;
+        line-height: 1.4;
+      }
+      .strength .text strong {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .strength .text span {
+        color: var(--text-muted);
+        font-size: 0.9rem;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1rem 0 1.5rem;
+        font-size: 0.9rem;
+      }
+      th {
+        text-align: left;
+        padding: 0.6rem 0.9rem;
+        background: var(--surface-raised);
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border-bottom: 1px solid var(--border-strong);
+      }
+      td {
+        padding: 0.6rem 0.9rem;
+        border-bottom: 1px solid var(--border);
+      }
+      tr:hover td {
+        background: var(--surface-raised);
+      }
+
+      .compare-header {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin: 1rem 0 0.5rem;
+      }
+      .compare-before,
+      .compare-after {
+        font-family: var(--font-mono);
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        padding: 0.4rem 0.7rem;
+        color: var(--surface);
+      }
+      .compare-before {
+        background: var(--problem);
+      }
+      .compare-after {
+        background: var(--solution);
+      }
+      .compare-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+      }
+      .compare-row pre {
+        margin: 0;
+      }
+
+      pre {
+        background: var(--surface-sunken);
+        border: 1px solid var(--border);
+        padding: 1rem 1.2rem;
+        margin: 1rem 0;
+        font-family: var(--font-mono);
+        font-size: 0.82rem;
+        line-height: 1.65;
+        overflow-x: auto;
+      }
+      code {
+        font-family: var(--font-mono);
+      }
+      p code,
+      li code,
+      td code {
+        font-size: 0.88em;
+        background: var(--surface-sunken);
+        padding: 0.1rem 0.35rem;
+      }
+      .tok-keyword {
+        color: var(--accent);
+      }
+      .tok-type {
+        color: var(--warning);
+      }
+      .tok-string {
+        color: var(--solution);
+      }
+      .tok-comment {
+        color: var(--text-faint);
+        font-style: italic;
+      }
+      .tok-func {
+        color: #74a9ff;
+      }
+      .tok-number {
+        color: var(--accent);
+      }
+      .tok-builtin {
+        color: #4dd9ff;
+      }
+      .tok-punct {
+        color: var(--text-muted);
+      }
+
+      .migration-step {
+        display: grid;
+        grid-template-columns: 48px 1fr;
+        gap: 1rem;
+        margin: 1rem 0;
+        padding: 1rem;
+        background: var(--surface-raised);
+        border: 1px solid var(--border);
+        border-left: 3px solid var(--accent);
+      }
+      .migration-num {
+        font-family: var(--font-mono);
+        font-weight: 800;
+        font-size: 1.5rem;
+        color: var(--accent);
+        line-height: 1;
+      }
+      .migration-content h4 {
+        margin-bottom: 0.2rem;
+      }
+      .migration-content p {
+        margin-bottom: 0;
+        color: var(--text-muted);
+        font-size: 0.92rem;
+      }
+
+      .footer {
+        margin-top: 2rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--border);
+        font-size: 0.8rem;
+        color: var(--text-faint);
+        font-family: var(--font-mono);
+      }
+
+      @media (min-width: 1024px) {
+        .sidebar {
+          display: block;
+        }
+      }
+      @media (max-width: 768px) {
+        .layout {
+          flex-direction: column;
+          padding: 1rem;
+        }
+        .top-bar {
+          padding: 0.6rem 1rem;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .compare-header,
+        .compare-row {
+          grid-template-columns: 1fr;
+        }
+        .stat-grid,
+        .scorecard {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .migration-step {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="top-bar">
+      <span>Status Report</span>
+      <span>2026-06-30</span>
+      <span>GoReleaser-Wizard &middot; master</span>
+    </div>
+
+    <div class="layout">
+      <aside class="sidebar" data-nav>
+        <nav>
+          <div class="label">Contents</div>
+          <a href="#summary">Summary</a>
+          <a href="#root-cause">Root Causes</a>
+          <a href="#done">Fully Done</a>
+          <a href="#partial">Partially Done</a>
+          <a href="#not-started">Not Started</a>
+          <a href="#fucked">Totally Fucked Up</a>
+          <a href="#improve">Improvements</a>
+          <a href="#coverage">Test Coverage</a>
+          <a href="#next25">Top 25 Next</a>
+          <a href="#question">Top Question</a>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <div class="hero">
+          <div class="hero-shapes">
+            <div class="circle"></div>
+            <div class="square"></div>
+            <div class="tri"></div>
+          </div>
+          <div class="hero-badge">Status Report &middot; Build Recovery</div>
+          <h1>Build Recovery &amp; Architecture Fix</h1>
+          <p class="hero-subtitle">
+            All 5 buildflow failures resolved. Two root causes fixed: a broken
+            <code>hasFile</code> helper that blocked compilation, and a clean-architecture violation
+            in the domain layer that broke the Nix sandbox build. Full suite now green: 39/39 steps
+            pass, all tests pass, Nix build succeeds.
+          </p>
+        </div>
+
+        <!-- SUMMARY -->
+        <h2 id="summary"><span class="num">00</span>Summary</h2>
+        <div class="stat-grid">
+          <div class="stat-card stat-good">
+            <div class="stat-value">39/39</div>
+            <div class="stat-label">Buildflow Steps</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">5/5</div>
+            <div class="stat-label">Failures Fixed</div>
+          </div>
+          <div class="stat-card stat-good">
+            <div class="stat-value">3</div>
+            <div class="stat-label">Files Changed</div>
+          </div>
+          <div class="stat-card stat-warn">
+            <div class="stat-value">25.9%</div>
+            <div class="stat-label">Avg Coverage</div>
+          </div>
+          <div class="stat-card stat-bad">
+            <div class="stat-value">4</div>
+            <div class="stat-label">Zero-Coverage Pkgs</div>
+          </div>
+        </div>
+
+        <p>
+          The project was in a <strong>blocked state</strong>: a previous dependency refactor
+          (commit <code>8b1440f</code>) replaced a working <code>hasFile</code> function with
+          non-compiling code (<code>slices.Contains(dirs, nil)</code>), which cascaded into 4 of the
+          5 buildflow failures. The 5th failure — <code>nix-build</code> — was caused by a deeper
+          architectural problem: the domain layer performed filesystem I/O
+          (<code>exec.LookPath</code>) during validation, which failed inside the Nix sandbox where
+          signing tools (<code>gpg</code>, <code>cosign</code>) are not installed.
+        </p>
+
+        <p>
+          Both root causes are now fixed. The build is fully green. This report documents the
+          current state, the remaining gaps, and the prioritized path forward.
+        </p>
+
+        <!-- ROOT CAUSE -->
+        <h2 id="root-cause"><span class="num">01</span>Root Causes (Both Fixed)</h2>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Fixed &middot; Root Cause 1</span>
+          <h3>Broken <code>hasFile</code> helper blocked compilation</h3>
+          <div class="where">internal/utils/recommendations.go:98</div>
+          <p>
+            Commit <code>8b1440f</code> ("use slices package instead of manual directory traversal")
+            replaced the working implementation with
+            <code>func hasFile(filename string) bool { return slices.Contains(dirs, nil) }</code>
+            — a one-liner that references an undefined variable <code>dirs</code>, doesn't use the
+            <code>filename</code> parameter, and cannot compile. This single breakage cascaded into
+            <code>test-race</code>, <code>test-coverage</code>, <code>go-fix</code>, and
+            <code>govalid-generate</code> — all of which depend on a successful build.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied:</strong> Restored the original <code>os.Stat</code>-based
+            implementation that checks the current directory plus common subdirectories
+            (<code>cmd</code>, <code>pkg</code>, <code>internal</code>, <code>src</code>,
+            <code>app</code>). Removed the now-unused <code>slices</code> import.
+          </div>
+        </div>
+
+        <div class="issue issue-critical">
+          <span class="severity severity-critical">Fixed &middot; Root Cause 2</span>
+          <h3>Domain layer performed filesystem I/O during validation</h3>
+          <div class="where">
+            internal/domain/config_core.go:288 &amp; internal/validation/business_rules.go:398
+          </div>
+          <p>
+            The domain layer's <code>validateSigningConfiguration()</code> called
+            <code>exec.LookPath(tool)</code> to verify signing tools (<code>gpg</code>,
+            <code>cosign</code>, <code>openssl</code>) were installed. This violated the project's
+            own documented architecture rule — "domain layer must not use external dependencies" —
+            and broke the Nix sandbox build, where those tools don't exist. Integration tests that
+            enable basic signing (<code>SigningLevelBasic</code>) failed with
+            <code>EXTERNAL_TOOL_NOT_FOUND</code>.
+          </p>
+          <div class="callout callout-solution">
+            <strong>Fix applied:</strong> Removed the filesystem check entirely from the domain
+            layer (signing-level enum validity was already checked separately at
+            <code>config_core.go:136</code>). In the validation layer, downgraded the duplicate
+            tool-availability check from a blocking <strong>error</strong> to a
+            <strong>warning</strong> — signing tools are needed at release time in CI, not at
+            config-generation time.
+          </div>
+        </div>
+
+        <!-- BEFORE / AFTER -->
+        <div class="compare-header">
+          <div class="compare-before">Before (broken)</div>
+          <div class="compare-after">After (fixed)</div>
+        </div>
+        <div class="compare-row">
+          <div>
+            <pre><code><span class="tok-comment">// Doesn't compile: undefined `dirs`</span>
+<span class="tok-keyword">func</span> <span class="tok-func">hasFile</span>(filename <span class="tok-type">string</span>) <span class="tok-type">bool</span> {
+  <span class="tok-keyword">return</span> <span class="tok-builtin">slices</span>.<span class="tok-func">Contains</span>(dirs, <span class="tok-keyword">nil</span>)
+}</code></pre>
+          </div>
+          <div>
+            <pre><code><span class="tok-comment">// Restored: checks filesystem properly</span>
+<span class="tok-keyword">func</span> <span class="tok-func">hasFile</span>(filename <span class="tok-type">string</span>) <span class="tok-type">bool</span> {
+  <span class="tok-keyword">if</span> _, err := <span class="tok-builtin">os</span>.<span class="tok-func">Stat</span>(filename); err == <span class="tok-keyword">nil</span> {
+    <span class="tok-keyword">return</span> <span class="tok-keyword">true</span>
+  }
+  <span class="tok-comment">// ...checks cmd, pkg, internal, src, app</span>
+}</code></pre>
+          </div>
+        </div>
+
+        <!-- FULLY DONE -->
+        <h2 id="done"><span class="num">02</span>Fully Done</h2>
+        <div class="strengths">
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Build is fully green — 39/39 buildflow steps pass</strong>
+              <span
+                >All previously-failing steps (<code>test-coverage</code>, <code>test-race</code>,
+                <code>go-fix</code>, <code>govalid-generate</code>, <code>nix-build</code>) now
+                pass.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>hasFile function restored</strong>
+              <span
+                ><code>internal/utils/recommendations.go</code> — proper <code>os.Stat</code> checks
+                across current dir + 5 common subdirs.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Domain layer purity restored</strong>
+              <span
+                ><code>internal/domain/config_core.go</code> — removed
+                <code>exec.LookPath</code> filesystem I/O and the <code>os/exec</code> import.
+                Domain is now side-effect-free.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Signing tool check correctly scoped</strong>
+              <span
+                ><code>internal/validation/business_rules.go</code> — downgraded from blocking error
+                to warning. Tools are a release-time concern, not a config-generation concern.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>All Go tests pass</strong>
+              <span
+                >Every package compiles and passes: <code>cmd/goreleaser-wizard</code>,
+                <code>internal/domain</code>, <code>internal/types</code>,
+                <code>internal/utils</code>, <code>internal/validation</code>.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Nix build succeeds</strong>
+              <span
+                ><code>nix build</code> produces a working binary. The integration tests that
+                exercise signing no longer fail in the sandbox.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Core features functional</strong>
+              <span
+                >Interactive wizard, project auto-detection, GoReleaser config generation, GitHub
+                Actions generation — all operational per FEATURES.md.</span
+              >
+            </div>
+          </div>
+          <div class="strength">
+            <div class="check">+</div>
+            <div class="text">
+              <strong>Architecture enforcement in place</strong>
+              <span
+                ><code>go-arch-lint</code> with AST-based deep scanning enforces domain isolation.
+                The violation we fixed would ideally have been caught here too.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <!-- PARTIALLY DONE -->
+        <h2 id="partial"><span class="num">03</span>Partially Done</h2>
+
+        <div class="card card-warning">
+          <h4>Test coverage — low across the board</h4>
+          <p>
+            Average coverage sits around <strong>25.9%</strong>. The project's own quality gate
+            requires <strong>80% minimum</strong>. Only <code>internal/validation</code> (57.8%) and
+            <code>cmd/goreleaser-wizard</code> (51.6%) are within striking distance. The domain
+            layer — the most critical package — is at <strong>10.0%</strong>.
+          </p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>Clean architecture — enforced but had a leak</h4>
+          <p>
+            <code>go-arch-lint</code> enforces layer boundaries, but it checks <em>imports</em>, not
+            <em>behavior</em>. The domain layer importing <code>os/exec</code> was caught by the
+            linter as an allowed stdlib import, masking the architectural violation. The purity rule
+            ("no side effects in domain") is documented but not mechanically enforced.
+          </p>
+        </div>
+
+        <div class="card card-warning">
+          <h4>FEATURES.md — stale (last updated 2025-12-16)</h4>
+          <p>
+            The feature inventory is 6+ months old and doesn't reflect today's fixes. Status
+            indicators don't match reality. No <code>TODO_LIST.md</code> exists at root — the
+            project tracking docs are fragmented across <code>docs/status/</code> (20+ historical
+            reports) and several root-level markdown files.
+          </p>
+        </div>
+
+        <!-- NOT STARTED -->
+        <h2 id="not-started"><span class="num">04</span>Not Started</h2>
+
+        <div class="card">
+          <h4>No TODO_LIST.md at project root</h4>
+          <p>
+            The AGENTS.md documentation system specifies <code>TODO_LIST.md</code> for
+            short/mid-term tasks. It doesn't exist. Work items are scattered across
+            <code>COMPREHENSIVE_REFACTORING_TODO.md</code>, <code>EXECUTION_PLAN.md</code>, and
+            historical status reports.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>No ROADMAP.md</h4>
+          <p>
+            Long-term direction is undocumented as a single source of truth. Multiple planning docs
+            exist in <code>docs/planning/</code> but they're point-in-time snapshots, not a
+            maintained roadmap.
+          </p>
+        </div>
+
+        <div class="card">
+          <h4>Domain layer unit tests</h4>
+          <p>
+            At 10% coverage, the domain layer — the heart of the business logic — is severely
+            undertested. <code>SafeProjectConfig.Validate()</code>, <code>ApplyDefaults()</code>,
+            enum validation, and the clone/copy logic need comprehensive table-driven tests.
+          </p>
+        </div>
+
+        <!-- TOTALLY FUCKED UP -->
+        <h2 id="fucked"><span class="num">05</span>Totally Fucked Up (Now Fixed)</h2>
+
+        <div class="card card-problem">
+          <h4>The <code>8b1440f</code> refactor was sabotage-by-automation</h4>
+          <p>
+            A commit titled "use slices package instead of manual directory traversal" replaced 15
+            lines of working <code>os.Stat</code> logic with a single line that
+            <strong>does not compile</strong>. The replacement
+            <code>slices.Contains(dirs, nil)</code> referenced an undefined variable, ignored its
+            input parameter, and returned a constant regardless of whether any file existed. This
+            shipped to <code>master</code> and broke the build for an unknown period.
+          </p>
+          <div class="callout callout-warning">
+            <strong>Lesson:</strong> No build/CI gate caught this before merge. The
+            <code>hasFile</code> function has no direct unit tests, so a nonsensical rewrite passed
+            review. This function needs tests <em>now</em>.
+          </div>
+        </div>
+
+        <div class="card card-problem">
+          <h4>Domain layer violated its own purity rule</h4>
+          <p>
+            The most important architectural rule in this project — "domain must be pure, zero
+            external dependencies, no side effects" — was violated by the domain layer itself
+            calling <code>exec.LookPath()</code>. This wasn't a new mistake: it was sitting in the
+            codebase, silently breaking the Nix sandbox build, until someone ran
+            <code>nix build</code>.
+          </p>
+        </div>
+
+        <!-- IMPROVEMENTS -->
+        <h2 id="improve"><span class="num">06</span>What We Should Improve</h2>
+
+        <ul>
+          <li>
+            <strong>Add a pre-commit/pre-merge build gate</strong> — a broken
+            <code>hasFile</code> should never reach <code>master</code>. The buildflow
+            <code>--fix</code> run exists; it should run on every push.
+          </li>
+          <li>
+            <strong>Add unit tests for <code>hasFile</code></strong> — the function that just broke
+            the build has zero direct tests. This is the highest-ROI test addition possible.
+          </li>
+          <li>
+            <strong>Enforce domain purity mechanically</strong> — <code>go-arch-lint</code> catches
+            import violations but not behavioral ones (like calling <code>exec.LookPath</code>).
+            Consider a custom linter rule or a domain test harness that runs in a hermetic
+            environment.
+          </li>
+          <li>
+            <strong>Consolidate documentation sprawl</strong> — 16 root-level <code>.md</code> files
+            (4,914 lines) plus 20+ status reports. Most are point-in-time snapshots that belong in
+            <code>docs/</code> or should be archived. Root should contain only living docs (README,
+            AGENTS, FEATURES, TODO_LIST, ROADMAP, CHANGELOG).
+          </li>
+          <li>
+            <strong>Raise domain coverage from 10% to 80%+</strong> — the domain layer is the
+            easiest code to test (pure functions, no I/O) and the most important to get right.
+          </li>
+          <li>
+            <strong>Fix the 16 <code>makezero</code> lint warnings</strong> — slices created with
+            <code>make([]T, len(x))</code> followed by <code>append</code> waste capacity. Use
+            <code>make([]T, 0, len(x))</code> instead. Trivial, mechanical fix.
+          </li>
+          <li>
+            <strong>Distinguish "config generation" vs "release readiness" validation</strong> — the
+            signing-tool check confusion shows these two concerns are conflated. Config generation
+            should validate <em>correctness</em>; release readiness should check
+            <em>environment</em>.
+          </li>
+        </ul>
+
+        <!-- COVERAGE TABLE -->
+        <h2 id="coverage"><span class="num">07</span>Test Coverage by Package</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Package</th>
+                <th>Coverage</th>
+                <th>Status</th>
+                <th>Gap to 80%</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>internal/validation</code></td>
+                <td>57.8%</td>
+                <td><span class="badge badge-medium">Close</span></td>
+                <td>22.2 pts</td>
+              </tr>
+              <tr>
+                <td><code>cmd/goreleaser-wizard</code></td>
+                <td>51.6%</td>
+                <td><span class="badge badge-medium">Close</span></td>
+                <td>28.4 pts</td>
+              </tr>
+              <tr>
+                <td><code>internal/utils</code></td>
+                <td>32.1%</td>
+                <td><span class="badge badge-high">Low</span></td>
+                <td>47.9 pts</td>
+              </tr>
+              <tr>
+                <td><code>internal/domain</code></td>
+                <td>10.0%</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>70.0 pts</td>
+              </tr>
+              <tr>
+                <td><code>internal/types</code></td>
+                <td>5.2%</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>74.8 pts</td>
+              </tr>
+              <tr>
+                <td><code>cmd/.../generators</code></td>
+                <td>0.0%</td>
+                <td><span class="badge badge-critical">None</span></td>
+                <td>80.0 pts</td>
+              </tr>
+              <tr>
+                <td><code>cmd/.../types</code></td>
+                <td>0.0%</td>
+                <td><span class="badge badge-critical">None</span></td>
+                <td>80.0 pts</td>
+              </tr>
+              <tr>
+                <td><code>internal/config</code></td>
+                <td>0.0%</td>
+                <td><span class="badge badge-critical">None</span></td>
+                <td>80.0 pts</td>
+              </tr>
+              <tr>
+                <td><code>internal/git</code></td>
+                <td>0.0%</td>
+                <td><span class="badge badge-critical">None</span></td>
+                <td>80.0 pts</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TOP 25 NEXT -->
+        <h2 id="next25"><span class="num">08</span>Top 25 Things to Get Done Next</h2>
+        <p>Sorted by impact (highest first). Items 1–5 are high-ROI, low-effort.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Priority</th>
+                <th>Task</th>
+                <th>Effort</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>
+                  Add unit tests for <code>hasFile</code> — the function that just broke the build
+                  has zero tests
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>
+                  Fix the 16 <code>makezero</code> lint warnings (use
+                  <code>make([]T, 0, len)</code>)
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td><span class="badge badge-critical">Critical</span></td>
+                <td>
+                  Remove unused <code>createTempFile</code> in <code>validate_test.go:59</code>
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>
+                  Fix 5 <code>infertypeargs</code> warnings in <code>internal/domain/ids.go</code>
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>
+                  Write domain-layer tests: <code>Validate()</code>, <code>ApplyDefaults()</code>,
+                  enum IsValid methods (raise 10% → 60%+)
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>
+                  Consolidate root-level doc sprawl: move historical reports to
+                  <code>docs/archive/</code>, keep only living docs at root
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>Create <code>TODO_LIST.md</code> from this report's top-25 list</td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>8</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>
+                  Refresh <code>FEATURES.md</code> — it's 6 months stale; audit actual feature state
+                  against code
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>9</td>
+                <td><span class="badge badge-high">High</span></td>
+                <td>
+                  Add a CI workflow that runs <code>buildflow --fix</code> (or at least
+                  <code>go build ./...</code> + <code>go test ./...</code>) on every push/PR
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>10</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Split "config-generation validation" from "release-readiness validation" into
+                  separate passes
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>11</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Write tests for <code>internal/types</code> (5.2% coverage) — validation result
+                  types, clone logic
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>12</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Write tests for <code>internal/utils</code> (32.1%) — recommendation functions,
+                  env detection
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>13</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Add tests for <code>cmd/.../generators</code> (0%) — goreleaser, github_actions,
+                  dockerfile generators
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>14</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Add tests for <code>internal/config</code> (0%) and <code>internal/git</code> (0%)
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>15</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Investigate mechanical enforcement of domain purity (custom linter or hermetic
+                  test harness)
+                </td>
+                <td>L</td>
+              </tr>
+              <tr>
+                <td>16</td>
+                <td><span class="badge badge-medium">Medium</span></td>
+                <td>
+                  Create <code>ROADMAP.md</code> — consolidate long-term direction from scattered
+                  planning docs
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>17</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Update <code>AGENTS.md</code> with the signing-tool architecture decision
+                  (warning, not error; release-time concern)
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>18</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Clean up <code>.buildflow-resume.json</code> — it's an untracked artifact that
+                  shouldn't be in the repo root
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>19</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Review whether <code>pkg/</code> directory (currently empty) should be removed
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>20</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Remove the <code>result</code> symlink left by <code>nix build</code> (add to
+                  <code>.gitignore</code>)
+                </td>
+                <td>S</td>
+              </tr>
+              <tr>
+                <td>21</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Document the TypeSpec → Go generation pipeline (templates/ and typespec/ dirs are
+                  opaque)
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>22</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Consider BDD tests (Ginkgo) for the interactive wizard flow — the skill exists but
+                  isn't used
+                </td>
+                <td>L</td>
+              </tr>
+              <tr>
+                <td>23</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Audit <code>docs/research/SPLIT-BRAIN.html</code> findings — was the
+                  domain/validation duplication resolved?
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>24</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Standardize error handling: AGENTS.md says "always use domain errors" but
+                  <code>fmt.Errorf</code> is used in <code>jobs.go</code>
+                </td>
+                <td>M</td>
+              </tr>
+              <tr>
+                <td>25</td>
+                <td><span class="badge badge-low">Low</span></td>
+                <td>
+                  Review the <code>github_issues/</code> directory (18 files) — are these still
+                  relevant or archival?
+                </td>
+                <td>S</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- TOP QUESTION -->
+        <h2 id="question"><span class="num">09</span>Top Question I Cannot Answer Myself</h2>
+
+        <div class="card card-warning">
+          <h4>Should signing-tool availability ever block, and if so — at which stage?</h4>
+          <p>
+            I downgraded the signing-tool check from a blocking <strong>error</strong> to a
+            <strong>warning</strong> in the validation layer, and removed it entirely from the
+            domain layer. My reasoning: at <em>config generation time</em>, the user is producing a
+            <code>.goreleaser.yaml</code> — they don't need <code>gpg</code> or
+            <code>cosign</code> installed locally; those run in CI at release time. Blocking config
+            generation because a local tool is missing seemed wrong, and it broke the Nix sandbox
+            build.
+          </p>
+          <p>
+            <strong>But I can't determine the intended product behavior:</strong> Should the wizard
+            offer a separate <em>"release readiness check"</em> command that DOES block on tool
+            availability (a pre-flight check before <code>goreleaser release</code>)? Or is the
+            warning sufficient and the user is expected to install tools before releasing? This is a
+            product/UX decision, not a technical one — and it determines whether the validation
+            architecture needs two distinct passes or one.
+          </p>
+          <div class="callout callout-warning">
+            <strong>Awaiting decision:</strong> Keep warning-only (current), or add a separate
+            blocking <code>goreleaser-wizard check</code> command for release-time environment
+            validation?
+          </div>
+        </div>
+
+        <footer class="footer">
+          Generated 2026-06-30 &middot; All claims verified against source code and buildflow output
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      (function () {
+        if (!("IntersectionObserver" in window)) return;
+        var nav = document.querySelector("[data-nav]");
+        if (!nav) return;
+        var links = nav.querySelectorAll('a[href^="#"]');
+        var ids = Array.from(links).map(function (l) {
+          return l.getAttribute("href").slice(1);
+        });
+        var sections = ids
+          .map(function (id) {
+            return document.getElementById(id);
+          })
+          .filter(Boolean);
+        if (!sections.length) return;
+        var observer = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (entry.isIntersecting) {
+                links.forEach(function (link) {
+                  link.classList.toggle(
+                    "active",
+                    link.getAttribute("href") === "#" + entry.target.id,
+                  );
+                });
+              }
+            });
+          },
+          { rootMargin: "-80px 0px -60% 0px", threshold: 0 },
+        );
+        sections.forEach(function (s) {
+          observer.observe(s);
+        });
+      })();
+    </script>
+  </body>
+</html>
