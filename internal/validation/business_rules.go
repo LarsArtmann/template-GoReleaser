@@ -393,19 +393,20 @@ func validateSigningBusinessRules(
 	config *domain.SafeProjectConfig,
 	result *types.ValidationResult,
 ) error {
-	// Signing tools availability
+	// Signing tools availability (warning only — tools are needed at release time in CI, not at config generation time)
 	if config.SigningLevel.IsEnabled() {
 		requiredTools := config.SigningLevel.GetRequiredTools()
 		for _, tool := range requiredTools {
 			_, err := exec.LookPath(tool)
 			if err != nil {
-				result.AddError(&types.ValidationError{
-					Code:       domain.ErrDependencyMissing,
-					Field:      "signing_tools",
-					Message:    "Required signing tool not found: " + tool,
-					Level:      types.ErrorLevelHigh,
-					Suggestion: fmt.Sprintf("Install %s or lower signing level", tool),
-				})
+				addWarning(
+					result,
+					"SIGNING_TOOL_MISSING",
+					"signing_tools",
+					"Required signing tool not found: "+tool,
+					types.WarningLevelMedium,
+					fmt.Sprintf("Install %s before releasing, or lower signing level", tool),
+				)
 			}
 		}
 	}

@@ -3,7 +3,6 @@ package domain
 import (
 	"encoding/json"
 	"fmt"
-	"os/exec"
 
 	"github.com/go-faster/yaml"
 )
@@ -227,12 +226,6 @@ func (spc *SafeProjectConfig) validateBusinessRules() error {
 		return err
 	}
 
-	// Validate signing configuration
-	err = spc.validateSigningConfiguration()
-	if err != nil {
-		return err
-	}
-
 	// Validate Actions configuration
 	err = spc.validateActionsConfiguration()
 	if err != nil {
@@ -278,28 +271,6 @@ func (spc *SafeProjectConfig) validateDockerConfiguration() error {
 				"Docker image name is required for deployment",
 				"Docker image name cannot be empty when deployment is enabled",
 			).WithField("docker_image")
-		}
-	}
-
-	return nil
-}
-
-// validateSigningConfiguration validates signing configuration.
-func (spc *SafeProjectConfig) validateSigningConfiguration() error {
-	if spc.SigningLevel.IsEnabled() {
-		// Check if required tools are available
-		requiredTools := spc.SigningLevel.GetRequiredTools()
-		for _, tool := range requiredTools {
-			path, err := exec.LookPath(tool)
-			if err != nil {
-				return NewValidationError(
-					ErrExternalToolNotFound,
-					"Required signing tool not found",
-					tool,
-				).WithField("signing_tools")
-			}
-
-			_ = path // Tool found, use path if needed
 		}
 	}
 

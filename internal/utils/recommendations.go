@@ -5,7 +5,6 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
-	"slices"
 	"strings"
 
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
@@ -95,7 +94,20 @@ func GetRecommendedDockerRegistry(gitProvider domain.GitProvider) domain.DockerR
 }
 
 // hasFile checks if a file exists in current directory or common subdirectories.
-func hasFile(filename string) bool { return slices.Contains(dirs, nil) }
+func hasFile(filename string) bool {
+	if _, err := os.Stat(filename); err == nil {
+		return true
+	}
+
+	dirs := []string{"cmd", "pkg", "internal", "src", "app"}
+	for _, dir := range dirs {
+		if _, err := os.Stat(dir + "/" + filename); err == nil {
+			return true
+		}
+	}
+
+	return false
+}
 
 // GetGitHubOwner tries to extract GitHub owner from git remote.
 func GetGitHubOwner() string {

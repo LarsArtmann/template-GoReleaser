@@ -194,3 +194,18 @@ Copy/paste detection report
 /report/jscpd-report.json
 # Nix build output
 /result
+
+# >>> buildflow-managed (.gitignore) >>>
+# Auto-managed by buildflow. Edit outside these markers; this block is regenerated on `buildflow --fix`.
+
+## Databases
+*.db-shm
+*.db-wal
+
+## Reports and coverage
+reports/
+
+## Nix
+result-*
+.direnv/
+# <<< buildflow-managed (.gitignore) <<<
