@@ -202,6 +202,11 @@ Copy/paste detection report
 *.db-shm
 *.db-wal
 
+## Buildflow artifacts
+audit-log.*
+workflow-audit-log.*
+.buildflow-workflow-baseline.json
+
 ## Reports and coverage
 reports/
 
