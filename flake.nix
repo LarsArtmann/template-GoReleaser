@@ -68,7 +68,12 @@
               homepage = "https://github.com/LarsArtmann/GoReleaser-Wizard";
               license = lib.licenses.mit;
               mainProgram = "goreleaser-wizard";
-              maintainers = [ lib.maintainers.larsartmann ];
+              maintainers = [
+                {
+                  name = "Lars Artmann";
+                  github = "LarsArtmann";
+                }
+              ];
               platforms = lib.platforms.linux ++ lib.platforms.darwin;
             };
           };
