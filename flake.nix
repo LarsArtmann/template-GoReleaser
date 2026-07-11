@@ -60,7 +60,7 @@
               "-w"
               "-X main.version=${version}"
               "-X main.commit=${self.rev or "dirty"}"
-              "-X main.date=1970-01-01T00:00:00Z"
+              "-X main.date=${toString self.lastModified}"
             ];
 
             meta = {
