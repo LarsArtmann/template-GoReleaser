@@ -190,7 +190,7 @@ tmpl := template.New("github-actions").Delims("[[", "]]")
 
 ```yaml
 # Before (BROKEN):
-username: {{.DockerUsername}}
+username: { { .DockerUsername } }
 # Or trying to escape:
 username: ${{ "{{ secrets.DOCKER_USERNAME }}" }}
 

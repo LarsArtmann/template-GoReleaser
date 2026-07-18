@@ -1,6 +1,5 @@
 # GoReleaser-Wizard Agent Guide
 
-**Last Updated**: February 9, 2026
 **Project**: GoReleaser-Wizard - Interactive GoReleaser configuration wizard
 **Repository**: https://github.com/LarsArtmann/GoReleaser-Wizard
 

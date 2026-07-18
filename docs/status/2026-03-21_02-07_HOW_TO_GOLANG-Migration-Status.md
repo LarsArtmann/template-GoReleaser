@@ -136,78 +136,78 @@ Successfully migrated from `gopkg.in/yaml.v3` to `github.com/go-faster/yaml` and
   - **Pre-commit Hooks** (Unknown)
   - May fail due to build errors
   - **File Size Analysis**:
-    | File | Lines | Category |
-    |---|---|---|
-    | `internal/types/validation.go` | 857 | Validation Types |
-    | `cmd/goreleaser-wizard/jobs.go` | 833 | Job Orchestration |
-    | `internal/domain/validation.go` | 659 | Domain Validation |
-    | `internal/validation/business_rules.go` | 626 | Business Rules |
-    | `internal/validation/basic.go` | 617 | Basic Validation |
-    | `cmd/goreleaser-wizard/jobs/implementations.go` | 573 | Job Implementations |
-    | `internal/domain/interfaces.go` | 490 | Domain Interfaces |
-    | `cmd/goreleaser-wizard/workflow.go` | 467 | Workflow |
-    | `internal/domain/config_core.go` | 427 | Core Configuration |
-    | `cmd/goreleaser-wizard/jobs/factory.go` | 408 | Job Factory |
-    | `internal/domain/config_defaults.go` | 381 | Configuration Defaults |
-    | `internal/domain/errors.go` | 368 | Domain Errors |
-    | `cmd/goreleaser-wizard/tui_wizard.go` | 367 | TUI Wizard |
-    | `cmd/goreleaser-wizard/jobs/types.go` | 364 | Job Types |
-    | `cmd/goreleaser-wizard/job_manager.go` | 367 | Job Manager |
-    | `internal/domain/enums.go` | 317 | Domain Enums |
-    | `cmd/goreleaser-wizard/interactive.go` | 331 | Interactive Prompts |
-    | `cmd/goreleaser-wizard/generate.go` | 300 | Generate Command |
-    | `internal/domain/architecture.go` | 275 | Architecture Config |
-    | `cmd/goreleaser-wizard/validate_main.go` | 250 | Validation Main |
-    | `internal/domain/ids.go` | 225 | ID Types |
-    | `internal/utils/recommendations.go` | 195 | Recommendations |
-    | `internal/domain/ids_test.go` | 200 | ID Tests |
-    | `internal/validation/template_escaping.go` | 156 | Template Escaping |
-    | `internal/validation/form_validator.go` | 132 | Form Validator |
-    | `cmd/goreleaser-wizard/generators/goreleaser.go` | 115 | GoReleaser Generator |
-    | `cmd/goreleaser-wizard/generators/github_actions.go` | 107 | GitHub Actions Generator |
-    | `cmd/goreleaser-wizard/generators/dockerfile.go` | 102 | Dockerfile Generator |
-    | `cmd/goreleaser-wizard/generators/homebrew.go` | 95 | Homebrew Generator |
-    | `internal/domain/architecture_test.go` | 275 | Architecture Tests |
-    | `internal/domain/enums_test.go` | 317 | Enum Tests |
-    | `cmd/goreleaser-wizard/generators/validate.go` | 84 | Validate Generator |
-    | `internal/git/commands.go` | 76 | Git Commands |
-    | `cmd/goreleaser-wizard/types/template_data.go` | 69 | Template Data |
-    | `cmd/goreleaser-wizard/validate_display.go` | 63 | Validation Display |
-    | `internal/validation/validate.go` | 60 | Validation Entry |
-    | `cmd/goreleaser-wizard/generators/sbom.go` | 55 | SBOM Generator |
-    | `internal/validation/validation_utils.go` | 54 | Validation Utils |
-    | `cmd/goreleaser-wizard/validate_workflow.go` | 52 | Validation Workflow |
-    | `cmd/goreleaser-wizard/generators/homebrew_formula.go` | 47 | Homebrew Formula |
+    | File                                                   | Lines | Category                 |
+    | ------------------------------------------------------ | ----- | ------------------------ |
+    | `internal/types/validation.go`                         | 857   | Validation Types         |
+    | `cmd/goreleaser-wizard/jobs.go`                        | 833   | Job Orchestration        |
+    | `internal/domain/validation.go`                        | 659   | Domain Validation        |
+    | `internal/validation/business_rules.go`                | 626   | Business Rules           |
+    | `internal/validation/basic.go`                         | 617   | Basic Validation         |
+    | `cmd/goreleaser-wizard/jobs/implementations.go`        | 573   | Job Implementations      |
+    | `internal/domain/interfaces.go`                        | 490   | Domain Interfaces        |
+    | `cmd/goreleaser-wizard/workflow.go`                    | 467   | Workflow                 |
+    | `internal/domain/config_core.go`                       | 427   | Core Configuration       |
+    | `cmd/goreleaser-wizard/jobs/factory.go`                | 408   | Job Factory              |
+    | `internal/domain/config_defaults.go`                   | 381   | Configuration Defaults   |
+    | `internal/domain/errors.go`                            | 368   | Domain Errors            |
+    | `cmd/goreleaser-wizard/tui_wizard.go`                  | 367   | TUI Wizard               |
+    | `cmd/goreleaser-wizard/jobs/types.go`                  | 364   | Job Types                |
+    | `cmd/goreleaser-wizard/job_manager.go`                 | 367   | Job Manager              |
+    | `internal/domain/enums.go`                             | 317   | Domain Enums             |
+    | `cmd/goreleaser-wizard/interactive.go`                 | 331   | Interactive Prompts      |
+    | `cmd/goreleaser-wizard/generate.go`                    | 300   | Generate Command         |
+    | `internal/domain/architecture.go`                      | 275   | Architecture Config      |
+    | `cmd/goreleaser-wizard/validate_main.go`               | 250   | Validation Main          |
+    | `internal/domain/ids.go`                               | 225   | ID Types                 |
+    | `internal/utils/recommendations.go`                    | 195   | Recommendations          |
+    | `internal/domain/ids_test.go`                          | 200   | ID Tests                 |
+    | `internal/validation/template_escaping.go`             | 156   | Template Escaping        |
+    | `internal/validation/form_validator.go`                | 132   | Form Validator           |
+    | `cmd/goreleaser-wizard/generators/goreleaser.go`       | 115   | GoReleaser Generator     |
+    | `cmd/goreleaser-wizard/generators/github_actions.go`   | 107   | GitHub Actions Generator |
+    | `cmd/goreleaser-wizard/generators/dockerfile.go`       | 102   | Dockerfile Generator     |
+    | `cmd/goreleaser-wizard/generators/homebrew.go`         | 95    | Homebrew Generator       |
+    | `internal/domain/architecture_test.go`                 | 275   | Architecture Tests       |
+    | `internal/domain/enums_test.go`                        | 317   | Enum Tests               |
+    | `cmd/goreleaser-wizard/generators/validate.go`         | 84    | Validate Generator       |
+    | `internal/git/commands.go`                             | 76    | Git Commands             |
+    | `cmd/goreleaser-wizard/types/template_data.go`         | 69    | Template Data            |
+    | `cmd/goreleaser-wizard/validate_display.go`            | 63    | Validation Display       |
+    | `internal/validation/validate.go`                      | 60    | Validation Entry         |
+    | `cmd/goreleaser-wizard/generators/sbom.go`             | 55    | SBOM Generator           |
+    | `internal/validation/validation_utils.go`              | 54    | Validation Utils         |
+    | `cmd/goreleaser-wizard/validate_workflow.go`           | 52    | Validation Workflow      |
+    | `cmd/goreleaser-wizard/generators/homebrew_formula.go` | 47    | Homebrew Formula         |
 
   ## Priority Recommendations (Next Steps)
 
-  | Priority | Task                                                              | Status  | Effort    | Impact                            |
+  | Priority | Task | Status | Effort | Impact |
   | -------- | ----------------------------------------------------------------- | ------- | --------- | --------------------------------- | --------------------- |
-  | **1**    | Fix koanf env provider API                                        | BLOCKED | 15 min    | HIGH - Blocks all builds/tests    |
-  | **2**    | Verify build succeeds                                             | PENDING | 5 min     | HIGH - Confirms migration success |
-  | **3**    | Run test suite                                                    | PENDING | 10 min    | HIGH - Ensures no regressions     |
-  | **4**    | Split `internal/types/validation.go` (857 lines)                  | PENDING | 2 hours   | HIGH - Largest violation          |
-  | **5**    | Split `cmd/goreleaser-wizard/jobs.go` (833 lines)                 | PENDING | 2 hours   | HIGH - Complex orchestration      |
-  | **6**    | Split `internal/domain/validation.go` (659 lines)                 | PENDING | 1.5 hours | HIGH - Core domain logic          |
-  | **7**    | Split `internal/validation/business_rules.go` (626 lines)         | PENDING | 1.5 hours | MEDIUM - Business validation      |
-  | **8**    | Split `internal/validation/basic.go` (617 lines)                  | PENDING | 1.5 hours | MEDIUM - Basic validation         |
-  | **9**    | Evaluate Cobra → fang migration                                   | PENDING | 2 hours   | MEDIUM - Modern CLI framework     |
-  | **10**   | Update AGENTS.md viper examples                                   | PENDING | 30 min    | LOW - Documentation consistency   |
-  | **11**   | Update README.md dependencies                                     | PENDING | 15 min    | LOW - User-facing docs            |
-  | **12**   | Add integration tests for config manager                          | PENDING | 1 hour    | MEDIUM - Test coverage            |
-  | **13**   | Consolidate duplicate validation logic                            | PENDING | 3 hours   | MEDIUM - Code quality             |
-  | **14**   | Remove unused code in interactive.go                              | PENDING | 30 min    | LOW - Code cleanup                |
-  | **15**   | Address golangci-lint warnings                                    | PENDING | 1 hour    | MEDIUM - Code quality             |
-  | **16**   | Fix local go-composable-business-types dependency                 | PENDING | 30 min    | MEDIUM - Dependency management    |
-  | **17**   | Review architecture violations                                    | PENDING | 2 hours   | MEDIUM - Architecture compliance  |
-  | **18**   | Add pre-commit hook verification                                  | PENDING | 30 min    | LOW - CI reliability              |
-  | **19**   | Free up disk space (currently 91%)                                | PENDING | 1 hour    | HIGH - Blocks builds              |
-  | **20**   | Split `cmd/goreleaser-wizard/jobs/implementations.go` (573 lines) | PENDING | 1.5 hours | MEDIUM                            | Job implementations   |
-  | **21**   | Split `internal/domain/interfaces.go` (490 lines)                 | PENDING | 1 hour    | MEDIUM                            | Interface definitions |
-  | **22**   | Split `cmd/goreleaser-wizard/workflow.go` (467 lines)             | PENDING | 1 hour    | MEDIUM                            | Workflow logic        |
-  | **23**   | Split `internal/domain/config_core.go` (427 lines)                | PENDING | 1 hour    | MEDIUM                            | Core configuration    |
-  | **24**   | Split `cmd/goreleaser-wizard/jobs/factory.go` (408 lines)         | PENDING | 1 hour    | MEDIUM                            | Factory pattern       |
-  | **25**   | Create migration checklist document                               | PENDING | 30 min    | LOW                               | Process tracking      |
+  | **1** | Fix koanf env provider API | BLOCKED | 15 min | HIGH - Blocks all builds/tests |
+  | **2** | Verify build succeeds | PENDING | 5 min | HIGH - Confirms migration success |
+  | **3** | Run test suite | PENDING | 10 min | HIGH - Ensures no regressions |
+  | **4** | Split `internal/types/validation.go` (857 lines) | PENDING | 2 hours | HIGH - Largest violation |
+  | **5** | Split `cmd/goreleaser-wizard/jobs.go` (833 lines) | PENDING | 2 hours | HIGH - Complex orchestration |
+  | **6** | Split `internal/domain/validation.go` (659 lines) | PENDING | 1.5 hours | HIGH - Core domain logic |
+  | **7** | Split `internal/validation/business_rules.go` (626 lines) | PENDING | 1.5 hours | MEDIUM - Business validation |
+  | **8** | Split `internal/validation/basic.go` (617 lines) | PENDING | 1.5 hours | MEDIUM - Basic validation |
+  | **9** | Evaluate Cobra → fang migration | PENDING | 2 hours | MEDIUM - Modern CLI framework |
+  | **10** | Update AGENTS.md viper examples | PENDING | 30 min | LOW - Documentation consistency |
+  | **11** | Update README.md dependencies | PENDING | 15 min | LOW - User-facing docs |
+  | **12** | Add integration tests for config manager | PENDING | 1 hour | MEDIUM - Test coverage |
+  | **13** | Consolidate duplicate validation logic | PENDING | 3 hours | MEDIUM - Code quality |
+  | **14** | Remove unused code in interactive.go | PENDING | 30 min | LOW - Code cleanup |
+  | **15** | Address golangci-lint warnings | PENDING | 1 hour | MEDIUM - Code quality |
+  | **16** | Fix local go-composable-business-types dependency | PENDING | 30 min | MEDIUM - Dependency management |
+  | **17** | Review architecture violations | PENDING | 2 hours | MEDIUM - Architecture compliance |
+  | **18** | Add pre-commit hook verification | PENDING | 30 min | LOW - CI reliability |
+  | **19** | Free up disk space (currently 91%) | PENDING | 1 hour | HIGH - Blocks builds |
+  | **20** | Split `cmd/goreleaser-wizard/jobs/implementations.go` (573 lines) | PENDING | 1.5 hours | MEDIUM | Job implementations |
+  | **21** | Split `internal/domain/interfaces.go` (490 lines) | PENDING | 1 hour | MEDIUM | Interface definitions |
+  | **22** | Split `cmd/goreleaser-wizard/workflow.go` (467 lines) | PENDING | 1 hour | MEDIUM | Workflow logic |
+  | **23** | Split `internal/domain/config_core.go` (427 lines) | PENDING | 1 hour | MEDIUM | Core configuration |
+  | **24** | Split `cmd/goreleaser-wizard/jobs/factory.go` (408 lines) | PENDING | 1 hour | MEDIUM | Factory pattern |
+  | **25** | Create migration checklist document | PENDING | 30 min | LOW | Process tracking |
 
   ## Metrics Summary
 
