@@ -16,8 +16,7 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	force, _ := cmd.Flags().GetBool("force")
 	configOnly, _ := cmd.Flags().GetBool("config-only")
 
-	fmt.Println(titleStyle.Render("⚙️ Generating GoReleaser Configuration"))
-	fmt.Println()
+	printCommandHeader("⚙️ Generating GoReleaser Configuration")
 
 	// Detect project information
 	projectConfig := &domain.SafeProjectConfig{}

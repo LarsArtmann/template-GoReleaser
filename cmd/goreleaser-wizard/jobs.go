@@ -508,11 +508,14 @@ func (j *ProjectValidationJob) Name() string {
 	return "Validate Project Structure"
 }
 
-func (j *ProjectValidationJob) Execute(ctx context.Context) error {
-	j.logger.Info("Validating project structure")
+func checkJobContext(ctx context.Context, logger *log.Logger, message string) error {
+	logger.Info(message)
 
-	err := checkContextCancellation(ctx, "context cancelled")
-	if err != nil {
+	return checkContextCancellation(ctx, "context cancelled")
+}
+
+func (j *ProjectValidationJob) Execute(ctx context.Context) error {
+	if err := checkJobContext(ctx, j.logger, "Validating project structure"); err != nil {
 		return err
 	}
 
@@ -582,10 +585,7 @@ func (j *DependencyCheckJob) Name() string {
 }
 
 func (j *DependencyCheckJob) Execute(ctx context.Context) error {
-	j.logger.Info("Checking dependencies")
-
-	err := checkContextCancellation(ctx, "context cancelled")
-	if err != nil {
+	if err := checkJobContext(ctx, j.logger, "Checking dependencies"); err != nil {
 		return err
 	}
 

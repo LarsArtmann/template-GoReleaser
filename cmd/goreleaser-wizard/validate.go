@@ -8,7 +8,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// Validation repository (would be injected in real implementation).
+// printCommandHeader prints a styled command heading.
+func printCommandHeader(title string) {
+	fmt.Println(titleStyle.Render(title))
+	fmt.Println()
+}
+
 var fileSystemRepo domain.FileSystemRepository
 
 var validateCmd = &cobra.Command{
@@ -46,8 +51,7 @@ func performValidation(cmd *cobra.Command) int {
 	fix, _ := cmd.Flags().GetBool("fix")
 	projectOnly, _ := cmd.Flags().GetBool("project-only")
 
-	fmt.Println(titleStyle.Render("🔍 Validating GoReleaser Configuration"))
-	fmt.Println()
+	printCommandHeader("🔍 Validating GoReleaser Configuration")
 
 	// Initialize dependencies (in real implementation, this would be injected)
 	fileSystemRepo = &SimpleFileSystemRepository{}

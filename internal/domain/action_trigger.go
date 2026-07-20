@@ -1,8 +1,6 @@
 package domain
 
 import (
-	"errors"
-	"fmt"
 	"slices"
 	"strings"
 )
@@ -127,17 +125,7 @@ func (at ActionTrigger) RecommendedFor() []ProjectType {
 
 // ValidateActionTriggers validates a slice of action triggers.
 func ValidateActionTriggers(triggers []ActionTrigger) error {
-	if len(triggers) == 0 {
-		return errors.New("at least one action trigger is required")
-	}
-
-	for _, trigger := range triggers {
-		if !trigger.IsValid() {
-			return fmt.Errorf("invalid action trigger: %s", trigger)
-		}
-	}
-
-	return nil
+	return validateEnumSlice(triggers, "action trigger", ActionTrigger.IsValid)
 }
 
 // GetRecommendedTriggers returns recommended triggers for a project type.

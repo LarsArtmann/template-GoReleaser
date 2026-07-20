@@ -378,6 +378,17 @@ func (j *MigrationValidationJob) Rollback(ctx context.Context) error {
 	return nil
 }
 
+func generateConfiguration(config *ProjectConfig, logger *log.Logger, failureMessage, successMessage string) error {
+	err := generateGoReleaserConfig(config)
+	if err != nil {
+		return fmt.Errorf("%s: %w", failureMessage, err)
+	}
+
+	logger.Info(successMessage)
+
+	return nil
+}
+
 // ConfigMigrationJob migrates configuration.
 type ConfigMigrationJob struct {
 	id          string
@@ -400,14 +411,12 @@ func (j *ConfigMigrationJob) Execute(ctx context.Context) error {
 
 	// This is a simplified migration - in real implementation,
 	// this would transform configuration based on version differences
-	err := generateGoReleaserConfig(j.config)
-	if err != nil {
-		return fmt.Errorf("migration failed: %w", err)
-	}
-
-	j.logger.Info("Configuration migrated successfully")
-
-	return nil
+	return generateConfiguration(
+		j.config,
+		j.logger,
+		"migration failed",
+		"Configuration migrated successfully",
+	)
 }
 
 func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
@@ -488,14 +497,12 @@ func (j *ConfigUpdateJob) Execute(ctx context.Context) error {
 
 	j.logger.Info("Updating configuration")
 
-	err := generateGoReleaserConfig(j.config)
-	if err != nil {
-		return fmt.Errorf("configuration update failed: %w", err)
-	}
-
-	j.logger.Info("Configuration updated successfully")
-
-	return nil
+	return generateConfiguration(
+		j.config,
+		j.logger,
+		"configuration update failed",
+		"Configuration updated successfully",
+	)
 }
 
 func (j *ConfigUpdateJob) Rollback(ctx context.Context) error {

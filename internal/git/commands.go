@@ -95,6 +95,19 @@ func (c *Command) GetRemoteURL(remote string) (string, error) {
 	return c.execute("remote", "get-url", remote)
 }
 
+func splitGitLines(output string, include func(string) bool) []string {
+	var result []string
+
+	for line := range strings.SplitSeq(output, "\n") {
+		line = strings.TrimSpace(line)
+		if line != "" && include(line) {
+			result = append(result, line)
+		}
+	}
+
+	return result
+}
+
 // GetBranches gets all branches.
 func (c *Command) GetBranches() ([]string, error) {
 	output, err := c.execute("branch", "-a")
@@ -102,18 +115,9 @@ func (c *Command) GetBranches() ([]string, error) {
 		return nil, err
 	}
 
-	branches := strings.Split(output, "\n")
-
-	var result []string
-
-	for _, branch := range branches {
-		branch = strings.TrimSpace(branch)
-		if branch != "" && !strings.HasPrefix(branch, "remotes/origin/HEAD") {
-			result = append(result, branch)
-		}
-	}
-
-	return result, nil
+	return splitGitLines(output, func(branch string) bool {
+		return !strings.HasPrefix(branch, "remotes/origin/HEAD")
+	}), nil
 }
 
 // GetTags gets all tags.
@@ -123,18 +127,7 @@ func (c *Command) GetTags() ([]string, error) {
 		return nil, err
 	}
 
-	tags := strings.Split(output, "\n")
-
-	var result []string
-
-	for _, tag := range tags {
-		tag = strings.TrimSpace(tag)
-		if tag != "" {
-			result = append(result, tag)
-		}
-	}
-
-	return result, nil
+	return splitGitLines(output, func(string) bool { return true }), nil
 }
 
 // IsRepository checks if the current directory is a git repository.
@@ -286,30 +279,23 @@ func GetCurrentDate() string {
 	return time.Now().Format("2006-01-02")
 }
 
-// GetGitHubOwner tries to get GitHub owner from git remote.
-func GetGitHubOwner() string {
-	ctx := context.Background()
-	cmd := NewCommand(ctx)
-
-	info, err := cmd.GetRepositoryInfo()
+func repositoryInfoPart(selector func(*RepositoryInfo) string, fallback string) string {
+	info, err := NewCommand(context.Background()).GetRepositoryInfo()
 	if err != nil {
-		return "owner"
+		return fallback
 	}
 
-	return info.Owner
+	return selector(info)
+}
+
+// GetGitHubOwner tries to get GitHub owner from git remote.
+func GetGitHubOwner() string {
+	return repositoryInfoPart(func(info *RepositoryInfo) string { return info.Owner }, "owner")
 }
 
 // GetGitHubRepo tries to get GitHub repo from git remote.
 func GetGitHubRepo() string {
-	ctx := context.Background()
-	cmd := NewCommand(ctx)
-
-	info, err := cmd.GetRepositoryInfo()
-	if err != nil {
-		return "repo"
-	}
-
-	return info.Repo
+	return repositoryInfoPart(func(info *RepositoryInfo) string { return info.Repo }, "repo")
 }
 
 // IncPatchVersion increments the patch version for snapshots.

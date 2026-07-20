@@ -282,20 +282,11 @@ func looksLikeNumber(value string) bool {
 }
 
 func containsShellInjection(value string) bool {
-	shellPatterns := []string{
+	return containsInjectionPattern(value, []string{
 		";", "|", "&", "<", ">", "`", "$(", "${",
 		"rm ", "del ", "format ", "shutdown", "reboot",
 		">/dev/", "</dev/", "2>&1",
-	}
-
-	lowerValue := strings.ToLower(value)
-	for _, pattern := range shellPatterns {
-		if strings.Contains(lowerValue, pattern) {
-			return true
-		}
-	}
-
-	return false
+	})
 }
 
 func isValidDockerLabel(value string) bool {
@@ -309,14 +300,9 @@ func isValidDockerLabel(value string) bool {
 	return dockerLabelPattern.MatchString(value)
 }
 
-func (te *TemplateEscaper) containsYAMLInjection(content string) bool {
-	yamlPatterns := []string{
-		"!!", "!!map", "!!seq", "!!str", "!!int",
-		"anchor:", "alias:", "<<:", "&", "*",
-	}
-
+func containsInjectionPattern(content string, patterns []string) bool {
 	lowerContent := strings.ToLower(content)
-	for _, pattern := range yamlPatterns {
+	for _, pattern := range patterns {
 		if strings.Contains(lowerContent, pattern) {
 			return true
 		}
@@ -325,18 +311,16 @@ func (te *TemplateEscaper) containsYAMLInjection(content string) bool {
 	return false
 }
 
+func (te *TemplateEscaper) containsYAMLInjection(content string) bool {
+	return containsInjectionPattern(content, []string{
+		"!!", "!!map", "!!seq", "!!str", "!!int",
+		"anchor:", "alias:", "<<:", "&", "*",
+	})
+}
+
 func (te *TemplateEscaper) containsGitHubActionsInjection(content string) bool {
-	githubPatterns := []string{
+	return containsInjectionPattern(content, []string{
 		"${{", "::set-output", "::add-path", "::error", "::warning",
 		"$GITHUB_", "github.token", "secrets.",
-	}
-
-	lowerContent := strings.ToLower(content)
-	for _, pattern := range githubPatterns {
-		if strings.Contains(lowerContent, pattern) {
-			return true
-		}
-	}
-
-	return false
+	})
 }

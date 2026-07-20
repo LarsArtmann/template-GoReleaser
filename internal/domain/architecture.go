@@ -1,10 +1,5 @@
 package domain
 
-import (
-	"errors"
-	"fmt"
-)
-
 // Architecture represents supported CPU architectures
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type Architecture string
@@ -141,17 +136,7 @@ func (a Architecture) GoSupport() string {
 
 // ValidateArchitectures validates a slice of architectures.
 func ValidateArchitectures(architectures []Architecture) error {
-	if len(architectures) == 0 {
-		return errors.New("at least one architecture is required")
-	}
-
-	for _, arch := range architectures {
-		if !arch.IsValid() {
-			return fmt.Errorf("invalid architecture: %s", arch)
-		}
-	}
-
-	return nil
+	return validateEnumSlice(architectures, "architecture", Architecture.IsValid)
 }
 
 // GetRecommendedArchitectures returns recommended architectures for common use cases.

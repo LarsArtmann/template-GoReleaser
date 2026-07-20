@@ -1,23 +1,26 @@
 package domain
 
 import (
-	"errors"
 	"fmt"
 )
 
-// ValidatePlatforms validates slice of platforms.
-func ValidatePlatforms(platforms []Platform) error {
-	if len(platforms) == 0 {
-		return errors.New("at least one platform is required")
+func validateEnumSlice[T ~string](values []T, itemName string, isValid func(T) bool) error {
+	if len(values) == 0 {
+		return fmt.Errorf("at least one %s is required", itemName)
 	}
 
-	for _, platform := range platforms {
-		if !platform.IsValid() {
-			return fmt.Errorf("invalid platform: %s", platform)
+	for _, value := range values {
+		if !isValid(value) {
+			return fmt.Errorf("invalid %s: %s", itemName, value)
 		}
 	}
 
 	return nil
+}
+
+// ValidatePlatforms validates slice of platforms.
+func ValidatePlatforms(platforms []Platform) error {
+	return validateEnumSlice(platforms, "platform", Platform.IsValid)
 }
 
 // ValidatePlatformArchCompatibility validates platform-architecture compatibility.
