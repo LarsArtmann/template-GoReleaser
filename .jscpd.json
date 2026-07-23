@@ -1,10 +1,6 @@
 {
   "threshold": 0,
-  "reporters": [
-    "console",
-    "json",
-    "html"
-  ],
+  "reporters": ["console", "json", "html"],
   "minLines": 5,
   "minTokens": 50,
   "ignore": [
