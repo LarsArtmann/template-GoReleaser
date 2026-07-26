@@ -1,6 +1,6 @@
 module github.com/LarsArtmann/GoReleaser-Wizard
 
-go 1.26.5
+go 1.26.4
 
 require (
 	charm.land/huh/v2 v2.0.3
