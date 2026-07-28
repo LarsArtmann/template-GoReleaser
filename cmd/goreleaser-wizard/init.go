@@ -17,8 +17,8 @@ import (
 func runInitWizard(cmd *cobra.Command, _ []string) {
 	defer recoverFromPanic("init wizard")
 
-	force, _ := cmd.Flags().GetBool("force")
-	interactive, _ := cmd.Flags().GetBool("interactive")
+	force := getBoolFlag(cmd, "force")
+	interactive := getBoolFlag(cmd, "interactive")
 
 	fmt.Println(titleStyle.Render("🧙 Initializing GoReleaser Configuration"))
 	fmt.Println()

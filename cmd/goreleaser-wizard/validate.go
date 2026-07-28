@@ -47,9 +47,9 @@ func performValidation(cmd *cobra.Command) int {
 	// Set up panic recovery using domain error handling
 	defer recoverFromPanic("validate command")
 
-	verbose, _ := cmd.Flags().GetBool("verbose")
-	fix, _ := cmd.Flags().GetBool("fix")
-	projectOnly, _ := cmd.Flags().GetBool("project-only")
+	verbose := getBoolFlag(cmd, "verbose")
+	fix := getBoolFlag(cmd, "fix")
+	projectOnly := getBoolFlag(cmd, "project-only")
 
 	printCommandHeader("🔍 Validating GoReleaser Configuration")
 

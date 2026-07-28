@@ -13,8 +13,8 @@ import (
 func runGenerate(cmd *cobra.Command, args []string) {
 	defer recoverFromPanic("generate command")
 
-	force, _ := cmd.Flags().GetBool("force")
-	configOnly, _ := cmd.Flags().GetBool("config-only")
+	force := getBoolFlag(cmd, "force")
+	configOnly := getBoolFlag(cmd, "config-only")
 
 	printCommandHeader("⚙️ Generating GoReleaser Configuration")
 
@@ -29,19 +29,19 @@ func runGenerate(cmd *cobra.Command, args []string) {
 	}
 
 	// Override with flags if provided
-	if name, _ := cmd.Flags().GetString("project-name"); name != "" {
+	if name := getStringFlag(cmd, "project-name"); name != "" {
 		projectConfig.ProjectName = name
 	}
 
-	if path, _ := cmd.Flags().GetString("main-path"); path != "" {
+	if path := getStringFlag(cmd, "main-path"); path != "" {
 		projectConfig.MainPath = path
 	}
 
-	if binName, _ := cmd.Flags().GetString("binary-name"); binName != "" {
+	if binName := getStringFlag(cmd, "binary-name"); binName != "" {
 		projectConfig.BinaryName = binName
 	}
 
-	if projType, _ := cmd.Flags().GetString("project-type"); projType != "" {
+	if projType := getStringFlag(cmd, "project-type"); projType != "" {
 		projectConfig.ProjectType = domain.ProjectType(projType)
 	}
 
