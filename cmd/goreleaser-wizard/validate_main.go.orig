@@ -113,7 +113,8 @@ func validateGitHubActions(results *ValidationResults) {
 	if err := validateWorkflowContent(workflowPath, results); err != nil {
 		results.ActionsValid = false
 
-		if domainErr, ok := errors.AsType[*DomainError](err); ok {
+		var domainErr *DomainError
+		if errors.As(err, &domainErr) {
 			results.Errors = append(results.Errors, domainErr)
 		}
 

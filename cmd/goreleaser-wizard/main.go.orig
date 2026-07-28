@@ -170,8 +170,8 @@ func displayError(err error) {
 	}
 
 	// Convert to domain error if not already
-	domainErr, ok := errors.AsType[*domain.DomainError](err)
-	if !ok {
+	var domainErr *domain.DomainError
+	if !errors.As(err, &domainErr) {
 		domainErr = domain.NewSystemError(
 			domain.ErrFileWriteFailed,
 			"Unexpected error",
