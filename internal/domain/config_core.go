@@ -1,7 +1,8 @@
 package domain
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 
 	"github.com/go-faster/yaml"
@@ -350,7 +351,7 @@ func (spc *SafeProjectConfig) serializeToFormat(
 // ToJSON converts configuration to JSON string.
 func (spc *SafeProjectConfig) ToJSON() (string, error) {
 	return spc.serializeToFormat(func(v any) ([]byte, error) {
-		return json.MarshalIndent(v, "", "  ")
+		return json.Marshal(v, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	}, "JSON")
 }
 

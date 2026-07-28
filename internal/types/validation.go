@@ -1,7 +1,8 @@
 package types
 
 import (
-	"encoding/json"
+	"encoding/json/jsontext"
+	"encoding/json/v2"
 	"fmt"
 	"slices"
 	"strings"
@@ -309,7 +310,7 @@ func (vr *ValidationResult) String() string {
 
 // ToJSON converts validation result to JSON.
 func (vr *ValidationResult) ToJSON() ([]byte, error) {
-	data, err := json.MarshalIndent(vr, "", "  ")
+	data, err := json.Marshal(vr, jsontext.WithIndentPrefix(""), jsontext.WithIndent("  "))
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal validation result to JSON: %w", err)
 	}

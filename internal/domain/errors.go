@@ -156,7 +156,6 @@ func (de *DomainError) WithCause(cause error) *DomainError {
 
 // IsErrorCode checks if an error matches a specific error code.
 func IsErrorCode(err error, code ErrorCode) bool {
-
 	errAs := &DomainError{}
 	if errors.As(err, &errAs) {
 		return errAs.Code == code
