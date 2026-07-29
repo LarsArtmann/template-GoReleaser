@@ -1,9 +1,5 @@
 package domain
 
-import (
-	"fmt"
-)
-
 const unknownValue = "Unknown"
 
 // CGOStatus represents CGO compilation status with compile-time safety
@@ -65,15 +61,7 @@ func (cs CGOStatus) ToBool() bool {
 
 // ValidateCGOStatus validates a CGO status.
 func ValidateCGOStatus(status CGOStatus) error {
-	if !status.IsValid() {
-		return NewValidationError(
-			ErrInvalidCharacters,
-			"Invalid CGO status",
-			fmt.Sprintf("'%s' is not a valid CGO status", status),
-		)
-	}
-
-	return nil
+	return validateEnum("CGO status", string(status), status.IsValid())
 }
 
 // SigningLevel represents code signing level with compile-time safety
@@ -169,15 +157,7 @@ func (sl SigningLevel) ToBool() bool {
 
 // ValidateSigningLevel validates a signing level.
 func ValidateSigningLevel(level SigningLevel) error {
-	if !level.IsValid() {
-		return NewValidationError(
-			ErrInvalidCharacters,
-			"Invalid signing level",
-			fmt.Sprintf("'%s' is not a valid signing level", level),
-		)
-	}
-
-	return nil
+	return validateEnum("signing level", string(level), level.IsValid())
 }
 
 // Enum migration utilities for backward compatibility

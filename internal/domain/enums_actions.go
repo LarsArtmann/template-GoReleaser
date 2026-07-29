@@ -1,7 +1,5 @@
 package domain
 
-import "fmt"
-
 // ActionLevel represents GitHub Actions complexity levels
 // This enum replaces string-based action levels for type safety.
 type ActionLevel string
@@ -205,9 +203,5 @@ func (ds DockerSupport) ToBool() bool {
 
 // ValidateDockerSupport validates a Docker support level.
 func ValidateDockerSupport(support DockerSupport) error {
-	if !support.IsValid() {
-		return fmt.Errorf("invalid Docker support level: %s", support)
-	}
-
-	return nil
+	return validateEnum("Docker support level", string(support), support.IsValid())
 }

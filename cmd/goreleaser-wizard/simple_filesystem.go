@@ -14,7 +14,7 @@ type SimpleFileSystemRepository struct{}
 func (r *SimpleFileSystemRepository) ReadFile(ctx context.Context, path string) ([]byte, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read file %q: %w", path, err)
+		return nil, wrapFSError("read file", path, err)
 	}
 
 	return data, nil
@@ -28,7 +28,7 @@ func (r *SimpleFileSystemRepository) WriteFile(
 ) error {
 	err := os.WriteFile(path, data, perm)
 	if err != nil {
-		return fmt.Errorf("failed to write file %q: %w", path, err)
+		return wrapFSError("write file", path, err)
 	}
 
 	return nil
@@ -40,7 +40,7 @@ func (r *SimpleFileSystemRepository) CreateFile(
 ) (io.WriteCloser, error) {
 	f, err := os.Create(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create file %q: %w", path, err)
+		return nil, wrapFSError("create file", path, err)
 	}
 
 	return f, nil
@@ -49,7 +49,7 @@ func (r *SimpleFileSystemRepository) CreateFile(
 func (r *SimpleFileSystemRepository) DeleteFile(ctx context.Context, path string) error {
 	err := os.Remove(path)
 	if err != nil {
-		return fmt.Errorf("failed to delete file %q: %w", path, err)
+		return wrapFSError("delete file", path, err)
 	}
 
 	return nil
@@ -65,7 +65,7 @@ func (r *SimpleFileSystemRepository) FileExists(ctx context.Context, path string
 		return false, nil
 	}
 
-	return false, fmt.Errorf("failed to check file existence %q: %w", path, err)
+	return false, wrapFSError("check file existence", path, err)
 }
 
 func (r *SimpleFileSystemRepository) CreateDir(
@@ -75,7 +75,7 @@ func (r *SimpleFileSystemRepository) CreateDir(
 ) error {
 	err := os.Mkdir(path, perm)
 	if err != nil {
-		return fmt.Errorf("failed to create directory %q: %w", path, err)
+		return wrapFSError("create directory", path, err)
 	}
 
 	return nil
@@ -88,7 +88,7 @@ func (r *SimpleFileSystemRepository) CreateDirAll(
 ) error {
 	err := os.MkdirAll(path, perm)
 	if err != nil {
-		return fmt.Errorf("failed to create directories %q: %w", path, err)
+		return wrapFSError("create directories", path, err)
 	}
 
 	return nil
@@ -104,7 +104,7 @@ func (r *SimpleFileSystemRepository) DirExists(ctx context.Context, path string)
 		return false, nil
 	}
 
-	return false, fmt.Errorf("failed to check directory existence %q: %w", path, err)
+	return false, wrapFSError("check directory existence", path, err)
 }
 
 func (r *SimpleFileSystemRepository) ReadDir(
@@ -113,7 +113,7 @@ func (r *SimpleFileSystemRepository) ReadDir(
 ) ([]os.DirEntry, error) {
 	entries, err := os.ReadDir(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to read directory %q: %w", path, err)
+		return nil, wrapFSError("read directory", path, err)
 	}
 
 	return entries, nil
@@ -125,7 +125,7 @@ func (r *SimpleFileSystemRepository) GetFileInfo(
 ) (os.FileInfo, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get file info %q: %w", path, err)
+		return nil, wrapFSError("get file info", path, err)
 	}
 
 	return info, nil
@@ -137,7 +137,7 @@ func (r *SimpleFileSystemRepository) CheckPermissions(
 ) (bool, error) {
 	info, err := os.Stat(path)
 	if err != nil {
-		return false, fmt.Errorf("failed to check permissions for %q: %w", path, err)
+		return false, wrapFSError("check permissions", path, err)
 	}
 
 	return info.Mode().Perm()&0o777 != 0, nil
@@ -146,7 +146,7 @@ func (r *SimpleFileSystemRepository) CheckPermissions(
 func (r *SimpleFileSystemRepository) AbsPath(path string) (string, error) {
 	abs, err := filepath.Abs(path)
 	if err != nil {
-		return "", fmt.Errorf("failed to get absolute path for %q: %w", path, err)
+		return "", wrapFSError("get absolute path", path, err)
 	}
 
 	return abs, nil
@@ -155,7 +155,11 @@ func (r *SimpleFileSystemRepository) AbsPath(path string) (string, error) {
 func (r *SimpleFileSystemRepository) RelPath(base, target string) (string, error) {
 	rel, err := filepath.Rel(base, target)
 	if err != nil {
-		return "", fmt.Errorf("failed to get relative path from %q to %q: %w", base, target, err)
+		return "", wrapFSError(
+			fmt.Sprintf("get relative path from %q to %q", base, target),
+			"",
+			err,
+		)
 	}
 
 	return rel, nil
@@ -181,4 +185,13 @@ func (r *SimpleFileSystemRepository) TempDir(dir, pattern string) (string, error
 	}
 
 	return tempDir, nil
+}
+
+// wrapFSError wraps a file system operation error with the operation name and path.
+func wrapFSError(op, path string, err error) error {
+	if path == "" {
+		return fmt.Errorf("failed to %s: %w", op, err)
+	}
+
+	return fmt.Errorf("failed to %s %q: %w", op, path, err)
 }
