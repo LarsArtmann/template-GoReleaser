@@ -264,7 +264,7 @@ type VersionInfo struct {
 
 // GetMajorVersion extracts major version from version string.
 func GetMajorVersion(version string) string {
-	version = strings.TrimPrefix(version, "v")
+	version = stripVersionPrefix(version)
 
 	parts := strings.Split(version, ".")
 	if len(parts) > 0 {
@@ -302,7 +302,7 @@ func GetGitHubRepo() string {
 // It removes the 'v' prefix if present, splits the version string,
 // and returns the version with the patch number incremented and "-next" suffix.
 func IncPatchVersion(v string) string {
-	v = strings.TrimPrefix(v, "v")
+	v = stripVersionPrefix(v)
 
 	parts := strings.Split(v, ".")
 	if len(parts) == 3 {
@@ -316,6 +316,13 @@ func IncPatchVersion(v string) string {
 	}
 
 	return v + "-next"
+}
+
+// stripVersionPrefix removes the leading "v" from a semantic-version-like string.
+// It centralises the prefix handling used by GetMajorVersion and IncPatchVersion so
+// the two callers stay in lockstep if the prefix convention ever changes.
+func stripVersionPrefix(version string) string {
+	return strings.TrimPrefix(version, "v")
 }
 
 // GetGitHubRepoDescription fetches the repository description from GitHub using gh CLI.

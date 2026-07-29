@@ -74,10 +74,8 @@ func ValidateProjectName(name string) error {
 		)
 	}
 
-	// Check for reserved names (case-insensitive)
-	lowerName := strings.ToLower(name)
-	if reservedNames[lowerName] {
-		return fmt.Errorf("'%s' is a reserved name and cannot be used", name)
+	if err := checkReservedName(name, "project"); err != nil {
+		return err
 	}
 
 	// Check for dangerous patterns
@@ -119,16 +117,25 @@ func ValidateBinaryName(name string) error {
 		)
 	}
 
-	// Check for reserved names (case-insensitive)
-	lowerName := strings.ToLower(name)
-	if reservedNames[lowerName] {
-		return fmt.Errorf("'%s' is a reserved name and cannot be used", name)
+	if err := checkReservedName(name, "binary"); err != nil {
+		return err
 	}
 
 	// Check for dangerous extensions
 	ext := strings.ToLower(filepath.Ext(name))
 	if dangerousExtensions[ext] {
 		return fmt.Errorf("binary name has dangerous extension: %s", ext)
+	}
+
+	return nil
+}
+
+// checkReservedName reports whether name is in the reservedNames set, doing the
+// case-insensitive lookup and formatting the error message consistently across
+// validators. label is the human-readable noun used in the error (e.g. "project").
+func checkReservedName(name, label string) error {
+	if reservedNames[strings.ToLower(name)] {
+		return fmt.Errorf("'%s' is a reserved %s name and cannot be used", name, label)
 	}
 
 	return nil
