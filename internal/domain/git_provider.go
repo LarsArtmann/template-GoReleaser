@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -136,15 +135,7 @@ func (gp GitProvider) RequiresPersonalAccessToken() bool {
 
 // ValidateGitProvider validates a git provider.
 func ValidateGitProvider(provider GitProvider) error {
-	if !provider.IsValid() {
-		return NewValidationError(
-			ErrInvalidGitProvider,
-			"Invalid git provider",
-			fmt.Sprintf("'%s' is not a valid git provider", provider),
-		)
-	}
-
-	return nil
+	return validateEnum("git provider", string(provider), provider.IsValid())
 }
 
 // GetAllGitProviders returns all available git providers.

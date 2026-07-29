@@ -1,7 +1,5 @@
 package domain
 
-import "fmt"
-
 // ConfigState represents configuration lifecycle states
 // Generated from TypeSpec specification - DO NOT MODIFY MANUALLY.
 type ConfigState string
@@ -118,15 +116,7 @@ func (cs ConfigState) AllowsGeneration() bool {
 
 // ValidateConfigState validates a configuration state.
 func ValidateConfigState(state ConfigState) error {
-	if !state.IsValid() {
-		return NewValidationError(
-			ErrInvalidConfigState,
-			"Invalid configuration state",
-			fmt.Sprintf("'%s' is not a valid configuration state", state),
-		)
-	}
-
-	return nil
+	return validateEnum("configuration state", string(state), state.IsValid())
 }
 
 // GetInitialConfigState returns the initial state for new configurations.

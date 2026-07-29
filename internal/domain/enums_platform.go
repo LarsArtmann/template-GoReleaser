@@ -1,7 +1,5 @@
 package domain
 
-import "fmt"
-
 // Platform represents supported operating systems
 // This enum replaces string-based platform types for type safety.
 type Platform string
@@ -180,15 +178,7 @@ func (p Platform) IsProductionReady() bool {
 
 // ValidatePlatform validates a platform.
 func ValidatePlatform(platform Platform) error {
-	if !platform.IsValid() {
-		return NewValidationError(
-			ErrInvalidPlatform,
-			"Invalid platform",
-			fmt.Sprintf("'%s' is not a valid platform", platform),
-		)
-	}
-
-	return nil
+	return validateEnum("platform", string(platform), platform.IsValid())
 }
 
 // GetRecommendedPlatforms returns recommended platforms for projects.

@@ -1,7 +1,5 @@
 package domain
 
-import "fmt"
-
 // BuildLevel represents build complexity levels
 // This enum replaces bool flags for build configuration.
 type BuildLevel string
@@ -75,11 +73,7 @@ func (bl BuildLevel) ToBool() bool {
 
 // ValidateBuildLevel validates a build level.
 func ValidateBuildLevel(level BuildLevel) error {
-	if !level.IsValid() {
-		return fmt.Errorf("invalid build level: %s", level)
-	}
-
-	return nil
+	return validateEnum("build level", string(level), level.IsValid())
 }
 
 // GetOptimizationFlags returns optimization flags for level.

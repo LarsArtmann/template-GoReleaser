@@ -48,7 +48,7 @@ func displayProjectStatus(results *ValidationResults) {
 }
 
 func displayErrors(errors []*DomainError, verbose bool) {
-	if len(errors) == 0 {
+	if isEmpty(errors) {
 		return
 	}
 
@@ -70,7 +70,7 @@ func displayErrors(errors []*DomainError, verbose bool) {
 }
 
 func displayWarnings(warnings []*DomainError, verbose bool) {
-	if len(warnings) == 0 {
+	if isEmpty(warnings) {
 		return
 	}
 
@@ -88,7 +88,7 @@ func displayWarnings(warnings []*DomainError, verbose bool) {
 }
 
 func displayRecommendations(recommendations []string) {
-	if len(recommendations) == 0 {
+	if isEmpty(recommendations) {
 		return
 	}
 
@@ -99,4 +99,10 @@ func displayRecommendations(recommendations []string) {
 	}
 
 	fmt.Println()
+}
+
+// isEmpty reports whether a slice is empty. Used to early-return from display helpers
+// before printing headers, keeping the per-section output idiomatic.
+func isEmpty[T any](items []T) bool {
+	return len(items) == 0
 }

@@ -123,15 +123,7 @@ func (dr DockerRegistry) DefaultNamespace() string {
 
 // ValidateDockerRegistry validates a Docker registry.
 func ValidateDockerRegistry(registry DockerRegistry) error {
-	if !registry.IsValid() {
-		return NewValidationError(
-			ErrInvalidDockerRegistry,
-			"Invalid Docker registry",
-			fmt.Sprintf("'%s' is not a valid Docker registry", registry),
-		)
-	}
-
-	return nil
+	return validateEnum("Docker registry", string(registry), registry.IsValid())
 }
 
 // ValidateDockerRegistryURL validates a Docker registry URL.
