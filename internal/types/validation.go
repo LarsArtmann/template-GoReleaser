@@ -372,66 +372,30 @@ func formatValidationItem(code, field, message, context string) string {
 	return fmt.Sprintf("[%s] %s: %s", code, field, message)
 }
 
-// detailSetter is the contract that validation items (ValidationError,
-// ValidationWarning) implement so they can share generic fluent-builders below.
-// Each method mutates a single field and returns the same typed pointer so
-// callers can chain. The combined type parameter + pointer constraint lets the
-// helpers return the correct concrete pointer (not an interface).
-type detailSetter[T any] interface {
-	setContext(string) *T
-	setDetails(string) *T
-	setSuggestion(string) *T
-}
-
-func withContext[T any, P interface { *T; detailSetter[T] }](p P, value string) P {
-	return p.setContext(value)
-}
-
-func withDetails[T any, P interface { *T; detailSetter[T] }](p P, value string) P {
-	return p.setDetails(value)
-}
-
-func withSuggestion[T any, P interface { *T; detailSetter[T] }](p P, value string) P {
-	return p.setSuggestion(value)
-}
-
 // Error implements the error interface.
 func (ve *ValidationError) Error() string {
 	return formatValidationItem(string(ve.Code), ve.Field, ve.Message, ve.Context)
 }
 
-// Internal setters used by the generic fluent-builders above.
-func (ve *ValidationError) setContext(value string) *ValidationError {
-	ve.Context = value
-
-	return ve
-}
-
-func (ve *ValidationError) setDetails(value string) *ValidationError {
-	ve.Details = value
-
-	return ve
-}
-
-func (ve *ValidationError) setSuggestion(value string) *ValidationError {
-	ve.Suggestion = value
-
-	return ve
-}
-
 // WithContext adds context to the validation error.
 func (ve *ValidationError) WithContext(context string) *ValidationError {
-	return withContext(ve, context)
+	ve.Context = context
+
+	return ve
 }
 
 // WithDetails adds details to the validation error.
 func (ve *ValidationError) WithDetails(details string) *ValidationError {
-	return withDetails(ve, details)
+	ve.Details = details
+
+	return ve
 }
 
 // WithSuggestion adds suggestion to the validation error.
 func (ve *ValidationError) WithSuggestion(suggestion string) *ValidationError {
-	return withSuggestion(ve, suggestion)
+	ve.Suggestion = suggestion
+
+	return ve
 }
 
 // cloneStruct creates a deep copy of a struct by value.
@@ -462,38 +426,25 @@ func (vw *ValidationWarning) String() string {
 	return formatValidationItem(vw.Code, vw.Field, vw.Message, vw.Context)
 }
 
-// Internal setters used by the generic fluent-builders.
-func (vw *ValidationWarning) setContext(value string) *ValidationWarning {
-	vw.Context = value
-
-	return vw
-}
-
-func (vw *ValidationWarning) setDetails(value string) *ValidationWarning {
-	vw.Details = value
-
-	return vw
-}
-
-func (vw *ValidationWarning) setSuggestion(value string) *ValidationWarning {
-	vw.Suggestion = value
-
-	return vw
-}
-
 // WithContext adds context to the validation warning.
 func (vw *ValidationWarning) WithContext(context string) *ValidationWarning {
-	return withContext(vw, context)
+	vw.Context = context
+
+	return vw
 }
 
 // WithDetails adds details to the validation warning.
 func (vw *ValidationWarning) WithDetails(details string) *ValidationWarning {
-	return withDetails(vw, details)
+	vw.Details = details
+
+	return vw
 }
 
 // WithSuggestion adds suggestion to the validation warning.
 func (vw *ValidationWarning) WithSuggestion(suggestion string) *ValidationWarning {
-	return withSuggestion(vw, suggestion)
+	vw.Suggestion = suggestion
+
+	return vw
 }
 
 // Clone creates a deep copy of the validation warning.

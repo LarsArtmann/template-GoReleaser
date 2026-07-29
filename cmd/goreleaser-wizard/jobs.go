@@ -47,6 +47,22 @@ func (h *noOpRollbackHelper) Rollback(ctx context.Context) error {
 
 const workflowDirPermission = 0o755
 
+// mapToStrings converts a slice of values into []string using an explicit
+// converter function. Used to flatten typed enum slices into the shape the
+// Go template data expects.
+//
+// Pass a closure that returns the string representation: identity for
+// ~string types (`string(s)`), String() for types that override their default
+// formatting, or GitHubPattern() for domain-specific conversions.
+func mapToStrings[T any](items []T, convert func(T) string) []string {
+	out := make([]string, len(items))
+	for i, item := range items {
+		out[i] = convert(item)
+	}
+
+	return out
+}
+
 // GoOS constants for template data.
 const goOSDarwin = "darwin"
 
@@ -701,32 +717,23 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 
 	// Convert platforms
 	if len(config.Platforms) > 0 {
-		platforms := make([]string, len(config.Platforms))
-		for i, platform := range config.Platforms {
-			platforms[i] = string(platform) // Use raw constant value
-		}
-
-		data["Platforms"] = platforms
+		data["Platforms"] = mapToStrings(config.Platforms, func(p domain.Platform) string {
+			return string(p) // Use raw constant value
+		})
 	}
 
 	// Convert architectures
 	if len(config.Architectures) > 0 {
-		architectures := make([]string, len(config.Architectures))
-		for i, arch := range config.Architectures {
-			architectures[i] = string(arch) // Use raw constant value
-		}
-
-		data["Architectures"] = architectures
+		data["Architectures"] = mapToStrings(config.Architectures, func(a domain.Architecture) string {
+			return string(a) // Use raw constant value
+		})
 	}
 
 	// Convert build tags
 	if len(config.BuildTags) > 0 {
-		tags := make([]string, len(config.BuildTags))
-		for i, tag := range config.BuildTags {
-			tags[i] = tag.String()
-		}
-
-		data["BuildTags"] = tags
+		data["BuildTags"] = mapToStrings(config.BuildTags, func(t domain.BuildTag) string {
+			return t.String()
+		})
 	}
 
 	// Add ignore combinations (common ones)
@@ -753,12 +760,9 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 
 	// Convert action triggers to GitHub patterns
 	if len(config.ActionsOn) > 0 {
-		triggers := make([]string, len(config.ActionsOn))
-		for i, trigger := range config.ActionsOn {
-			triggers[i] = trigger.GitHubPattern()
-		}
-
-		data["Triggers"] = triggers
+		data["Triggers"] = mapToStrings(config.ActionsOn, func(t domain.ActionTrigger) string {
+			return t.GitHubPattern()
+		})
 	}
 
 	addDockerConfig(data, config)

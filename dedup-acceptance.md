@@ -263,6 +263,12 @@ Extracted (real harmful duplication, this session):
   `GetMajorVersion`/`IncPatchVersion` prefix handling.
 - `checkReservedName(name, label)` in `internal/domain/validators.go` —
   unified case-insensitive reserved-name check in `ValidateProjectName`/`ValidateBinaryName`.
+- `mapToStrings[T any](items []T, convert func(T) string) []string` in
+  `cmd/goreleaser-wizard/jobs.go` — unified 4 typed-enum-slice → []string
+  conversions in `prepareGoReleaserData` and `prepareGitHubActionsData`
+  (`Platforms`/`Architectures`/`BuildTags`/`Triggers`).
 
-Final `art-dupl --sort total-tokens -t 2` report: 17 groups, all accepted above
-(see also session review at `docs/status/2026-07-29_…-dedup-session-review.md`).
+Final `art-dupl --sort total-tokens -t 2` report: **17 groups, all accepted
+above**. Each remaining hit is documented with its reason — split-brain
+parallel implementations, idiomatic Go shapes that resist generic extraction,
+or 2-line guard clauses whose extraction would add more code than it removes.
