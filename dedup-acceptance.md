@@ -6,12 +6,12 @@ can skip re-evaluating them.
 Each entry records the **location**, the **shape** of the duplication, and the
 **reason** it was kept. Reasons fall into a small set:
 
-- *Idiomatic Go* — standard language or library pattern; extracting would obscure.
-- *Different rules, same shape* — the bodies are similar but encode distinct
+- _Idiomatic Go_ — standard language or library pattern; extracting would obscure.
+- _Different rules, same shape_ — the bodies are similar but encode distinct
   business rules that must evolve independently.
-- *Generic refactor would add more code than it removes* — see "abstraction
+- _Generic refactor would add more code than it removes_ — see "abstraction
   trade-off" in the dedup skill.
-- *Split-brain*: parallel implementations in different packages that should be
+- _Split-brain_: parallel implementations in different packages that should be
   reconciled by a future task (out of scope here).
 
 ---
@@ -191,7 +191,7 @@ trailing characters and uses a longer max length; the validation version uses
 a 50-char max (matches user input form) and allows `.`/`-` at the end (handled
 separately by the `strings.HasSuffix` checks). Different consumers
 (`tui_wizard.go` vs `init_test.go`) need different rules. This is a split-brain
-that *should* be reconciled — but reconciliation is a product decision (do we
+that _should_ be reconciled — but reconciliation is a product decision (do we
 tighten the validation rules or loosen the domain rules?), not a dedup task.
 
 ---
@@ -225,7 +225,7 @@ the cost of indirection. Net negative. Canonical guard-clause idiom.
 - `cmd/goreleaser-wizard/validation_display.go:91` — `if isEmpty(recommendations)`
 
 **Reason:** Already extracted into generic `isEmpty[T any](items []T) bool` helper
-in `validation_display.go`. The art-dupl hit is on the *call sites* (each
+in `validation_display.go`. The art-dupl hit is on the _call sites_ (each
 passing a different slice type), not on the function body. Two sites of a
 3-line helper call is not worth further extraction.
 
