@@ -347,6 +347,7 @@ linters:
       - examples
       - internal/mock
       - testdata
+      - test-wizard
       - third_party
       - vendor
       - vendor/

@@ -288,7 +288,7 @@ type ConfigUpdate struct {
 	State              *ConfigState    `json:"state,omitempty"`
 }
 
-// Project information and validation types.
+// ProjectInfo describes the inputs collected about a project for downstream configuration.
 type ProjectInfo struct {
 	Name         string      `json:"name"`
 	Path         string      `json:"path"`
@@ -429,7 +429,7 @@ type GitHubPermissions struct {
 	Triage   bool `json:"triage"`
 }
 
-// Docker configuration and build types.
+// DockerBuildConfig holds the inputs required to build a Docker image for a release.
 type DockerBuildConfig struct {
 	Context    string            `json:"context"`
 	Dockerfile string            `json:"dockerfile"`
@@ -469,7 +469,7 @@ type ProgressTracker interface {
 	WithLogger(logger Logger) ProgressTracker
 }
 
-// Configuration store interface.
+// ConfigurationStore persists and retrieves arbitrary configuration values by key.
 type ConfigurationStore interface {
 	Save(ctx context.Context, key string, value any) error
 	Load(ctx context.Context, key string, value any) (bool, error)

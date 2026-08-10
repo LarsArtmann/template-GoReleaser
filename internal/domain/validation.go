@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// Validation use case implementation.
+// ValidationUseCase is the implementation of the validation use case.
 type ValidationUseCase struct {
 	logger Logger
 	repo   FileSystemRepository

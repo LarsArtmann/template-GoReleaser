@@ -55,9 +55,9 @@ const workflowDirPermission = 0o755
 // ~string types (`string(s)`), String() for types that override their default
 // formatting, or GitHubPattern() for domain-specific conversions.
 func mapToStrings[T any](items []T, convert func(T) string) []string {
-	out := make([]string, len(items))
-	for i, item := range items {
-		out[i] = convert(item)
+	out := make([]string, 0, len(items))
+	for _, item := range items {
+		out = append(out, convert(item))
 	}
 
 	return out

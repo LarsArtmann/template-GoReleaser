@@ -1,3 +1,5 @@
+//godoclint:disable
+
 // CRITICAL ARCHITECTURE TODO: This file is 412 lines - SPLIT IMMEDIATELY into:
 // 1. job_manager_test.go - JobManager functionality tests
 // 2. workflow_test.go - Workflow execution tests

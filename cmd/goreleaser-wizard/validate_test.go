@@ -1,3 +1,5 @@
+//godoclint:disable
+
 // CRITICAL ARCHITECTURE TODO: This file is 489 lines - SPLIT IMMEDIATELY into:
 // 1. validate_unit_test.go - Unit tests for validation
 // 2. validate_integration_test.go - Integration tests

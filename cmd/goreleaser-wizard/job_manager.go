@@ -244,8 +244,8 @@ func (jm *JobManager) GetResults() []JobResult {
 	jm.mu.Lock()
 	defer jm.mu.Unlock()
 
-	results := make([]JobResult, len(jm.results))
-	copy(results, jm.results)
+	results := make([]JobResult, 0, len(jm.results))
+	results = append(results, jm.results...)
 
 	return results
 }

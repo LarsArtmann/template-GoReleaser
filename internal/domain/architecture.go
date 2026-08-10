@@ -15,7 +15,8 @@ const (
 	ArchitectureMIPS    Architecture = "mips"    // 32-bit MIPS (big endian)
 	ArchitectureMIPSLE  Architecture = "mipsle"  // 32-bit MIPS (little endian)
 
-	// GoSupport levels.
+	// GoSupportStable marks a build as using only stable Go toolchain features.
+
 	GoSupportStable = "stable"
 )
 

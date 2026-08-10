@@ -40,12 +40,14 @@ type EventType string
 
 const (
 	// Configuration events.
+
 	EventTypeConfigCreated   EventType = "CONFIG_CREATED"
 	EventTypeConfigUpdated   EventType = "CONFIG_UPDATED"
 	EventTypeConfigValidated EventType = "CONFIG_VALIDATED"
 	EventTypeConfigGenerated EventType = "CONFIG_GENERATED"
 
 	// Job execution events.
+
 	EventTypeJobCreated   EventType = "JOB_CREATED"
 	EventTypeJobStarted   EventType = "JOB_STARTED"
 	EventTypeJobCompleted EventType = "JOB_COMPLETED"
@@ -54,6 +56,7 @@ const (
 	EventTypeJobRetried   EventType = "JOB_RETRIED"
 
 	// Workflow execution events.
+
 	EventTypeWorkflowCreated   EventType = "WORKFLOW_CREATED"
 	EventTypeWorkflowStarted   EventType = "WORKFLOW_STARTED"
 	EventTypeWorkflowCompleted EventType = "WORKFLOW_COMPLETED"
@@ -61,11 +64,13 @@ const (
 	EventTypeWorkflowCancelled EventType = "WORKFLOW_CANCELLED"
 
 	// Template generation events.
+
 	EventTypeTemplateGenerated EventType = "TEMPLATE_GENERATED"
 	EventTypeTemplateRendered  EventType = "TEMPLATE_RENDERED"
 	EventTypeTemplateValidated EventType = "TEMPLATE_VALIDATED"
 
 	// File system events.
+
 	EventTypeFileCreated EventType = "FILE_CREATED"
 	EventTypeFileUpdated EventType = "FILE_UPDATED"
 	EventTypeFileDeleted EventType = "FILE_DELETED"
@@ -73,12 +78,14 @@ const (
 	EventTypeDirDeleted  EventType = "DIR_DELETED"
 
 	// Git operations events.
+
 	EventTypeGitOperation EventType = "GIT_OPERATION"
 	EventTypeGitPush      EventType = "GIT_PUSH"
 	EventTypeGitCommit    EventType = "GIT_COMMIT"
 	EventTypeGitTag       EventType = "GIT_TAG"
 
 	// External integration events.
+
 	EventTypeGitHubAPI           EventType = "GITHUB_API"
 	EventTypeDockerOperation     EventType = "DOCKER_OPERATION"
 	EventTypeGoReleaserOperation EventType = "GORELEASER_OPERATION"

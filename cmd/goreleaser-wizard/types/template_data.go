@@ -164,9 +164,9 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 
 	// Convert platforms
 	if len(config.Platforms) > 0 {
-		platforms := make([]string, len(config.Platforms))
-		for i, platform := range config.Platforms {
-			platforms[i] = string(platform)
+		platforms := make([]string, 0, len(config.Platforms))
+		for _, platform := range config.Platforms {
+			platforms = append(platforms, string(platform))
 		}
 
 		data.Platforms = platforms
@@ -174,9 +174,9 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 
 	// Convert architectures
 	if len(config.Architectures) > 0 {
-		architectures := make([]string, len(config.Architectures))
-		for i, arch := range config.Architectures {
-			architectures[i] = string(arch)
+		architectures := make([]string, 0, len(config.Architectures))
+		for _, arch := range config.Architectures {
+			architectures = append(architectures, string(arch))
 		}
 
 		data.Architectures = architectures
@@ -184,9 +184,9 @@ func NewGoReleaserTemplateData(config *domain.SafeProjectConfig) *GoReleaserTemp
 
 	// Convert build tags
 	if len(config.BuildTags) > 0 {
-		tags := make([]string, len(config.BuildTags))
-		for i, tag := range config.BuildTags {
-			tags[i] = tag.String()
+		tags := make([]string, 0, len(config.BuildTags))
+		for _, tag := range config.BuildTags {
+			tags = append(tags, tag.String())
 		}
 
 		data.BuildTags = tags
@@ -215,9 +215,9 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 
 	// Convert action triggers
 	if len(config.ActionsOn) > 0 {
-		triggers := make([]string, len(config.ActionsOn))
-		for i, trigger := range config.ActionsOn {
-			triggers[i] = trigger.GitHubPattern()
+		triggers := make([]string, 0, len(config.ActionsOn))
+		for _, trigger := range config.ActionsOn {
+			triggers = append(triggers, trigger.GitHubPattern())
 		}
 
 		data.Triggers = triggers

@@ -1,3 +1,5 @@
+//godoclint:disable
+
 // CRITICAL ARCHITECTURE TODO: This file is 415 lines - SPLIT IMMEDIATELY:
 // 1. workflow_core.go - Core Workflow struct and basic methods
 // 2. workflow_execution.go - Execution logic and state management

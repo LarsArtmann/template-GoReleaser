@@ -22,6 +22,7 @@ type ErrorCode string
 
 const (
 	// Validation Errors.
+
 	ErrInvalidProjectName        ErrorCode = "INVALID_PROJECT_NAME"
 	ErrInvalidBinaryName         ErrorCode = "INVALID_BINARY_NAME"
 	ErrInvalidMainPath           ErrorCode = "INVALID_MAIN_PATH"
@@ -35,6 +36,7 @@ const (
 	ErrInvalidConfigState        ErrorCode = "INVALID_CONFIG_STATE"
 
 	// Configuration Errors.
+
 	ErrDockerNotSupported     ErrorCode = "DOCKER_NOT_SUPPORTED"
 	ErrPlatformArchMismatch   ErrorCode = "PLATFORM_ARCH_MISMATCH"
 	ErrMainPathRequired       ErrorCode = "MAIN_PATH_REQUIRED"
@@ -44,6 +46,7 @@ const (
 	ErrFieldTooShort          ErrorCode = "FIELD_TOO_SHORT"
 
 	// Business Rule Errors.
+
 	ErrDuplicateBuildTag ErrorCode = "DUPLICATE_BUILD_TAG"
 	ErrTooManyBuildTags  ErrorCode = "TOO_MANY_BUILD_TAGS"
 	ErrInvalidURLPattern ErrorCode = "INVALID_URL_PATTERN"
@@ -51,6 +54,7 @@ const (
 	ErrInvalidCharacters ErrorCode = "INVALID_CHARACTERS"
 
 	// System Errors.
+
 	ErrFileNotFound          ErrorCode = "FILE_NOT_FOUND"
 	ErrPermissionDenied      ErrorCode = "PERMISSION_DENIED"
 	ErrFileWriteFailed       ErrorCode = "FILE_WRITE_FAILED"
@@ -59,11 +63,13 @@ const (
 	ErrDependencyNotFound    ErrorCode = "DEPENDENCY_NOT_FOUND"
 
 	// Template Errors.
+
 	ErrTemplateNotFound        ErrorCode = "TEMPLATE_NOT_FOUND"
 	ErrTemplateExecutionFailed ErrorCode = "TEMPLATE_EXECUTION_FAILED"
 	ErrTemplateSyntaxError     ErrorCode = "TEMPLATE_SYNTAX_ERROR"
 
 	// Configuration Errors.
+
 	ErrInvalidConfiguration    ErrorCode = "INVALID_CONFIGURATION"
 	ErrInvalidFileFormat       ErrorCode = "INVALID_FILE_FORMAT"
 	ErrInvalidProjectStructure ErrorCode = "INVALID_PROJECT_STRUCTURE"
@@ -71,6 +77,7 @@ const (
 	ErrExternalToolNotFound    ErrorCode = "EXTERNAL_TOOL_NOT_FOUND"
 
 	// Application Errors.
+
 	ErrInvalidProject    ErrorCode = "INVALID_PROJECT"
 	ErrInvalidBinary     ErrorCode = "INVALID_BINARY"
 	ErrInvalidConfig     ErrorCode = "INVALID_CONFIG"
@@ -81,19 +88,23 @@ const (
 	ErrDependencyMissing ErrorCode = "DEPENDENCY_MISSING"
 
 	// Template Errors.
+
 	ErrTemplateParsing   ErrorCode = "TEMPLATE_PARSING"
 	ErrTemplateRendering ErrorCode = "TEMPLATE_RENDERING"
 
 	// File Operation Errors.
+
 	ErrFileOperation  ErrorCode = "FILE_OPERATION"
 	ErrFilePermission ErrorCode = "FILE_PERMISSION"
 
 	// Git Errors.
+
 	ErrGitOperation ErrorCode = "GIT_OPERATION"
 	ErrGitNotFound  ErrorCode = "GIT_NOT_FOUND"
 	ErrGitCommand   ErrorCode = "GIT_COMMAND"
 
 	// Extended Validation Errors.
+
 	ErrInvalidDockerImage ErrorCode = "INVALID_DOCKER_IMAGE"
 	ErrInvalidVersion     ErrorCode = "INVALID_VERSION"
 	ErrInvalidGitBranch   ErrorCode = "INVALID_GIT_BRANCH"
@@ -101,6 +112,7 @@ const (
 	ErrInvalidPort        ErrorCode = "INVALID_PORT"
 
 	// External Service Errors.
+
 	ErrGitOperationFailed   ErrorCode = "GIT_OPERATION_FAILED"
 	ErrRegistryAccessDenied ErrorCode = "REGISTRY_ACCESS_DENIED"
 	ErrGitHubAPIError       ErrorCode = "GITHUB_API_ERROR"
@@ -168,7 +180,7 @@ func IsErrorCode(err error, code ErrorCode) bool {
 	return false
 }
 
-// Error constructors for type-safe error creation.
+// NewValidationError creates a validation error of the given code, message, and details.
 func NewValidationError(code ErrorCode, message, details string) *DomainError {
 	return &DomainError{
 		Code:    code,
@@ -242,7 +254,7 @@ func NewGitError(code ErrorCode, message, details string) *DomainError {
 	}
 }
 
-// Common validation error constructors.
+// InvalidProjectNameError returns a validation error for an invalid project name.
 func InvalidProjectNameError(value string) *DomainError {
 	return NewValidationError(
 		ErrInvalidProjectName,
@@ -299,7 +311,7 @@ func PlatformArchMismatchError(platform Platform, arch Architecture) *DomainErro
 	)
 }
 
-// System error constructors.
+// FileNotFoundError returns a system error for a missing file at the given path.
 func FileNotFoundError(path string, cause error) *DomainError {
 	return NewSystemError(
 		ErrFileNotFound,
@@ -327,7 +339,7 @@ func FileWriteFailedError(path string, cause error) *DomainError {
 	)
 }
 
-// Template error constructors.
+// TemplateNotFoundError returns a template error when the given template cannot be located.
 func TemplateNotFoundError(template string) *DomainError {
 	return NewTemplateError(
 		ErrTemplateNotFound,
@@ -344,7 +356,7 @@ func TemplateExecutionFailedError(template string, cause error) *DomainError {
 	).WithCause(cause)
 }
 
-// External service error constructors.
+// GitOperationFailedError returns an external service error when a git operation fails.
 func GitOperationFailedError(operation string, cause error) *DomainError {
 	return NewExternalServiceError(
 		ErrGitOperationFailed,
@@ -361,7 +373,7 @@ func RegistryAccessDeniedError(registry string) *DomainError {
 	)
 }
 
-// Error recovery suggestions based on error codes.
+// GetRecoverySuggestion returns a user-friendly hint explaining how to fix the error.
 func (de *DomainError) GetRecoverySuggestion() string {
 	switch de.Code {
 	case ErrInvalidProjectName:
@@ -385,7 +397,7 @@ func (de *DomainError) GetRecoverySuggestion() string {
 	}
 }
 
-// Error severity levels for proper handling.
+// ErrorSeverity classifies errors for proper handling (e.g. logging, UI presentation).
 type ErrorSeverity int
 
 const (

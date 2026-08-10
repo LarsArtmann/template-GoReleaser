@@ -73,9 +73,9 @@ func boolValidationCase(name, input string, expected bool) boolTestCaseInput {
 
 // escapeStringTestCaseBuilder builds String escape test cases from variadic stringTestCaseInput.
 func escapeStringTestCaseBuilder(cases ...stringTestCaseInput) []valueTestCase[string] {
-	result := make([]valueTestCase[string], len(cases))
-	for i, c := range cases {
-		result[i] = valueTestCase[string]{name: c.Name, input: c.Input, expected: c.Expected}
+	result := make([]valueTestCase[string], 0, len(cases))
+	for _, c := range cases {
+		result = append(result, valueTestCase[string]{name: c.Name, input: c.Input, expected: c.Expected})
 	}
 
 	return result
@@ -83,9 +83,9 @@ func escapeStringTestCaseBuilder(cases ...stringTestCaseInput) []valueTestCase[s
 
 // escapeBoolTestCaseBuilder builds boolean validation test cases from variadic boolTestCaseInput.
 func escapeBoolTestCaseBuilder(cases ...boolTestCaseInput) []valueTestCase[bool] {
-	result := make([]valueTestCase[bool], len(cases))
-	for i, c := range cases {
-		result[i] = valueTestCase[bool]{name: c.Name, input: c.Input, expected: c.Expected}
+	result := make([]valueTestCase[bool], 0, len(cases))
+	for _, c := range cases {
+		result = append(result, valueTestCase[bool]{name: c.Name, input: c.Input, expected: c.Expected})
 	}
 
 	return result

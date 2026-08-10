@@ -9,7 +9,7 @@ import (
 
 type DomainError = domain.DomainError
 
-// Error constructors - delegate to domain package.
+// NewValidationError creates a validation error by delegating to the domain package.
 func NewValidationError(code, message, details string) *DomainError {
 	return domain.NewValidationError(domain.ErrorCode(code), message, details)
 }

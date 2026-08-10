@@ -216,9 +216,9 @@ type validationItem interface {
 
 // toValidationItems converts a slice of validation items to validationItem interface.
 func toValidationItems[T validationItem](items []T) []validationItem {
-	result := make([]validationItem, len(items))
-	for i, item := range items {
-		result[i] = item
+	result := make([]validationItem, 0, len(items))
+	for _, item := range items {
+		result = append(result, item)
 	}
 
 	return result

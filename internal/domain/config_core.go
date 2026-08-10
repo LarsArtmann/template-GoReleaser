@@ -309,23 +309,23 @@ func (spc *SafeProjectConfig) Clone() *SafeProjectConfig {
 
 	// Deep copy slices
 	if spc.Platforms != nil {
-		clone.Platforms = make([]Platform, len(spc.Platforms))
-		copy(clone.Platforms, spc.Platforms)
+		clone.Platforms = make([]Platform, 0, len(spc.Platforms))
+		clone.Platforms = append(clone.Platforms, spc.Platforms...)
 	}
 
 	if spc.Architectures != nil {
-		clone.Architectures = make([]Architecture, len(spc.Architectures))
-		copy(clone.Architectures, spc.Architectures)
+		clone.Architectures = make([]Architecture, 0, len(spc.Architectures))
+		clone.Architectures = append(clone.Architectures, spc.Architectures...)
 	}
 
 	if spc.BuildTags != nil {
-		clone.BuildTags = make([]BuildTag, len(spc.BuildTags))
-		copy(clone.BuildTags, spc.BuildTags)
+		clone.BuildTags = make([]BuildTag, 0, len(spc.BuildTags))
+		clone.BuildTags = append(clone.BuildTags, spc.BuildTags...)
 	}
 
 	if spc.ActionsOn != nil {
-		clone.ActionsOn = make([]ActionTrigger, len(spc.ActionsOn))
-		copy(clone.ActionsOn, spc.ActionsOn)
+		clone.ActionsOn = make([]ActionTrigger, 0, len(spc.ActionsOn))
+		clone.ActionsOn = append(clone.ActionsOn, spc.ActionsOn...)
 	}
 
 	return &clone
