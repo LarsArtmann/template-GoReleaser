@@ -155,7 +155,7 @@ func NewExecutionPlanID(value string) ExecutionPlanID {
 //
 //	repoID := domain.NewGitHubRepoID(12345)
 //	fmt.Println(repoID.Get()) // 12345
-func NewGitHubRepoID(value int64) GitHubRepoID { return id.NewID[gitHubRepoBrand, int64](value) }
+func NewGitHubRepoID(value int64) GitHubRepoID { return id.NewID[gitHubRepoBrand](value) }
 
 // NewGitHubReleaseID creates a new GitHubReleaseID from an int64 value.
 // Returns a zero GitHubReleaseID if the input is 0.
@@ -165,7 +165,7 @@ func NewGitHubRepoID(value int64) GitHubRepoID { return id.NewID[gitHubRepoBrand
 //	releaseID := domain.NewGitHubReleaseID(67890)
 //	fmt.Println(releaseID.Get()) // 67890
 func NewGitHubReleaseID(value int64) GitHubReleaseID {
-	return id.NewID[gitHubReleaseBrand, int64](value)
+	return id.NewID[gitHubReleaseBrand](value)
 }
 
 // NewGitHubAssetID creates a new GitHubAssetID from an int64 value.
@@ -176,7 +176,7 @@ func NewGitHubReleaseID(value int64) GitHubReleaseID {
 //	assetID := domain.NewGitHubAssetID(11111)
 //	fmt.Println(assetID.Get()) // 11111
 func NewGitHubAssetID(value int64) GitHubAssetID {
-	return id.NewID[gitHubAssetBrand, int64](value)
+	return id.NewID[gitHubAssetBrand](value)
 }
 
 // NewGitHubWorkflowID creates a new GitHubWorkflowID from an int64 value.
@@ -187,7 +187,7 @@ func NewGitHubAssetID(value int64) GitHubAssetID {
 //	workflowID := domain.NewGitHubWorkflowID(22222)
 //	fmt.Println(workflowID.Get()) // 22222
 func NewGitHubWorkflowID(value int64) GitHubWorkflowID {
-	return id.NewID[gitHubWorkflowBrand, int64](value)
+	return id.NewID[gitHubWorkflowBrand](value)
 }
 
 // NewGitHubUserID creates a new GitHubUserID from an int64 value.
@@ -198,7 +198,7 @@ func NewGitHubWorkflowID(value int64) GitHubWorkflowID {
 //	userID := domain.NewGitHubUserID(33333)
 //	fmt.Println(userID.Get()) // 33333
 func NewGitHubUserID(value int64) GitHubUserID {
-	return id.NewID[gitHubUserBrand, int64](value)
+	return id.NewID[gitHubUserBrand](value)
 }
 
 // NewConfigID creates a new ConfigID from a string value.

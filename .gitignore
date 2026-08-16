@@ -215,3 +215,4 @@ reports/
 result-*
 .direnv/
 # <<< buildflow-managed (.gitignore) <<<
+*.orig
