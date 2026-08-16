@@ -1,0 +1,85 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Build
+        env:
+          GOEXPERIMENT: jsonv2
+        run: go build ./...
+
+      - name: Vet
+        env:
+          GOEXPERIMENT: jsonv2
+        run: go vet ./...
+
+      - name: Lint
+        uses: golangci/golangci-lint-action@9fae48acfc02a90574d7c304a1758ef9895495fa # v7
+        with:
+          args: ./...
+        env:
+          GOEXPERIMENT: jsonv2
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Test
+        env:
+          GOEXPERIMENT: jsonv2
+        run: go test -race ./...
+
+      - name: Generate golden diff check
+        env:
+          GOEXPERIMENT: jsonv2
+        run: go test ./cmd/goreleaser-wizard -run TestGolden -count=1
+
+  goreleaser-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up Go
+        uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: "go.mod"
+          cache: true
+
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6
+        with:
+          install-only: true
+
+      # The wizard's product IS its generated config: if this step regresses,
+      # every project using the wizard ships broken releases.
+      - name: Generated fixture passes goreleaser check
+        env:
+          GOEXPERIMENT: jsonv2
+        run: go test ./cmd/goreleaser-wizard -run TestGeneratedConfigPassesGoReleaserCheck -v -count=1
