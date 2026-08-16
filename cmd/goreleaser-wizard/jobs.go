@@ -91,8 +91,6 @@ project_name: {{.ProjectName}}
 before:
   hooks:
     - go mod tidy
-    - go generate ./...
-    - go test ./...
 
 builds:
   - id: {{.BinaryName}}
@@ -199,19 +197,22 @@ permissions:
 
 jobs:
   release:
-    runs-on: ["self-hosted", "linux", "x64"]
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
           go-version-file: 'go.mod'
           cache: true
 [[if .DockerEnabled]]
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Registry
         uses: docker/login-action@v3
         with:
