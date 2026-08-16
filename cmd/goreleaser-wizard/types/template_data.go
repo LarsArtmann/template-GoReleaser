@@ -249,8 +249,31 @@ func parseGitHubRemote() (string, string) {
 	return "owner", "repo" // fallbacks
 }
 
+var (
+	//nolint:gochecknoglobals // Set once from CLI flags at startup, before any reader runs.
+	githubOwnerOverride string
+	//nolint:gochecknoglobals // Set once from CLI flags at startup, before any reader runs.
+	githubRepoOverride string
+)
+
+// SetGitHubOwnerOverride sets an explicit GitHub owner, taking precedence
+// over git remote detection. Used by the --github-owner flag.
+func SetGitHubOwnerOverride(owner string) {
+	githubOwnerOverride = owner
+}
+
+// SetGitHubRepoOverride sets an explicit GitHub repository, taking precedence
+// over git remote detection. Used by the --github-repo flag.
+func SetGitHubRepoOverride(repo string) {
+	githubRepoOverride = repo
+}
+
 // GetGitHubOwner tries to get GitHub owner from git remote.
 func GetGitHubOwner() string {
+	if githubOwnerOverride != "" {
+		return githubOwnerOverride
+	}
+
 	owner, _ := parseGitHubRemote()
 
 	return owner
@@ -258,6 +281,10 @@ func GetGitHubOwner() string {
 
 // GetGitHubRepo tries to get GitHub repo from git remote.
 func GetGitHubRepo() string {
+	if githubRepoOverride != "" {
+		return githubRepoOverride
+	}
+
 	_, repo := parseGitHubRemote()
 
 	return repo

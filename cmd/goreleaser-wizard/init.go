@@ -17,6 +17,8 @@ import (
 func runInitWizard(cmd *cobra.Command, _ []string) {
 	defer recoverFromPanic("init wizard")
 
+	applyGitHubOverrides(cmd)
+
 	force := getBoolFlag(cmd, "force")
 	interactive := getBoolFlag(cmd, "interactive")
 

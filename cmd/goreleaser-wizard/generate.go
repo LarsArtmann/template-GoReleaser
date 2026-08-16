@@ -13,6 +13,8 @@ import (
 func runGenerate(cmd *cobra.Command, args []string) {
 	defer recoverFromPanic("generate command")
 
+	applyGitHubOverrides(cmd)
+
 	force := getBoolFlag(cmd, "force")
 	configOnly := getBoolFlag(cmd, "config-only")
 

@@ -8,6 +8,7 @@ import (
 
 	"charm.land/lipgloss/v2"
 	"charm.land/log/v2"
+	"github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard/types"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/config"
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 	"github.com/charmbracelet/fang"
@@ -298,6 +299,20 @@ func addCommonFlags(cmd *cobra.Command) {
 	cmd.Flags().String("main-path", "", "override main.go path")
 	cmd.Flags().String("binary-name", "", "override binary name")
 	cmd.Flags().String("project-type", "", "override project type (CLI Application, Library)")
+	cmd.Flags().String("github-owner", "", "override GitHub repository owner (detected from git remote by default)")
+	cmd.Flags().String("github-repo", "", "override GitHub repository name (detected from git remote by default)")
+}
+
+// applyGitHubOverrides forwards explicit --github-owner/--github-repo flags
+// into the template data layer, overriding git remote detection.
+func applyGitHubOverrides(cmd *cobra.Command) {
+	if owner := getStringFlag(cmd, "github-owner"); owner != "" {
+		types.SetGitHubOwnerOverride(owner)
+	}
+
+	if repo := getStringFlag(cmd, "github-repo"); repo != "" {
+		types.SetGitHubRepoOverride(repo)
+	}
 }
 
 // configureInitCommand adds flags specific to the init command.

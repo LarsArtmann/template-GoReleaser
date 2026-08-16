@@ -53,8 +53,7 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 				"- amd64",
 				"- arm64",
 				"CGO_ENABLED=0",
-				`owner: "{{.Env.GITHUB_OWNER}}"`, // GoReleaser template variable
-				`name: "{{.Env.GITHUB_REPO}}"`,   // GoReleaser template variable
+				"prerelease: auto", // release section renders without requiring env vars
 			},
 		},
 		{
@@ -70,10 +69,11 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 			},
 			wantErr: false,
 			checks: []string{
-				"dockers:",
-				"image_templates:",
-				"ghcr.io/docker-app:{{.Tag}}",
+				"dockers_v2:",
+				"images:",
+				"ghcr.io/docker-app",
 				"dockerfile: Dockerfile",
+				"platforms:",
 			},
 		},
 		{
