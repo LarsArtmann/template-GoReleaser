@@ -5,14 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"os/exec"
-	"path/filepath"
 	"strings"
 	"time"
 )
 
 // validateGoReleaserConfig validates GoReleaser configuration.
 func validateGoReleaserConfig(results *ValidationResults) error {
-	configPath := ".goreleaser.yaml"
+	configPath := goreleaserConfigFilename
 
 	// Check if config exists
 	exists, err := fileSystemRepo.FileExists(context.Background(), configPath)
@@ -85,7 +84,7 @@ func validateGoReleaserConfig(results *ValidationResults) error {
 
 // validateGitHubActions validates GitHub Actions workflow.
 func validateGitHubActions(results *ValidationResults) {
-	workflowPath := filepath.Join(".github", "workflows", "release.yml")
+	workflowPath := releaseWorkflowTargetPath
 
 	// Check if workflow exists
 	exists, err := fileSystemRepo.FileExists(context.Background(), workflowPath)

@@ -36,7 +36,7 @@ func attemptFixes(results *ValidationResults) {
 	if !results.ConfigExists {
 		configContent := generateBasicConfig()
 
-		err := os.WriteFile(".goreleaser.yaml", []byte(configContent), configFilePermission)
+		err := os.WriteFile(goreleaserConfigFilename, []byte(configContent), configFilePermission)
 		if err == nil {
 			printFix("✅ Created basic .goreleaser.yaml", &fixed)
 		}

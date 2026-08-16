@@ -320,7 +320,7 @@ func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 	j.logger.Info("Backing up existing configuration")
 
 	// Check if .goreleaser.yaml exists
-	if _, err := os.Stat(".goreleaser.yaml"); os.IsNotExist(err) {
+	if _, err := os.Stat(goreleaserConfigFilename); os.IsNotExist(err) {
 		j.logger.Info("No existing configuration to backup")
 
 		return nil
@@ -330,7 +330,7 @@ func (j *ConfigBackupJob) Execute(ctx context.Context) error {
 	timestamp := time.Now().Format("20060102-150405")
 	backupFile := ".goreleaser.yaml.backup." + timestamp
 
-	err := os.Rename(".goreleaser.yaml", backupFile)
+	err := os.Rename(goreleaserConfigFilename, backupFile)
 	if err != nil {
 		return fmt.Errorf("failed to create backup: %w", err)
 	}
@@ -433,7 +433,7 @@ func (j *ConfigMigrationJob) Rollback(ctx context.Context) error {
 	// Get the most recent backup
 	latestBackup := backupFiles[len(backupFiles)-1]
 
-	err = os.Rename(latestBackup, ".goreleaser.yaml")
+	err = os.Rename(latestBackup, goreleaserConfigFilename)
 	if err != nil {
 		return fmt.Errorf("failed to restore backup: %w", err)
 	}

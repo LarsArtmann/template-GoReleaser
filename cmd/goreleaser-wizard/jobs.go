@@ -269,17 +269,17 @@ func generateGoReleaserConfig(config *domain.SafeProjectConfig) error {
 	}
 
 	// Create backup if file exists
-	if _, err := os.Stat(".goreleaser.yaml"); err == nil {
+	if _, err := os.Stat(goreleaserConfigFilename); err == nil {
 		backupPath := ".goreleaser.yaml.backup"
 
-		err := os.Rename(".goreleaser.yaml", backupPath)
+		err := os.Rename(goreleaserConfigFilename, backupPath)
 		if err != nil {
 			return fmt.Errorf("failed to create backup: %w", err)
 		}
 	}
 
 	// Write generated file
-	if err := os.WriteFile(".goreleaser.yaml", output, 0o644); err != nil {
+	if err := os.WriteFile(goreleaserConfigFilename, output, 0o644); err != nil {
 		return fmt.Errorf("failed to write GoReleaser config: %w", err)
 	}
 
@@ -380,7 +380,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 
 	// Check existing files
 	if !j.force {
-		if _, err := os.Stat(".goreleaser.yaml"); err == nil {
+		if _, err := os.Stat(goreleaserConfigFilename); err == nil {
 			j.config.State = domain.ConfigStateDraft
 
 			return errors.New(".goreleaser.yaml already exists (use --force to overwrite)")
@@ -409,7 +409,7 @@ func (j *ConfigGenerationJob) Execute(ctx context.Context) error {
 func (j *ConfigGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rollback: removing generated .goreleaser.yaml")
 
-	err := os.Remove(".goreleaser.yaml")
+	err := os.Remove(goreleaserConfigFilename)
 	if err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("failed to remove .goreleaser.yaml: %w", err)
 	}
@@ -487,7 +487,7 @@ func (j *GitHubActionsGenerationJob) Rollback(ctx context.Context) error {
 	}
 
 	// Remove generated workflow
-	workflowPath := filepath.Join(".github", "workflows", "release.yml")
+	workflowPath := releaseWorkflowTargetPath
 	if _, err := os.Stat(workflowPath); err == nil {
 		err := os.Remove(workflowPath)
 		if err != nil {
@@ -574,7 +574,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 	}
 
 	if !j.force {
-		if _, err := os.Stat("Dockerfile"); err == nil {
+		if _, err := os.Stat(dockerfileFilename); err == nil {
 			return errors.New("dockerfile already exists (use --force to overwrite)")
 		}
 	}
@@ -606,7 +606,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 		return err
 	}
 
-	if err := os.WriteFile("Dockerfile", output, 0o644); err != nil {
+	if err := os.WriteFile(dockerfileFilename, output, 0o644); err != nil {
 		return fmt.Errorf("failed to write Dockerfile: %w", err)
 	}
 
@@ -618,7 +618,7 @@ func (j *DockerfileGenerationJob) Execute(ctx context.Context) error {
 func (j *DockerfileGenerationJob) Rollback(ctx context.Context) error {
 	j.logger.Info("Rollback: removing generated Dockerfile")
 
-	if err := os.Remove("Dockerfile"); err != nil && !os.IsNotExist(err) {
+	if err := os.Remove(dockerfileFilename); err != nil && !os.IsNotExist(err) {
 		return fmt.Errorf("failed to remove Dockerfile: %w", err)
 	}
 
@@ -701,6 +701,91 @@ func (j *ProjectValidationJob) Execute(ctx context.Context) error {
 	return nil
 }
 
+// GenerationPreflightJob fails the workflow before anything is written when a
+// target artifact already exists, so generation is atomic: it never leaves a
+// project half-generated because a later target collided with an existing file.
+type GenerationPreflightJob struct {
+	noOpRollbackHelper
+
+	id      string
+	force   bool
+	targets []string
+}
+
+// NewGenerationPreflightJob creates a job that verifies none of the given
+// target paths exist unless force is set. It also warns when GitHub owner or
+// repository resolution fell back to placeholders.
+func NewGenerationPreflightJob(force bool, targets []string, logger *log.Logger) *GenerationPreflightJob {
+	return &GenerationPreflightJob{
+		noOpRollbackHelper: noOpRollbackHelper{
+			logger: logger,
+			name:   "Generation preflight",
+		},
+		id:      "generation-preflight",
+		force:   force,
+		targets: targets,
+	}
+}
+
+func (j *GenerationPreflightJob) ID() string {
+	return j.id
+}
+
+func (j *GenerationPreflightJob) Name() string {
+	return "Check Generation Targets"
+}
+
+func (j *GenerationPreflightJob) Execute(ctx context.Context) error {
+	if err := checkJobContext(ctx, j.logger, "Checking generation targets"); err != nil {
+		return err
+	}
+
+	if !j.force {
+		var existing []string
+
+		for _, target := range j.targets {
+			if _, err := os.Stat(target); err == nil {
+				existing = append(existing, target)
+			}
+		}
+
+		if len(existing) > 0 {
+			return fmt.Errorf(
+				"refusing to overwrite existing file(s): %s (use --force to overwrite)",
+				strings.Join(existing, ", "),
+			)
+		}
+	}
+
+	if types.HasPlaceholderGitHubTarget() {
+		j.logger.Warnf(
+			"GitHub owner/repo not detected: no git remote found and no --github-owner/--github-repo given. "+
+				"The generated release section targets the placeholder repository %q/%q; "+
+				"add a git remote or re-run with --github-owner and --github-repo before releasing.",
+			types.PlaceholderGitHubOwner, types.PlaceholderGitHubRepo,
+		)
+	}
+
+	return nil
+}
+
+// generationTargets lists every file the wizard may write for the given
+// configuration. includeActions controls whether the GitHub Actions workflow
+// is among the targets (the config-only workflow never writes it).
+func generationTargets(config *domain.SafeProjectConfig, includeActions bool) []string {
+	targets := []string{goreleaserConfigFilename}
+
+	if includeActions && config.GetGenerateActions() {
+		targets = append(targets, releaseWorkflowTargetPath)
+	}
+
+	if config.DockerSupport.IsEnabled() {
+		targets = append(targets, dockerfileFilename)
+	}
+
+	return targets
+}
+
 // DependencyCheckJob checks for required dependencies.
 type DependencyCheckJob struct {
 	noOpRollbackHelper
@@ -777,6 +862,10 @@ func (jf *JobFactory) CreateFullWizardJobs(config *ProjectConfig, force bool) []
 
 	// Add project validation job
 	jobs = append(jobs, NewProjectValidationJob(".", jf.logger))
+
+	// Fail before writing anything if a target artifact already exists
+	jobs = append(jobs,
+		NewGenerationPreflightJob(force, generationTargets(config, true), jf.logger))
 
 	// Add dependency check job
 	dependencies := []string{"go"}
@@ -874,7 +963,7 @@ func prepareGoReleaserData(config *domain.SafeProjectConfig) map[string]any {
 	// Add ignore combinations (common ones)
 	data["IgnoreCombinations"] = []map[string]string{
 		{"GoOS": goOSDarwin, "GoArch": "386"},
-		{"GoOS": "windows", "GoArch": "arm64"},
+		{"GoOS": "windows", "GoArch": string(domain.ArchitectureARM64)},
 	}
 
 	addDockerConfig(data, config)
@@ -907,10 +996,19 @@ func prepareGitHubActionsData(config *domain.SafeProjectConfig) map[string]any {
 
 // CreateConfigOnlyJobs creates jobs for config generation only.
 func (jf *JobFactory) CreateConfigOnlyJobs(config *ProjectConfig, force bool) []Job {
-	return []Job{
+	jobs := []Job{
 		NewProjectValidationJob(".", jf.logger),
+		NewGenerationPreflightJob(force, generationTargets(config, false), jf.logger),
 		NewConfigGenerationJob(config, force, jf.logger),
 	}
+
+	// A Docker-enabled config references a Dockerfile; generate it in the
+	// config-only path too so the generated config is actually releasable.
+	if config.DockerSupport.IsEnabled() {
+		jobs = append(jobs, NewDockerfileGenerationJob(config, force, jf.logger))
+	}
+
+	return jobs
 }
 
 // CreateValidationOnlyJob creates a validation-only job.

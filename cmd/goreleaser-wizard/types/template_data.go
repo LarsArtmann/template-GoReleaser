@@ -232,6 +232,16 @@ func NewGitHubActionsTemplateData(config *domain.SafeProjectConfig) *GitHubActio
 	return data
 }
 
+// PlaceholderGitHubOwner and PlaceholderGitHubRepo are the fallback values used
+// when the GitHub remote cannot be detected. They keep `goreleaser check`
+// green without environment variables, but a release would target a
+// nonexistent repository, so callers must warn when they leak into generated
+// output.
+const (
+	PlaceholderGitHubOwner = "owner"
+	PlaceholderGitHubRepo  = "repo"
+)
+
 // parseGitHubRemote tries to get GitHub owner and repo from git remote.
 func parseGitHubRemote() (string, string) {
 	ctx := context.Background()
@@ -246,7 +256,14 @@ func parseGitHubRemote() (string, string) {
 		}
 	}
 
-	return "owner", "repo" // fallbacks
+	return PlaceholderGitHubOwner, PlaceholderGitHubRepo
+}
+
+// HasPlaceholderGitHubTarget reports whether GitHub owner or repository
+// resolution fell back to placeholders: no git remote was detected and no
+// explicit override was set via flags.
+func HasPlaceholderGitHubTarget() bool {
+	return GetGitHubOwner() == PlaceholderGitHubOwner || GetGitHubRepo() == PlaceholderGitHubRepo
 }
 
 var (
