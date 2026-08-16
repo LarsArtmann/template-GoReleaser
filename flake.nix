@@ -45,7 +45,6 @@
               fileset = lib.fileset.unions [
                 ./cmd
                 ./internal
-                ./templates
                 ./assets
                 ./go.mod
                 ./go.sum

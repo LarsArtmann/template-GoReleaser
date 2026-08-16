@@ -175,7 +175,7 @@ func TestTemplateGeneration(t *testing.T) {
 			defer os.Chdir(originalDir)
 
 			// Generate config
-			err := generateGoReleaserConfig(&tt.config)
+			err := generateGoReleaserConfig(&tt.config, quietLogger())
 
 			// Check error
 			AssertErr(t, "generateGoReleaserConfig", err, tt.expectError)
@@ -265,7 +265,7 @@ func TestGitHubActionsGeneration(t *testing.T) {
 			config.ApplyDefaults()
 
 			// Generate actions
-			err := generateGitHubActions(config)
+			err := generateGitHubActions(config, quietLogger())
 
 			// Check error
 			AssertErr(t, "generateGitHubActions", err, tt.expectError)
@@ -385,7 +385,7 @@ func TestConfigValidation(t *testing.T) {
 			os.Chdir(tmpDir)
 			defer os.Chdir(originalDir)
 
-			err := generateGoReleaserConfig(&tt.config)
+			err := generateGoReleaserConfig(&tt.config, quietLogger())
 
 			AssertErr(t, "generateGoReleaserConfig", err, tt.wantErr)
 		})

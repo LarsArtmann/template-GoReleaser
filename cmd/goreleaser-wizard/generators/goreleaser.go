@@ -1,7 +1,6 @@
 package generators
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -54,22 +53,19 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 		return err
 	}
 
-	// Generate template data with git information
-	data := g.prepareTemplateData(ctx)
-
 	// Execute template
-	output, err := executeTemplateWithError(tmpl, data, "GoReleaser")
+	output, err := executeTemplateWithError(tmpl, g.templateData, "GoReleaser")
 	if err != nil {
 		return err
 	}
 
 	// Create backup if file exists
-	if err := g.createBackup(".goreleaser.yaml"); err != nil {
+	if err := g.createBackup(goreleaserConfigFilename); err != nil {
 		return err
 	}
 
 	// Write configuration file
-	if err := WriteFile(".goreleaser.yaml", output, 0o644); err != nil {
+	if err := WriteFile(goreleaserConfigFilename, output, filePermission); err != nil {
 		return WrapFileError(err, "Failed to write GoReleaser config")
 	}
 
@@ -77,6 +73,9 @@ func (g *GoReleaserGenerator) Generate(ctx context.Context) error {
 
 	return nil
 }
+
+// goreleaserConfigFilename is the file the GoReleaser generator writes.
+const goreleaserConfigFilename = ".goreleaser.yaml"
 
 // createBackup creates a backup of existing file.
 func (g *GoReleaserGenerator) createBackup(filename string) error {
@@ -92,40 +91,6 @@ func (g *GoReleaserGenerator) createBackup(filename string) error {
 	}
 
 	return nil
-}
-
-// prepareTemplateData prepares complete template data including git information.
-func (g *GoReleaserGenerator) prepareTemplateData(
-	ctx context.Context,
-) *types.GoReleaserTemplateData {
-	// Get version information from git
-	versionInfo, err := git.GetVersionInfo(ctx)
-	if err != nil {
-		g.logger.Warn("Failed to get git version info, using defaults", "error", err)
-
-		versionInfo = &git.VersionInfo{
-			Version:    "v0.1.0",
-			CommitHash: "unknown",
-		}
-	}
-
-	// Update template data with git information
-	data := *g.templateData // Copy to avoid mutation
-	data.Version = versionInfo.Version
-	data.Tag = versionInfo.Version
-	data.Major = git.GetMajorVersion(versionInfo.Version)
-	data.Date = git.GetCurrentDate()
-	data.FullCommit = versionInfo.CommitHash
-
-	// Update environment variables
-	if data.Env == nil {
-		data.Env = make(map[string]string)
-	}
-
-	data.Env["GITHUB_OWNER"] = versionInfo.Owner
-	data.Env["GITHUB_REPO"] = versionInfo.Repo
-
-	return &data
 }
 
 // ValidateTemplate validates the GoReleaser template.
@@ -154,32 +119,17 @@ func (g *GoReleaserGenerator) GeneratePreview(ctx context.Context) (string, erro
 		return "", err
 	}
 
-	// Create template
-	tmpl := template.New("goreleaser").Funcs(template.FuncMap{
-		"incpatch": git.IncPatchVersion,
-	})
-
-	tmpl, err := tmpl.Parse(templates.GoReleaserTemplate)
+	output, err := GeneratePreview(
+		ctx,
+		g.logger,
+		"goreleaser",
+		templates.GoReleaserTemplate,
+		"Generating GoReleaser configuration preview",
+		g.templateData,
+	)
 	if err != nil {
-		return "", domain.NewConfigError(
-			domain.ErrTemplateParsing,
-			"Failed to parse GoReleaser template",
-			err.Error(),
-		).WithCause(err)
+		return "", err
 	}
 
-	// Prepare template data
-	data := g.prepareTemplateData(ctx)
-
-	// Execute template
-	var output bytes.Buffer
-	if err := tmpl.Execute(&output, data); err != nil {
-		return "", domain.NewConfigError(
-			domain.ErrTemplateRendering,
-			"Failed to execute GoReleaser template preview",
-			err.Error(),
-		).WithCause(err)
-	}
-
-	return output.String(), nil
+	return output, nil
 }

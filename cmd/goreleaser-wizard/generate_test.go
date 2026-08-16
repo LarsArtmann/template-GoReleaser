@@ -175,7 +175,7 @@ func TestGenerateGoReleaserConfig(t *testing.T) {
 			config.ApplyDefaults()
 
 			// Generate config
-			err = generateGoReleaserConfig(config)
+			err = generateGoReleaserConfig(config, quietLogger())
 
 			// Check error
 			AssertErr(t, "generateGoReleaserConfig", err, tt.wantErr)
@@ -236,8 +236,6 @@ func TestGenerateGitHubActions(t *testing.T) {
 				"- 'v*'",
 				"uses: goreleaser/goreleaser-action@v6",
 				"GITHUB_TOKEN:",
-				"GITHUB_OWNER:",
-				"GITHUB_REPO:",
 			},
 		},
 		{
@@ -301,7 +299,7 @@ func TestGenerateGitHubActions(t *testing.T) {
 			config.ApplyDefaults()
 
 			// Generate actions
-			err = generateGitHubActions(config)
+			err = generateGitHubActions(config, quietLogger())
 
 			// Check error
 			AssertErr(t, "generateGitHubActions", err, tt.wantErr)

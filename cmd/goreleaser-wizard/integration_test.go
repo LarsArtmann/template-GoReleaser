@@ -78,7 +78,7 @@ require github.com/charmbracelet/bubbletea v0.25.0
 			}
 
 			// Test config generation
-			err := generateGoReleaserConfig(config)
+			err := generateGoReleaserConfig(config, quietLogger())
 			if err != nil {
 				t.Errorf("generateGoReleaserConfig() error = %v", err)
 			}
@@ -90,7 +90,7 @@ require github.com/charmbracelet/bubbletea v0.25.0
 			config.ActionLevel = domain.ActionLevelBasic
 			config.ActionsOn = []domain.ActionTrigger{domain.ActionTriggerVersionTags}
 
-			err = generateGitHubActions(config)
+			err = generateGitHubActions(config, quietLogger())
 			if err != nil {
 				t.Errorf("generateGitHubActions() error = %v", err)
 			}
@@ -208,7 +208,7 @@ func TestConfigurationValidation(t *testing.T) {
 			defer os.Chdir(originalDir)
 
 			// Test config generation
-			err := generateGoReleaserConfig(&tt.config)
+			err := generateGoReleaserConfig(&tt.config, quietLogger())
 
 			// Check error
 			if (err != nil) != tt.expectError {
@@ -365,7 +365,7 @@ go 1.21
 			}
 
 			// Generate config to test
-			err := generateGoReleaserConfig(config)
+			err := generateGoReleaserConfig(config, quietLogger())
 			if err != nil {
 				t.Errorf("generateGoReleaserConfig() error = %v", err)
 			}

@@ -85,7 +85,7 @@ go 1.21
 	}
 
 	for b.Loop() {
-		err := generateGoReleaserConfig(config)
+		err := generateGoReleaserConfig(config, quietLogger())
 		if err != nil {
 			b.Fatalf("Config generation failed: %v", err)
 		}
@@ -123,7 +123,7 @@ go 1.21
 	}
 
 	for b.Loop() {
-		err := generateGitHubActions(config)
+		err := generateGitHubActions(config, quietLogger())
 		if err != nil {
 			b.Fatalf("GitHub Actions generation failed: %v", err)
 		}
@@ -204,12 +204,12 @@ func TestPerformanceCharacteristics(t *testing.T) {
 			config := baseTestProjectConfig()
 			detectProjectInfo(&config)
 
-			err := generateGoReleaserConfig(&config)
+			err := generateGoReleaserConfig(&config, quietLogger())
 			if err != nil {
 				t.Errorf("Config generation failed: %v", err)
 			}
 
-			err = generateGitHubActions(&config)
+			err = generateGitHubActions(&config, quietLogger())
 			if err != nil {
 				t.Errorf("GitHub Actions generation failed: %v", err)
 			}
@@ -254,7 +254,7 @@ func TestMemoryUsage(t *testing.T) {
 		// Run wizard operations
 		config := &ProjectConfig{}
 		detectProjectInfo(config)
-		generateGoReleaserConfig(config)
+		generateGoReleaserConfig(config, quietLogger())
 	}
 
 	// Get final memory stats
@@ -318,7 +318,7 @@ func TestConcurrentOperations(t *testing.T) {
 		}
 		detectProjectInfo(config)
 
-		err := generateGoReleaserConfig(config)
+		err := generateGoReleaserConfig(config, quietLogger())
 		if err != nil {
 			errors = append(errors, fmt.Errorf("project %d: %w", i, err))
 		}

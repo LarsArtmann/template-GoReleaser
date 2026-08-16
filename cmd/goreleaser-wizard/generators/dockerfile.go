@@ -7,41 +7,29 @@ import (
 	"github.com/LarsArtmann/GoReleaser-Wizard/internal/domain"
 )
 
+// dockerfileBaseImageScratch is the base for pure-Go static binaries.
+const dockerfileBaseImageScratch = "scratch"
+
+// dockerfileBaseImageAlpine is the base for CGO binaries, which are
+// dynamically linked and need a C runtime.
+const dockerfileBaseImageAlpine = "alpine:latest"
+
+// webAPIExposePort is the conventional port exposed for Web API projects.
+const webAPIExposePort = "8080"
+
 // DockerfileGenerator handles Dockerfile generation.
 type DockerfileGenerator struct {
 	templateData *DockerfileTemplateData
 	logger       Logger
 }
 
-// DockerfileTemplateData contains data for Dockerfile template.
+// DockerfileTemplateData is the typed data for the prebuilt-pattern
+// Dockerfile template.
 type DockerfileTemplateData struct {
-	ProjectName   string
-	GoVersion     string
-	AlpineVersion string
-	CGOEnabled    string
-	TargetOS      string
-	TargetArch    string
-	LDFlags       string
-	MainPath      string
-	ConfigFiles   []string
-	ExposePort    string
-	EnvVars       []EnvVar
-	HealthCheck   *HealthCheck
-}
-
-// EnvVar represents an environment variable.
-type EnvVar struct {
-	Key   string
-	Value string
-}
-
-// HealthCheck represents container health check configuration.
-type HealthCheck struct {
-	Interval    string
-	Timeout     string
-	StartPeriod string
-	Retries     int
-	Commands    []string
+	ProjectName string
+	BinaryName  string
+	BaseImage   string
+	ExposePort  string
 }
 
 // NewDockerfileGenerator creates a new Dockerfile generator.
@@ -55,43 +43,19 @@ func NewDockerfileGenerator(config *domain.SafeProjectConfig, logger Logger) *Do
 // createDockerfileTemplateData creates template data from project config.
 func createDockerfileTemplateData(config *domain.SafeProjectConfig) *DockerfileTemplateData {
 	data := &DockerfileTemplateData{
-		ProjectName:   config.ProjectName,
-		GoVersion:     "1.21", // Default Go version
-		AlpineVersion: "latest",
-		CGOEnabled:    "false",
-		TargetOS:      "linux",
-		TargetArch:    "amd64",
-		LDFlags:       "-s -w",
-		MainPath:      config.MainPath,
-		ConfigFiles:   []string{},
-		ExposePort:    "",
-		EnvVars:       []EnvVar{},
-		HealthCheck:   nil,
+		ProjectName: config.ProjectName,
+		BinaryName:  config.BinaryName,
+		BaseImage:   dockerfileBaseImageScratch,
+		ExposePort:  "",
 	}
 
-	// Set CGO based on configuration
+	// CGO binaries are dynamically linked and need a C runtime.
 	if config.CGOStatus.IsEnabled() {
-		data.CGOEnabled = "true"
+		data.BaseImage = dockerfileBaseImageAlpine
 	}
 
-	// Add common config files
 	if config.ProjectType == domain.ProjectTypeWebAPI {
-		data.ConfigFiles = []string{"config.yaml", ".env.example"}
-		data.ExposePort = "8080"
-		data.EnvVars = []EnvVar{
-			{Key: "PORT", Value: "8080"},
-			{Key: "LOG_LEVEL", Value: "info"},
-		}
-		data.HealthCheck = &HealthCheck{
-			Interval:    "30s",
-			Timeout:     "10s",
-			StartPeriod: "5s",
-			Retries:     defaultHealthRetries,
-			Commands: []string{
-				"CMD-SHELL",
-				"wget --no-verbose --tries=1 --spider http://localhost:8080/health || exit 1",
-			},
-		}
+		data.ExposePort = webAPIExposePort
 	}
 
 	return data
@@ -143,8 +107,7 @@ func (g *DockerfileGenerator) GeneratePreview(ctx context.Context) (string, erro
 func (g *DockerfileGenerator) Rollback(ctx context.Context) error {
 	g.logger.Info("Rolling back Dockerfile generation")
 
-	err := CheckContext(ctx)
-	if err != nil {
+	if err := CheckContext(ctx); err != nil {
 		return err
 	}
 

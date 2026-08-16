@@ -17,7 +17,7 @@ func renderReleaseWorkflow(t *testing.T, cfg *ProjectConfig) string {
 
 	t.Chdir(t.TempDir())
 
-	if err := generateGitHubActions(cfg); err != nil {
+	if err := generateGitHubActions(cfg, quietLogger()); err != nil {
 		t.Fatalf("generateGitHubActions() failed: %v", err)
 	}
 

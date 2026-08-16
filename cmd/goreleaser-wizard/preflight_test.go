@@ -34,48 +34,6 @@ func dockerTestConfig(t *testing.T, docker domain.DockerSupport, projectType dom
 	return &cfg
 }
 
-func TestDockerPlatforms(t *testing.T) {
-	tests := []struct {
-		name          string
-		architectures []domain.Architecture
-		wantPlatforms []string
-	}{
-		{
-			name:          "amd64_only",
-			architectures: []domain.Architecture{"amd64"},
-			wantPlatforms: []string{"linux/amd64"},
-		},
-		{
-			name:          "amd64_and_arm64",
-			architectures: []domain.Architecture{"amd64", "arm64"},
-			wantPlatforms: []string{"linux/amd64", "linux/arm64"},
-		},
-		{
-			name:          "arm64_alone_still_gets_amd64",
-			architectures: []domain.Architecture{"arm64"},
-			wantPlatforms: []string{"linux/amd64", "linux/arm64"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			cfg := baseTestProjectConfig()
-			cfg.Architectures = tt.architectures
-
-			got := dockerPlatforms(&cfg)
-			if len(got) != len(tt.wantPlatforms) {
-				t.Fatalf("dockerPlatforms() = %v, want %v", got, tt.wantPlatforms)
-			}
-
-			for i, want := range tt.wantPlatforms {
-				if got[i] != want {
-					t.Errorf("dockerPlatforms()[%d] = %q, want %q", i, got[i], want)
-				}
-			}
-		})
-	}
-}
-
 func TestGenerationTargets(t *testing.T) {
 	tests := []struct {
 		name           string

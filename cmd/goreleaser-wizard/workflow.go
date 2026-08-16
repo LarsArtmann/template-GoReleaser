@@ -381,7 +381,7 @@ func (j *MigrationValidationJob) Rollback(ctx context.Context) error {
 }
 
 func generateConfiguration(config *ProjectConfig, logger *log.Logger, failureMessage, successMessage string) error {
-	err := generateGoReleaserConfig(config)
+	err := generateGoReleaserConfig(config, logger)
 	if err != nil {
 		return fmt.Errorf("%s: %w", failureMessage, err)
 	}
