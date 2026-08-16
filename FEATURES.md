@@ -1,6 +1,6 @@
 # GoReleaser-Wizard Features
 
-> **Last Updated:** 2025-12-16  
+> **Last Updated:** 2025-12-16\
 > **Version:** Current Development State
 
 ## 🎯 Executive Summary
@@ -89,17 +89,15 @@ GoReleaser-Wizard is an ambitious CLI tool designed to simplify GoReleaser confi
 **State:** FULLY_FUNCTIONAL
 
 - **Description:** Docker image building and publishing configuration
-- **Implementation:** Complete Docker integration with template generation
+- **Implementation:** `dockers_v2` multi-platform images with OCI annotations; prebuilt-pattern Dockerfile (`FROM scratch`/`alpine`, `ARG TARGETPLATFORM`, copies binaries GoReleaser built -- never rebuilds in-image), generated in both full-wizard and config-only workflows
 - **Features:**
-  - Multi-stage Dockerfile generation ✅
+  - Prebuilt-pattern Dockerfile generation ✅ (multi-stage rebuild would be wrong for dockers_v2)
   - Build-only mode ✅
   - Publish-only mode ✅
   - Build and Publish mode ✅
   - Multiple registry support (GitHub, Docker Hub, etc.) ✅
-  - Project-specific Dockerfile customization ✅
-  - Non-root user security best practices ✅
-  - Health check configuration for web services ✅
-- **Status:** Complete Docker integration implemented
+  - Web API projects get `EXPOSE 8080` ✅
+- **Status:** Verified end-to-end: snapshot release builds and pushes amd64+arm64 images
 
 ### 7. Code Signing Support
 
@@ -108,27 +106,25 @@ GoReleaser-Wizard is an ambitious CLI tool designed to simplify GoReleaser confi
 - **Description:** Code signing configuration for releases
 - **Implementation:** Signing level enums and configuration options
 - **Features:**
-  - Cosign integration in GitHub Actions ✅
+  - Cosign installer step in generated GitHub Actions workflow (conditional) ✅
   - Multiple signing levels defined ✅
-- **Limitations:** Actual signing implementation incomplete
-- **Status:** Configuration generated, but signing workflow needs work
+- **Limitations:** Generated `.goreleaser.yaml` contains no `signs:` section yet
+- **Status:** CI-side signing ready; config-side signing not yet generated
 
 ### 8. Package Manager Integration
 
 **State:** PARTIALLY_FUNCTIONAL
 
 - **Description:** Generate configurations for package managers
-- **Implementation:** Homebrew formula generation implemented
+- **Implementation:** Typed Homebrew cask generator exists (`generators/homebrew.go`) but is not yet wired into any workflow; generated configs currently contain no tap-publishing section
 - **Features:**
-  - Homebrew formula generation ✅
-  - Automatic formula naming (CamelCase) ✅
   - Project detection and defaults ✅
-  - Service configuration for background services ✅
 - **Planned Features:**
+  - Wire `homebrew_casks` generation (blocked on personal tap defaults)
   - Snap package support
   - Scoop Windows packages
   - AUR (Arch Linux) support
-- **Status:** Homebrew implemented, other package managers planned
+- **Status:** Homebrew generator built but unwired; other package managers planned
 
 ---
 
@@ -283,8 +279,8 @@ GoReleaser-Wizard is an ambitious CLI tool designed to simplify GoReleaser confi
 
 ### Missing Features
 
-- **Dockerfile Generation:** Docker templates not implemented
-- **Package Managers:** No generation for Homebrew, Snap, etc.
+- **Package Managers:** Homebrew cask generation built but not wired into workflows
+- **Config-side signing:** No `signs:` section in generated configs
 - **Rich Interactivity:** Limited user input and confirmation
 - **Documentation:** Generated configs lack inline documentation
 - **Preview Mode:** Limited preview capabilities

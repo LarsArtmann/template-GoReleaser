@@ -1,9 +1,20 @@
 # SUPERB Wizard Modernization — Pareto Execution Plan
 
 **Date:** 2026-08-16 18:45
-**Status:** PLANNED — awaiting execution
-**Sources:** `docs/research/2026-08-10_GORELASER_17_RESEARCH.md` (research) + re-verification on 2026-08-16 (state drift checked)
-**Goal owner:** Lars — "I want to use GoReleaser in pretty much ALL my projects"
+**Status:** EXECUTING — Waves 1-5 complete + M23 pulled forward (2026-08-17); Wave 6 remainder open
+
+**Execution log:**
+
+- Wave 1 (M1-M4/F1-F18) + F27/F30/F32: commits `e85bb4f`, `3282680` (2026-08-16/17)
+- Wave 1 gap closers (preflight, config-only Dockerfile, placeholder warning, tests, F31): `6f4f54d`
+- Wave 2 (M5-M8/F19-F26, root templates/ deleted): `9f4bd71`
+- Wave 3 (M9-M11/F34-F45: E2E + goldens + ci.yml): `8edf0b1`
+- Wave 4 (M12/F46-F48 + test-wizard removal): `3cb91da`
+- Wave 5 (M13 guide, M14 README, M15 AGENTS, M16 FEATURES): this session's docs commit
+- M23 pulled forward (own config on v2.17, snapshot release verified incl. docker; cosign keyless = CI-only)
+- Deferred: F33 (needs TypeSpec change, belongs with M18). Wave 6 open: M17-M22, M24-M27
+  **Sources:** `docs/research/2026-08-10_GORELASER_17_RESEARCH.md` (research) + re-verification on 2026-08-16 (state drift checked)
+  **Goal owner:** Lars — "I want to use GoReleaser in pretty much ALL my projects"
 
 ---
 

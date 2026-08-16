@@ -75,80 +75,58 @@ changelog:
 
 signs:
   - cmd: cosign
-    certificate: "${artifact}.pem"
+    signature: "${artifact}.sigstore.json"
     args:
       - sign-blob
-      - "--oidc-issuer=https://token.actions.githubusercontent.com"
-      - "--output-certificate=${certificate}"
-      - "--output-signature=${signature}"
+      - "--bundle=${signature}"
       - "${artifact}"
+      - "--yes"
     artifacts: all
     output: true
 
 sboms:
   - artifacts: archive
 
-brews:
+homebrew_casks:
   - name: goreleaser-wizard
+    binaries:
+      - goreleaser-wizard
     skip_upload: true
     homepage: https://github.com/LarsArtmann/GoReleaser-Wizard
     description: "Interactive setup wizard that creates perfect GoReleaser configurations"
-    license: MIT
     repository:
       owner: LarsArtmann
       name: homebrew-tap
-    directory: Formula
+    directory: Casks
     commit_author:
       name: goreleaserbot
       email: goreleaser@larsartmann.com
-    install: |
-      bin.install "goreleaser-wizard"
-    test: |
-      system "#{bin}/goreleaser-wizard --version"
+    hooks:
+      post:
+        install: |
+          if OS.mac?
+            system_command "/usr/bin/xattr", args: ["-dr", "com.apple.quarantine", "#{staged_path}/goreleaser-wizard"]
+          end
 
-dockers:
-  - image_templates:
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
+dockers_v2:
+  - id: goreleaser-wizard
+    images:
+      - ghcr.io/larsartmann/goreleaser-wizard
+    tags:
+      - "{{.Tag}}"
+      - "v{{.Major}}"
+      - "v{{.Major}}.{{.Minor}}"
+      - "{{if not .IsNightly}}latest{{end}}"
     dockerfile: Dockerfile
-    goarch: amd64
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/amd64"
-  - image_templates:
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
-    dockerfile: Dockerfile
-    goarch: arm64
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.title={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/arm64"
-
-docker_manifests:
-  - name_template: "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}"
-    image_templates:
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/larsartmann/goreleaser-wizard:v{{ .Major }}"
-    image_templates:
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/larsartmann/goreleaser-wizard:v{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
-  - name_template: "ghcr.io/larsartmann/goreleaser-wizard:latest"
-    image_templates:
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-amd64"
-      - "ghcr.io/larsartmann/goreleaser-wizard:{{ .Tag }}-arm64"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    annotations:
+      org.opencontainers.image.created: "{{.Date}}"
+      org.opencontainers.image.title: "{{.ProjectName}}"
+      org.opencontainers.image.revision: "{{.FullCommit}}"
+      org.opencontainers.image.version: "{{.Version}}"
+      org.opencontainers.image.source: "{{.GitURL}}"
 
 nfpms:
   - id: default

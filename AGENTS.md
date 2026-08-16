@@ -11,24 +11,47 @@ GoReleaser-Wizard is an interactive CLI tool that generates production-ready GoR
 
 **Key Technologies**:
 
-- Go 1.25.6
+- Go 1.26.5 (requires `GOEXPERIMENT=jsonv2` to build — see Gotchas)
 - Cobra CLI framework
 - Viper for configuration
 - Charm libraries (lipgloss, log) for terminal UI
 - golangci-lint for code quality
 - go-arch-lint for architecture enforcement
+- GoReleaser v2.17 as the target of generated configs
 
 ---
 
 ## Essential Commands
 
-### Primary Development Commands
+All Go commands need the environment prefixes below while `/mnt/buildcache` is broken.
 
-### Advanced Commands (dev/arch-lint.just)
+### Build / Test / Lint
 
-The project uses an enterprise-grade linting justfile with comprehensive tooling:
+```bash
+export GOCACHE=/tmp/gw-cache GOMODCACHE=/tmp/gw-modcache GOLANGCI_LINT_CACHE=/tmp/gw-lint-cache GOEXPERIMENT=jsonv2
+
+go build ./...
+go test ./...                            # includes E2E + golden tests
+go test ./cmd/goreleaser-wizard -update-golden   # regenerate golden files
+golangci-lint run ./...
+go-arch-lint check
+```
+
+### Verify the product (generated configs)
+
+```bash
+go build -o /tmp/gw-bin ./cmd/goreleaser-wizard
+# in a fresh Go module with git init:
+/tmp/gw-bin generate --config <cfg.yaml> --github-owner <owner> --github-repo <repo>
+goreleaser check                        # must exit 0 with zero deprecations
+```
+
+The E2E test `TestGeneratedConfigPassesGoReleaserCheck` automates exactly this and skips gracefully when `goreleaser` is not in PATH.
 
 ### Project-Specific Commands
+
+- `nix flake check`, `nix build`, `nix run .#test`, `nix run .#lint` (never Makefile/justfile)
+- BuildFlow runs as pre-commit hook: ~60 tools, auto-fixes files — check `git status` after every commit
 
 ---
 
@@ -57,7 +80,10 @@ The project implements Clean Architecture with DDD principles:
    - Git command wrappers
    - Utility functions
 
-4. **Configuration Layer** (`templates/`)
+4. **Configuration Layer** (`cmd/goreleaser-wizard/templates/`)
+   - Embedded Go templates — THE single source of truth for all generated files
+   - Rendered exclusively by the typed generators in `cmd/goreleaser-wizard/generators/`
+   - `cmd/goreleaser-wizard/types/` holds the typed template data + GitHub owner/repo resolution (flag overrides > git remote detection > placeholders)
    - Go templates for file generation
    - Template data structures
    - Template escaping utilities
@@ -324,10 +350,34 @@ ioutil.WriteFile("config.yaml", data, 0o644)  // Deprecated
 
 ### Build and Dependencies
 
-**10. Justfile Priority**
+**10. Nix First, Never Justfile**
 
-- Prefer `just` commands over manual commands
-- `just test` instead of `go test ./...`
-- `just build` instead of `go build ./...`
+- Prefer `nix` commands (`nix flake check`, `nix run .#test`); never create justfiles
+
+### Environment Gotchas (verified 2026-08-17)
+
+**11. `GOEXPERIMENT=jsonv2` is REQUIRED to build**
+
+- `internal/types` imports `encoding/json/v2` and `encoding/json/jsontext`
+- Build fails without it; BuildFlow's preflight claims it is redundant — that static check is WRONG (it misses `internal/types`); trust the build
+- CI (`.github/workflows/ci.yml`) sets it on every Go step
+
+**12. `/mnt/buildcache` may be broken**
+
+- Symptom: `failed to initialize build cache at /mnt/buildcache/...`
+- Fix: export `GOCACHE=/tmp/gw-cache GOMODCACHE=/tmp/gw-modcache GOLANGCI_LINT_CACHE=/tmp/gw-lint-cache`
+
+**13. BuildFlow pre-commit hook can hang on telemetry**
+
+- PostHog TLS timeouts (network outage) block the commit AFTER the pipeline finished green
+- Recovery: kill the `buildflow`/`git commit` processes, verify the pipeline log shows `0 failed`, then commit with `--no-verify` and note why in the message
+
+**14. E2E testing gotcha**
+
+- `go run github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard` resolves the PUBLISHED module from the proxy, not local code — always `go build -o /tmp/gw-bin ./cmd/goreleaser-wizard` first
+
+**15. Domain validation rejects windows+arm64**
+
+- Test configs must not combine them (`architecture_compat.go`); template ignore lists are belt-and-braces, not a license
 
 > This file was auto-trimmed. Full history in git.

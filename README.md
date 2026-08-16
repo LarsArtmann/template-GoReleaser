@@ -6,7 +6,7 @@
 [![Go Version](https://img.shields.io/badge/go-1.26+-blue.svg)](https://golang.org)
 [![GoReleaser](https://img.shields.io/badge/powered%20by-GoReleaser-blue.svg)](https://goreleaser.com)
 
-An interactive CLI tool that generates production-ready GoReleaser configurations for Go projects. It auto-detects your project structure, guides you through options with a rich TUI, and outputs `.goreleaser.yaml`, GitHub Actions workflows, Dockerfiles, and Homebrew formulas -- all following best practices.
+An interactive CLI tool that generates production-ready GoReleaser configurations for Go projects. It auto-detects your project structure, guides you through options with a rich TUI, and outputs `.goreleaser.yaml`, a GitHub Actions release workflow, and a Dockerfile -- all verified against GoReleaser v2.17 with zero deprecations.
 
 ## Quick Start
 
@@ -15,7 +15,7 @@ go install github.com/LarsArtmann/GoReleaser-Wizard/cmd/goreleaser-wizard@latest
 goreleaser-wizard init
 ```
 
-That's it. Your `.goreleaser.yaml` is ready.
+That's it. Your `.goreleaser.yaml` passes `goreleaser check` with zero deprecations, no environment variables required -- GitHub owner/repo are detected from your git remote (override with `--github-owner` / `--github-repo`).
 
 ## Demo
 
@@ -97,6 +97,8 @@ goreleaser-wizard init
 | `--binary-name`  | auto-detected | Override binary name                          |
 | `--main-path`    | auto-detected | Override main package path                    |
 | `--project-type` | auto-detected | Override project type                         |
+| `--github-owner` | git remote    | Override GitHub repository owner              |
+| `--github-repo`  | git remote    | Override GitHub repository name               |
 
 When stdout is not a terminal, `init` prints a helpful message with the non-interactive flag.
 
@@ -120,6 +122,8 @@ goreleaser-wizard generate \
 | `--binary-name`  | auto-detected | Override binary name                                 |
 | `--main-path`    | auto-detected | Override main package path                           |
 | `--project-type` | auto-detected | Override project type                                |
+| `--github-owner` | git remote    | Override GitHub repository owner                     |
+| `--github-repo`  | git remote    | Override GitHub repository name                      |
 
 ### `validate` -- Check Configuration
 
@@ -148,19 +152,17 @@ goreleaser-wizard version
 
 ### `.goreleaser.yaml`
 
-Optimized build configuration with multi-platform support, archive generation, checksums, changelog, code signing (cosign), SBOM, Homebrew, Docker images, nFPM packages, Nix, and Scoop.
+Modern GoReleaser v2.17 configuration: multi-platform builds, archives with Windows zip overrides, checksums, GitHub-native changelog, literal owner/repo (checks clean locally without env vars), and `dockers_v2` multi-platform images with OCI annotations when Docker is enabled.
 
 ### `.github/workflows/release.yml`
 
-Automated release pipeline triggered on tags -- multi-platform builds, Docker image publishing, code signing, and SBOM generation.
+Tag-triggered release workflow on `ubuntu-latest`: checkout with full history, Go from `go.mod`, Docker buildx + registry login when Docker is enabled, cosign installer when signing is enabled, then `goreleaser release --clean`.
 
 ### `Dockerfile`
 
-Multi-stage production Docker build with non-root user, health checks, and minimal final image.
+Prebuilt-pattern Dockerfile for `dockers_v2`: `FROM scratch` (or `alpine` when CGO is enabled), `ARG TARGETPLATFORM`, copies the binaries GoReleaser already built -- never rebuilds inside the image. Web API projects get `EXPOSE 8080`.
 
-### Homebrew Formula
-
-Package manager formula with automatic CamelCase naming and proper install/test directives.
+Generation is atomic: if any target file already exists the wizard refuses up front unless `--force` is set, so you never end up half-generated.
 
 ## Supported Project Types
 
@@ -214,28 +216,33 @@ Supported registries: GitHub Container Registry (ghcr.io), Docker Hub, GitLab Re
 GoReleaser Wizard follows Domain-Driven Design with Clean Architecture:
 
 ```
-internal/domain/       Pure business logic, zero external dependencies
-internal/validation/   Field-level and business rule validation
-internal/errors/       Typed error codes with recovery suggestions
-internal/git/          Git operations
-internal/config/       Configuration management (koanf)
-cmd/goreleaser-wizard/ CLI layer (Cobra), TUI (huh), generators, workflows
-templates/             Go templates for all generated files
+internal/domain/            Pure business logic, zero external dependencies
+internal/validation/        Field-level and business rule validation
+internal/git/               Git operations, URL parsing, version helpers
+internal/config/            Configuration management
+
+cmd/goreleaser-wizard/      CLI layer (Cobra), TUI (huh), workflow + jobs
+cmd/goreleaser-wizard/generators/   Typed generators (single template render path)
+cmd/goreleaser-wizard/templates/    Embedded templates -- single source of truth
+cmd/goreleaser-wizard/types/        Typed template data + GitHub target resolution
 ```
 
 The domain layer uses type-safe enums for all configuration options (platforms, architectures, project types, Docker support levels, signing levels, etc.) and enforces validation through a centralized error system with structured diagnostics.
 
+Correctness is pinned by tests: an E2E test generates into a temp module and requires `goreleaser check` to exit clean, and golden files lock every generated artifact variant (`go test ./cmd/goreleaser-wizard -update-golden` to regenerate).
+
 ## Development
 
 ```bash
-just build          # Build the binary
-just test           # Run tests
-just fmt            # Format code
-just ci             # Full CI pipeline (fmt + test + build + verify + check)
-just clean          # Remove build artifacts
+nix develop                                   # dev shell
+GOEXPERIMENT=jsonv2 go build ./...           # jsonv2 is required
+GOEXPERIMENT=jsonv2 go test ./...            # includes E2E + golden tests
+GOEXPERIMENT=jsonv2 golangci-lint run ./...
+go-arch-lint check
+nix flake check
 ```
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines and [docs/goreleaser-guide.md](docs/goreleaser-guide.md) to learn GoReleaser v2.17 itself.
 
 ## License
 
