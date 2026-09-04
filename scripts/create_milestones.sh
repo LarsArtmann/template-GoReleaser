@@ -10,7 +10,7 @@ gh milestone create \
   --description "Foundation restoration - fix build system, complete domain layer, basic CLI functionality. Critical path that enables all subsequent development work." \
   --due-on "2025-11-24"
 
-# v0.1.1 - Testing & Validation  
+# v0.1.1 - Testing & Validation
 gh milestone create \
   --repo LarsArtmann/GoReleaser-Wizard \
   --title "v0.1.1 - Testing & Validation" \

@@ -1,7 +1,7 @@
 # GitHub Issues Index
 
-**Last Updated**: 2025-06-17 14:30  
-**Total Issues**: 5 (1 Critical, 1 High, 1 Medium, 2 Planning)  
+**Last Updated**: 2025-06-17 14:30\
+**Total Issues**: 5 (1 Critical, 1 High, 1 Medium, 2 Planning)\
 **Status**: In Progress - Critical Path Identified
 
 ---

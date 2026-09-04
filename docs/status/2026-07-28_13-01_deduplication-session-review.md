@@ -20,48 +20,48 @@ clones are structural Cobra boilerplate with unique values — accepted and docu
 
 ## A) FULLY DONE
 
-| #   | Item                                                    | Verification                      |
-| --- | ------------------------------------------------------- | --------------------------------- |
-| 1   | `art-dupl -t 3` report run and analyzed                 | HTML + text output reviewed       |
-| 2   | Root cause identified (11× error-discarding flag reads) | grep confirmed all sites          |
-| 3   | `flags.go` created with `getBoolFlag` / `getStringFlag` | Compiles, 11 call sites updated   |
-| 4   | `generate.go` — 6 flag reads replaced                   | `go test` passes                  |
-| 5   | `validate.go` — 3 flag reads replaced                   | `go test` passes                  |
-| 6   | `init.go` — 2 flag reads replaced                       | `go test` passes                  |
-| 7   | Remaining clones evaluated and accepted                 | `dedup-acceptance.md` written     |
-| 8   | Full test suite passes                                  | `go test ./...` — all packages OK |
-| 9   | Changes auto-committed by git daemon                    | `22d656f` on `master`             |
+| # | Item                                                    | Verification                      |
+| - | ------------------------------------------------------- | --------------------------------- |
+| 1 | `art-dupl -t 3` report run and analyzed                 | HTML + text output reviewed       |
+| 2 | Root cause identified (11× error-discarding flag reads) | grep confirmed all sites          |
+| 3 | `flags.go` created with `getBoolFlag` / `getStringFlag` | Compiles, 11 call sites updated   |
+| 4 | `generate.go` — 6 flag reads replaced                   | `go test` passes                  |
+| 5 | `validate.go` — 3 flag reads replaced                   | `go test` passes                  |
+| 6 | `init.go` — 2 flag reads replaced                       | `go test` passes                  |
+| 7 | Remaining clones evaluated and accepted                 | `dedup-acceptance.md` written     |
+| 8 | Full test suite passes                                  | `go test ./...` — all packages OK |
+| 9 | Changes auto-committed by git daemon                    | `22d656f` on `master`             |
 
 ---
 
 ## B) PARTIALLY DONE
 
-| #   | Item                    | What's done                       | What's missing                                                                          |
-| --- | ----------------------- | --------------------------------- | --------------------------------------------------------------------------------------- |
-| 1   | Duplication elimination | All harmful duplication extracted | Did not run art-dupl a 3rd time post-acceptance to confirm report is stable             |
-| 2   | Test verification       | `go test ./...` passes            | Did NOT run `golangci-lint` or `go-arch-lint` — both are project-standard quality gates |
+| # | Item                    | What's done                       | What's missing                                                                          |
+| - | ----------------------- | --------------------------------- | --------------------------------------------------------------------------------------- |
+| 1 | Duplication elimination | All harmful duplication extracted | Did not run art-dupl a 3rd time post-acceptance to confirm report is stable             |
+| 2 | Test verification       | `go test ./...` passes            | Did NOT run `golangci-lint` or `go-arch-lint` — both are project-standard quality gates |
 
 ---
 
 ## C) NOT STARTED
 
-| #   | Item                                                     | Why it matters                                                                                                                                                                    |
-| --- | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | **Document `GOEXPERIMENT=jsonv2` requirement**           | Build FAILS without it. `internal/domain/config_core.go` imports `encoding/json/v2`. Not in AGENTS.md, not in flake.nix. Every fresh session will hit this wall.                  |
-| 2   | **Remove 3 stale `.orig` files**                         | `main.go.orig`, `validate_main.go.orig`, `internal/domain/errors.go.orig` — commit `fa648db` claimed to remove these but they're still here.                                      |
-| 3   | **Fix unused `createTempFile` in `validate_test.go:59`** | gopls flagged it as unused during this session. Ignored.                                                                                                                          |
-| 4   | **Fix `init.go` header inconsistency**                   | `generate.go` and `validate.go` use `printCommandHeader()`; `init.go` does `fmt.Println(titleStyle.Render(...)); fmt.Println()` inline — same logic, not using the shared helper. |
-| 5   | **Investigate Go cache corruption**                      | `rm -rf ~/.cache/go-build` failed with "directory not empty" on multiple subdirs. Worked around with `GOCACHE=/tmp/...` but root cause unknown.                                   |
+| # | Item                                                     | Why it matters                                                                                                                                                                    |
+| - | -------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1 | **Document `GOEXPERIMENT=jsonv2` requirement**           | Build FAILS without it. `internal/domain/config_core.go` imports `encoding/json/v2`. Not in AGENTS.md, not in flake.nix. Every fresh session will hit this wall.                  |
+| 2 | **Remove 3 stale `.orig` files**                         | `main.go.orig`, `validate_main.go.orig`, `internal/domain/errors.go.orig` — commit `fa648db` claimed to remove these but they're still here.                                      |
+| 3 | **Fix unused `createTempFile` in `validate_test.go:59`** | gopls flagged it as unused during this session. Ignored.                                                                                                                          |
+| 4 | **Fix `init.go` header inconsistency**                   | `generate.go` and `validate.go` use `printCommandHeader()`; `init.go` does `fmt.Println(titleStyle.Render(...)); fmt.Println()` inline — same logic, not using the shared helper. |
+| 5 | **Investigate Go cache corruption**                      | `rm -rf ~/.cache/go-build` failed with "directory not empty" on multiple subdirs. Worked around with `GOCACHE=/tmp/...` but root cause unknown.                                   |
 
 ---
 
 ## D) TOTALLY FUCKED UP
 
-| #   | What                                                                   | Impact                                                                                                                                                                                                  | Severity |
-| --- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
-| 1   | **Skipped project-standard linting**                                   | Project has golangci-lint + go-arch-lint as quality gates. I ran neither. Only `go test`. This violates the project's own AGENTS.md testing mandate.                                                    | HIGH     |
-| 2   | **Saw `.orig` files and walked past them**                             | Ran `ls` early in the session, saw `main.go.orig` and `validate_main.go.orig`. A previous commit explicitly tried to remove these. I did nothing.                                                       | MEDIUM   |
-| 3   | **Discovered a critical build-breaking gotcha and didn't document it** | The `GOEXPERIMENT=jsonv2` requirement is a trap for every future session. I spent 4 tool calls working around it, then dropped it. The AGENTS.md "Important Gotchas" section is begging for this entry. | HIGH     |
+| # | What                                                                   | Impact                                                                                                                                                                                                  | Severity |
+| - | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------- |
+| 1 | **Skipped project-standard linting**                                   | Project has golangci-lint + go-arch-lint as quality gates. I ran neither. Only `go test`. This violates the project's own AGENTS.md testing mandate.                                                    | HIGH     |
+| 2 | **Saw `.orig` files and walked past them**                             | Ran `ls` early in the session, saw `main.go.orig` and `validate_main.go.orig`. A previous commit explicitly tried to remove these. I did nothing.                                                       | MEDIUM   |
+| 3 | **Discovered a critical build-breaking gotcha and didn't document it** | The `GOEXPERIMENT=jsonv2` requirement is a trap for every future session. I spent 4 tool calls working around it, then dropped it. The AGENTS.md "Important Gotchas" section is begging for this entry. | HIGH     |
 
 ---
 

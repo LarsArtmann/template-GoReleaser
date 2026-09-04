@@ -15,7 +15,7 @@ GoReleaser-Wizard is an interactive CLI tool designed to generate production-rea
 | ---------------------- | --------------------------------- |
 | **Build**              | ✅ SUCCESS                        |
 | **Tests Passing**      | ❌ ~15% (2 of 4 packages failing) |
-| **Core Functionality** | ⚠️ PARTIAL                        |
+| **Core Functionality** | ⚠️ PARTIAL                         |
 | **Production Ready**   | ❌ NO                             |
 
 ---
@@ -176,48 +176,48 @@ Actual: NOT PRESENT IN OUTPUT
 
 ### Priority 1: CRITICAL (Must Fix Now)
 
-| #   | Task                                                               | Effort | Impact |
-| --- | ------------------------------------------------------------------ | ------ | ------ |
-| 1   | Add `signs:` section to goreleaser.yaml template                   | 1h     | HIGH   |
-| 2   | Add `brews:` section to goreleaser.yaml template                   | 1h     | HIGH   |
-| 3   | Fix `ValidateDockerRegistry("")` to return error                   | 15m    | MEDIUM |
-| 4   | Fix `SanitizeInput()` tab handling OR fix test                     | 15m    | LOW    |
-| 5   | Add validation in `generateGoReleaserConfig()` for required fields | 30m    | HIGH   |
+| # | Task                                                               | Effort | Impact |
+| - | ------------------------------------------------------------------ | ------ | ------ |
+| 1 | Add `signs:` section to goreleaser.yaml template                   | 1h     | HIGH   |
+| 2 | Add `brews:` section to goreleaser.yaml template                   | 1h     | HIGH   |
+| 3 | Fix `ValidateDockerRegistry("")` to return error                   | 15m    | MEDIUM |
+| 4 | Fix `SanitizeInput()` tab handling OR fix test                     | 15m    | LOW    |
+| 5 | Add validation in `generateGoReleaserConfig()` for required fields | 30m    | HIGH   |
 
 ### Priority 2: HIGH (Should Fix Soon)
 
-| #   | Task                                               | Effort | Impact |
-| --- | -------------------------------------------------- | ------ | ------ |
-| 6   | Wire GitHub Actions generator to workflow          | 2h     | HIGH   |
-| 7   | Wire Dockerfile generator to workflow              | 1h     | MEDIUM |
-| 8   | Wire Homebrew generator to workflow                | 1h     | MEDIUM |
-| 9   | Fix project type detection string format           | 30m    | MEDIUM |
-| 10  | Update test expectations to match correct behavior | 2h     | MEDIUM |
-| 11  | Add missing constants to constants.go files        | 1h     | LOW    |
-| 12  | Enable GitHub Actions generation by default        | 30m    | HIGH   |
+| #  | Task                                               | Effort | Impact |
+| -- | -------------------------------------------------- | ------ | ------ |
+| 6  | Wire GitHub Actions generator to workflow          | 2h     | HIGH   |
+| 7  | Wire Dockerfile generator to workflow              | 1h     | MEDIUM |
+| 8  | Wire Homebrew generator to workflow                | 1h     | MEDIUM |
+| 9  | Fix project type detection string format           | 30m    | MEDIUM |
+| 10 | Update test expectations to match correct behavior | 2h     | MEDIUM |
+| 11 | Add missing constants to constants.go files        | 1h     | LOW    |
+| 12 | Enable GitHub Actions generation by default        | 30m    | HIGH   |
 
 ### Priority 3: MEDIUM (Nice to Have)
 
-| #   | Task                                         | Effort | Impact |
-| --- | -------------------------------------------- | ------ | ------ |
-| 13  | Split jobs.go (833 lines) into smaller files | 2h     | MEDIUM |
-| 14  | Add integration tests                        | 3h     | HIGH   |
-| 15  | Update README.md                             | 30m    | MEDIUM |
-| 16  | Add snapshot tests for template output       | 2h     | MEDIUM |
-| 17  | Improve error messages with examples         | 1h     | MEDIUM |
-| 18  | Add --dry-run flag for preview               | 1h     | LOW    |
-| 19  | Consolidate error type definitions           | 1h     | LOW    |
+| #  | Task                                         | Effort | Impact |
+| -- | -------------------------------------------- | ------ | ------ |
+| 13 | Split jobs.go (833 lines) into smaller files | 2h     | MEDIUM |
+| 14 | Add integration tests                        | 3h     | HIGH   |
+| 15 | Update README.md                             | 30m    | MEDIUM |
+| 16 | Add snapshot tests for template output       | 2h     | MEDIUM |
+| 17 | Improve error messages with examples         | 1h     | MEDIUM |
+| 18 | Add --dry-run flag for preview               | 1h     | LOW    |
+| 19 | Consolidate error type definitions           | 1h     | LOW    |
 
 ### Priority 4: LOW (Future)
 
-| #   | Task                                      | Effort | Impact |
-| --- | ----------------------------------------- | ------ | ------ |
-| 20  | Add godoc comments to all exported types  | 2h     | LOW    |
-| 21  | Add configuration file support            | 3h     | LOW    |
-| 22  | Add template customization hooks          | 4h     | LOW    |
-| 23  | Add plugin system for custom generators   | 8h     | LOW    |
-| 24  | Add web UI for configuration              | 40h    | LOW    |
-| 25  | Add AI-assisted configuration suggestions | 20h    | LOW    |
+| #  | Task                                      | Effort | Impact |
+| -- | ----------------------------------------- | ------ | ------ |
+| 20 | Add godoc comments to all exported types  | 2h     | LOW    |
+| 21 | Add configuration file support            | 3h     | LOW    |
+| 22 | Add template customization hooks          | 4h     | LOW    |
+| 23 | Add plugin system for custom generators   | 8h     | LOW    |
+| 24 | Add web UI for configuration              | 40h    | LOW    |
+| 25 | Add AI-assisted configuration suggestions | 20h    | LOW    |
 
 ---
 

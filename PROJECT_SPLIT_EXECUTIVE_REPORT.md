@@ -54,24 +54,24 @@ This project would house the interactive command-line application, responsible f
 
 ## Advantages of this Split
 
-1.  **Enhanced Modularity and Reusability**:
-    - The `goreleaser-wizard-core` library can be independently imported and used by other Go projects, APIs, or services that need to interact with GoReleaser configurations without the overhead of the CLI.
-    - Enables a clear separation between domain logic and application-specific concerns.
+1. **Enhanced Modularity and Reusability**:
+   - The `goreleaser-wizard-core` library can be independently imported and used by other Go projects, APIs, or services that need to interact with GoReleaser configurations without the overhead of the CLI.
+   - Enables a clear separation between domain logic and application-specific concerns.
 
-2.  **Independent Development and Release Cycles**:
-    - Each project can evolve at its own pace. Changes in the core configuration definitions or validation rules can be released as a new version of `goreleaser-wizard-core` without immediately requiring a new `goreleaser-wizard-cli` release, and vice versa.
-    - Facilitates faster iteration on specific components.
+2. **Independent Development and Release Cycles**:
+   - Each project can evolve at its own pace. Changes in the core configuration definitions or validation rules can be released as a new version of `goreleaser-wizard-core` without immediately requiring a new `goreleaser-wizard-cli` release, and vice versa.
+   - Facilitates faster iteration on specific components.
 
-3.  **Improved Maintainability and Focus**:
-    - Smaller, more focused codebases are easier to understand, test, and maintain.
-    - Developers can concentrate on specific areas (e.g., core domain logic vs. CLI user experience) without navigating a larger codebase.
+3. **Improved Maintainability and Focus**:
+   - Smaller, more focused codebases are easier to understand, test, and maintain.
+   - Developers can concentrate on specific areas (e.g., core domain logic vs. CLI user experience) without navigating a larger codebase.
 
-4.  **Clearer Architectural Boundaries**:
-    - Reinforces the Clean Architecture principles, making the dependency flow explicit (CLI depends on Core, not the other way around).
-    - Simplifies architecture linting and enforcement within each project.
+4. **Clearer Architectural Boundaries**:
+   - Reinforces the Clean Architecture principles, making the dependency flow explicit (CLI depends on Core, not the other way around).
+   - Simplifies architecture linting and enforcement within each project.
 
-5.  **Reduced Cognitive Load**:
-    - New contributors can more easily onboard to a smaller, single-purpose project.
+5. **Reduced Cognitive Load**:
+   - New contributors can more easily onboard to a smaller, single-purpose project.
 
 ## Implementation Considerations
 

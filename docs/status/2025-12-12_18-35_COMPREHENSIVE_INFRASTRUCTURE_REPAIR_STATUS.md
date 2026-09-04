@@ -2,9 +2,9 @@
 
 ## Status Overview
 
-**Date:** 2025-12-12 18:35 CET  
-**Project:** GoReleaser-Wizard  
-**Severity:** CRITICAL - Infrastructure Repair in Progress  
+**Date:** 2025-12-12 18:35 CET\
+**Project:** GoReleaser-Wizard\
+**Severity:** CRITICAL - Infrastructure Repair in Progress\
 **Production Readiness:** 40% (Up from 35% due to critical fixes in progress)
 
 ---

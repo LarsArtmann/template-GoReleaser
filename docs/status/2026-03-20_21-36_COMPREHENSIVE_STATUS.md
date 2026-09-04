@@ -13,8 +13,8 @@
 | **Build**            | ✅ SUCCESS                 | 100%       |
 | **Tests**            | ❌ FAILING (~85%+ failing) | High       |
 | **Production Ready** | ❌ NO                      | Critical   |
-| **Code Quality**     | ⚠️ WARNINGS                | Medium     |
-| **Disk Space**       | ⚠️ CRITICAL                | High       |
+| **Code Quality**     | ⚠️ WARNINGS                 | Medium     |
+| **Disk Space**       | ⚠️ CRITICAL                 | High       |
 
 ---
 

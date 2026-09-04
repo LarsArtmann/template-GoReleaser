@@ -8,6 +8,6 @@ gh issue comment 27 \
   --repo LarsArtmann/GoReleaser-Wizard \
   --body "$(cat /tmp/issue_comment_architecture.txt)"
 
-# Comment on #28 - BDD Test Suite  
+# Comment on #28 - BDD Test Suite
 echo "Architecture comments added!"
 echo ""

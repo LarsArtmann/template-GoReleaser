@@ -8,12 +8,12 @@
 
 ## Executive Summary
 
-| Category         | Status            | Details                                               |
-| ---------------- | ----------------- | ----------------------------------------------------- |
-| **Build**        | ✅ PASSING        | Compiles cleanly with Go 1.26.1                       |
-| **Tests**        | ✅ ALL PASSING    | 4 packages tested, 0 failures                         |
+| Category         | Status           | Details                                               |
+| ---------------- | ---------------- | ----------------------------------------------------- |
+| **Build**        | ✅ PASSING       | Compiles cleanly with Go 1.26.1                       |
+| **Tests**        | ✅ ALL PASSING   | 4 packages tested, 0 failures                         |
 | **Coverage**     | ⚠️ LOW            | 51.9% main, 0.7% domain, 1.7% types, 56.3% validation |
-| **Linting**      | ✅ PASSING        | `go vet` clean                                        |
+| **Linting**      | ✅ PASSING       | `go vet` clean                                        |
 | **Git Status**   | ⚠️ 1 COMMIT AHEAD | Unpushed documentation commit                         |
 | **Architecture** | ⚠️ ISSUES         | Template duplication, large files                     |
 
@@ -195,33 +195,33 @@ The most critical layer has almost no test coverage. This is unacceptable for a 
 
 ## F) TOP #25 THINGS TO DO NEXT 📋
 
-| #   | Task                                              | Impact | Effort | Priority Score |
-| --- | ------------------------------------------------- | ------ | ------ | -------------- |
-| 1   | Consolidate GoReleaser templates to single source | High   | Medium | 95             |
-| 2   | Add WorkingDir to SafeProjectConfig               | High   | Medium | 90             |
-| 3   | Fix pre-commit hook timeout                       | Low    | Low    | 85             |
-| 4   | Add tests for generators package                  | Medium | Medium | 80             |
-| 5   | Split jobs.go (838 lines) into focused files      | Medium | Medium | 78             |
-| 6   | Improve domain test coverage to 50%               | High   | High   | 75             |
-| 7   | Push unpushed commits to remote                   | Low    | Low    | 72             |
-| 8   | Add tests for internal/git package                | Medium | Medium | 70             |
-| 9   | Split internal/types/validation.go (857 lines)    | Medium | Medium | 68             |
-| 10  | Implement repository pattern for file operations  | High   | High   | 65             |
-| 11  | Add contract tests for interfaces                 | Medium | Medium | 62             |
-| 12  | Remove TODOs or convert to issues                 | Low    | Low    | 60             |
-| 13  | Add fuzz testing for validation                   | Medium | High   | 58             |
-| 14  | Split internal/domain/validation.go (659 lines)   | Medium | Medium | 55             |
-| 15  | Add performance regression tests                  | Medium | High   | 52             |
-| 16  | Implement proper error types                      | Medium | Medium | 50             |
-| 17  | Add tests for internal/errors package             | Low    | Low    | 48             |
-| 18  | Create test data builders                         | Medium | Medium | 45             |
-| 19  | Implement command pattern for jobs                | Medium | High   | 42             |
-| 20  | Add chaos engineering tests                       | Low    | High   | 40             |
-| 21  | Replace map[string]any with typed structs         | Medium | Medium | 38             |
-| 22  | Validate all data at compile-time                 | Medium | High   | 35             |
-| 23  | Add benchmark tests for validation                | Low    | Medium | 32             |
-| 24  | Create GitHubActionsTemplateData struct           | Low    | Low    | 30             |
-| 25  | Update documentation for new architecture         | Medium | Medium | 28             |
+| #  | Task                                              | Impact | Effort | Priority Score |
+| -- | ------------------------------------------------- | ------ | ------ | -------------- |
+| 1  | Consolidate GoReleaser templates to single source | High   | Medium | 95             |
+| 2  | Add WorkingDir to SafeProjectConfig               | High   | Medium | 90             |
+| 3  | Fix pre-commit hook timeout                       | Low    | Low    | 85             |
+| 4  | Add tests for generators package                  | Medium | Medium | 80             |
+| 5  | Split jobs.go (838 lines) into focused files      | Medium | Medium | 78             |
+| 6  | Improve domain test coverage to 50%               | High   | High   | 75             |
+| 7  | Push unpushed commits to remote                   | Low    | Low    | 72             |
+| 8  | Add tests for internal/git package                | Medium | Medium | 70             |
+| 9  | Split internal/types/validation.go (857 lines)    | Medium | Medium | 68             |
+| 10 | Implement repository pattern for file operations  | High   | High   | 65             |
+| 11 | Add contract tests for interfaces                 | Medium | Medium | 62             |
+| 12 | Remove TODOs or convert to issues                 | Low    | Low    | 60             |
+| 13 | Add fuzz testing for validation                   | Medium | High   | 58             |
+| 14 | Split internal/domain/validation.go (659 lines)   | Medium | Medium | 55             |
+| 15 | Add performance regression tests                  | Medium | High   | 52             |
+| 16 | Implement proper error types                      | Medium | Medium | 50             |
+| 17 | Add tests for internal/errors package             | Low    | Low    | 48             |
+| 18 | Create test data builders                         | Medium | Medium | 45             |
+| 19 | Implement command pattern for jobs                | Medium | High   | 42             |
+| 20 | Add chaos engineering tests                       | Low    | High   | 40             |
+| 21 | Replace map[string]any with typed structs         | Medium | Medium | 38             |
+| 22 | Validate all data at compile-time                 | Medium | High   | 35             |
+| 23 | Add benchmark tests for validation                | Low    | Medium | 32             |
+| 24 | Create GitHubActionsTemplateData struct           | Low    | Low    | 30             |
+| 25 | Update documentation for new architecture         | Medium | Medium | 28             |
 
 ---
 

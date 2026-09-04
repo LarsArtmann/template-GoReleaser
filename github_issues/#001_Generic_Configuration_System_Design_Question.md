@@ -1,9 +1,9 @@
 # 🎯 [CRITICAL] Generic Configuration System Design Question
 
-**Priority**: Critical  
-**Status**: Open  
-**Estimated Effort**: 1-2 days  
-**Dependencies**: None  
+**Priority**: Critical\
+**Status**: Open\
+**Estimated Effort**: 1-2 days\
+**Dependencies**: None\
 **Category**: Architecture
 
 ## 🤔 Core Question
@@ -200,5 +200,5 @@ type SafeProjectConfig struct {
 
 ---
 
-**🎯 This is our top priority technical question that needs immediate resolution.**  
+**🎯 This is our top priority technical question that needs immediate resolution.**\
 **The solution to this question will determine the success of our entire configuration architecture.**

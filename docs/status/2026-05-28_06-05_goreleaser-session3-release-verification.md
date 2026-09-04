@@ -1,8 +1,8 @@
 # GoReleaser-Wizard Session 3 — Release Verification Status Report
 
-**Report Date**: 2026-05-28 06:05 CEST  
-**Branch**: master (up to date with origin/master)  
-**Commit**: 3d431e1  
+**Report Date**: 2026-05-28 06:05 CEST\
+**Branch**: master (up to date with origin/master)\
+**Commit**: 3d431e1\
 **Session Focus**: Release readiness verification, build integrity, test coverage, architecture compliance
 
 ---
@@ -141,8 +141,8 @@ not found directories for 'internal/errors/**'
 not found directories for 'pkg/errors/**'
 ```
 
-**Impact**: Automated architecture compliance checks fail. This is a hard blocker for CI pipelines that enforce arch-lint.  
-**Root Cause**: Error types were migrated from `internal/errors` to `internal/domain` (commit dde1081) but `.go-arch-lint.yml` was never updated.  
+**Impact**: Automated architecture compliance checks fail. This is a hard blocker for CI pipelines that enforce arch-lint.\
+**Root Cause**: Error types were migrated from `internal/errors` to `internal/domain` (commit dde1081) but `.go-arch-lint.yml` was never updated.\
 **Fix Effort**: 5 minutes — update or remove the stale component definitions.
 
 ### Critical: Test Coverage Catastrophically Low
@@ -220,33 +220,33 @@ Verify `nix build` and `nix flake check` work. The Nix support is a differentiat
 
 ## f) Top #25 Things We Should Get Done Next
 
-| #   | Task                                                                   | Priority | Est. Effort | Impact                     |
-| --- | ---------------------------------------------------------------------- | -------- | ----------- | -------------------------- |
-| 1   | Fix `.go-arch-lint.yml` stale `internal/errors` and `pkg/errors` refs  | P0       | 5 min       | Unblocks CI                |
-| 2   | Run `goreleaser check` and fix any issues                              | P0       | 15 min      | Validates release config   |
-| 3   | Run `goreleaser release --snapshot --clean`                            | P0       | 10 min      | Verifies pipeline          |
-| 4   | Add table-driven tests for all domain enums (`internal/domain`)        | P1       | 2-3 hrs     | +40% coverage              |
-| 5   | Add tests for `generators` package (golden files or output validation) | P1       | 3-4 hrs     | Tests core feature         |
-| 6   | Verify Docker build works: `docker build -f Dockerfile .`              | P1       | 10 min      | Validates containerization |
-| 7   | Update `AGENTS.md` — remove justfile refs, fix directory listing       | P1       | 30 min      | Docs accuracy              |
-| 8   | Update `FEATURES.md` — honest status, remove contradictions            | P1       | 1 hr        | Docs accuracy              |
-| 9   | Split `cmd/goreleaser-wizard/jobs.go` into focused files               | P1       | 2-3 hrs     | Maintainability            |
-| 10  | Replace `map[string]any` in `jobs.go` with typed structs               | P1       | 3-4 hrs     | Type safety                |
-| 11  | Add tests for `internal/config` package                                | P2       | 1-2 hrs     | Coverage                   |
-| 12  | Add tests for `internal/git` package                                   | P2       | 1-2 hrs     | Coverage                   |
-| 13  | Add tests for `internal/utils` package                                 | P2       | 1-2 hrs     | Coverage                   |
-| 14  | Split `workflow.go` (415 lines)                                        | P2       | 2-3 hrs     | Maintainability            |
-| 15  | Split `validate_test.go` (489 lines)                                   | P2       | 2-3 hrs     | Maintainability            |
-| 16  | Run `govulncheck ./...` and address findings                           | P2       | 30 min      | Security                   |
-| 17  | Run `gosec ./...` and address findings                                 | P2       | 30 min      | Security                   |
-| 18  | Verify `nix build` succeeds                                            | P2       | 15 min      | Nix support                |
-| 19  | Add integration test: full `init` → `generate` → `validate` flow       | P2       | 4-6 hrs     | E2E coverage               |
-| 20  | Add benchmark for template generation                                  | P3       | 1 hr        | Performance baseline       |
-| 21  | Add `goreleaser-wizard validate` tests with real configs               | P3       | 2 hrs       | Validation coverage        |
-| 22  | Generate and inspect Homebrew formula output                           | P3       | 30 min      | Distribution verification  |
-| 23  | Generate and inspect Scoop manifest output                             | P3       | 30 min      | Distribution verification  |
-| 24  | Add property-based tests for validation rules                          | P3       | 3-4 hrs     | Robustness                 |
-| 25  | Add README section for Nix usage                                       | P3       | 15 min      | Documentation              |
+| #  | Task                                                                   | Priority | Est. Effort | Impact                     |
+| -- | ---------------------------------------------------------------------- | -------- | ----------- | -------------------------- |
+| 1  | Fix `.go-arch-lint.yml` stale `internal/errors` and `pkg/errors` refs  | P0       | 5 min       | Unblocks CI                |
+| 2  | Run `goreleaser check` and fix any issues                              | P0       | 15 min      | Validates release config   |
+| 3  | Run `goreleaser release --snapshot --clean`                            | P0       | 10 min      | Verifies pipeline          |
+| 4  | Add table-driven tests for all domain enums (`internal/domain`)        | P1       | 2-3 hrs     | +40% coverage              |
+| 5  | Add tests for `generators` package (golden files or output validation) | P1       | 3-4 hrs     | Tests core feature         |
+| 6  | Verify Docker build works: `docker build -f Dockerfile .`              | P1       | 10 min      | Validates containerization |
+| 7  | Update `AGENTS.md` — remove justfile refs, fix directory listing       | P1       | 30 min      | Docs accuracy              |
+| 8  | Update `FEATURES.md` — honest status, remove contradictions            | P1       | 1 hr        | Docs accuracy              |
+| 9  | Split `cmd/goreleaser-wizard/jobs.go` into focused files               | P1       | 2-3 hrs     | Maintainability            |
+| 10 | Replace `map[string]any` in `jobs.go` with typed structs               | P1       | 3-4 hrs     | Type safety                |
+| 11 | Add tests for `internal/config` package                                | P2       | 1-2 hrs     | Coverage                   |
+| 12 | Add tests for `internal/git` package                                   | P2       | 1-2 hrs     | Coverage                   |
+| 13 | Add tests for `internal/utils` package                                 | P2       | 1-2 hrs     | Coverage                   |
+| 14 | Split `workflow.go` (415 lines)                                        | P2       | 2-3 hrs     | Maintainability            |
+| 15 | Split `validate_test.go` (489 lines)                                   | P2       | 2-3 hrs     | Maintainability            |
+| 16 | Run `govulncheck ./...` and address findings                           | P2       | 30 min      | Security                   |
+| 17 | Run `gosec ./...` and address findings                                 | P2       | 30 min      | Security                   |
+| 18 | Verify `nix build` succeeds                                            | P2       | 15 min      | Nix support                |
+| 19 | Add integration test: full `init` → `generate` → `validate` flow       | P2       | 4-6 hrs     | E2E coverage               |
+| 20 | Add benchmark for template generation                                  | P3       | 1 hr        | Performance baseline       |
+| 21 | Add `goreleaser-wizard validate` tests with real configs               | P3       | 2 hrs       | Validation coverage        |
+| 22 | Generate and inspect Homebrew formula output                           | P3       | 30 min      | Distribution verification  |
+| 23 | Generate and inspect Scoop manifest output                             | P3       | 30 min      | Distribution verification  |
+| 24 | Add property-based tests for validation rules                          | P3       | 3-4 hrs     | Robustness                 |
+| 25 | Add README section for Nix usage                                       | P3       | 15 min      | Documentation              |
 
 ---
 

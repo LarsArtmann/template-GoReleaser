@@ -2,8 +2,8 @@
 
 ## Status Overview
 
-**Date:** 2025-12-12 02:27:46 CET  
-**Project:** GoReleaser-Wizard  
+**Date:** 2025-12-12 02:27:46 CET\
+**Project:** GoReleaser-Wizard\
 **Phase:** FROM ARCHITECTURE TO IMPLEMENTATION
 
 ---

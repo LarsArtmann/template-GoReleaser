@@ -9,16 +9,16 @@ Research performed against the current codebase (master, `358e420`) and GoReleas
 
 ### Verified Commands
 
-| Check | Result | Notes |
-|---|---|---|
-| `go build ./...` | ✅ passes | — |
-| `go test ./...` | ✅ 7 packages pass | only 14 `_test.go` files / 83 `.go` files |
-| `nix flake check` | ✅ all 3 checks pass | build / test / format |
-| `go-arch-lint check` | ✅ OK | stale `internal/errors` refs from May 2026 are gone |
-| `golangci-lint run ./...` | ⚠️ **52 issues** | 39 godoclint + 13 makezero |
-| Coverage | ⚠️ | cmd 51.5%, domain 10%, validation 57%, **5 packages at 0%** |
-| `goreleaser check` (own `.goreleaser.yaml`) | ⚠️ valid, **uses deprecated properties** | `dockers`, `docker_manifests`, `brews` |
-| `GOEXPERIMENT=jsonv2` | ✅ works | `encoding/json/v2` is intentional; env must be set; go.mod targets go 1.26.5 |
+| Check                                       | Result                                  | Notes                                                                        |
+| ------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------- |
+| `go build ./...`                            | ✅ passes                               | —                                                                            |
+| `go test ./...`                             | ✅ 7 packages pass                      | only 14 `_test.go` files / 83 `.go` files                                    |
+| `nix flake check`                           | ✅ all 3 checks pass                    | build / test / format                                                        |
+| `go-arch-lint check`                        | ✅ OK                                   | stale `internal/errors` refs from May 2026 are gone                          |
+| `golangci-lint run ./...`                   | ⚠️ **52 issues**                         | 39 godoclint + 13 makezero                                                   |
+| Coverage                                    | ⚠️                                       | cmd 51.5%, domain 10%, validation 57%, **5 packages at 0%**                  |
+| `goreleaser check` (own `.goreleaser.yaml`) | ⚠️ valid, **uses deprecated properties** | `dockers`, `docker_manifests`, `brews`                                       |
+| `GOEXPERIMENT=jsonv2`                       | ✅ works                                | `encoding/json/v2` is intentional; env must be set; go.mod targets go 1.26.5 |
 
 ### Repo Hygiene
 
@@ -38,7 +38,7 @@ Ran `generate` in a scratch Go module:
 
 1. **`goreleaser check` fails without env vars.**
    `release:` section uses `{{.Env.GITHUB_OWNER}}` / `{{.Env.GITHUB_REPO}}`.
-   The wizard fills them from git detection at *generate* time and the generated
+   The wizard fills them from git detection at _generate_ time and the generated
    GH Actions workflow sets them, but a local `goreleaser check` / `release`
    without those env vars fails:
    `template: failed to apply "{{.Env.GITHUB_REPO}}": map has no entry for key "GITHUB_REPO"`.
@@ -87,16 +87,16 @@ Ran `generate` in a scratch Go module:
 
 ### Error-Discarding / Fragile Sites (non-test)
 
-| File | Line | Pattern |
-|---|---|---|
-| `cmd/goreleaser-wizard/flags.go` | 8, 16 | `value, _ := cmd.Flags().GetBool/GetString(name)` — errors silently swallowed |
-| `cmd/goreleaser-wizard/init.go` | 248 | `matches, _ := filepath.Glob(...)` — filesystem errors hidden |
-| `cmd/goreleaser-wizard/validate_main.go` | 167 | `if exists, _ := fileSystemRepo.DirExists(...)` — FS error treated as "dir missing" |
-| `cmd/goreleaser-wizard/types/template_data.go` | 236-261 | `parseGitHubRemote()` swallows git errors, returns placeholder `"owner"`/`"repo"` |
-| `cmd/goreleaser-wizard/jobs.go` | 490-491 | `_ = os.Remove(...)` — best-effort cleanup (defensible) |
-| `internal/config/config.go` | 110 | `_ = info` — vestigial assignment |
-| `cmd/goreleaser-wizard/validate.go` | 41 | `os.Exit(exitCode)` — unconditional process exit |
-| `cmd/goreleaser-wizard/main.go` | 162 | `os.Exit(1)` inside `recoverFromPanic` |
+| File                                           | Line    | Pattern                                                                             |
+| ---------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
+| `cmd/goreleaser-wizard/flags.go`               | 8, 16   | `value, _ := cmd.Flags().GetBool/GetString(name)` — errors silently swallowed       |
+| `cmd/goreleaser-wizard/init.go`                | 248     | `matches, _ := filepath.Glob(...)` — filesystem errors hidden                       |
+| `cmd/goreleaser-wizard/validate_main.go`       | 167     | `if exists, _ := fileSystemRepo.DirExists(...)` — FS error treated as "dir missing" |
+| `cmd/goreleaser-wizard/types/template_data.go` | 236-261 | `parseGitHubRemote()` swallows git errors, returns placeholder `"owner"`/`"repo"`   |
+| `cmd/goreleaser-wizard/jobs.go`                | 490-491 | `_ = os.Remove(...)` — best-effort cleanup (defensible)                             |
+| `internal/config/config.go`                    | 110     | `_ = info` — vestigial assignment                                                   |
+| `cmd/goreleaser-wizard/validate.go`            | 41      | `os.Exit(exitCode)` — unconditional process exit                                    |
+| `cmd/goreleaser-wizard/main.go`                | 162     | `os.Exit(1)` inside `recoverFromPanic`                                              |
 
 ### Other Structural Notes
 
@@ -111,42 +111,43 @@ Ran `generate` in a scratch Go module:
 
 ### Key Deprecations (from goreleaser.com/deprecations)
 
-| Deprecated | Since | Replacement |
-|---|---|---|
-| `dockers` + `docker_manifests` | v2.12 / v2.16 | **`dockers_v2`** (fast-tracked to become `dockers` in v3) |
-| `brews` | v2.10 soft, v2.16 | **`homebrew_casks`** |
-| `archives.format_overrides.format` | v2.6 | `archives.format_overrides.formats` (list) |
-| per-`dockers` `retry` | v2.15.3 | root-level `retry` |
+| Deprecated                         | Since             | Replacement                                               |
+| ---------------------------------- | ----------------- | --------------------------------------------------------- |
+| `dockers` + `docker_manifests`     | v2.12 / v2.16     | **`dockers_v2`** (fast-tracked to become `dockers` in v3) |
+| `brews`                            | v2.10 soft, v2.16 | **`homebrew_casks`**                                      |
+| `archives.format_overrides.format` | v2.6              | `archives.format_overrides.formats` (list)                |
+| per-`dockers` `retry`              | v2.15.3           | root-level `retry`                                        |
 
 ### `dockers_v2` Essentials (verified against docs source)
 
 ```yaml
 dockers_v2:
-  - id: myimg                # default: project name
-    dockerfile: Dockerfile   # path from project root; templates allowed
-    ids: [mybuild]           # filter binaries/packages to copy
-    images:                  # image names (templates allowed)
+  - id: myimg # default: project name
+    dockerfile: Dockerfile # path from project root; templates allowed
+    ids: [mybuild] # filter binaries/packages to copy
+    images: # image names (templates allowed)
       - "user/repo"
       - "ghcr.io/user/repo"
-    tags:                    # tag templates
+    tags: # tag templates
       - "v{{ .Version }}"
       - "{{ if not .IsNightly }}latest{{ end }}"
-    platforms:               # default: [linux/amd64 linux/arm64]
+    platforms: # default: [linux/amd64 linux/arm64]
       - linux/amd64
       - linux/arm64
-    extra_files: []          # files to add to the build context
-    labels: {}               # image labels
-    annotations: {}          # OCI annotations ({{.Date}}, {{.FullCommit}}, etc.)
+    extra_files: [] # files to add to the build context
+    labels: {} # image labels
+    annotations: {} # OCI annotations ({{.Date}}, {{.FullCommit}}, etc.)
     sbom: "{{ not .IsNightly }}"
     build_args: {}
     flags: []
-    retry: {attempts: 10, delay: 10s, max_delay: 5m}
+    retry: { attempts: 10, delay: 10s, max_delay: 5m }
 ```
 
 Behavior notes:
+
 - **Build and push are one step**: `docker buildx build --push`; runs in the **publish phase** (NOT in `goreleaser build`).
 - `--snapshot` builds per-platform images instead (`repo:1.2.4-amd64`, `repo:1.2.4-arm64`) so the Dockerfile can be verified locally.
-- The build context is a *temporary directory* containing prebuilt binaries/packages — **do not build binaries inside the Dockerfile**. Recommended minimal Dockerfile:
+- The build context is a _temporary directory_ containing prebuilt binaries/packages — **do not build binaries inside the Dockerfile**. Recommended minimal Dockerfile:
 
   ```dockerfile
   FROM scratch
@@ -175,22 +176,26 @@ Behavior notes:
 ## 5. Recommended Plan (Priority Order)
 
 ### A. Fix broken output first — correctness
+
 1. **Generate a `Dockerfile` whenever Docker is enabled** (wire `DockerfileGenerator` into the job factory; use a `scratch` + `COPY $TARGETPLATFORM/...` layout).
 2. **Make `release` env-tolerant**: keep `{{.Env.GITHUB_OWNER}}`/`{{.Env.GITHUB_REPO}}` but detect defaults from git, or surface a clear error at generate/check time (fail fast with instructions).
 3. **Remove `go test ./...` / `go generate ./...` from `before.hooks`** by default (offer as opt-in).
 4. **Fix GH Actions template**: use `ubuntu-latest` by default (or keep self-hosted as an option), only emit Docker login / cosign steps when the respective features are enabled.
 
 ### B. Consolidate dead code — maintainability
+
 5. **Delete or wire `cmd/goreleaser-wizard/generators/` and `templates/`**. Recommended: wire the typed generators in (they already exist: GoReleaser, GitHubActions, Dockerfile, Homebrew) and route `jobs.go` through them; delete `jobs.go`'s inline templates and `map[string]any` data prep.
 6. **Remove the 3 `.orig` files** (git rm) — they were intended to be deleted in `fa648db`.
 7. Fix error-discarding sites in `flags.go`, `init.go:248`, `validate_main.go:167`, `template_data.go` (`parseGitHubRemote`).
 
 ### C. Modernize to GoReleaser 2.17
+
 8. **Migrate templates** to `dockers_v2` (buildx), `homebrew_casks`, `archives.formats`.
 9. Add wizard **knowledge guide**: a `docs/` + README section explaining modern GoReleaser concepts (dockers_v2, casks, phases, snapshot) — the "understand goreleaser" deliverable.
 10. Add a `--verify` step that runs `goreleaser check` on the generated output and reports deprecations/warnings.
 
 ### D. Quality gates
+
 11. Fix the 52 lint issues (39 godoclint comment start-symbol fixes, 13 makezero slice preallocation) — mostly mechanical.
 12. Lift coverage: golden-file tests for generated configs, tests for `generators`, `templates`, `types`, `internal/config`, `internal/git`.
 13. CI: run `goreleaser check` on the wizard's own config and on generated fixtures so deprecations cannot silently slip in again.

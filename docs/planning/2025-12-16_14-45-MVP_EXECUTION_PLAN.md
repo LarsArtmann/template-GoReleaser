@@ -18,7 +18,7 @@ Based on comprehensive analysis, this plan identifies the minimum viable functio
 | 4        | Basic project detection (go.mod + main.go) | Critical | 30min  | Auto-detects project structure |
 | 5        | Generate .goreleaser.yaml from template    | Critical | 15min  | Produces working output        |
 
-**Total Time: 2 hours**  
+**Total Time: 2 hours**\
 **Deliverable: `goreleaser-wizard init` that works on standard Go projects**
 
 ---
@@ -35,7 +35,7 @@ Based on comprehensive analysis, this plan identifies the minimum viable functio
 | 9        | Platform selection (linux/darwin/windows) | Medium | 30min  | Users get relevant builds            |
 | 10       | Basic logging & user feedback             | Medium | 30min  | Better user experience               |
 
-**Total Additional Time: 2.75 hours**  
+**Total Additional Time: 2.75 hours**\
 **Deliverable: Robust CLI that handles common edge cases**
 
 ---
@@ -53,7 +53,7 @@ Based on comprehensive analysis, this plan identifies the minimum viable functio
 | 15       | Multiple project types support     | Low    | 60min  | Works with libraries/web services |
 | 16       | Comprehensive tests                | High   | 90min  | Reliable tool                     |
 
-**Total Additional Time: 5.5 hours**  
+**Total Additional Time: 5.5 hours**\
 **Deliverable: Full-featured tool matching README promises**
 
 ---
@@ -62,45 +62,45 @@ Based on comprehensive analysis, this plan identifies the minimum viable functio
 
 ### Phase 1: MVP Core (Tasks 1-5, 2 hours)
 
-| #   | Task                                  | Est. Time | Dependencies | Files Affected                                 |
-| --- | ------------------------------------- | --------- | ------------ | ---------------------------------------------- |
-| 1   | Fix package naming in config_core.go  | 15min     | -            | internal/domain/config_core.go                 |
-| 2   | Fix import statement (exec → os/exec) | 15min     | -            | internal/domain/config_core.go                 |
-| 3   | Create simplified main.go             | 30min     | 1,2          | cmd/goreleaser-wizard/main.go                  |
-| 4   | Extract project detection logic       | 30min     | 3            | cmd/goreleaser-wizard/init.go                  |
-| 5   | Implement basic template generation   | 30min     | 4            | cmd/goreleaser-wizard/generators/goreleaser.go |
-| 6   | Test with test-wizard directory       | 15min     | 5            | test-wizard/                                   |
-| 7   | Add --force flag implementation       | 15min     | 6            | cmd/goreleaser-wizard/main.go                  |
+| # | Task                                  | Est. Time | Dependencies | Files Affected                                 |
+| - | ------------------------------------- | --------- | ------------ | ---------------------------------------------- |
+| 1 | Fix package naming in config_core.go  | 15min     | -            | internal/domain/config_core.go                 |
+| 2 | Fix import statement (exec → os/exec) | 15min     | -            | internal/domain/config_core.go                 |
+| 3 | Create simplified main.go             | 30min     | 1,2          | cmd/goreleaser-wizard/main.go                  |
+| 4 | Extract project detection logic       | 30min     | 3            | cmd/goreleaser-wizard/init.go                  |
+| 5 | Implement basic template generation   | 30min     | 4            | cmd/goreleaser-wizard/generators/goreleaser.go |
+| 6 | Test with test-wizard directory       | 15min     | 5            | test-wizard/                                   |
+| 7 | Add --force flag implementation       | 15min     | 6            | cmd/goreleaser-wizard/main.go                  |
 
 ### Phase 2: Expanded MVP (Tasks 8-15, 2.75 hours)
 
-| #   | Task                                      | Est. Time | Dependencies | Files Affected                               |
-| --- | ----------------------------------------- | --------- | ------------ | -------------------------------------------- |
-| 8   | Add command-line flags (--name, --binary) | 30min     | 7            | cmd/goreleaser-wizard/main.go                |
-| 9   | Implement robust error handling           | 45min     | 8            | All core files                               |
-| 10  | Multiple main.go detection patterns       | 30min     | 9            | cmd/goreleaser-wizard/init.go                |
-| 11  | Platform selection logic                  | 30min     | 10           | cmd/goreleaser-wizard/types/template_data.go |
-| 12  | Basic logging implementation              | 30min     | 11           | cmd/goreleaser-wizard/main.go                |
-| 13  | Configuration validation                  | 30min     | 12           | cmd/goreleaser-wizard/validate.go            |
-| 14  | Add --help documentation                  | 15min     | 13           | cmd/goreleaser-wizard/main.go                |
-| 15  | Test edge cases & error paths             | 30min     | 14           | All core files                               |
+| #  | Task                                      | Est. Time | Dependencies | Files Affected                               |
+| -- | ----------------------------------------- | --------- | ------------ | -------------------------------------------- |
+| 8  | Add command-line flags (--name, --binary) | 30min     | 7            | cmd/goreleaser-wizard/main.go                |
+| 9  | Implement robust error handling           | 45min     | 8            | All core files                               |
+| 10 | Multiple main.go detection patterns       | 30min     | 9            | cmd/goreleaser-wizard/init.go                |
+| 11 | Platform selection logic                  | 30min     | 10           | cmd/goreleaser-wizard/types/template_data.go |
+| 12 | Basic logging implementation              | 30min     | 11           | cmd/goreleaser-wizard/main.go                |
+| 13 | Configuration validation                  | 30min     | 12           | cmd/goreleaser-wizard/validate.go            |
+| 14 | Add --help documentation                  | 15min     | 13           | cmd/goreleaser-wizard/main.go                |
+| 15 | Test edge cases & error paths             | 30min     | 14           | All core files                               |
 
 ### Phase 3: Full Features (Tasks 16-27, 5.5 hours)
 
-| #   | Task                                 | Est. Time | Dependencies | Files Affected                                     |
-| --- | ------------------------------------ | --------- | ------------ | -------------------------------------------------- |
-| 16  | Extract GitHub Actions template      | 45min     | 15           | cmd/goreleaser-wizard/generators/github_actions.go |
-| 17  | Implement GitHub Actions generation  | 45min     | 16           | cmd/goreleaser-wizard/generators/github_actions.go |
-| 18  | Docker template integration          | 45min     | 17           | cmd/goreleaser-wizard/generators/goreleaser.go     |
-| 19  | Interactive prompts using lipgloss   | 60min     | 18           | cmd/goreleaser-wizard/init.go                      |
-| 20  | Advanced validation rules            | 45min     | 19           | cmd/goreleaser-wizard/validate.go                  |
-| 21  | Project type detection (CLI/lib/web) | 60min     | 20           | cmd/goreleaser-wizard/init.go                      |
-| 22  | Comprehensive test suite             | 90min     | 21           | All files + \*\_test.go                            |
-| 23  | Performance optimization             | 30min     | 22           | All core files                                     |
-| 24  | Documentation updates                | 45min     | 23           | README.md, docs/                                   |
-| 25  | Integration with go.mod tidy         | 30min     | 24           | cmd/goreleaser-wizard/init.go                      |
-| 26  | Error recovery & suggestions         | 30min     | 25           | cmd/goreleaser-wizard/main.go                      |
-| 27  | Final testing & edge case coverage   | 45min     | 26           | All files                                          |
+| #  | Task                                 | Est. Time | Dependencies | Files Affected                                     |
+| -- | ------------------------------------ | --------- | ------------ | -------------------------------------------------- |
+| 16 | Extract GitHub Actions template      | 45min     | 15           | cmd/goreleaser-wizard/generators/github_actions.go |
+| 17 | Implement GitHub Actions generation  | 45min     | 16           | cmd/goreleaser-wizard/generators/github_actions.go |
+| 18 | Docker template integration          | 45min     | 17           | cmd/goreleaser-wizard/generators/goreleaser.go     |
+| 19 | Interactive prompts using lipgloss   | 60min     | 18           | cmd/goreleaser-wizard/init.go                      |
+| 20 | Advanced validation rules            | 45min     | 19           | cmd/goreleaser-wizard/validate.go                  |
+| 21 | Project type detection (CLI/lib/web) | 60min     | 20           | cmd/goreleaser-wizard/init.go                      |
+| 22 | Comprehensive test suite             | 90min     | 21           | All files + \*\_test.go                            |
+| 23 | Performance optimization             | 30min     | 22           | All core files                                     |
+| 24 | Documentation updates                | 45min     | 23           | README.md, docs/                                   |
+| 25 | Integration with go.mod tidy         | 30min     | 24           | cmd/goreleaser-wizard/init.go                      |
+| 26 | Error recovery & suggestions         | 30min     | 25           | cmd/goreleaser-wizard/main.go                      |
+| 27 | Final testing & edge case coverage   | 45min     | 26           | All files                                          |
 
 ---
 
@@ -110,15 +110,15 @@ Based on comprehensive analysis, this plan identifies the minimum viable functio
 
 _(Each task designed for maximum 15 minutes completion)_
 
-1.  Fix package declaration in config_core.go (15min)
-2.  Fix import statement in config_core.go (15min)
-3.  Verify project compiles (15min)
-4.  Create simplified main.go structure (15min)
-5.  Remove unused workflow/job system (15min)
-6.  Add basic Cobra command for 'init' (15min)
-7.  Add basic flags to init command (15min)
-8.  Extract go.mod reading logic (15min)
-9.  Extract main.go detection logic (15min)
+1. Fix package declaration in config_core.go (15min)
+2. Fix import statement in config_core.go (15min)
+3. Verify project compiles (15min)
+4. Create simplified main.go structure (15min)
+5. Remove unused workflow/job system (15min)
+6. Add basic Cobra command for 'init' (15min)
+7. Add basic flags to init command (15min)
+8. Extract go.mod reading logic (15min)
+9. Extract main.go detection logic (15min)
 10. Create minimal template data struct (15min)
 11. Extract GoReleaser template to constants (15min)
 12. Implement basic template execution (15min)
@@ -218,32 +218,32 @@ _(Each task designed for maximum 15 minutes completion)_
 97. Write unit tests for validation (15min)
 98. Write integration tests (15min)
 99. Add test for edge cases (15min)
-100.  Add performance benchmarking (15min)
-101.  Optimize template execution speed (15min)
-102.  Optimize file I/O operations (15min)
-103.  Reduce memory usage (15min)
-104.  Update README with current features (15min)
-105.  Add installation instructions (15min)
-106.  Add usage examples (15min)
-107.  Add troubleshooting section (15min)
-108.  Document all command flags (15min)
-109.  Add configuration documentation (15min)
-110.  Add go mod tidy integration (15min)
-111.  Add git ignore suggestions (15min)
-112.  Add pre-commit hook suggestions (15min)
-113.  Improve error suggestion quality (15min)
-114.  Add context-aware suggestions (15min)
-115.  Add recovery action suggestions (15min)
-116.  Add final integration testing (15min)
-117.  Test with complex real-world projects (15min)
-118.  Test with edge case project structures (15min)
-119.  Performance testing with large projects (15min)
-120.  Stress testing with invalid inputs (15min)
-121.  Code review and quality improvements (15min)
-122.  Security audit of template generation (15min)
-123.  Final documentation review (15min)
-124.  Final testing and validation (15min)
-125.  Release preparation and tagging (15min)
+100. Add performance benchmarking (15min)
+101. Optimize template execution speed (15min)
+102. Optimize file I/O operations (15min)
+103. Reduce memory usage (15min)
+104. Update README with current features (15min)
+105. Add installation instructions (15min)
+106. Add usage examples (15min)
+107. Add troubleshooting section (15min)
+108. Document all command flags (15min)
+109. Add configuration documentation (15min)
+110. Add go mod tidy integration (15min)
+111. Add git ignore suggestions (15min)
+112. Add pre-commit hook suggestions (15min)
+113. Improve error suggestion quality (15min)
+114. Add context-aware suggestions (15min)
+115. Add recovery action suggestions (15min)
+116. Add final integration testing (15min)
+117. Test with complex real-world projects (15min)
+118. Test with edge case project structures (15min)
+119. Performance testing with large projects (15min)
+120. Stress testing with invalid inputs (15min)
+121. Code review and quality improvements (15min)
+122. Security audit of template generation (15min)
+123. Final documentation review (15min)
+124. Final testing and validation (15min)
+125. Release preparation and tagging (15min)
 
 ---
 

@@ -1,8 +1,8 @@
 # Migration to Nix Flakes — Proposal
 
-**Project:** GoReleaser-Wizard  
-**Date:** 2026-04-09  
-**Status:** Draft — Pending Approval  
+**Project:** GoReleaser-Wizard\
+**Date:** 2026-04-09\
+**Status:** Draft — Pending Approval\
 **Author:** Generated from tooling audit
 
 ---
@@ -554,18 +554,18 @@ Tools marked **"Check needed"** will require either:
 
 ## 7. Open Questions
 
-| #   | Question                                                                                                  | Decision Needed By |
-| --- | --------------------------------------------------------------------------------------------------------- | ------------------ |
-| 1   | Should `flake-parts` be used for modularity, or plain `flake-utils`?                                      | Phase 1            |
-| 2   | Is `github.com/larsartmann/go-composable-business-types` publishable?                                     | Phase 2            |
-| 3   | Should `direnv` + `.envrc` be committed to the repo?                                                      | Phase 5            |
-| 4   | Should `cachix` be set up for CI caching?                                                                 | Phase 4            |
-| 5   | What is the target `vendorHash` strategy? (computed vs. fake)                                             | Phase 2            |
-| 6   | Should the Dockerfile be updated to use Nix-built binary?                                                 | Phase 2+           |
-| 7   | Should `.golangci.yml` and `.go-arch-lint.yml` be created as part of this migration?                      | Phase 3            |
-| 8   | Is macOS ARM (aarch64-darwin) the primary dev platform?                                                   | Phase 1            |
-| 9   | Should the missing `scripts/check-cmd-single.sh` be created or should the recipe be removed?              | Phase 3            |
-| 10  | Should the `bootstrap*.sh` remote-download recipes be removed entirely or replaced with Nix alternatives? | Phase 3            |
+| #  | Question                                                                                                  | Decision Needed By |
+| -- | --------------------------------------------------------------------------------------------------------- | ------------------ |
+| 1  | Should `flake-parts` be used for modularity, or plain `flake-utils`?                                      | Phase 1            |
+| 2  | Is `github.com/larsartmann/go-composable-business-types` publishable?                                     | Phase 2            |
+| 3  | Should `direnv` + `.envrc` be committed to the repo?                                                      | Phase 5            |
+| 4  | Should `cachix` be set up for CI caching?                                                                 | Phase 4            |
+| 5  | What is the target `vendorHash` strategy? (computed vs. fake)                                             | Phase 2            |
+| 6  | Should the Dockerfile be updated to use Nix-built binary?                                                 | Phase 2+           |
+| 7  | Should `.golangci.yml` and `.go-arch-lint.yml` be created as part of this migration?                      | Phase 3            |
+| 8  | Is macOS ARM (aarch64-darwin) the primary dev platform?                                                   | Phase 1            |
+| 9  | Should the missing `scripts/check-cmd-single.sh` be created or should the recipe be removed?              | Phase 3            |
+| 10 | Should the `bootstrap*.sh` remote-download recipes be removed entirely or replaced with Nix alternatives? | Phase 3            |
 
 ---
 

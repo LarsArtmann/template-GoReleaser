@@ -159,48 +159,48 @@ The codebase is in good shape. No show-stoppers identified.
 
 ### Immediate (This Week)
 
-| #   | Task                                              | Impact | Effort | Priority Score |
-| --- | ------------------------------------------------- | ------ | ------ | -------------- |
-| 1   | Consolidate GoReleaser templates to single source | High   | Medium | 95             |
-| 2   | Add `WorkingDir` to `SafeProjectConfig`           | High   | Medium | 90             |
-| 3   | Fix pre-commit hook timeout (README age check)    | Low    | Low    | 85             |
-| 4   | Add tests for `generators` package                | Medium | Medium | 80             |
-| 5   | Split `jobs.go` (838 lines) into focused files    | Medium | Medium | 75             |
+| # | Task                                              | Impact | Effort | Priority Score |
+| - | ------------------------------------------------- | ------ | ------ | -------------- |
+| 1 | Consolidate GoReleaser templates to single source | High   | Medium | 95             |
+| 2 | Add `WorkingDir` to `SafeProjectConfig`           | High   | Medium | 90             |
+| 3 | Fix pre-commit hook timeout (README age check)    | Low    | Low    | 85             |
+| 4 | Add tests for `generators` package                | Medium | Medium | 80             |
+| 5 | Split `jobs.go` (838 lines) into focused files    | Medium | Medium | 75             |
 
 ### Short Term (Next 2 Weeks)
 
-| #   | Task                                                  | Impact | Effort | Priority Score |
-| --- | ----------------------------------------------------- | ------ | ------ | -------------- |
-| 6   | Replace `os.Chdir()` with working directory parameter | High   | High   | 70             |
-| 7   | Add tests for `jobs` package                          | Medium | Medium | 68             |
-| 8   | Split `internal/types/validation.go` (857 lines)      | Medium | Medium | 65             |
-| 9   | Implement dependency injection with `samber/do/v2`    | Medium | High   | 62             |
-| 10  | Add tests for `git` package                           | Medium | Low    | 60             |
+| #  | Task                                                  | Impact | Effort | Priority Score |
+| -- | ----------------------------------------------------- | ------ | ------ | -------------- |
+| 6  | Replace `os.Chdir()` with working directory parameter | High   | High   | 70             |
+| 7  | Add tests for `jobs` package                          | Medium | Medium | 68             |
+| 8  | Split `internal/types/validation.go` (857 lines)      | Medium | Medium | 65             |
+| 9  | Implement dependency injection with `samber/do/v2`    | Medium | High   | 62             |
+| 10 | Add tests for `git` package                           | Medium | Low    | 60             |
 
 ### Medium Term (Next Month)
 
-| #   | Task                                                      | Impact | Effort | Priority Score |
-| --- | --------------------------------------------------------- | ------ | ------ | -------------- |
-| 11  | Split `internal/domain/validation.go` (659 lines)         | Medium | Medium | 55             |
-| 12  | Split `internal/validation/basic.go` (626 lines)          | Medium | Medium | 52             |
-| 13  | Split `internal/validation/business_rules.go` (626 lines) | Medium | Medium | 50             |
-| 14  | Add tests for `internal/errors` package                   | Low    | Low    | 48             |
-| 15  | Add tests for `internal/utils` package                    | Low    | Low    | 45             |
-| 16  | Standardize error handling across codebase                | Medium | Medium | 42             |
-| 17  | Add integration tests for full wizard flow                | Medium | High   | 40             |
-| 18  | Document architecture decisions (ADR)                     | Low    | Medium | 38             |
-| 19  | Add benchmark tests for performance                       | Low    | Medium | 35             |
-| 20  | Implement result type pattern for error handling          | Medium | High   | 32             |
+| #  | Task                                                      | Impact | Effort | Priority Score |
+| -- | --------------------------------------------------------- | ------ | ------ | -------------- |
+| 11 | Split `internal/domain/validation.go` (659 lines)         | Medium | Medium | 55             |
+| 12 | Split `internal/validation/basic.go` (626 lines)          | Medium | Medium | 52             |
+| 13 | Split `internal/validation/business_rules.go` (626 lines) | Medium | Medium | 50             |
+| 14 | Add tests for `internal/errors` package                   | Low    | Low    | 48             |
+| 15 | Add tests for `internal/utils` package                    | Low    | Low    | 45             |
+| 16 | Standardize error handling across codebase                | Medium | Medium | 42             |
+| 17 | Add integration tests for full wizard flow                | Medium | High   | 40             |
+| 18 | Document architecture decisions (ADR)                     | Low    | Medium | 38             |
+| 19 | Add benchmark tests for performance                       | Low    | Medium | 35             |
+| 20 | Implement result type pattern for error handling          | Medium | High   | 32             |
 
 ### Long Term (Future)
 
-| #   | Task                                          | Impact | Effort    | Priority Score |
-| --- | --------------------------------------------- | ------ | --------- | -------------- |
-| 21  | Consider `samber/lo` for functional utilities | Low    | Low       | 28             |
-| 22  | Evaluate `go.uber.org/zap` for logging        | Low    | Medium    | 25             |
-| 23  | Add OpenAPI documentation                     | Low    | Medium    | 22             |
-| 24  | Create plugin architecture                    | Low    | High      | 20             |
-| 25  | Add web UI for configuration                  | Low    | Very High | 15             |
+| #  | Task                                          | Impact | Effort    | Priority Score |
+| -- | --------------------------------------------- | ------ | --------- | -------------- |
+| 21 | Consider `samber/lo` for functional utilities | Low    | Low       | 28             |
+| 22 | Evaluate `go.uber.org/zap` for logging        | Low    | Medium    | 25             |
+| 23 | Add OpenAPI documentation                     | Low    | Medium    | 22             |
+| 24 | Create plugin architecture                    | Low    | High      | 20             |
+| 25 | Add web UI for configuration                  | Low    | Very High | 15             |
 
 ---
 

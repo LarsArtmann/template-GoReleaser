@@ -331,22 +331,22 @@ Successfully migrated from `gopkg.in/yaml.v3` to `github.com/go-faster/yaml` and
 
   ## Commit Plan
 
-            1. **Fix env provider API** (Priority 1)
-               - Update internal/config/config.go to use correct v1 API
-               - Run `go build ./...` to verify
-               2. **Verify and commit** (Priority 2)
-               - Run `go test ./...` to ensure tests pass
-               - Commit with message: "refactor(config): fix koanf env provider API"
-               3. **Split oversized files** (Priority 3)
-               - Start with largest file: internal/types/validation.go (857 lines)
-               - Create splitting plan document
-               - Execute splits incrementally
-               - Run tests after each split
-               4. **Update documentation** (Priority 4)
-               - Remove viper references from AGENTS.md
-               - Update README.md dependencies section
-               - Add migration notes to changelog
-            5. **Final verification** (Priority 5)
-               - Run full CI pipeline locally
-               - Verify all changes work correctly
-               - Create PR or merge to master
+      1. **Fix env provider API** (Priority 1)
+         - Update internal/config/config.go to use correct v1 API
+         - Run `go build ./...` to verify
+         2. **Verify and commit** (Priority 2)
+         - Run `go test ./...` to ensure tests pass
+         - Commit with message: "refactor(config): fix koanf env provider API"
+         3. **Split oversized files** (Priority 3)
+         - Start with largest file: internal/types/validation.go (857 lines)
+         - Create splitting plan document
+         - Execute splits incrementally
+         - Run tests after each split
+         4. **Update documentation** (Priority 4)
+         - Remove viper references from AGENTS.md
+         - Update README.md dependencies section
+         - Add migration notes to changelog
+      5. **Final verification** (Priority 5)
+         - Run full CI pipeline locally
+         - Verify all changes work correctly
+         - Create PR or merge to master

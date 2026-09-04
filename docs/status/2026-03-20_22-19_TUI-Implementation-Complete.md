@@ -386,27 +386,27 @@ b767071 fix(validation): align validation patterns with test expectations
 ### Staged Changes
 
 ```
- .github/workflows/release.yml       | 45 ++++++++++++++++++++++++++++++
- .goreleaser.yaml                    | 55 +++++++++++++++++++++----------------
- cmd/goreleaser-wizard/tui_wizard.go | 15 ++++++++--
- go.mod                              |  3 +-
- go.sum                              | 18 ++++++++++--
- internal/validation/basic.go        | 22 +++++++++++++--
- 6 files changed, 126 insertions(+), 32 deletions(-)
+.github/workflows/release.yml       | 45 ++++++++++++++++++++++++++++++
+.goreleaser.yaml                    | 55 +++++++++++++++++++++----------------
+cmd/goreleaser-wizard/tui_wizard.go | 15 ++++++++--
+go.mod                              |  3 +-
+go.sum                              | 18 ++++++++++--
+internal/validation/basic.go        | 22 +++++++++++++--
+6 files changed, 126 insertions(+), 32 deletions(-)
 ```
 
 ### Unstaged Changes
 
 ```
- .github/workflows/release.yml  | formatting changes
- .goreleaser.yaml               | whitespace changes
+.github/workflows/release.yml  | formatting changes
+.goreleaser.yaml               | whitespace changes
 ```
 
 ### Untracked Files
 
 ```
- .github/                         (partially staged)
- goreleaser-wizard                (binary - should be gitignored)
+.github/                         (partially staged)
+goreleaser-wizard                (binary - should be gitignored)
 ```
 
 ---

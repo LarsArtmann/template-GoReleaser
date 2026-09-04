@@ -213,28 +213,28 @@ graph TD
 
 ### CRITICAL CHUNKS (6 TASKS - 100 MINUTES EACH)
 
-| #   | Task                                       | Impact | Dependencies |
-| --- | ------------------------------------------ | ------ | ------------ |
-| 1   | Fix type redeclarations                    | 🔥🔥🔥 | None         |
-| 2   | Replace boolean flags in SafeProjectConfig | 🔥🔥🔥 | Task 1       |
-| 3   | Fix compilation errors                     | 🔥🔥🔥 | Task 1,2     |
-| 4   | Split oversized files                      | 🔥🔥   | Task 3       |
-| 5   | Update CLI integration for enums           | 🔥🔥   | Task 2,4     |
-| 6   | Create migration utilities                 | 🔥🔥   | Task 2,5     |
+| # | Task                                       | Impact | Dependencies |
+| - | ------------------------------------------ | ------ | ------------ |
+| 1 | Fix type redeclarations                    | 🔥🔥🔥 | None         |
+| 2 | Replace boolean flags in SafeProjectConfig | 🔥🔥🔥 | Task 1       |
+| 3 | Fix compilation errors                     | 🔥🔥🔥 | Task 1,2     |
+| 4 | Split oversized files                      | 🔥🔥   | Task 3       |
+| 5 | Update CLI integration for enums           | 🔥🔥   | Task 2,4     |
+| 6 | Create migration utilities                 | 🔥🔥   | Task 2,5     |
 
 ### HIGH CHUNKS (9 TASKS - 100 MINUTES EACH)
 
-| #   | Task                             | Impact | Dependencies |
-| --- | -------------------------------- | ------ | ------------ |
-| 7   | Add comprehensive error handling | 🔥     | Task 3,6     |
-| 8   | Implement BDD test scenarios     | 🔥     | Task 7       |
-| 9   | Create integration test suite    | 🔥     | Task 8       |
-| 10  | Add property-based testing       | 🔥     | Task 9       |
-| 11  | Create external adapters         | 🔥     | Task 10      |
-| 12  | Update documentation             | 🔥     | Task 11      |
-| 13  | Add performance benchmarks       | 🔥     | Task 12      |
-| 14  | Create developer setup scripts   | 🔥     | Task 13      |
-| 15  | Add monitoring and observability | 🔥     | Task 14      |
+| #  | Task                             | Impact | Dependencies |
+| -- | -------------------------------- | ------ | ------------ |
+| 7  | Add comprehensive error handling | 🔥     | Task 3,6     |
+| 8  | Implement BDD test scenarios     | 🔥     | Task 7       |
+| 9  | Create integration test suite    | 🔥     | Task 8       |
+| 10 | Add property-based testing       | 🔥     | Task 9       |
+| 11 | Create external adapters         | 🔥     | Task 10      |
+| 12 | Update documentation             | 🔥     | Task 11      |
+| 13 | Add performance benchmarks       | 🔥     | Task 12      |
+| 14 | Create developer setup scripts   | 🔥     | Task 13      |
+| 15 | Add monitoring and observability | 🔥     | Task 14      |
 
 ---
 

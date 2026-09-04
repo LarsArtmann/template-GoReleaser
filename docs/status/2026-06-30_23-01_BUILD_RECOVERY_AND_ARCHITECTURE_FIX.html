@@ -47,14 +47,14 @@
         --radius-sm: 0px;
 
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -269,15 +269,27 @@
       }
       .card-problem {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .card-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .card-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
 
       .issue {
@@ -289,15 +301,27 @@
       }
       .issue-critical {
         border-left-color: var(--problem);
-        background: color-mix(in srgb, var(--problem) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--problem) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-important {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 8%,
+          var(--surface-raised)
+        );
       }
       .issue-nice {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 8%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 8%,
+          var(--surface-raised)
+        );
       }
       .issue h3 {
         margin-bottom: 0.3rem;
@@ -690,9 +714,10 @@
           <h1>Build Recovery &amp; Architecture Fix</h1>
           <p class="hero-subtitle">
             All 5 buildflow failures resolved. Two root causes fixed: a broken
-            <code>hasFile</code> helper that blocked compilation, and a clean-architecture violation
-            in the domain layer that broke the Nix sandbox build. Full suite now green: 39/39 steps
-            pass, all tests pass, Nix build succeeds.
+            <code>hasFile</code> helper that blocked compilation, and a
+            clean-architecture violation in the domain layer that broke the Nix
+            sandbox build. Full suite now green: 39/39 steps pass, all tests
+            pass, Nix build succeeds.
           </p>
         </div>
 
@@ -722,66 +747,87 @@
         </div>
 
         <p>
-          The project was in a <strong>blocked state</strong>: a previous dependency refactor
-          (commit <code>8b1440f</code>) replaced a working <code>hasFile</code> function with
-          non-compiling code (<code>slices.Contains(dirs, nil)</code>), which cascaded into 4 of the
-          5 buildflow failures. The 5th failure — <code>nix-build</code> — was caused by a deeper
-          architectural problem: the domain layer performed filesystem I/O
-          (<code>exec.LookPath</code>) during validation, which failed inside the Nix sandbox where
-          signing tools (<code>gpg</code>, <code>cosign</code>) are not installed.
+          The project was in a <strong>blocked state</strong>: a previous
+          dependency refactor (commit <code>8b1440f</code>) replaced a working
+          <code>hasFile</code> function with non-compiling code (<code
+            >slices.Contains(dirs, nil)</code
+          >), which cascaded into 4 of the 5 buildflow failures. The 5th failure
+          — <code>nix-build</code> — was caused by a deeper architectural
+          problem: the domain layer performed filesystem I/O
+          (<code>exec.LookPath</code>) during validation, which failed inside
+          the Nix sandbox where signing tools (<code>gpg</code>,
+          <code>cosign</code>) are not installed.
         </p>
 
         <p>
-          Both root causes are now fixed. The build is fully green. This report documents the
-          current state, the remaining gaps, and the prioritized path forward.
+          Both root causes are now fixed. The build is fully green. This report
+          documents the current state, the remaining gaps, and the prioritized
+          path forward.
         </p>
 
         <!-- ROOT CAUSE -->
-        <h2 id="root-cause"><span class="num">01</span>Root Causes (Both Fixed)</h2>
+        <h2 id="root-cause">
+          <span class="num">01</span>Root Causes (Both Fixed)
+        </h2>
 
         <div class="issue issue-critical">
-          <span class="severity severity-critical">Fixed &middot; Root Cause 1</span>
+          <span class="severity severity-critical"
+            >Fixed &middot; Root Cause 1</span
+          >
           <h3>Broken <code>hasFile</code> helper blocked compilation</h3>
           <div class="where">internal/utils/recommendations.go:98</div>
           <p>
-            Commit <code>8b1440f</code> ("use slices package instead of manual directory traversal")
-            replaced the working implementation with
-            <code>func hasFile(filename string) bool { return slices.Contains(dirs, nil) }</code>
-            — a one-liner that references an undefined variable <code>dirs</code>, doesn't use the
-            <code>filename</code> parameter, and cannot compile. This single breakage cascaded into
-            <code>test-race</code>, <code>test-coverage</code>, <code>go-fix</code>, and
-            <code>govalid-generate</code> — all of which depend on a successful build.
+            Commit <code>8b1440f</code> ("use slices package instead of manual
+            directory traversal") replaced the working implementation with
+            <code
+              >func hasFile(filename string) bool { return slices.Contains(dirs,
+              nil) }</code
+            >
+            — a one-liner that references an undefined variable
+            <code>dirs</code>, doesn't use the <code>filename</code> parameter,
+            and cannot compile. This single breakage cascaded into
+            <code>test-race</code>, <code>test-coverage</code>,
+            <code>go-fix</code>, and <code>govalid-generate</code> — all of
+            which depend on a successful build.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix applied:</strong> Restored the original <code>os.Stat</code>-based
-            implementation that checks the current directory plus common subdirectories
-            (<code>cmd</code>, <code>pkg</code>, <code>internal</code>, <code>src</code>,
-            <code>app</code>). Removed the now-unused <code>slices</code> import.
+            <strong>Fix applied:</strong> Restored the original
+            <code>os.Stat</code>-based implementation that checks the current
+            directory plus common subdirectories (<code>cmd</code>,
+            <code>pkg</code>, <code>internal</code>, <code>src</code>,
+            <code>app</code>). Removed the now-unused
+            <code>slices</code> import.
           </div>
         </div>
 
         <div class="issue issue-critical">
-          <span class="severity severity-critical">Fixed &middot; Root Cause 2</span>
+          <span class="severity severity-critical"
+            >Fixed &middot; Root Cause 2</span
+          >
           <h3>Domain layer performed filesystem I/O during validation</h3>
           <div class="where">
-            internal/domain/config_core.go:288 &amp; internal/validation/business_rules.go:398
+            internal/domain/config_core.go:288 &amp;
+            internal/validation/business_rules.go:398
           </div>
           <p>
-            The domain layer's <code>validateSigningConfiguration()</code> called
-            <code>exec.LookPath(tool)</code> to verify signing tools (<code>gpg</code>,
-            <code>cosign</code>, <code>openssl</code>) were installed. This violated the project's
-            own documented architecture rule — "domain layer must not use external dependencies" —
-            and broke the Nix sandbox build, where those tools don't exist. Integration tests that
-            enable basic signing (<code>SigningLevelBasic</code>) failed with
-            <code>EXTERNAL_TOOL_NOT_FOUND</code>.
+            The domain layer's
+            <code>validateSigningConfiguration()</code> called
+            <code>exec.LookPath(tool)</code> to verify signing tools
+            (<code>gpg</code>, <code>cosign</code>, <code>openssl</code>) were
+            installed. This violated the project's own documented architecture
+            rule — "domain layer must not use external dependencies" — and broke
+            the Nix sandbox build, where those tools don't exist. Integration
+            tests that enable basic signing (<code>SigningLevelBasic</code>)
+            failed with <code>EXTERNAL_TOOL_NOT_FOUND</code>.
           </p>
           <div class="callout callout-solution">
-            <strong>Fix applied:</strong> Removed the filesystem check entirely from the domain
-            layer (signing-level enum validity was already checked separately at
-            <code>config_core.go:136</code>). In the validation layer, downgraded the duplicate
-            tool-availability check from a blocking <strong>error</strong> to a
-            <strong>warning</strong> — signing tools are needed at release time in CI, not at
-            config-generation time.
+            <strong>Fix applied:</strong> Removed the filesystem check entirely
+            from the domain layer (signing-level enum validity was already
+            checked separately at <code>config_core.go:136</code>). In the
+            validation layer, downgraded the duplicate tool-availability check
+            from a blocking <strong>error</strong> to a
+            <strong>warning</strong> — signing tools are needed at release time
+            in CI, not at config-generation time.
           </div>
         </div>
 
@@ -816,8 +862,9 @@
             <div class="text">
               <strong>Build is fully green — 39/39 buildflow steps pass</strong>
               <span
-                >All previously-failing steps (<code>test-coverage</code>, <code>test-race</code>,
-                <code>go-fix</code>, <code>govalid-generate</code>, <code>nix-build</code>) now
+                >All previously-failing steps (<code>test-coverage</code>,
+                <code>test-race</code>, <code>go-fix</code>,
+                <code>govalid-generate</code>, <code>nix-build</code>) now
                 pass.</span
               >
             </div>
@@ -827,8 +874,9 @@
             <div class="text">
               <strong>hasFile function restored</strong>
               <span
-                ><code>internal/utils/recommendations.go</code> — proper <code>os.Stat</code> checks
-                across current dir + 5 common subdirs.</span
+                ><code>internal/utils/recommendations.go</code> — proper
+                <code>os.Stat</code> checks across current dir + 5 common
+                subdirs.</span
               >
             </div>
           </div>
@@ -838,8 +886,9 @@
               <strong>Domain layer purity restored</strong>
               <span
                 ><code>internal/domain/config_core.go</code> — removed
-                <code>exec.LookPath</code> filesystem I/O and the <code>os/exec</code> import.
-                Domain is now side-effect-free.</span
+                <code>exec.LookPath</code> filesystem I/O and the
+                <code>os/exec</code> import. Domain is now
+                side-effect-free.</span
               >
             </div>
           </div>
@@ -848,8 +897,9 @@
             <div class="text">
               <strong>Signing tool check correctly scoped</strong>
               <span
-                ><code>internal/validation/business_rules.go</code> — downgraded from blocking error
-                to warning. Tools are a release-time concern, not a config-generation concern.</span
+                ><code>internal/validation/business_rules.go</code> — downgraded
+                from blocking error to warning. Tools are a release-time
+                concern, not a config-generation concern.</span
               >
             </div>
           </div>
@@ -858,9 +908,11 @@
             <div class="text">
               <strong>All Go tests pass</strong>
               <span
-                >Every package compiles and passes: <code>cmd/goreleaser-wizard</code>,
+                >Every package compiles and passes:
+                <code>cmd/goreleaser-wizard</code>,
                 <code>internal/domain</code>, <code>internal/types</code>,
-                <code>internal/utils</code>, <code>internal/validation</code>.</span
+                <code>internal/utils</code>,
+                <code>internal/validation</code>.</span
               >
             </div>
           </div>
@@ -869,8 +921,9 @@
             <div class="text">
               <strong>Nix build succeeds</strong>
               <span
-                ><code>nix build</code> produces a working binary. The integration tests that
-                exercise signing no longer fail in the sandbox.</span
+                ><code>nix build</code> produces a working binary. The
+                integration tests that exercise signing no longer fail in the
+                sandbox.</span
               >
             </div>
           </div>
@@ -879,8 +932,9 @@
             <div class="text">
               <strong>Core features functional</strong>
               <span
-                >Interactive wizard, project auto-detection, GoReleaser config generation, GitHub
-                Actions generation — all operational per FEATURES.md.</span
+                >Interactive wizard, project auto-detection, GoReleaser config
+                generation, GitHub Actions generation — all operational per
+                FEATURES.md.</span
               >
             </div>
           </div>
@@ -889,8 +943,9 @@
             <div class="text">
               <strong>Architecture enforcement in place</strong>
               <span
-                ><code>go-arch-lint</code> with AST-based deep scanning enforces domain isolation.
-                The violation we fixed would ideally have been caught here too.</span
+                ><code>go-arch-lint</code> with AST-based deep scanning enforces
+                domain isolation. The violation we fixed would ideally have been
+                caught here too.</span
               >
             </div>
           </div>
@@ -902,29 +957,34 @@
         <div class="card card-warning">
           <h4>Test coverage — low across the board</h4>
           <p>
-            Average coverage sits around <strong>25.9%</strong>. The project's own quality gate
-            requires <strong>80% minimum</strong>. Only <code>internal/validation</code> (57.8%) and
-            <code>cmd/goreleaser-wizard</code> (51.6%) are within striking distance. The domain
-            layer — the most critical package — is at <strong>10.0%</strong>.
+            Average coverage sits around <strong>25.9%</strong>. The project's
+            own quality gate requires <strong>80% minimum</strong>. Only
+            <code>internal/validation</code> (57.8%) and
+            <code>cmd/goreleaser-wizard</code> (51.6%) are within striking
+            distance. The domain layer — the most critical package — is at
+            <strong>10.0%</strong>.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>Clean architecture — enforced but had a leak</h4>
           <p>
-            <code>go-arch-lint</code> enforces layer boundaries, but it checks <em>imports</em>, not
-            <em>behavior</em>. The domain layer importing <code>os/exec</code> was caught by the
-            linter as an allowed stdlib import, masking the architectural violation. The purity rule
-            ("no side effects in domain") is documented but not mechanically enforced.
+            <code>go-arch-lint</code> enforces layer boundaries, but it checks
+            <em>imports</em>, not <em>behavior</em>. The domain layer importing
+            <code>os/exec</code> was caught by the linter as an allowed stdlib
+            import, masking the architectural violation. The purity rule ("no
+            side effects in domain") is documented but not mechanically
+            enforced.
           </p>
         </div>
 
         <div class="card card-warning">
           <h4>FEATURES.md — stale (last updated 2025-12-16)</h4>
           <p>
-            The feature inventory is 6+ months old and doesn't reflect today's fixes. Status
-            indicators don't match reality. No <code>TODO_LIST.md</code> exists at root — the
-            project tracking docs are fragmented across <code>docs/status/</code> (20+ historical
+            The feature inventory is 6+ months old and doesn't reflect today's
+            fixes. Status indicators don't match reality. No
+            <code>TODO_LIST.md</code> exists at root — the project tracking docs
+            are fragmented across <code>docs/status/</code> (20+ historical
             reports) and several root-level markdown files.
           </p>
         </div>
@@ -935,58 +995,66 @@
         <div class="card">
           <h4>No TODO_LIST.md at project root</h4>
           <p>
-            The AGENTS.md documentation system specifies <code>TODO_LIST.md</code> for
-            short/mid-term tasks. It doesn't exist. Work items are scattered across
-            <code>COMPREHENSIVE_REFACTORING_TODO.md</code>, <code>EXECUTION_PLAN.md</code>, and
-            historical status reports.
+            The AGENTS.md documentation system specifies
+            <code>TODO_LIST.md</code> for short/mid-term tasks. It doesn't
+            exist. Work items are scattered across
+            <code>COMPREHENSIVE_REFACTORING_TODO.md</code>,
+            <code>EXECUTION_PLAN.md</code>, and historical status reports.
           </p>
         </div>
 
         <div class="card">
           <h4>No ROADMAP.md</h4>
           <p>
-            Long-term direction is undocumented as a single source of truth. Multiple planning docs
-            exist in <code>docs/planning/</code> but they're point-in-time snapshots, not a
-            maintained roadmap.
+            Long-term direction is undocumented as a single source of truth.
+            Multiple planning docs exist in <code>docs/planning/</code> but
+            they're point-in-time snapshots, not a maintained roadmap.
           </p>
         </div>
 
         <div class="card">
           <h4>Domain layer unit tests</h4>
           <p>
-            At 10% coverage, the domain layer — the heart of the business logic — is severely
-            undertested. <code>SafeProjectConfig.Validate()</code>, <code>ApplyDefaults()</code>,
-            enum validation, and the clone/copy logic need comprehensive table-driven tests.
+            At 10% coverage, the domain layer — the heart of the business logic
+            — is severely undertested.
+            <code>SafeProjectConfig.Validate()</code>,
+            <code>ApplyDefaults()</code>, enum validation, and the clone/copy
+            logic need comprehensive table-driven tests.
           </p>
         </div>
 
         <!-- TOTALLY FUCKED UP -->
-        <h2 id="fucked"><span class="num">05</span>Totally Fucked Up (Now Fixed)</h2>
+        <h2 id="fucked">
+          <span class="num">05</span>Totally Fucked Up (Now Fixed)
+        </h2>
 
         <div class="card card-problem">
           <h4>The <code>8b1440f</code> refactor was sabotage-by-automation</h4>
           <p>
-            A commit titled "use slices package instead of manual directory traversal" replaced 15
-            lines of working <code>os.Stat</code> logic with a single line that
-            <strong>does not compile</strong>. The replacement
-            <code>slices.Contains(dirs, nil)</code> referenced an undefined variable, ignored its
-            input parameter, and returned a constant regardless of whether any file existed. This
-            shipped to <code>master</code> and broke the build for an unknown period.
+            A commit titled "use slices package instead of manual directory
+            traversal" replaced 15 lines of working <code>os.Stat</code> logic
+            with a single line that <strong>does not compile</strong>. The
+            replacement <code>slices.Contains(dirs, nil)</code> referenced an
+            undefined variable, ignored its input parameter, and returned a
+            constant regardless of whether any file existed. This shipped to
+            <code>master</code> and broke the build for an unknown period.
           </p>
           <div class="callout callout-warning">
-            <strong>Lesson:</strong> No build/CI gate caught this before merge. The
-            <code>hasFile</code> function has no direct unit tests, so a nonsensical rewrite passed
-            review. This function needs tests <em>now</em>.
+            <strong>Lesson:</strong> No build/CI gate caught this before merge.
+            The <code>hasFile</code> function has no direct unit tests, so a
+            nonsensical rewrite passed review. This function needs tests
+            <em>now</em>.
           </div>
         </div>
 
         <div class="card card-problem">
           <h4>Domain layer violated its own purity rule</h4>
           <p>
-            The most important architectural rule in this project — "domain must be pure, zero
-            external dependencies, no side effects" — was violated by the domain layer itself
-            calling <code>exec.LookPath()</code>. This wasn't a new mistake: it was sitting in the
-            codebase, silently breaking the Nix sandbox build, until someone ran
+            The most important architectural rule in this project — "domain must
+            be pure, zero external dependencies, no side effects" — was violated
+            by the domain layer itself calling <code>exec.LookPath()</code>.
+            This wasn't a new mistake: it was sitting in the codebase, silently
+            breaking the Nix sandbox build, until someone ran
             <code>nix build</code>.
           </p>
         </div>
@@ -997,44 +1065,55 @@
         <ul>
           <li>
             <strong>Add a pre-commit/pre-merge build gate</strong> — a broken
-            <code>hasFile</code> should never reach <code>master</code>. The buildflow
-            <code>--fix</code> run exists; it should run on every push.
+            <code>hasFile</code> should never reach <code>master</code>. The
+            buildflow <code>--fix</code> run exists; it should run on every
+            push.
           </li>
           <li>
-            <strong>Add unit tests for <code>hasFile</code></strong> — the function that just broke
-            the build has zero direct tests. This is the highest-ROI test addition possible.
+            <strong>Add unit tests for <code>hasFile</code></strong> — the
+            function that just broke the build has zero direct tests. This is
+            the highest-ROI test addition possible.
           </li>
           <li>
-            <strong>Enforce domain purity mechanically</strong> — <code>go-arch-lint</code> catches
-            import violations but not behavioral ones (like calling <code>exec.LookPath</code>).
-            Consider a custom linter rule or a domain test harness that runs in a hermetic
-            environment.
+            <strong>Enforce domain purity mechanically</strong> —
+            <code>go-arch-lint</code> catches import violations but not
+            behavioral ones (like calling <code>exec.LookPath</code>). Consider
+            a custom linter rule or a domain test harness that runs in a
+            hermetic environment.
           </li>
           <li>
-            <strong>Consolidate documentation sprawl</strong> — 16 root-level <code>.md</code> files
-            (4,914 lines) plus 20+ status reports. Most are point-in-time snapshots that belong in
-            <code>docs/</code> or should be archived. Root should contain only living docs (README,
+            <strong>Consolidate documentation sprawl</strong> — 16 root-level
+            <code>.md</code> files (4,914 lines) plus 20+ status reports. Most
+            are point-in-time snapshots that belong in <code>docs/</code> or
+            should be archived. Root should contain only living docs (README,
             AGENTS, FEATURES, TODO_LIST, ROADMAP, CHANGELOG).
           </li>
           <li>
-            <strong>Raise domain coverage from 10% to 80%+</strong> — the domain layer is the
-            easiest code to test (pure functions, no I/O) and the most important to get right.
+            <strong>Raise domain coverage from 10% to 80%+</strong> — the domain
+            layer is the easiest code to test (pure functions, no I/O) and the
+            most important to get right.
           </li>
           <li>
-            <strong>Fix the 16 <code>makezero</code> lint warnings</strong> — slices created with
-            <code>make([]T, len(x))</code> followed by <code>append</code> waste capacity. Use
+            <strong>Fix the 16 <code>makezero</code> lint warnings</strong> —
+            slices created with <code>make([]T, len(x))</code> followed by
+            <code>append</code> waste capacity. Use
             <code>make([]T, 0, len(x))</code> instead. Trivial, mechanical fix.
           </li>
           <li>
-            <strong>Distinguish "config generation" vs "release readiness" validation</strong> — the
-            signing-tool check confusion shows these two concerns are conflated. Config generation
-            should validate <em>correctness</em>; release readiness should check
-            <em>environment</em>.
+            <strong
+              >Distinguish "config generation" vs "release readiness"
+              validation</strong
+            >
+            — the signing-tool check confusion shows these two concerns are
+            conflated. Config generation should validate <em>correctness</em>;
+            release readiness should check <em>environment</em>.
           </li>
         </ul>
 
         <!-- COVERAGE TABLE -->
-        <h2 id="coverage"><span class="num">07</span>Test Coverage by Package</h2>
+        <h2 id="coverage">
+          <span class="num">07</span>Test Coverage by Package
+        </h2>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1105,8 +1184,12 @@
         </div>
 
         <!-- TOP 25 NEXT -->
-        <h2 id="next25"><span class="num">08</span>Top 25 Things to Get Done Next</h2>
-        <p>Sorted by impact (highest first). Items 1–5 are high-ROI, low-effort.</p>
+        <h2 id="next25">
+          <span class="num">08</span>Top 25 Things to Get Done Next
+        </h2>
+        <p>
+          Sorted by impact (highest first). Items 1–5 are high-ROI, low-effort.
+        </p>
         <div class="table-wrap">
           <table>
             <thead>
@@ -1122,8 +1205,8 @@
                 <td>1</td>
                 <td><span class="badge badge-critical">Critical</span></td>
                 <td>
-                  Add unit tests for <code>hasFile</code> — the function that just broke the build
-                  has zero tests
+                  Add unit tests for <code>hasFile</code> — the function that
+                  just broke the build has zero tests
                 </td>
                 <td>S</td>
               </tr>
@@ -1140,7 +1223,8 @@
                 <td>3</td>
                 <td><span class="badge badge-critical">Critical</span></td>
                 <td>
-                  Remove unused <code>createTempFile</code> in <code>validate_test.go:59</code>
+                  Remove unused <code>createTempFile</code> in
+                  <code>validate_test.go:59</code>
                 </td>
                 <td>S</td>
               </tr>
@@ -1148,7 +1232,8 @@
                 <td>4</td>
                 <td><span class="badge badge-high">High</span></td>
                 <td>
-                  Fix 5 <code>infertypeargs</code> warnings in <code>internal/domain/ids.go</code>
+                  Fix 5 <code>infertypeargs</code> warnings in
+                  <code>internal/domain/ids.go</code>
                 </td>
                 <td>S</td>
               </tr>
@@ -1156,8 +1241,9 @@
                 <td>5</td>
                 <td><span class="badge badge-high">High</span></td>
                 <td>
-                  Write domain-layer tests: <code>Validate()</code>, <code>ApplyDefaults()</code>,
-                  enum IsValid methods (raise 10% → 60%+)
+                  Write domain-layer tests: <code>Validate()</code>,
+                  <code>ApplyDefaults()</code>, enum IsValid methods (raise 10%
+                  → 60%+)
                 </td>
                 <td>M</td>
               </tr>
@@ -1173,15 +1259,18 @@
               <tr>
                 <td>7</td>
                 <td><span class="badge badge-high">High</span></td>
-                <td>Create <code>TODO_LIST.md</code> from this report's top-25 list</td>
+                <td>
+                  Create <code>TODO_LIST.md</code> from this report's top-25
+                  list
+                </td>
                 <td>S</td>
               </tr>
               <tr>
                 <td>8</td>
                 <td><span class="badge badge-high">High</span></td>
                 <td>
-                  Refresh <code>FEATURES.md</code> — it's 6 months stale; audit actual feature state
-                  against code
+                  Refresh <code>FEATURES.md</code> — it's 6 months stale; audit
+                  actual feature state against code
                 </td>
                 <td>M</td>
               </tr>
@@ -1189,8 +1278,9 @@
                 <td>9</td>
                 <td><span class="badge badge-high">High</span></td>
                 <td>
-                  Add a CI workflow that runs <code>buildflow --fix</code> (or at least
-                  <code>go build ./...</code> + <code>go test ./...</code>) on every push/PR
+                  Add a CI workflow that runs <code>buildflow --fix</code> (or
+                  at least <code>go build ./...</code> +
+                  <code>go test ./...</code>) on every push/PR
                 </td>
                 <td>S</td>
               </tr>
@@ -1198,8 +1288,8 @@
                 <td>10</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Split "config-generation validation" from "release-readiness validation" into
-                  separate passes
+                  Split "config-generation validation" from "release-readiness
+                  validation" into separate passes
                 </td>
                 <td>M</td>
               </tr>
@@ -1207,8 +1297,8 @@
                 <td>11</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Write tests for <code>internal/types</code> (5.2% coverage) — validation result
-                  types, clone logic
+                  Write tests for <code>internal/types</code> (5.2% coverage) —
+                  validation result types, clone logic
                 </td>
                 <td>M</td>
               </tr>
@@ -1216,8 +1306,8 @@
                 <td>12</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Write tests for <code>internal/utils</code> (32.1%) — recommendation functions,
-                  env detection
+                  Write tests for <code>internal/utils</code> (32.1%) —
+                  recommendation functions, env detection
                 </td>
                 <td>M</td>
               </tr>
@@ -1225,8 +1315,8 @@
                 <td>13</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Add tests for <code>cmd/.../generators</code> (0%) — goreleaser, github_actions,
-                  dockerfile generators
+                  Add tests for <code>cmd/.../generators</code> (0%) —
+                  goreleaser, github_actions, dockerfile generators
                 </td>
                 <td>M</td>
               </tr>
@@ -1234,7 +1324,8 @@
                 <td>14</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Add tests for <code>internal/config</code> (0%) and <code>internal/git</code> (0%)
+                  Add tests for <code>internal/config</code> (0%) and
+                  <code>internal/git</code> (0%)
                 </td>
                 <td>M</td>
               </tr>
@@ -1242,8 +1333,8 @@
                 <td>15</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Investigate mechanical enforcement of domain purity (custom linter or hermetic
-                  test harness)
+                  Investigate mechanical enforcement of domain purity (custom
+                  linter or hermetic test harness)
                 </td>
                 <td>L</td>
               </tr>
@@ -1251,8 +1342,8 @@
                 <td>16</td>
                 <td><span class="badge badge-medium">Medium</span></td>
                 <td>
-                  Create <code>ROADMAP.md</code> — consolidate long-term direction from scattered
-                  planning docs
+                  Create <code>ROADMAP.md</code> — consolidate long-term
+                  direction from scattered planning docs
                 </td>
                 <td>M</td>
               </tr>
@@ -1260,8 +1351,9 @@
                 <td>17</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Update <code>AGENTS.md</code> with the signing-tool architecture decision
-                  (warning, not error; release-time concern)
+                  Update <code>AGENTS.md</code> with the signing-tool
+                  architecture decision (warning, not error; release-time
+                  concern)
                 </td>
                 <td>S</td>
               </tr>
@@ -1269,8 +1361,8 @@
                 <td>18</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Clean up <code>.buildflow-resume.json</code> — it's an untracked artifact that
-                  shouldn't be in the repo root
+                  Clean up <code>.buildflow-resume.json</code> — it's an
+                  untracked artifact that shouldn't be in the repo root
                 </td>
                 <td>S</td>
               </tr>
@@ -1278,7 +1370,8 @@
                 <td>19</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Review whether <code>pkg/</code> directory (currently empty) should be removed
+                  Review whether <code>pkg/</code> directory (currently empty)
+                  should be removed
                 </td>
                 <td>S</td>
               </tr>
@@ -1286,8 +1379,8 @@
                 <td>20</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Remove the <code>result</code> symlink left by <code>nix build</code> (add to
-                  <code>.gitignore</code>)
+                  Remove the <code>result</code> symlink left by
+                  <code>nix build</code> (add to <code>.gitignore</code>)
                 </td>
                 <td>S</td>
               </tr>
@@ -1295,8 +1388,8 @@
                 <td>21</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Document the TypeSpec → Go generation pipeline (templates/ and typespec/ dirs are
-                  opaque)
+                  Document the TypeSpec → Go generation pipeline (templates/ and
+                  typespec/ dirs are opaque)
                 </td>
                 <td>M</td>
               </tr>
@@ -1304,8 +1397,8 @@
                 <td>22</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Consider BDD tests (Ginkgo) for the interactive wizard flow — the skill exists but
-                  isn't used
+                  Consider BDD tests (Ginkgo) for the interactive wizard flow —
+                  the skill exists but isn't used
                 </td>
                 <td>L</td>
               </tr>
@@ -1313,8 +1406,8 @@
                 <td>23</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Audit <code>docs/research/SPLIT-BRAIN.html</code> findings — was the
-                  domain/validation duplication resolved?
+                  Audit <code>docs/research/SPLIT-BRAIN.html</code> findings —
+                  was the domain/validation duplication resolved?
                 </td>
                 <td>M</td>
               </tr>
@@ -1322,7 +1415,8 @@
                 <td>24</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Standardize error handling: AGENTS.md says "always use domain errors" but
+                  Standardize error handling: AGENTS.md says "always use domain
+                  errors" but
                   <code>fmt.Errorf</code> is used in <code>jobs.go</code>
                 </td>
                 <td>M</td>
@@ -1331,8 +1425,8 @@
                 <td>25</td>
                 <td><span class="badge badge-low">Low</span></td>
                 <td>
-                  Review the <code>github_issues/</code> directory (18 files) — are these still
-                  relevant or archival?
+                  Review the <code>github_issues/</code> directory (18 files) —
+                  are these still relevant or archival?
                 </td>
                 <td>S</td>
               </tr>
@@ -1341,36 +1435,47 @@
         </div>
 
         <!-- TOP QUESTION -->
-        <h2 id="question"><span class="num">09</span>Top Question I Cannot Answer Myself</h2>
+        <h2 id="question">
+          <span class="num">09</span>Top Question I Cannot Answer Myself
+        </h2>
 
         <div class="card card-warning">
-          <h4>Should signing-tool availability ever block, and if so — at which stage?</h4>
+          <h4>
+            Should signing-tool availability ever block, and if so — at which
+            stage?
+          </h4>
           <p>
-            I downgraded the signing-tool check from a blocking <strong>error</strong> to a
-            <strong>warning</strong> in the validation layer, and removed it entirely from the
-            domain layer. My reasoning: at <em>config generation time</em>, the user is producing a
-            <code>.goreleaser.yaml</code> — they don't need <code>gpg</code> or
-            <code>cosign</code> installed locally; those run in CI at release time. Blocking config
-            generation because a local tool is missing seemed wrong, and it broke the Nix sandbox
-            build.
+            I downgraded the signing-tool check from a blocking
+            <strong>error</strong> to a <strong>warning</strong> in the
+            validation layer, and removed it entirely from the domain layer. My
+            reasoning: at <em>config generation time</em>, the user is producing
+            a <code>.goreleaser.yaml</code> — they don't need
+            <code>gpg</code> or <code>cosign</code> installed locally; those run
+            in CI at release time. Blocking config generation because a local
+            tool is missing seemed wrong, and it broke the Nix sandbox build.
           </p>
           <p>
-            <strong>But I can't determine the intended product behavior:</strong> Should the wizard
-            offer a separate <em>"release readiness check"</em> command that DOES block on tool
-            availability (a pre-flight check before <code>goreleaser release</code>)? Or is the
-            warning sufficient and the user is expected to install tools before releasing? This is a
-            product/UX decision, not a technical one — and it determines whether the validation
-            architecture needs two distinct passes or one.
+            <strong
+              >But I can't determine the intended product behavior:</strong
+            >
+            Should the wizard offer a separate
+            <em>"release readiness check"</em> command that DOES block on tool
+            availability (a pre-flight check before
+            <code>goreleaser release</code>)? Or is the warning sufficient and
+            the user is expected to install tools before releasing? This is a
+            product/UX decision, not a technical one — and it determines whether
+            the validation architecture needs two distinct passes or one.
           </p>
           <div class="callout callout-warning">
-            <strong>Awaiting decision:</strong> Keep warning-only (current), or add a separate
-            blocking <code>goreleaser-wizard check</code> command for release-time environment
-            validation?
+            <strong>Awaiting decision:</strong> Keep warning-only (current), or
+            add a separate blocking <code>goreleaser-wizard check</code> command
+            for release-time environment validation?
           </div>
         </div>
 
         <footer class="footer">
-          Generated 2026-06-30 &middot; All claims verified against source code and buildflow output
+          Generated 2026-06-30 &middot; All claims verified against source code
+          and buildflow output
         </footer>
       </main>
     </div>

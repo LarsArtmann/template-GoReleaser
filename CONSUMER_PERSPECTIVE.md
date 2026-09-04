@@ -118,18 +118,18 @@ FEATURES.md claims Dockerfile and Homebrew generation are "not implemented" when
 
 ## Summary: Prioritized Consumer Impact
 
-| #   | Gap                                    | Impact                              | Effort |
-| --- | -------------------------------------- | ----------------------------------- | ------ |
-| 1   | Save/load wizard preferences           | Every user, every re-run            | Medium |
-| 2   | Project-type-aware templates           | Misleading UX — 10 types, 1 output  | High   |
-| 3   | Remove hardcoded author values         | Trust/ownership issue               | Low    |
-| 4   | Expose `--dry-run` flag                | Already implemented, just not wired | Low    |
-| 5   | GitLab/Bitbucket CI templates          | Non-GitHub users are stranded       | High   |
-| 6   | Config migration command               | Already scaffolded                  | Medium |
-| 7   | Multi-binary support                   | Common Go project pattern           | Medium |
-| 8   | Generate what you collect (Snap, etc.) | Trust — flags that do nothing       | Medium |
-| 9   | Shell completions                      | Professional polish, zero effort    | Low    |
-| 10  | Example outputs in docs                | Helps evaluation before install     | Low    |
-| 11  | Post-setup guidance                    | First release success rate          | Low    |
-| 12  | Config diff on re-run                  | Confidence in changes               | Medium |
-| 13  | Fix stale FEATURES.md                  | Docs accuracy                       | Low    |
+| #  | Gap                                    | Impact                              | Effort |
+| -- | -------------------------------------- | ----------------------------------- | ------ |
+| 1  | Save/load wizard preferences           | Every user, every re-run            | Medium |
+| 2  | Project-type-aware templates           | Misleading UX — 10 types, 1 output  | High   |
+| 3  | Remove hardcoded author values         | Trust/ownership issue               | Low    |
+| 4  | Expose `--dry-run` flag                | Already implemented, just not wired | Low    |
+| 5  | GitLab/Bitbucket CI templates          | Non-GitHub users are stranded       | High   |
+| 6  | Config migration command               | Already scaffolded                  | Medium |
+| 7  | Multi-binary support                   | Common Go project pattern           | Medium |
+| 8  | Generate what you collect (Snap, etc.) | Trust — flags that do nothing       | Medium |
+| 9  | Shell completions                      | Professional polish, zero effort    | Low    |
+| 10 | Example outputs in docs                | Helps evaluation before install     | Low    |
+| 11 | Post-setup guidance                    | First release success rate          | Low    |
+| 12 | Config diff on re-run                  | Confidence in changes               | Medium |
+| 13 | Fix stale FEATURES.md                  | Docs accuracy                       | Low    |

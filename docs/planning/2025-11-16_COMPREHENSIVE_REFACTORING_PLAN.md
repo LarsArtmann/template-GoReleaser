@@ -1,7 +1,7 @@
 # GoReleaser Wizard Comprehensive Refactoring Plan
 
-**Date:** 2025-11-16  
-**Author:** Crush AI Assistant  
+**Date:** 2025-11-16\
+**Author:** Crush AI Assistant\
 **Scope:** Complete architectural overhaul and production readiness
 
 ---
@@ -312,7 +312,7 @@ gantt
 
 ### Phase 3 Completion
 
-- [ ] > 95% test coverage achieved
+- [ ] 95% test coverage achieved
 - [ ] All tests pass in CI pipeline
 - [ ] BDD scenarios implemented
 - [ ] Integration tests validate workflows

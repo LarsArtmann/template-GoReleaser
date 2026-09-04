@@ -34,7 +34,7 @@
         let
           version = self.rev or self.dirtyRev or "dev";
 
-          vendorHash = "sha256-qWubTtl+/DvbFRbjNcSFZ2/4T6MFhkX7ZULmKWJ/lV4=";
+          vendorHash = "sha256-pVopOCazLbJo/9oivW7SwG+Yiz6zwSn3ZjO4RC0gwek=";
 
           goreleaser-wizard = pkgs.buildGoModule {
             pname = "goreleaser-wizard";

@@ -37,14 +37,14 @@
         --radius-sm: 0px;
 
         --font-heading:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-body:
-          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          Helvetica, Arial, sans-serif;
+          ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         --font-mono:
-          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono", Menlo, Consolas,
-          monospace;
+          ui-monospace, "Cascadia Code", "Source Code Pro", "JetBrains Mono",
+          Menlo, Consolas, monospace;
       }
 
       * {
@@ -437,12 +437,20 @@
       .callout-teal,
       .callout-solution {
         border-left-color: var(--solution);
-        background: color-mix(in srgb, var(--solution) 10%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--solution) 10%,
+          var(--surface-raised)
+        );
       }
       .callout-amber,
       .callout-warning {
         border-left-color: var(--warning);
-        background: color-mix(in srgb, var(--warning) 18%, var(--surface-raised));
+        background: color-mix(
+          in srgb,
+          var(--warning) 18%,
+          var(--surface-raised)
+        );
       }
 
       .strengths {
@@ -815,13 +823,16 @@
           <div class="eyebrow">DATA MODEL AUDIT &middot; 2026-06-19</div>
           <h1>Split-Brain Issues in the Data Model</h1>
           <p class="subtitle">
-            A point-in-time audit of GoReleaser-Wizard's domain layer for duplicated types,
-            divergent defaults, and parallel sources of truth. Ten split-brain sites were identified
-            across the domain, application, and infrastructure layers &mdash; three critical enough
+            A point-in-time audit of GoReleaser-Wizard's domain layer for
+            duplicated types, divergent defaults, and parallel sources of truth.
+            Ten split-brain sites were identified across the domain,
+            application, and infrastructure layers &mdash; three critical enough
             to silently produce different configurations from identical inputs.
           </p>
           <div class="meta">
-            <span class="tag amber">Scope: internal/domain + cmd/goreleaser-wizard</span>
+            <span class="tag amber"
+              >Scope: internal/domain + cmd/goreleaser-wizard</span
+            >
             <span class="tag">10 findings</span>
             <span class="tag teal">3 critical</span>
           </div>
@@ -850,71 +861,92 @@
           <h2><span class="num">00</span>Summary</h2>
           <p>
             The codebase claims a <em>single source of truth</em> through
-            <code>SafeProjectConfig</code>, but in practice the same concepts are defined two or
-            three times in different packages with subtly different shapes. The most dangerous split
-            is between <code>NewSafeProjectConfig()</code> (which sets
-            <code>FeatureLevelBasic</code>) and <code>ApplyDefaults()</code> (which defaults to
-            <code>FeatureLevelStandard</code> when the field is empty). A config built via the
-            constructor and a config hydrated from YAML then defaulted end up with different feature
-            levels, signing levels, and Docker support &mdash; silently.
+            <code>SafeProjectConfig</code>, but in practice the same concepts
+            are defined two or three times in different packages with subtly
+            different shapes. The most dangerous split is between
+            <code>NewSafeProjectConfig()</code> (which sets
+            <code>FeatureLevelBasic</code>) and
+            <code>ApplyDefaults()</code> (which defaults to
+            <code>FeatureLevelStandard</code> when the field is empty). A config
+            built via the constructor and a config hydrated from YAML then
+            defaulted end up with different feature levels, signing levels, and
+            Docker support &mdash; silently.
           </p>
           <p>
-            Validation is similarly split: <code>SafeProjectConfig.Validate()</code> and
-            <code>ValidationUseCase.ValidateConfiguration()</code> both validate the same struct but
-            use different error codes, different rules (one requires non-empty action triggers, the
-            other does not), and only one of them performs security checks.
-            <code>JobStatus</code> is defined twice in the same build with different underlying
-            kinds (<code>int</code> vs <code>string</code>) and different enum members.
+            Validation is similarly split:
+            <code>SafeProjectConfig.Validate()</code> and
+            <code>ValidationUseCase.ValidateConfiguration()</code> both validate
+            the same struct but use different error codes, different rules (one
+            requires non-empty action triggers, the other does not), and only
+            one of them performs security checks. <code>JobStatus</code> is
+            defined twice in the same build with different underlying kinds
+            (<code>int</code> vs <code>string</code>) and different enum
+            members.
           </p>
           <div class="callout callout-amber">
             <strong>The bottom line</strong>
-            Three critical sites can produce silently divergent behavior from identical inputs. The
-            other seven create maintenance traps that will drift further with each change.
-            Consolidating each duplicated concept behind one canonical type &mdash; and treating
-            <code>SafeProjectConfig</code> as the only constructable shape &mdash; eliminates the
-            entire class.
+            Three critical sites can produce silently divergent behavior from
+            identical inputs. The other seven create maintenance traps that will
+            drift further with each change. Consolidating each duplicated
+            concept behind one canonical type &mdash; and treating
+            <code>SafeProjectConfig</code> as the only constructable shape
+            &mdash; eliminates the entire class.
           </div>
         </section>
 
         <section id="scope">
           <h2><span class="num">&diams;</span>Scope &amp; Method</h2>
           <p>
-            Every non-test <code>.go</code> file under <code>internal/domain</code>,
-            <code>internal/types</code>, <code>internal/config</code>, <code>internal/git</code>,
-            <code>internal/utils</code>, and <code>cmd/goreleaser-wizard</code> was inspected for
-            the following split-brain patterns:
+            Every non-test <code>.go</code> file under
+            <code>internal/domain</code>, <code>internal/types</code>,
+            <code>internal/config</code>, <code>internal/git</code>,
+            <code>internal/utils</code>, and
+            <code>cmd/goreleaser-wizard</code> was inspected for the following
+            split-brain patterns:
           </p>
           <div class="grid-2">
             <div class="card card-warning">
               <h4>Duplicate type definitions</h4>
-              <p>Same concept, two structs with different shapes or field names.</p>
+              <p>
+                Same concept, two structs with different shapes or field names.
+              </p>
             </div>
             <div class="card card-warning">
               <h4>Multiple sources of truth</h4>
-              <p>Constants, defaults, or validation rules defined in &gt;1 location.</p>
+              <p>
+                Constants, defaults, or validation rules defined in &gt;1
+                location.
+              </p>
             </div>
             <div class="card card-warning">
               <h4>Bypassable smart constructors</h4>
-              <p>"Safe" types that can be built invalid through a sibling type.</p>
+              <p>
+                "Safe" types that can be built invalid through a sibling type.
+              </p>
             </div>
             <div class="card card-warning">
               <h4>Drift-prone parallel logic</h4>
-              <p>Functions that compute the same answer by independent code paths.</p>
+              <p>
+                Functions that compute the same answer by independent code
+                paths.
+              </p>
             </div>
           </div>
           <p>
-            Severity is assigned by the combination of <em>likelihood of divergence</em> and
-            <em>blast radius if it diverges</em>. A "critical" finding can already produce incorrect
-            behavior today; an "important" finding will drift on the next change to either copy; a
-            "minor" finding is noise but worth noting.
+            Severity is assigned by the combination of
+            <em>likelihood of divergence</em> and
+            <em>blast radius if it diverges</em>. A "critical" finding can
+            already produce incorrect behavior today; an "important" finding
+            will drift on the next change to either copy; a "minor" finding is
+            noise but worth noting.
           </p>
         </section>
 
         <section id="strengths">
           <h2><span class="num">&#9670;</span>What's already excellent</h2>
           <p>
-            Before listing problems: the project does several things right that make the split-brain
-            issues fixable rather than structural.
+            Before listing problems: the project does several things right that
+            make the split-brain issues fixable rather than structural.
           </p>
           <div class="strengths">
             <div class="strength">
@@ -924,8 +956,9 @@
                 <span>
                   Every enum (<code>ProjectType</code>, <code>Platform</code>,
                   <code>SigningLevel</code>, etc.) is a named type with an
-                  <code>IsValid()</code> method. This is the right foundation; the splits are in the
-                  <em>consumers</em>, not the enums themselves.
+                  <code>IsValid()</code> method. This is the right foundation;
+                  the splits are in the <em>consumers</em>, not the enums
+                  themselves.
                 </span>
               </div>
             </div>
@@ -934,9 +967,10 @@
               <div class="text">
                 <strong>Architecture enforcement via go-arch-lint</strong>
                 <span>
-                  <code>.go-arch-lint.yml</code> already forbids the domain layer from importing
-                  application or infrastructure. The structural boundary exists; only the
-                  <em>type</em> boundary inside it is leaking.
+                  <code>.go-arch-lint.yml</code> already forbids the domain
+                  layer from importing application or infrastructure. The
+                  structural boundary exists; only the <em>type</em> boundary
+                  inside it is leaking.
                 </span>
               </div>
             </div>
@@ -945,10 +979,11 @@
               <div class="text">
                 <strong>Centralized typed errors</strong>
                 <span>
-                  <code>internal/domain/errors.go</code> defines <code>DomainError</code> with
-                  <code>Code</code>, <code>Message</code>, <code>Details</code>, and recovery
-                  suggestions. The plumbing for structured errors is in place even where the
-                  <em>error codes</em> drift (see finding 7).
+                  <code>internal/domain/errors.go</code> defines
+                  <code>DomainError</code> with <code>Code</code>,
+                  <code>Message</code>, <code>Details</code>, and recovery
+                  suggestions. The plumbing for structured errors is in place
+                  even where the <em>error codes</em> drift (see finding 7).
                 </span>
               </div>
             </div>
@@ -958,8 +993,9 @@
                 <strong>Small, focused files under 300 lines</strong>
                 <span>
                   The workflow package was already split into
-                  <code>workflow_core.go</code>, <code>workflow_execution.go</code>, etc. This
-                  discipline makes consolidation mechanical rather than surgical.
+                  <code>workflow_core.go</code>,
+                  <code>workflow_execution.go</code>, etc. This discipline makes
+                  consolidation mechanical rather than surgical.
                 </span>
               </div>
             </div>
@@ -972,21 +1008,31 @@
 
           <!-- Finding 1 -->
           <div class="issue issue-critical" id="finding-1">
-            <span class="severity severity-critical">Critical &middot; Silent wrong output</span>
-            <h3>Triple-duplicated <code>GetGitHubOwner</code> / <code>GetGitHubRepo</code></h3>
+            <span class="severity severity-critical"
+              >Critical &middot; Silent wrong output</span
+            >
+            <h3>
+              Triple-duplicated <code>GetGitHubOwner</code> /
+              <code>GetGitHubRepo</code>
+            </h3>
             <div class="where">
-              internal/git/commands.go:290 &middot; internal/utils/recommendations.go:101 &middot;
+              internal/git/commands.go:290 &middot;
+              internal/utils/recommendations.go:101 &middot;
               cmd/goreleaser-wizard/types/template_data.go:236-260
             </div>
             <p>
-              Three independent implementations of the same function with different behavior.
+              Three independent implementations of the same function with
+              different behavior.
               <strong>A</strong> shells out through
-              <code>NewCommand(ctx).GetRepositoryInfo()</code>. <strong>B</strong> delegates to
-              <strong>A</strong> and falls back to the literal <code>"owner"</code>.
-              <strong>C</strong> uses a completely different
-              <code>exec.CommandContext("git", "remote", "get-url", "origin")</code> path with its
-              own parser (<code>parseGitHubRemote</code>). All three can return different answers
-              for the same repository.
+              <code>NewCommand(ctx).GetRepositoryInfo()</code>.
+              <strong>B</strong> delegates to <strong>A</strong> and falls back
+              to the literal <code>"owner"</code>. <strong>C</strong> uses a
+              completely different
+              <code
+                >exec.CommandContext("git", "remote", "get-url", "origin")</code
+              >
+              path with its own parser (<code>parseGitHubRemote</code>). All
+              three can return different answers for the same repository.
             </p>
             <pre><code><span class="tok-comment">// A — internal/git/commands.go:290</span>
 <span class="tok-keyword">func</span> <span class="tok-func">GetGitHubOwner</span>() <span class="tok-type">string</span> {
@@ -1010,9 +1056,11 @@
 }</code></pre>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Keep one canonical implementation in <code>internal/git</code>. Delete B and C; have
-              <code>template_data.go</code> import <code>git.GetGitHubOwner()</code>. The sentinel
-              <code>"owner"</code> should be a named constant in one place, not three.
+              Keep one canonical implementation in <code>internal/git</code>.
+              Delete B and C; have <code>template_data.go</code> import
+              <code>git.GetGitHubOwner()</code>. The sentinel
+              <code>"owner"</code> should be a named constant in one place, not
+              three.
             </div>
           </div>
 
@@ -1022,7 +1070,8 @@
               >Critical &middot; Silent config divergence</span
             >
             <h3>
-              Two sources of truth for defaults: <code>NewSafeProjectConfig</code> vs
+              Two sources of truth for defaults:
+              <code>NewSafeProjectConfig</code> vs
               <code>ApplyDefaults</code>
             </h3>
             <div class="where">
@@ -1030,23 +1079,31 @@
               internal/domain/config_defaults.go:10-131
             </div>
             <p>
-              The constructor hard-codes <code>FeatureLevelBasic</code>; the defaults method falls
-              back to <code>FeatureLevelStandard</code> when the field is empty. A config created
-              via <code>NewSafeProjectConfig()</code> already has a non-empty
-              <code>FeatureLevel</code>, so <code>ApplyDefaults()</code> will not touch it. But a
-              config hydrated from YAML with an omitted <code>feature_level</code> will receive
-              <code>FeatureLevelStandard</code>. Two code paths, two outcomes, no enforcement.
+              The constructor hard-codes <code>FeatureLevelBasic</code>; the
+              defaults method falls back to
+              <code>FeatureLevelStandard</code> when the field is empty. A
+              config created via <code>NewSafeProjectConfig()</code> already has
+              a non-empty <code>FeatureLevel</code>, so
+              <code>ApplyDefaults()</code> will not touch it. But a config
+              hydrated from YAML with an omitted <code>feature_level</code> will
+              receive <code>FeatureLevelStandard</code>. Two code paths, two
+              outcomes, no enforcement.
             </p>
             <p>
-              The same pattern repeats across <code>SigningLevel</code>, <code>DockerSupport</code>,
-              and <code>ActionLevel</code>: the constructor sets fixed values;
-              <code>ApplyDefaults</code> derives them from <code>ProjectType</code> /
-              <code>FeatureLevel</code>. They agree today for the CLI case but disagree for several
-              other project types.
+              The same pattern repeats across <code>SigningLevel</code>,
+              <code>DockerSupport</code>, and <code>ActionLevel</code>: the
+              constructor sets fixed values; <code>ApplyDefaults</code> derives
+              them from <code>ProjectType</code> / <code>FeatureLevel</code>.
+              They agree today for the CLI case but disagree for several other
+              project types.
             </p>
             <div class="compare-header">
-              <div class="compare-before">NewSafeProjectConfig (config_core.go:50)</div>
-              <div class="compare-after">ApplyDefaults (config_defaults.go:10)</div>
+              <div class="compare-before">
+                NewSafeProjectConfig (config_core.go:50)
+              </div>
+              <div class="compare-after">
+                ApplyDefaults (config_defaults.go:10)
+              </div>
             </div>
             <div class="compare-row">
               <pre><code>ProjectType:    GetRecommendedProjectType()
@@ -1063,10 +1120,12 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             </div>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Make <code>ApplyDefaults()</code> the only place defaults are computed. The
-              constructor should set <em>nothing</em> but the <code>State</code> field (or call
-              <code>ApplyDefaults()</code> itself after setting <code>ProjectType</code> to the
-              recommended value). This guarantees one code path regardless of how the struct was
+              Make <code>ApplyDefaults()</code> the only place defaults are
+              computed. The constructor should set <em>nothing</em> but the
+              <code>State</code> field (or call
+              <code>ApplyDefaults()</code> itself after setting
+              <code>ProjectType</code> to the recommended value). This
+              guarantees one code path regardless of how the struct was
               allocated.
             </div>
           </div>
@@ -1077,47 +1136,58 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
               >Critical &middot; Different validation outcomes</span
             >
             <h3>
-              Dual validation: <code>Validate()</code> vs <code>ValidateConfiguration()</code>
+              Dual validation: <code>Validate()</code> vs
+              <code>ValidateConfiguration()</code>
             </h3>
             <div class="where">
-              internal/domain/config_core.go:71-213 &middot; internal/domain/validation.go:38-71
+              internal/domain/config_core.go:71-213 &middot;
+              internal/domain/validation.go:38-71
             </div>
             <p>
-              Two methods validate the same <code>SafeProjectConfig</code> with different rules and
-              different error codes. <code>SafeProjectConfig.Validate()</code> returns an
-              <code>error</code>; <code>ValidationUseCase.ValidateConfiguration()</code> returns a
-              <code>*ValidationResult</code> with a pipeline of <code>validateBasicFields</code>,
-              <code>validateTypes</code>, <code>validatePlatformArchCompatibility</code>,
-              <code>validateBusinessRules</code>, and <code>validateSecurity</code>. They disagree
-              on:
+              Two methods validate the same <code>SafeProjectConfig</code> with
+              different rules and different error codes.
+              <code>SafeProjectConfig.Validate()</code> returns an
+              <code>error</code>;
+              <code>ValidationUseCase.ValidateConfiguration()</code> returns a
+              <code>*ValidationResult</code> with a pipeline of
+              <code>validateBasicFields</code>, <code>validateTypes</code>,
+              <code>validatePlatformArchCompatibility</code>,
+              <code>validateBusinessRules</code>, and
+              <code>validateSecurity</code>. They disagree on:
             </p>
             <ul style="margin: 0 0 1rem 1.5rem">
               <li>
                 <strong>Error codes</strong>: <code>Validate()</code> uses
-                <code>ErrInvalidProjectName</code> for enum errors (line 96-102); the use case uses
-                the correct per-field codes like <code>ErrInvalidPlatform</code>.
+                <code>ErrInvalidProjectName</code> for enum errors (line
+                96-102); the use case uses the correct per-field codes like
+                <code>ErrInvalidPlatform</code>.
               </li>
               <li>
-                <strong>Action triggers</strong>: <code>Validate()</code> only checks that each
-                <em>existing</em> trigger is valid; the use case requires at least one trigger
-                (<code>ValidateActionTriggers</code> errors on empty).
+                <strong>Action triggers</strong>: <code>Validate()</code> only
+                checks that each <em>existing</em> trigger is valid; the use
+                case requires at least one trigger (<code
+                  >ValidateActionTriggers</code
+                >
+                errors on empty).
               </li>
               <li>
                 <strong>Side effects</strong>: <code>Validate()</code> calls
-                <code>exec.LookPath</code> for signing tools &mdash; a filesystem side effect inside
-                what should be pure domain logic.
+                <code>exec.LookPath</code> for signing tools &mdash; a
+                filesystem side effect inside what should be pure domain logic.
               </li>
               <li>
-                <strong>Security</strong>: only the use case runs <code>validateSecurity</code>.
+                <strong>Security</strong>: only the use case runs
+                <code>validateSecurity</code>.
               </li>
             </ul>
             <div class="callout callout-teal">
               <strong>Fix</strong>
               <code>Validate()</code> should be a thin delegate to
-              <code>ValidationUseCase.ValidateConfiguration()</code> (or the reverse). One pipeline,
-              one set of error codes, one place that decides whether empty triggers are valid.
-              <code>exec.LookPath</code> belongs in an infrastructure check, not in domain
-              validation.
+              <code>ValidationUseCase.ValidateConfiguration()</code> (or the
+              reverse). One pipeline, one set of error codes, one place that
+              decides whether empty triggers are valid.
+              <code>exec.LookPath</code> belongs in an infrastructure check, not
+              in domain validation.
             </div>
           </div>
 
@@ -1126,18 +1196,24 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             <span class="severity severity-important"
               >Important &middot; Compile-time ambiguity</span
             >
-            <h3>Duplicate <code>JobStatus</code> with different underlying kinds</h3>
+            <h3>
+              Duplicate <code>JobStatus</code> with different underlying kinds
+            </h3>
             <div class="where">
-              cmd/goreleaser-wizard/job_manager.go:31-40 (<code>int</code>) &middot;
-              cmd/goreleaser-wizard/types/template_data.go:89-97 (<code>string</code>)
+              cmd/goreleaser-wizard/job_manager.go:31-40 (<code>int</code>)
+              &middot; cmd/goreleaser-wizard/types/template_data.go:89-97
+              (<code>string</code>)
             </div>
             <p>
-              <code>JobStatus</code> is defined twice in the same <code>main</code> package build:
-              once as <code>type JobStatus int</code> with an iota block including
-              <code>JobStatusRolledBack</code> and no <code>JobStatusCancelled</code>, and once as
+              <code>JobStatus</code> is defined twice in the same
+              <code>main</code> package build: once as
+              <code>type JobStatus int</code> with an iota block including
+              <code>JobStatusRolledBack</code> and no
+              <code>JobStatusCancelled</code>, and once as
               <code>type JobStatus string</code> with string constants including
-              <code>JobStatusCancelled</code> and no <code>JobStatusRolledBack</code>. Whichever
-              definition is in scope at a given file depends on import order; they are not
+              <code>JobStatusCancelled</code> and no
+              <code>JobStatusRolledBack</code>. Whichever definition is in scope
+              at a given file depends on import order; they are not
               assignment-compatible.
             </p>
             <pre><code><span class="tok-comment">// job_manager.go:32 — int-based</span>
@@ -1161,8 +1237,9 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
 )</code></pre>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Keep one definition. Prefer the <code>string</code>-based version (serializes cleanly
-              for templates and JSON) and add <code>JobStatusRolledBack</code> to it. Delete the
+              Keep one definition. Prefer the <code>string</code>-based version
+              (serializes cleanly for templates and JSON) and add
+              <code>JobStatusRolledBack</code> to it. Delete the
               <code>int</code> version entirely.
             </div>
           </div>
@@ -1172,19 +1249,24 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             <span class="severity severity-important"
               >Important &middot; Same name, different shape</span
             >
-            <h3>Duplicate <code>ValidationResult</code> type in two packages</h3>
+            <h3>
+              Duplicate <code>ValidationResult</code> type in two packages
+            </h3>
             <div class="where">
-              internal/domain/interfaces.go:259-264 &middot; internal/types/validation.go:13-18
+              internal/domain/interfaces.go:259-264 &middot;
+              internal/types/validation.go:13-18
             </div>
             <p>
-              Both packages define <code>ValidationResult</code> with the same JSON shape
-              (<code>is_valid</code>, <code>errors</code>, <code>warnings</code>) but completely
-              different element types. The domain version uses <code>*DomainError</code> for both
-              errors and warnings and adds a <code>Rules *ValidationRules</code> field. The
+              Both packages define <code>ValidationResult</code> with the same
+              JSON shape (<code>is_valid</code>, <code>errors</code>,
+              <code>warnings</code>) but completely different element types. The
+              domain version uses <code>*DomainError</code> for both errors and
+              warnings and adds a <code>Rules *ValidationRules</code> field. The
               <code>types</code> version uses <code>*ValidationError</code> and
               <code>*ValidationWarning</code> and adds a
-              <code>Summary ValidationSummary</code> field. Consumers must remember which package
-              they imported, and the two cannot be substituted.
+              <code>Summary ValidationSummary</code> field. Consumers must
+              remember which package they imported, and the two cannot be
+              substituted.
             </p>
             <div class="compare-header">
               <div class="compare-before">domain.ValidationResult</div>
@@ -1206,10 +1288,11 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             </div>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Keep the domain version as canonical. The <code>types</code> package should either
-              import it or be deleted entirely. If separate DTO and domain shapes are truly needed,
-              rename one (e.g. <code>ValidationResultDTO</code>) so the collision cannot happen
-              silently.
+              Keep the domain version as canonical. The
+              <code>types</code> package should either import it or be deleted
+              entirely. If separate DTO and domain shapes are truly needed,
+              rename one (e.g. <code>ValidationResultDTO</code>) so the
+              collision cannot happen silently.
             </div>
           </div>
 
@@ -1219,26 +1302,29 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
               >Important &middot; Subset interface drift</span
             >
             <h3>
-              Duplicate <code>Logger</code> interface &mdash; generators define a strict subset
+              Duplicate <code>Logger</code> interface &mdash; generators define
+              a strict subset
             </h3>
             <div class="where">
               internal/domain/interfaces.go:151-168 &middot;
               cmd/goreleaser-wizard/generators/goreleaser.go:23-28
             </div>
             <p>
-              The domain <code>Logger</code> interface has 12 methods (Debug/Info/Warn/Error plus
-              their <code>*Context</code> variants, plus <code>WithField</code>,
-              <code>WithFields</code>, <code>WithError</code>). The generators redefine a 4-method
-              subset. Any struct satisfying the generators' interface does not satisfy the domain
-              one. The two can drift independently &mdash; adding a method to one does not
-              propagate.
+              The domain <code>Logger</code> interface has 12 methods
+              (Debug/Info/Warn/Error plus their <code>*Context</code> variants,
+              plus <code>WithField</code>, <code>WithFields</code>,
+              <code>WithError</code>). The generators redefine a 4-method
+              subset. Any struct satisfying the generators' interface does not
+              satisfy the domain one. The two can drift independently &mdash;
+              adding a method to one does not propagate.
             </p>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Delete the generators' <code>Logger</code> and import the domain one. If the
-              generators genuinely only need four methods, define a small
-              <code>GeneratorLogger</code> interface in the generators package and have the domain
-              logger satisfy it &mdash; but do not name both <code>Logger</code>.
+              Delete the generators' <code>Logger</code> and import the domain
+              one. If the generators genuinely only need four methods, define a
+              small <code>GeneratorLogger</code> interface in the generators
+              package and have the domain logger satisfy it &mdash; but do not
+              name both <code>Logger</code>.
             </div>
           </div>
 
@@ -1249,16 +1335,19 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             >
             <h3>Three parallel sets of recommendation functions</h3>
             <div class="where">
-              internal/domain/enums.go:232-310 &middot; enums_project.go:87-152, 216-267
+              internal/domain/enums.go:232-310 &middot; enums_project.go:87-152,
+              216-267
             </div>
             <p>
-              The same question &mdash; "what is the recommended signing level for this project?"
-              &mdash; is answered by three independent code paths: standalone functions keyed on
-              <code>ProjectType</code>, methods on <code>ProjectType</code>, and methods on
-              <code>FeatureLevel</code>. <code>NewSafeProjectConfig</code> uses one path;
-              <code>ApplyDefaults</code> uses another. They agree today for the common cases because
-              someone manually kept them in sync, but there is no compile-time guarantee they stay
-              aligned.
+              The same question &mdash; "what is the recommended signing level
+              for this project?" &mdash; is answered by three independent code
+              paths: standalone functions keyed on
+              <code>ProjectType</code>, methods on <code>ProjectType</code>, and
+              methods on <code>FeatureLevel</code>.
+              <code>NewSafeProjectConfig</code> uses one path;
+              <code>ApplyDefaults</code> uses another. They agree today for the
+              common cases because someone manually kept them in sync, but there
+              is no compile-time guarantee they stay aligned.
             </p>
             <pre><code><span class="tok-comment">// A — standalone (enums.go)</span>
 <span class="tok-keyword">func</span> <span class="tok-func">GetRecommendedSigningLevel</span>(pt <span class="tok-type">ProjectType</span>) <span class="tok-type">SigningLevel</span>
@@ -1271,9 +1360,10 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             <div class="callout callout-teal">
               <strong>Fix</strong>
               Pick one owner per question. Signing recommendations belong to
-              <code>FeatureLevel</code> (since feature level is the user-facing knob); platform and
-              architecture recommendations belong to <code>ProjectType</code>. Delete the standalone
-              functions and route every consumer through the method form.
+              <code>FeatureLevel</code> (since feature level is the user-facing
+              knob); platform and architecture recommendations belong to
+              <code>ProjectType</code>. Delete the standalone functions and
+              route every consumer through the method form.
             </div>
           </div>
 
@@ -1282,22 +1372,31 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             <span class="severity severity-important"
               >Important &middot; Identical enum, two types</span
             >
-            <h3><code>WorkflowStatus</code> duplicates <code>JobStatus</code> string values</h3>
-            <div class="where">cmd/goreleaser-wizard/types/template_data.go:89-97, 130-138</div>
+            <h3>
+              <code>WorkflowStatus</code> duplicates
+              <code>JobStatus</code> string values
+            </h3>
+            <div class="where">
+              cmd/goreleaser-wizard/types/template_data.go:89-97, 130-138
+            </div>
             <p>
-              <code>WorkflowStatus</code> and the string variant of <code>JobStatus</code> have
-              identical values (<code>pending</code>, <code>running</code>, <code>completed</code>,
-              <code>failed</code>, <code>cancelled</code>) but are separate types. They model the
-              same 5-state execution lifecycle. A job and a workflow both progress through the same
-              states; defining them twice means a future addition (e.g. <code>paused</code>) must be
-              made in two places.
+              <code>WorkflowStatus</code> and the string variant of
+              <code>JobStatus</code> have identical values
+              (<code>pending</code>, <code>running</code>,
+              <code>completed</code>, <code>failed</code>,
+              <code>cancelled</code>) but are separate types. They model the
+              same 5-state execution lifecycle. A job and a workflow both
+              progress through the same states; defining them twice means a
+              future addition (e.g. <code>paused</code>) must be made in two
+              places.
             </p>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Collapse both into a single <code>ExecutionStatus</code> type in the domain layer. A
-              workflow and a job both have an <code>ExecutionStatus</code>; the wrapper structs
-              (<code>WorkflowState</code>, <code>JobExecutionResult</code>) already differentiate
-              them.
+              Collapse both into a single <code>ExecutionStatus</code> type in
+              the domain layer. A workflow and a job both have an
+              <code>ExecutionStatus</code>; the wrapper structs
+              (<code>WorkflowState</code>, <code>JobExecutionResult</code>)
+              already differentiate them.
             </div>
           </div>
 
@@ -1308,47 +1407,64 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
             >
             <h3>Recommended platforms defined twice</h3>
             <div class="where">
-              internal/domain/enums_platform.go:195-200 &middot; enums_project.go:103-124
+              internal/domain/enums_platform.go:195-200 &middot;
+              enums_project.go:103-124
             </div>
             <p>
-              <code>GetRecommendedPlatforms()</code> returns <code>[Linux, Darwin]</code> as a fixed
-              list. <code>ProjectType.RecommendedPlatforms()</code> returns the same list via a
-              switch whose every case (except Mobile) also yields <code>[Linux, Darwin]</code>.
-              <code>NewSafeProjectConfig</code> uses the former; <code>ApplyDefaults</code> uses the
-              latter. They agree today, but a future change to add <code>PlatformWindows</code> to
-              the CLI case would silently diverge from the standalone function.
+              <code>GetRecommendedPlatforms()</code> returns
+              <code>[Linux, Darwin]</code> as a fixed list.
+              <code>ProjectType.RecommendedPlatforms()</code> returns the same
+              list via a switch whose every case (except Mobile) also yields
+              <code>[Linux, Darwin]</code>.
+              <code>NewSafeProjectConfig</code> uses the former;
+              <code>ApplyDefaults</code> uses the latter. They agree today, but
+              a future change to add <code>PlatformWindows</code> to the CLI
+              case would silently diverge from the standalone function.
             </p>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Delete <code>GetRecommendedPlatforms()</code>. Every consumer should call
-              <code>spc.ProjectType.RecommendedPlatforms()</code>. If a project-type-agnostic
-              default is needed, expose it as <code>ProjectType("").RecommendedPlatforms()</code>
+              Delete <code>GetRecommendedPlatforms()</code>. Every consumer
+              should call <code>spc.ProjectType.RecommendedPlatforms()</code>.
+              If a project-type-agnostic default is needed, expose it as
+              <code>ProjectType("").RecommendedPlatforms()</code>
               or a named constant.
             </div>
           </div>
 
           <!-- Finding 8 -->
           <div class="issue issue-nice" id="finding-8">
-            <span class="severity severity-nice">Minor &middot; Noise, not a bug today</span>
+            <span class="severity severity-nice"
+              >Minor &middot; Noise, not a bug today</span
+            >
             <h3>Eight identical error constructor functions</h3>
             <div class="where">internal/domain/errors.go:174-245</div>
             <p>
-              <code>NewValidationError</code>, <code>NewConfigurationError</code>,
+              <code>NewValidationError</code>,
+              <code>NewConfigurationError</code>,
               <code>NewBusinessRuleError</code>, <code>NewTemplateError</code>,
               <code>NewExternalServiceError</code>, <code>NewFileError</code>,
-              <code>NewConfigError</code>, and <code>NewGitError</code> all have the same signature
-              <code>(code ErrorCode, message, details string) *DomainError</code> and the same body
-              <code>return &amp;DomainError{Code: code, Message: message, Details: details}</code>.
-              They create the illusion of distinct error categories but encode no distinguishing
-              information. (<code>NewSystemError</code> is the only one that differs &mdash; it
-              takes an extra <code>cause</code> parameter.)
+              <code>NewConfigError</code>, and <code>NewGitError</code> all have
+              the same signature
+              <code
+                >(code ErrorCode, message, details string) *DomainError</code
+              >
+              and the same body
+              <code
+                >return &amp;DomainError{Code: code, Message: message, Details:
+                details}</code
+              >. They create the illusion of distinct error categories but
+              encode no distinguishing information. (<code>NewSystemError</code>
+              is the only one that differs &mdash; it takes an extra
+              <code>cause</code> parameter.)
             </p>
             <div class="callout callout-teal">
               <strong>Fix</strong>
-              Either (a) delete seven of the eight aliases and keep <code>NewValidationError</code>
-              as the single constructor, or (b) if the intent is to tag error categories, add a
-              <code>Category</code> field to <code>DomainError</code> and have each constructor set
-              it. Today they are pure ceremony.
+              Either (a) delete seven of the eight aliases and keep
+              <code>NewValidationError</code>
+              as the single constructor, or (b) if the intent is to tag error
+              categories, add a
+              <code>Category</code> field to <code>DomainError</code> and have
+              each constructor set it. Today they are pure ceremony.
             </div>
           </div>
         </section>
@@ -1356,8 +1472,9 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
         <section id="priority">
           <h2><span class="num">02</span>Priority Matrix</h2>
           <p>
-            Findings ranked by impact and effort. The critical row is where remediation should start
-            &mdash; each of those three can already produce wrong output silently.
+            Findings ranked by impact and effort. The critical row is where
+            remediation should start &mdash; each of those three can already
+            produce wrong output silently.
           </p>
           <table class="compare">
             <thead>
@@ -1383,7 +1500,8 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
               <tr>
                 <td>7</td>
                 <td>
-                  Dual validation (<code>Validate</code> vs <code>ValidateConfiguration</code>)
+                  Dual validation (<code>Validate</code> vs
+                  <code>ValidateConfiguration</code>)
                 </td>
                 <td class="no">Critical</td>
                 <td>Medium</td>
@@ -1391,7 +1509,10 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
               </tr>
               <tr>
                 <td>1</td>
-                <td>Triple <code>GetGitHubOwner</code> / <code>GetGitHubRepo</code></td>
+                <td>
+                  Triple <code>GetGitHubOwner</code> /
+                  <code>GetGitHubRepo</code>
+                </td>
                 <td class="no">Critical</td>
                 <td>Low</td>
                 <td>3</td>
@@ -1412,7 +1533,9 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
               </tr>
               <tr>
                 <td>9</td>
-                <td><code>WorkflowStatus</code> duplicates <code>JobStatus</code></td>
+                <td>
+                  <code>WorkflowStatus</code> duplicates <code>JobStatus</code>
+                </td>
                 <td class="no">Important</td>
                 <td>Low</td>
                 <td>6</td>
@@ -1452,12 +1575,15 @@ DockerSupport  = FeatureLevel.<span class="tok-func">GetRecommendedDockerSupport
         <section id="proposal">
           <h2><span class="num">03</span>Target State</h2>
           <p>
-            After remediation, each concept has exactly one definition site. The dependency graph
-            collapses from a tangled three-source mesh to a clean owner-per-concept tree.
+            After remediation, each concept has exactly one definition site. The
+            dependency graph collapses from a tangled three-source mesh to a
+            clean owner-per-concept tree.
           </p>
           <div class="compare-header">
             <div class="compare-before">Today &mdash; tangled</div>
-            <div class="compare-after">Target &mdash; one owner per concept</div>
+            <div class="compare-after">
+              Target &mdash; one owner per concept
+            </div>
           </div>
           <div class="compare-row">
             <pre><code>SafeProjectConfig
@@ -1499,16 +1625,18 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
           </div>
           <div class="callout callout-teal">
             <strong>This is the target</strong>
-            One owner per concept. The "safe" in <code>SafeProjectConfig</code> becomes truthful
-            because there is no second code path that can construct or default it differently.
+            One owner per concept. The "safe" in
+            <code>SafeProjectConfig</code> becomes truthful because there is no
+            second code path that can construct or default it differently.
           </div>
         </section>
 
         <section id="roadmap">
           <h2><span class="num">04</span>Remediation</h2>
           <p>
-            Ordered so each step is independently shippable and verifiable. Steps 1&ndash;3 close
-            the critical silent-divergence gaps; steps 4&ndash;10 are mechanical consolidation.
+            Ordered so each step is independently shippable and verifiable.
+            Steps 1&ndash;3 close the critical silent-divergence gaps; steps
+            4&ndash;10 are mechanical consolidation.
           </p>
 
           <div class="migration-step">
@@ -1516,10 +1644,12 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
             <div class="migration-content">
               <h4>Collapse defaults to <code>ApplyDefaults</code></h4>
               <p>
-                Make <code>NewSafeProjectConfig</code> set only <code>State</code> and then call
-                <code>ApplyDefaults</code>. Add a table-driven test that constructs a config via the
-                constructor and via YAML-hydration-plus-<code>ApplyDefaults</code> and asserts field
-                equality. Files: <code>config_core.go</code>, <code>config_defaults.go</code>.
+                Make <code>NewSafeProjectConfig</code> set only
+                <code>State</code> and then call <code>ApplyDefaults</code>. Add
+                a table-driven test that constructs a config via the constructor
+                and via YAML-hydration-plus-<code>ApplyDefaults</code> and
+                asserts field equality. Files: <code>config_core.go</code>,
+                <code>config_defaults.go</code>.
               </p>
             </div>
           </div>
@@ -1529,11 +1659,13 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
             <div class="migration-content">
               <h4>Unify validation behind <code>ValidationUseCase</code></h4>
               <p>
-                Replace <code>SafeProjectConfig.Validate()</code> body with a delegate call to
+                Replace <code>SafeProjectConfig.Validate()</code> body with a
+                delegate call to
                 <code>ValidationUseCase.ValidateConfiguration</code>. Move
-                <code>exec.LookPath</code> out of the domain into an infrastructure checker. Audit
-                error codes so every field uses its dedicated code (<code>ErrInvalidPlatform</code>,
-                not <code>ErrInvalidProjectName</code>).
+                <code>exec.LookPath</code> out of the domain into an
+                infrastructure checker. Audit error codes so every field uses
+                its dedicated code (<code>ErrInvalidPlatform</code>, not
+                <code>ErrInvalidProjectName</code>).
               </p>
             </div>
           </div>
@@ -1541,13 +1673,17 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
           <div class="migration-step">
             <div class="migration-num">3</div>
             <div class="migration-content">
-              <h4>Delete duplicate <code>GetGitHubOwner</code> / <code>GetGitHubRepo</code></h4>
+              <h4>
+                Delete duplicate <code>GetGitHubOwner</code> /
+                <code>GetGitHubRepo</code>
+              </h4>
               <p>
-                Keep <code>internal/git/commands.go</code> as canonical. Remove the wrappers in
+                Keep <code>internal/git/commands.go</code> as canonical. Remove
+                the wrappers in
                 <code>internal/utils/recommendations.go</code> and the
                 <code>parseGitHubRemote</code>-based versions in
-                <code>types/template_data.go</code>. Extract the <code>"owner"</code> sentinel to a
-                named constant.
+                <code>types/template_data.go</code>. Extract the
+                <code>"owner"</code> sentinel to a named constant.
               </p>
             </div>
           </div>
@@ -1555,12 +1691,17 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
           <div class="migration-step">
             <div class="migration-num">4</div>
             <div class="migration-content">
-              <h4>Collapse <code>JobStatus</code> / <code>WorkflowStatus</code> into one type</h4>
+              <h4>
+                Collapse <code>JobStatus</code> /
+                <code>WorkflowStatus</code> into one type
+              </h4>
               <p>
-                Introduce <code>domain.ExecutionStatus</code> (string-based, with all current
-                members). Delete both <code>cmd/.../job_manager.go</code>'s <code>int</code> version
-                and <code>types/template_data.go</code>'s two string versions. Update
-                <code>WorkflowState</code> and <code>JobExecutionResult</code> to use it.
+                Introduce <code>domain.ExecutionStatus</code> (string-based,
+                with all current members). Delete both
+                <code>cmd/.../job_manager.go</code>'s <code>int</code> version
+                and <code>types/template_data.go</code>'s two string versions.
+                Update <code>WorkflowState</code> and
+                <code>JobExecutionResult</code> to use it.
               </p>
             </div>
           </div>
@@ -1569,14 +1710,16 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
             <div class="migration-num">5</div>
             <div class="migration-content">
               <h4>
-                Consolidate <code>ValidationResult</code>, <code>Logger</code>, recommendation
-                functions
+                Consolidate <code>ValidationResult</code>, <code>Logger</code>,
+                recommendation functions
               </h4>
               <p>
-                Delete <code>internal/types/validation.go</code>'s <code>ValidationResult</code> (or
-                rename to DTO). Delete the generators' <code>Logger</code>. Delete standalone
-                <code>GetRecommended*</code> functions whose logic already lives as methods on
-                <code>ProjectType</code> / <code>FeatureLevel</code>.
+                Delete <code>internal/types/validation.go</code>'s
+                <code>ValidationResult</code> (or rename to DTO). Delete the
+                generators' <code>Logger</code>. Delete standalone
+                <code>GetRecommended*</code> functions whose logic already lives
+                as methods on <code>ProjectType</code> /
+                <code>FeatureLevel</code>.
               </p>
             </div>
           </div>
@@ -1584,11 +1727,13 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
           <div class="migration-step">
             <div class="migration-num">6</div>
             <div class="migration-content">
-              <h4>Cleanup pass &mdash; error constructors and platform defaults</h4>
+              <h4>
+                Cleanup pass &mdash; error constructors and platform defaults
+              </h4>
               <p>
                 Collapse the eight identical error constructors to one (or add a
-                <code>Category</code> field that actually distinguishes them). Delete
-                <code>GetRecommendedPlatforms()</code> in favor of
+                <code>Category</code> field that actually distinguishes them).
+                Delete <code>GetRecommendedPlatforms()</code> in favor of
                 <code>ProjectType.RecommendedPlatforms()</code>.
               </p>
             </div>
@@ -1596,10 +1741,12 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
         </section>
 
         <section id="appendix">
-          <h2><span class="num">05</span>Appendix &mdash; Verification Checklist</h2>
+          <h2>
+            <span class="num">05</span>Appendix &mdash; Verification Checklist
+          </h2>
           <p>
-            After remediation, these properties should hold. Each is a candidate for a regression
-            test.
+            After remediation, these properties should hold. Each is a candidate
+            for a regression test.
           </p>
           <table class="compare">
             <thead>
@@ -1617,16 +1764,20 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
               </tr>
               <tr>
                 <td>
-                  <code>NewSafeProjectConfig()</code> and YAML+<code>ApplyDefaults()</code> produce
-                  equal configs
+                  <code>NewSafeProjectConfig()</code> and YAML+<code
+                    >ApplyDefaults()</code
+                  >
+                  produce equal configs
                 </td>
-                <td class="no">Diverge on FeatureLevel, SigningLevel, DockerSupport</td>
+                <td class="no">
+                  Diverge on FeatureLevel, SigningLevel, DockerSupport
+                </td>
                 <td class="yes">Equal for every ProjectType</td>
               </tr>
               <tr>
                 <td>
-                  <code>Validate()</code> and <code>ValidateConfiguration()</code> agree on every
-                  input
+                  <code>Validate()</code> and
+                  <code>ValidateConfiguration()</code> agree on every input
                 </td>
                 <td class="no">Different codes, different rules</td>
                 <td class="yes">One delegates to the other</td>
@@ -1637,7 +1788,9 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
                 <td class="yes">One</td>
               </tr>
               <tr>
-                <td>One <code>Logger</code> interface named <code>Logger</code></td>
+                <td>
+                  One <code>Logger</code> interface named <code>Logger</code>
+                </td>
                 <td class="no">Two (12-method and 4-method)</td>
                 <td class="yes">One</td>
               </tr>
@@ -1657,9 +1810,9 @@ domain.ValidationResult  <span class="tok-comment">// canonical</span></code></p
 
         <footer class="footer">
           <p>
-            Generated 2026-06-19 &middot; Reviewed against GoReleaser-Wizard master (commit a6719bc)
-            &middot; All findings verified against source code; line numbers current as of audit
-            date
+            Generated 2026-06-19 &middot; Reviewed against GoReleaser-Wizard
+            master (commit a6719bc) &middot; All findings verified against
+            source code; line numbers current as of audit date
           </p>
         </footer>
       </main>

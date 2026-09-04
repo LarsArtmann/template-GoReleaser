@@ -1,7 +1,7 @@
 # Comprehensive Status Report: GoReleaser-Wizard
 
-**Date:** 2026-03-25 21:58  
-**Report Type:** Post-Migration Status & Full Project Assessment  
+**Date:** 2026-03-25 21:58\
+**Report Type:** Post-Migration Status & Full Project Assessment\
 **Status:** ✅ MIGRATION SUCCESSFUL - All Systems Operational
 
 ---
@@ -92,12 +92,12 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 1. Test Coverage (CRITICAL GAP)
 
-| Package                 | Current | Target | Gap       |
-| ----------------------- | ------- | ------ | --------- |
-| `cmd/goreleaser-wizard` | 51.9%   | 80%    | -28.1%    |
+| Package                 | Current | Target | Gap      |
+| ----------------------- | ------- | ------ | -------- |
+| `cmd/goreleaser-wizard` | 51.9%   | 80%    | -28.1%   |
 | `internal/domain`       | 0.7%    | 80%    | -79.3% ⚠️ |
 | `internal/types`        | 1.7%    | 80%    | -78.3% ⚠️ |
-| `internal/validation`   | 56.3%   | 80%    | -23.7%    |
+| `internal/validation`   | 56.3%   | 80%    | -23.7%   |
 
 **Untested Packages (0% coverage):**
 
@@ -112,8 +112,8 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 2. File Size Management
 
-| File                                         | Lines | Limit | Status       |
-| -------------------------------------------- | ----- | ----- | ------------ |
+| File                                         | Lines | Limit | Status      |
+| -------------------------------------------- | ----- | ----- | ----------- |
 | `cmd/goreleaser-wizard/jobs.go`              | 848   | 300   | ⚠️ 283% over |
 | `internal/types/validation.go`               | 857   | 300   | ⚠️ 286% over |
 | `cmd/goreleaser-wizard/workflow.go`          | 467   | 300   | ⚠️ 56% over  |
@@ -124,18 +124,18 @@ Successfully completed migration from `charmbracelet/log` v1 and `charmbracelet/
 
 ### 3. Architecture Enforcement
 
-| Component               | Status                     |
-| ----------------------- | -------------------------- |
-| go-arch-lint configured | ✅                         |
-| Deep scanning enabled   | ✅                         |
+| Component               | Status                    |
+| ----------------------- | ------------------------- |
+| go-arch-lint configured | ✅                        |
+| Deep scanning enabled   | ✅                        |
 | CI integration          | ⚠️ Works but slow          |
 | Pre-commit hooks        | ⚠️ 1+ minute timeout issue |
 
 ### 4. Code Quality
 
-| Aspect              | Status                                  |
-| ------------------- | --------------------------------------- |
-| golangci-lint       | ✅ 100+ linters enabled                 |
+| Aspect              | Status                                 |
+| ------------------- | -------------------------------------- |
+| golangci-lint       | ✅ 100+ linters enabled                |
 | Error wrapping      | ⚠️ Partial - some `fmt.Errorf` remain   |
 | Context propagation | ⚠️ Partial - some functions missing ctx |
 | Type safety         | ⚠️ Some `map[string]any` remain         |
@@ -421,5 +421,5 @@ The charmbracelet/log v2 migration is complete and successful. The project build
 
 ---
 
-_Report generated: 2026-03-25 21:58_  
+_Report generated: 2026-03-25 21:58_\
 _Migration completed: 2026-03-25 21:55_

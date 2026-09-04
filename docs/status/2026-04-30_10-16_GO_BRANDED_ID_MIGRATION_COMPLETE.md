@@ -1,8 +1,8 @@
 # Status Report: Go-Branded-ID Migration
 
-**Date:** 2026-04-30 10:16 AM CEST  
-**Project:** GoReleaser-Wizard  
-**Branch:** master  
+**Date:** 2026-04-30 10:16 AM CEST\
+**Project:** GoReleaser-Wizard\
+**Branch:** master\
 **Status:** 🟢 MIGRATION COMPLETE
 
 ---
